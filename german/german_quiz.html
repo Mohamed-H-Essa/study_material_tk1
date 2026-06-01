@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>German Level Quiz (A1–B1)</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;max-width:700px;margin:0 auto;padding:20px;background:#fafafa;color:#222}
+h1{font-size:22px;margin-bottom:4px}
+.subtitle{color:#666;font-size:14px;margin-bottom:20px}
+.progress{height:6px;background:#ddd;border-radius:4px;margin-bottom:6px}
+.progress-fill{height:100%;background:#3b82f6;border-radius:4px;transition:width .3s}
+.progress-text{font-size:12px;color:#888;text-align:right;margin-bottom:16px}
+.card{background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:20px;margin-bottom:16px}
+.level-tag{display:inline-block;font-size:11px;font-weight:600;padding:2px 10px;border-radius:12px;margin-bottom:10px}
+.a1{background:#dcfce7;color:#166534}.a2{background:#dbeafe;color:#1e40af}.b1{background:#ede9fe;color:#5b21b6}
+.q-text{font-size:15px;margin-bottom:14px;line-height:1.5}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.opt{padding:10px 12px;border:1px solid #d0d0d0;border-radius:6px;background:#fff;cursor:pointer;font-size:14px;text-align:left}
+.opt:hover{border-color:#999}.opt.sel{border-color:#3b82f6;background:#eff6ff;color:#1d4ed8}
+.conf-label{font-size:12px;color:#888;margin-bottom:6px}
+.confs{display:flex;gap:6px;flex-wrap:wrap}
+.conf{padding:4px 12px;border:1px solid #d0d0d0;border-radius:16px;font-size:12px;cursor:pointer;background:#fff}
+.conf:hover{border-color:#999}
+.conf.s-sure{border-color:#16a34a;background:#f0fdf4;color:#166534}
+.conf.s-think{border-color:#2563eb;background:#eff6ff;color:#1e40af}
+.conf.s-guess{border-color:#d97706;background:#fffbeb;color:#92400e}
+.conf.s-noidea{border-color:#dc2626;background:#fef2f2;color:#991b1b}
+.nav{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+.btn{padding:8px 20px;border:1px solid #ccc;border-radius:6px;background:#fff;cursor:pointer;font-size:14px}
+.btn:disabled{opacity:.3;cursor:default}.btn.primary{background:#3b82f6;color:#fff;border-color:#3b82f6}
+.skip{font-size:13px;color:#999;background:none;border:none;cursor:pointer;text-decoration:underline}
+.results{display:none}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}
+.stat{background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:14px;text-align:center}
+.stat-n{font-size:24px;font-weight:600}.stat-l{font-size:12px;color:#888;margin-top:2px}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.bar-label{font-size:13px;width:40px;color:#666}
+.bar-bg{flex:1;height:8px;background:#e5e7eb;border-radius:4px;overflow:hidden}
+.bar-fg{height:100%;border-radius:4px}
+.bar-pct{font-size:12px;color:#888;width:40px;text-align:right}
+.dl-btn{width:100%;padding:12px;background:#3b82f6;color:#fff;border:none;border-radius:6px;font-size:14px;cursor:pointer;margin-top:16px}
+.dl-btn:hover{background:#2563eb}
+.instructions{background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:16px;margin-top:12px;font-size:13px;color:#555;line-height:1.6}
+</style>
+</head>
+<body>
+
+<div id="quizArea">
+<h1>German level assessment</h1>
+<p class="subtitle">30 questions · A1 to B1 · pick an answer + confidence</p>
+<div class="progress"><div class="progress-fill" id="pFill" style="width:0%"></div></div>
+<div class="progress-text" id="pText">1 / 30</div>
+<div id="qArea"></div>
+<div class="nav">
+  <button class="btn" id="prevBtn" onclick="go(-1)" disabled>← Back</button>
+  <button class="skip" onclick="doSkip()">Skip</button>
+  <button class="btn primary" id="nextBtn" onclick="go(1)">Next →</button>
+</div>
+</div>
+
+<div class="results" id="results">
+<h1>Results</h1>
+<div class="stats" id="statsGrid"></div>
+<div id="bars"></div>
+<button class="dl-btn" onclick="dlCSV()">⬇ Download CSV</button>
+<div class="instructions">
+  <strong>Next step:</strong> Open Claude, paste the CSV contents, and ask:<br>
+  "Analyze my German quiz results and give me a study plan for my weak areas."
+</div>
+</div>
+
+<script>
+const QS=[
+  {id:1,lv:"A1",top:"Vocabulary",q:"What does 'Hund' mean?",o:["Cat","Dog","House","Car"],a:1},
+  {id:2,lv:"A1",top:"Pronouns",q:"Which pronoun means 'she'?",o:["er","ich","sie","wir"],a:2},
+  {id:3,lv:"A1",top:"Numbers",q:"What is 'zwanzig'?",o:["12","20","22","30"],a:1},
+  {id:4,lv:"A1",top:"Articles",q:"Fill in: ___ Mann trinkt Wasser.",o:["Die","Das","Den","Der"],a:3},
+  {id:5,lv:"A1",top:"Verbs",q:"Conjugation: 'ich ___' (sein)",o:["bin","bist","ist","sind"],a:0},
+  {id:6,lv:"A1",top:"Greetings",q:"How do you say 'Good evening'?",o:["Guten Morgen","Guten Tag","Guten Abend","Auf Wiedersehen"],a:2},
+  {id:7,lv:"A1",top:"Negation",q:"Which word means 'not'?",o:["kein","auch","nicht","viel"],a:2},
+  {id:8,lv:"A1",top:"Colors",q:"What color is 'schwarz'?",o:["White","Red","Blue","Black"],a:3},
+  {id:9,lv:"A1",top:"Questions",q:"What does 'Wie heißt du?' mean?",o:["Where do you live?","What is your name?","How old are you?","Where are you from?"],a:1},
+  {id:10,lv:"A1",top:"Possession",q:"'Mein' means:",o:["Your","His","My","Our"],a:2},
+  {id:11,lv:"A2",top:"Cases",q:"Fill in: Ich sehe ___ Frau. (accusative)",o:["die","der","dem","des"],a:0},
+  {id:12,lv:"A2",top:"Perfekt",q:"'Ich habe gegessen' means:",o:["I am eating","I will eat","I have eaten","I was eating"],a:2},
+  {id:13,lv:"A2",top:"Prepositions",q:"Which preposition always takes Dative?",o:["durch","für","mit","ohne"],a:2},
+  {id:14,lv:"A2",top:"Word order",q:"Correct sentence?",o:["Ich gehe heute ins Kino.","Ich heute gehe ins Kino.","Heute ich gehe ins Kino.","Ich ins Kino gehe heute."],a:0},
+  {id:15,lv:"A2",top:"Modal verbs",q:"'Ich kann schwimmen' means:",o:["I must swim","I can swim","I want to swim","I should swim"],a:1},
+  {id:16,lv:"A2",top:"Adjective endings",q:"'Das rote Auto' — the ending is:",o:["-en","-er","-em","-e"],a:3},
+  {id:17,lv:"A2",top:"Comparatives",q:"'schneller' is the comparative of:",o:["langsam","groß","schnell","klein"],a:2},
+  {id:18,lv:"A2",top:"Separable verbs",q:"Er ___ das Licht ___ (anmachen)",o:["macht … an","anmacht …","machen … an","an … macht"],a:0},
+  {id:19,lv:"A2",top:"Dative pronouns",q:"'Mir' is the Dative of:",o:["er","du","ich","sie"],a:2},
+  {id:20,lv:"A2",top:"Time expressions",q:"'vorgestern' means:",o:["yesterday","tomorrow","day before yesterday","last week"],a:2},
+  {id:21,lv:"B1",top:"Subordinate clauses",q:"Correct word order after 'weil':",o:["…weil ich müde bin.","…weil ich bin müde.","…weil bin ich müde.","…weil müde ich bin."],a:0},
+  {id:22,lv:"B1",top:"Konjunktiv II",q:"'Ich würde gerne reisen' expresses:",o:["a past action","a command","a wish / hypothetical","a question"],a:2},
+  {id:23,lv:"B1",top:"Passiv",q:"'Das Buch wird gelesen' is:",o:["active voice","passive voice","future tense","past perfect"],a:1},
+  {id:24,lv:"B1",top:"Wechselpräpositionen",q:"'Ich lege das Buch ___ den Tisch.' (movement)",o:["auf","an","in","über"],a:0},
+  {id:25,lv:"B1",top:"Relative clauses",q:"'Der Mann, ___ ich kenne.' (accusative)",o:["den","dem","dessen","der"],a:0},
+  {id:26,lv:"B1",top:"Genitiv",q:"'Das Auto meines Vaters' — case of 'meines Vaters'?",o:["Nominative","Accusative","Genitive","Dative"],a:2},
+  {id:27,lv:"B1",top:"Infinitiv mit zu",q:"'Ich versuche, Deutsch zu lernen.' — 'zu lernen' is:",o:["modal verb","separable verb","infinitive with zu","subordinate clause verb"],a:2},
+  {id:28,lv:"B1",top:"Conjunctions",q:"'obwohl' introduces a:",o:["causal clause","concessive clause","temporal clause","conditional clause"],a:1},
+  {id:29,lv:"B1",top:"Reflexive verbs",q:"'Ich wasche mich.' — 'mich' is:",o:["direct object","reflexive pronoun","dative pronoun","possessive pronoun"],a:1},
+  {id:30,lv:"B1",top:"Vocabulary (B1)",q:"'die Unterkunft' means:",o:["university","accommodation","underground","environment"],a:1}
+];
+const CL=[{k:"sure",l:"Sure",c:"s-sure"},{k:"think",l:"I think so",c:"s-think"},{k:"guess",l:"Guessing",c:"s-guess"},{k:"noidea",l:"No idea",c:"s-noidea"}];
+let ans={},cur=0;
+
+function render(i){
+  const q=QS[i],s=ans[q.id]||{};
+  document.getElementById('pFill').style.width=((i+1)/QS.length*100)+'%';
+  document.getElementById('pText').textContent=(i+1)+' / '+QS.length;
+  document.getElementById('prevBtn').disabled=i===0;
+  document.getElementById('nextBtn').textContent=i===QS.length-1?'Finish ✓':'Next →';
+  const tc=q.lv==='A1'?'a1':q.lv==='A2'?'a2':'b1';
+  let oh=q.o.map((x,j)=>`<button class="opt${s.a===j?' sel':''}" onclick="pick(${q.id},${j},this)">${x}</button>`).join('');
+  let ch=CL.map(c=>`<button class="conf${s.c===c.k?' '+c.c:''}" onclick="pickC(${q.id},'${c.k}','${c.c}',this)">${c.l}</button>`).join('');
+  document.getElementById('qArea').innerHTML=`<div class="card"><span class="level-tag ${tc}">${q.lv} · ${q.top}</span><div class="q-text">${q.q}</div><div class="opts">${oh}</div><div class="conf-label">Confidence:</div><div class="confs">${ch}</div></div>`;
+}
+function pick(id,j,el){if(!ans[id])ans[id]={};ans[id].a=j;el.parentElement.querySelectorAll('.opt').forEach(b=>b.classList.remove('sel'));el.classList.add('sel')}
+function pickC(id,k,cls,el){if(!ans[id])ans[id]={};ans[id].c=k;el.parentElement.querySelectorAll('.conf').forEach(b=>b.className='conf');el.classList.add(cls)}
+function go(d){const n=cur+d;if(n>=QS.length){showResults();return}if(n<0)return;cur=n;render(cur)}
+function doSkip(){if(!ans[QS[cur].id])ans[QS[cur].id]={skip:true};go(1)}
+
+function showResults(){
+  document.getElementById('quizArea').style.display='none';
+  document.getElementById('results').style.display='block';
+  let tot=0,cor=0;const by={A1:{c:0,t:0},A2:{c:0,t:0},B1:{c:0,t:0}};
+  QS.forEach(q=>{const a=ans[q.id];by[q.lv].t++;if(a&&a.a===q.a){cor++;by[q.lv].c++}tot++});
+  const sk=QS.filter(q=>!ans[q.id]||ans[q.id].skip).length;
+  document.getElementById('statsGrid').innerHTML=`<div class="stat"><div class="stat-n">${cor}/${tot}</div><div class="stat-l">Correct</div></div><div class="stat"><div class="stat-n">${Math.round(cor/tot*100)}%</div><div class="stat-l">Score</div></div><div class="stat"><div class="stat-n">${sk}</div><div class="stat-l">Skipped</div></div>`;
+  const colors={A1:'#22c55e',A2:'#3b82f6',B1:'#8b5cf6'};
+  document.getElementById('bars').innerHTML=Object.entries(by).map(([l,v])=>{const p=v.t?Math.round(v.c/v.t*100):0;return`<div class="bar-row"><span class="bar-label">${l}</span><div class="bar-bg"><div class="bar-fg" style="width:${p}%;background:${colors[l]}"></div></div><span class="bar-pct">${p}%</span></div>`}).join('');
+}
+
+function dlCSV(){
+  const rows=[['Question','Level','Topic','Question Text','Your Answer','Correct Answer','Correct?','Confidence']];
+  QS.forEach(q=>{const a=ans[q.id]||{};const sk=a.skip||a.a===undefined;rows.push([q.id,q.lv,q.top,'"'+q.q+'"',sk?'Skipped':'"'+q.o[a.a]+'"','"'+q.o[q.a]+'"',!sk&&a.a===q.a?'Yes':sk?'Skipped':'No',a.c||'not set'])});
+  const csv=rows.map(r=>r.join(',')).join('\n');
+  const b=new Blob([csv],{type:'text/csv'});
+  const u=URL.createObjectURL(b);
+  const a=document.createElement('a');a.href=u;a.download='german_quiz_results.csv';a.click();URL.revokeObjectURL(u);
+}
+
+render(0);
+</script>
+</body>
+</html>

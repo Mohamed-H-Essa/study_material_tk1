@@ -1,0 +1,31 @@
+Question,Level,Topic,Question Text,Your Answer,Correct Answer,Correct?,Confidence
+1,A1,Vocabulary,"What does 'Hund' mean?","Dog","Dog",Yes,sure
+2,A1,Pronouns,"Which pronoun means 'she'?","sie","sie",Yes,sure
+3,A1,Numbers,"What is 'zwanzig'?","20","20",Yes,sure
+4,A1,Articles,"Fill in: ___ Mann trinkt Wasser.","Der","Der",Yes,sure
+5,A1,Verbs,"Conjugation: 'ich ___' (sein)","bin","bin",Yes,sure
+6,A1,Greetings,"How do you say 'Good evening'?","Guten Tag","Guten Abend",No,sure
+7,A1,Negation,"Which word means 'not'?","nicht","nicht",Yes,sure
+8,A1,Colors,"What color is 'schwarz'?","White","Black",No,sure
+9,A1,Questions,"What does 'Wie heißt du?' mean?","What is your name?","What is your name?",Yes,sure
+10,A1,Possession,"'Mein' means:","My","My",Yes,sure
+11,A2,Cases,"Fill in: Ich sehe ___ Frau. (accusative)","die","die",Yes,think
+12,A2,Perfekt,"'Ich habe gegessen' means:","I have eaten","I have eaten",Yes,guess
+13,A2,Prepositions,"Which preposition always takes Dative?",Skipped,"mit",Skipped,noidea
+14,A2,Word order,"Correct sentence?","Heute ich gehe ins Kino.","Ich gehe heute ins Kino.",No,guess
+15,A2,Modal verbs,"'Ich kann schwimmen' means:","I can swim","I can swim",Yes,think
+16,A2,Adjective endings,"'Das rote Auto' — the ending is:","-e","-e",Yes,guess
+17,A2,Comparatives,"'schneller' is the comparative of:","schnell","schnell",Yes,sure
+18,A2,Separable verbs,"Er ___ das Licht ___ (anmachen)","macht … an","macht … an",Yes,think
+19,A2,Dative pronouns,"'Mir' is the Dative of:","ich","ich",Yes,think
+20,A2,Time expressions,"'vorgestern' means:",Skipped,"day before yesterday",Skipped,noidea
+21,B1,Subordinate clauses,"Correct word order after 'weil':",Skipped,"…weil ich müde bin.",Skipped,noidea
+22,B1,Konjunktiv II,"'Ich würde gerne reisen' expresses:",Skipped,"a wish / hypothetical",Skipped,noidea
+23,B1,Passiv,"'Das Buch wird gelesen' is:",Skipped,"passive voice",Skipped,noidea
+24,B1,Wechselpräpositionen,"'Ich lege das Buch ___ den Tisch.' (movement)","an","auf",No,guess
+25,B1,Relative clauses,"'Der Mann, ___ ich kenne.' (accusative)","dessen","den",No,noidea
+26,B1,Genitiv,"'Das Auto meines Vaters' — case of 'meines Vaters'?",Skipped,"Genitive",Skipped,noidea
+27,B1,Infinitiv mit zu,"'Ich versuche, Deutsch zu lernen.' — 'zu lernen' is:",Skipped,"infinitive with zu",Skipped,noidea
+28,B1,Conjunctions,"'obwohl' introduces a:",Skipped,"concessive clause",Skipped,noidea
+29,B1,Reflexive verbs,"'Ich wasche mich.' — 'mich' is:",Skipped,"reflexive pronoun",Skipped,noidea
+30,B1,Vocabulary (B1),"'die Unterkunft' means:",Skipped,"accommodation",Skipped,noidea

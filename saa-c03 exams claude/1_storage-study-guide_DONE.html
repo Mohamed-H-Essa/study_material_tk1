@@ -1,0 +1,1454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAA-C03 Storage Deep Dive — Exam Prep</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,300;8..60,400;8..60,600;8..60,700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0e1117;
+  --surface: #161b22;
+  --surface-2: #1c2333;
+  --border: #2a3142;
+  --text: #c9d1d9;
+  --text-dim: #8b949e;
+  --text-bright: #e6edf3;
+  --accent: #f0883e;
+  --accent-dim: #f0883e33;
+  --green: #3fb950;
+  --green-dim: #3fb95022;
+  --red: #f85149;
+  --red-dim: #f8514922;
+  --blue: #58a6ff;
+  --blue-dim: #58a6ff22;
+  --purple: #bc8cff;
+  --yellow: #d29922;
+  --yellow-dim: #d2992222;
+  --mono: 'IBM Plex Mono', monospace;
+  --serif: 'Source Serif 4', Georgia, serif;
+  --sans: 'DM Sans', system-ui, sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 17px;
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* === PROGRESS BAR === */
+#progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--yellow), var(--green));
+  z-index: 1000;
+  transition: width 0.15s;
+  width: 0%;
+}
+
+/* === HEADER === */
+header {
+  border-bottom: 1px solid var(--border);
+  padding: 60px 0 50px;
+  text-align: center;
+  background: linear-gradient(180deg, #131820 0%, var(--bg) 100%);
+}
+header .badge {
+  display: inline-block;
+  background: var(--accent-dim);
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 6px 16px;
+  border-radius: 4px;
+  border: 1px solid var(--accent);
+  margin-bottom: 20px;
+}
+header h1 {
+  font-family: var(--serif);
+  font-size: clamp(32px, 5vw, 52px);
+  font-weight: 700;
+  color: var(--text-bright);
+  line-height: 1.15;
+  max-width: 700px;
+  margin: 0 auto 16px;
+}
+header p {
+  color: var(--text-dim);
+  font-size: 17px;
+  max-width: 540px;
+  margin: 0 auto;
+}
+
+/* === SCORE PANEL === */
+#score-panel {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 22px;
+  z-index: 999;
+  font-family: var(--mono);
+  font-size: 13px;
+  box-shadow: 0 8px 32px #00000066;
+  min-width: 180px;
+}
+#score-panel .score-title {
+  color: var(--text-dim);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+#score-panel .score-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 4px 0;
+}
+#score-panel .correct { color: var(--green); }
+#score-panel .wrong { color: var(--red); }
+#score-panel .total { color: var(--text-bright); font-weight: 600; }
+
+/* === LAYOUT === */
+.container {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 0 28px;
+}
+
+/* === SECTIONS === */
+.section {
+  padding: 60px 0;
+  border-bottom: 1px solid var(--border);
+}
+.section-num {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--accent);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.section h2 {
+  font-family: var(--serif);
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--text-bright);
+  margin-bottom: 24px;
+  line-height: 1.3;
+}
+.section h3 {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-bright);
+  margin: 36px 0 16px;
+}
+.section p {
+  margin-bottom: 16px;
+}
+
+/* === TABLES === */
+.table-wrap {
+  overflow-x: auto;
+  margin: 24px 0;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  font-family: var(--mono);
+}
+thead th {
+  background: var(--surface-2);
+  color: var(--accent);
+  font-weight: 600;
+  text-align: left;
+  padding: 12px 16px;
+  border-bottom: 2px solid var(--border);
+  white-space: nowrap;
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--surface-2); }
+td.highlight {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* === KEY POINTS === */
+.key-point {
+  background: var(--surface);
+  border-left: 3px solid var(--accent);
+  padding: 16px 20px;
+  margin: 20px 0;
+  border-radius: 0 8px 8px 0;
+  font-size: 15px;
+}
+.key-point strong {
+  color: var(--accent);
+}
+
+.exam-tip {
+  background: var(--yellow-dim);
+  border-left: 3px solid var(--yellow);
+  padding: 16px 20px;
+  margin: 20px 0;
+  border-radius: 0 8px 8px 0;
+  font-size: 15px;
+}
+.exam-tip::before {
+  content: '⚠ EXAM TIP: ';
+  color: var(--yellow);
+  font-weight: 700;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+
+.vs-box {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 20px 0;
+}
+.vs-box > div {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 18px;
+}
+.vs-box > div h4 {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--blue);
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+}
+.vs-box > div ul {
+  list-style: none;
+  padding: 0;
+}
+.vs-box > div ul li {
+  font-size: 14px;
+  padding: 3px 0;
+  color: var(--text);
+}
+.vs-box > div ul li::before {
+  content: '→ ';
+  color: var(--text-dim);
+}
+
+code {
+  font-family: var(--mono);
+  background: var(--surface-2);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 14px;
+  color: var(--purple);
+}
+
+ul.content-list {
+  padding-left: 20px;
+  margin: 12px 0;
+}
+ul.content-list li {
+  margin: 6px 0;
+  color: var(--text);
+}
+ul.content-list li strong {
+  color: var(--text-bright);
+}
+
+/* === MCQ === */
+.quiz-block {
+  margin: 40px 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.quiz-header {
+  background: var(--surface-2);
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.quiz-header .q-badge {
+  background: var(--accent);
+  color: var(--bg);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 4px;
+  letter-spacing: 1px;
+}
+.quiz-header .q-label {
+  font-size: 13px;
+  color: var(--text-dim);
+  font-family: var(--mono);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.quiz-body {
+  padding: 22px;
+}
+.quiz-body .question-text {
+  font-size: 16px;
+  color: var(--text-bright);
+  margin-bottom: 18px;
+  line-height: 1.6;
+}
+.quiz-body .option {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 8px 0;
+  color: var(--text);
+  font-size: 15px;
+  font-family: var(--sans);
+  cursor: pointer;
+  transition: all 0.15s;
+  line-height: 1.5;
+}
+.quiz-body .option:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+.quiz-body .option .opt-letter {
+  font-family: var(--mono);
+  font-weight: 600;
+  color: var(--accent);
+  margin-right: 10px;
+}
+.quiz-body .option.correct {
+  border-color: var(--green);
+  background: var(--green-dim);
+  color: var(--green);
+}
+.quiz-body .option.wrong {
+  border-color: var(--red);
+  background: var(--red-dim);
+  color: var(--red);
+}
+.quiz-body .option.reveal-correct {
+  border-color: var(--green);
+  background: var(--green-dim);
+}
+.quiz-body .explanation {
+  display: none;
+  margin-top: 16px;
+  padding: 16px;
+  background: var(--bg);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--text);
+}
+.quiz-body .explanation .exp-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--yellow);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+.quiz-body .explanation strong {
+  color: var(--text-bright);
+}
+
+/* === TOC === */
+.toc {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 30px;
+  margin: 40px 0;
+}
+.toc h3 {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 18px;
+}
+.toc a {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 8px 0;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 15px;
+  transition: color 0.15s;
+  border-bottom: 1px solid var(--border);
+}
+.toc a:last-child { border-bottom: none; }
+.toc a:hover { color: var(--accent); }
+.toc a .toc-num {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-dim);
+  min-width: 28px;
+}
+
+/* === FOOTER === */
+footer {
+  padding: 40px 0;
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 13px;
+  font-family: var(--mono);
+}
+
+@media (max-width: 640px) {
+  .vs-box { grid-template-columns: 1fr; }
+  #score-panel { bottom: 12px; right: 12px; left: 12px; min-width: unset; }
+  .container { padding: 0 16px; }
+  .section { padding: 40px 0; }
+}
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<header>
+  <div class="badge">AWS SAA-C03 Exam Prep</div>
+  <h1>Storage Services Deep Dive</h1>
+  <p>EBS volume types, FSx vs EFS, session management, and everything in between — with exam-style questions after every section.</p>
+</header>
+
+<div class="container">
+
+  <nav class="toc">
+    <h3>Table of Contents</h3>
+    <a href="#s1"><span class="toc-num">01</span> EBS Volume Types & Limits</a>
+    <a href="#s2"><span class="toc-num">02</span> EBS Snapshots, Encryption & Multi-Attach</a>
+    <a href="#s3"><span class="toc-num">03</span> Instance Store vs EBS</a>
+    <a href="#s4"><span class="toc-num">04</span> EFS — Elastic File System</a>
+    <a href="#s5"><span class="toc-num">05</span> FSx Family (Lustre, Windows, NetApp, OpenZFS)</a>
+    <a href="#s6"><span class="toc-num">06</span> EFS vs FSx for Lustre — When to Use Which</a>
+    <a href="#s7"><span class="toc-num">07</span> S3 Storage Classes & Lifecycle</a>
+    <a href="#s8"><span class="toc-num">08</span> Session State Management</a>
+    <a href="#s9"><span class="toc-num">09</span> AWS Storage Gateway</a>
+    <a href="#s10"><span class="toc-num">10</span> Data Transfer & Migration</a>
+  </nav>
+
+  <!-- ===== SECTION 1 ===== -->
+  <div class="section" id="s1">
+    <div class="section-num">Section 01</div>
+    <h2>EBS Volume Types & Limits</h2>
+
+    <p>Amazon Elastic Block Store (EBS) provides persistent block-level storage volumes for EC2 instances. Choosing the right volume type is one of the most frequently tested topics on the SAA-C03. You need to <strong>memorize the IOPS and throughput limits</strong> for each type — the exam expects you to pick the correct volume based on workload requirements.</p>
+
+    <h3>SSD-Backed Volumes (for transactional workloads)</h3>
+
+    <p>SSD volumes are designed for workloads where the dominant performance attribute is <strong>random I/O operations per second (IOPS)</strong>. There are two families: General Purpose (gp) and Provisioned IOPS (io).</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Attribute</th>
+            <th>gp2</th>
+            <th>gp3</th>
+            <th>io1</th>
+            <th>io2</th>
+            <th>io2 Block Express</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Max IOPS</td>
+            <td>16,000</td>
+            <td class="highlight">16,000</td>
+            <td>64,000</td>
+            <td class="highlight">64,000</td>
+            <td class="highlight">256,000</td>
+          </tr>
+          <tr>
+            <td>Max Throughput</td>
+            <td>250 MiB/s</td>
+            <td>1,000 MiB/s</td>
+            <td>1,000 MiB/s</td>
+            <td>1,000 MiB/s</td>
+            <td>4,000 MiB/s</td>
+          </tr>
+          <tr>
+            <td>Max Volume Size</td>
+            <td>16 TiB</td>
+            <td>16 TiB</td>
+            <td>16 TiB</td>
+            <td>16 TiB</td>
+            <td>64 TiB</td>
+          </tr>
+          <tr>
+            <td>IOPS/GiB Ratio</td>
+            <td>3 IOPS/GiB</td>
+            <td>3,000 baseline</td>
+            <td>50:1</td>
+            <td>500:1</td>
+            <td>1,000:1</td>
+          </tr>
+          <tr>
+            <td>Multi-Attach</td>
+            <td>No</td>
+            <td>No</td>
+            <td>Yes</td>
+            <td>Yes</td>
+            <td>Yes</td>
+          </tr>
+          <tr>
+            <td>Durability</td>
+            <td>99.8–99.9%</td>
+            <td>99.8–99.9%</td>
+            <td>99.8–99.9%</td>
+            <td>99.999%</td>
+            <td>99.999%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="key-point">
+      <strong>gp3 vs gp2:</strong> gp3 gives you a baseline of 3,000 IOPS and 125 MiB/s <em>regardless of volume size</em>, and you can independently provision more. gp2 ties IOPS to volume size at 3 IOPS per GiB — so you'd need a 5,334 GiB volume to hit max IOPS. gp3 is almost always the better and cheaper choice.
+    </div>
+
+    <div class="key-point">
+      <strong>io2 vs io2 Block Express:</strong> io2 Block Express is the highest-performance EBS option. It runs on Nitro-based instances and delivers up to 256,000 IOPS, 4,000 MiB/s throughput, and 64 TiB volume size. Regular io2 caps at 64,000 IOPS. The exam may present a scenario needing >64K IOPS — that's your cue for Block Express.
+    </div>
+
+    <h3>HDD-Backed Volumes (for sequential workloads)</h3>
+
+    <p>HDD volumes are optimized for <strong>large, sequential I/O</strong> — think data warehouses, log processing, and big data. They cannot be boot volumes.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Attribute</th>
+            <th>st1 (Throughput Optimized)</th>
+            <th>sc1 (Cold HDD)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Max Throughput</td>
+            <td>500 MiB/s</td>
+            <td>250 MiB/s</td>
+          </tr>
+          <tr>
+            <td>Max IOPS</td>
+            <td>500</td>
+            <td>250</td>
+          </tr>
+          <tr>
+            <td>Use Case</td>
+            <td>Big data, data warehousing, log processing</td>
+            <td>Infrequently accessed cold data, lowest cost</td>
+          </tr>
+          <tr>
+            <td>Can be boot volume?</td>
+            <td>No</td>
+            <td>No</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="exam-tip">If a question mentions "boot volume," eliminate st1 and sc1 immediately. Only SSD volumes (gp2, gp3, io1, io2) can be used as boot volumes.</div>
+
+    <!-- MCQ Section 1 -->
+    <div class="quiz-block" data-quiz="1">
+      <div class="quiz-header">
+        <span class="q-badge">Q1</span>
+        <span class="q-label">EBS Volume Types</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">A company runs a mission-critical Oracle database on an EC2 instance. The database requires sustained 80,000 IOPS with sub-millisecond latency and 99.999% durability. The current io2 volume cannot meet the IOPS requirement. Which solution meets these requirements?</div>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">A.</span> Create a RAID 0 configuration with two io2 volumes to stripe IOPS across them</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">B.</span> Migrate to gp3 volumes and provision 80,000 IOPS</button>
+        <button class="option" data-correct="true" onclick="checkAnswer(this)"><span class="opt-letter">C.</span> Use an io2 Block Express volume on a Nitro-based instance</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">D.</span> Use an instance store volume for maximum IOPS performance</button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>C is correct.</strong> io2 Block Express supports up to 256,000 IOPS with sub-millisecond latency and 99.999% durability — the only EBS option exceeding 64,000 IOPS. <strong>A</strong> is a valid technique but adds operational complexity and doesn't provide the 99.999% durability guarantee on a single logical volume. <strong>B</strong> is wrong because gp3 maxes out at 16,000 IOPS. <strong>D</strong> provides high IOPS but instance store is ephemeral — data is lost if the instance stops, which is unacceptable for a mission-critical database.
+        </div>
+      </div>
+    </div>
+
+    <div class="quiz-block" data-quiz="2">
+      <div class="quiz-header">
+        <span class="q-badge">Q2</span>
+        <span class="q-label">EBS Volume Types</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">A developer is running a small development workload on a t3.micro instance. The application needs a root volume with moderate IOPS and the lowest possible cost. Which EBS volume type should the developer choose?</div>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">A.</span> io2 with the minimum provisioned IOPS</button>
+        <button class="option" data-correct="true" onclick="checkAnswer(this)"><span class="opt-letter">B.</span> gp3</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">C.</span> st1</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">D.</span> sc1</button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>B is correct.</strong> gp3 provides 3,000 baseline IOPS at a lower price per GiB than gp2 and is the most cost-effective SSD option. <strong>A</strong> is far too expensive for a dev workload. <strong>C and D</strong> are HDD volumes that cannot be used as boot/root volumes.
+        </div>
+      </div>
+    </div>
+
+    <div class="quiz-block" data-quiz="3">
+      <div class="quiz-header">
+        <span class="q-badge">Q3</span>
+        <span class="q-label">EBS Volume Types</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">A data analytics team processes large sequential datasets nightly. They need maximum throughput at the lowest cost and do not need to boot from this volume. Which EBS volume type is MOST cost-effective?</div>
+        <button class="option" data-correct="true" onclick="checkAnswer(this)"><span class="opt-letter">A.</span> st1 (Throughput Optimized HDD)</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">B.</span> gp3 with increased throughput</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">C.</span> io1 with baseline IOPS</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">D.</span> sc1 (Cold HDD)</button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>A is correct.</strong> st1 is designed exactly for large sequential workloads like analytics and log processing, providing up to 500 MiB/s throughput at a low cost. <strong>B</strong> would work but costs more. <strong>C</strong> is designed for random I/O, not sequential. <strong>D</strong> is cheaper but only provides 250 MiB/s throughput — the question asks for "maximum throughput at lowest cost," and st1 delivers 500 MiB/s, making it the best fit.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 2 ===== -->
+  <div class="section" id="s2">
+    <div class="section-num">Section 02</div>
+    <h2>EBS Snapshots, Encryption & Multi-Attach</h2>
+
+    <h3>EBS Snapshots</h3>
+    <p>Snapshots are point-in-time backups of EBS volumes stored in S3 (managed by AWS — you don't see them in your S3 bucket). They are <strong>incremental</strong>: only blocks that changed since the last snapshot are stored, saving cost and time. You can create volumes from snapshots across Availability Zones and even copy them across regions.</p>
+
+    <ul class="content-list">
+      <li><strong>Fast Snapshot Restore (FSR):</strong> Eliminates the latency penalty of lazy-loading data from S3 when you create a volume from a snapshot. Useful when you need full volume performance immediately (e.g., booting many instances from a snapshot). It's expensive — you pay per AZ per hour it's enabled.</li>
+      <li><strong>EBS Snapshot Archive:</strong> Move rarely-accessed snapshots to an archive tier that is up to 75% cheaper. Retrieval takes 24–72 hours. Good for compliance/retention needs.</li>
+      <li><strong>Recycle Bin:</strong> Protects against accidental snapshot deletion. You set retention rules (1 day to 1 year), and deleted snapshots go to the recycle bin instead of being permanently removed.</li>
+    </ul>
+
+    <h3>EBS Encryption</h3>
+    <p>EBS encryption uses AWS KMS keys (AES-256) and is transparent to the instance — the OS sees an unencrypted volume. Key facts for the exam:</p>
+    <ul class="content-list">
+      <li>Encryption is handled at the <strong>host level</strong> (between EC2 instance and EBS volume), so there is minimal performance impact.</li>
+      <li>You <strong>cannot directly encrypt an unencrypted volume</strong>. The process is: create a snapshot → copy the snapshot with encryption enabled → create a new encrypted volume from the copied snapshot.</li>
+      <li>Snapshots of encrypted volumes are automatically encrypted.</li>
+      <li>You can set a <strong>default encryption</strong> at the account/region level so all new volumes are encrypted.</li>
+    </ul>
+
+    <h3>Multi-Attach</h3>
+    <p>Multi-Attach allows a single <strong>io1 or io2</strong> volume to be attached to up to <strong>16 Nitro-based instances in the same AZ</strong>. This is useful for clustered applications (like Oracle RAC) that manage concurrent write operations. The application must handle I/O fencing — EBS does not coordinate writes between instances.</p>
+
+    <div class="exam-tip">Multi-Attach only works within a single AZ, only with io1/io2, and only on Nitro instances. If a question says "across AZs" or "gp3 multi-attach," it's a wrong answer.</div>
+
+    <div class="quiz-block" data-quiz="4">
+      <div class="quiz-header">
+        <span class="q-badge">Q4</span>
+        <span class="q-label">EBS Snapshots & Encryption</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">A solutions architect needs to encrypt an existing unencrypted EBS root volume for a running EC2 instance with minimal downtime. Which approach should the architect use?</div>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">A.</span> Enable encryption on the existing volume using the AWS CLI <code>modify-volume</code> command</button>
+        <button class="option" data-correct="true" onclick="checkAnswer(this)"><span class="opt-letter">B.</span> Create a snapshot of the volume, copy the snapshot with encryption enabled, create a new encrypted volume, stop the instance, detach the old volume, attach the new one, and start the instance</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">C.</span> Create an AMI from the instance, then launch a new instance with encrypted volumes from the AMI</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">D.</span> Enable default encryption for the region and reboot the instance</button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>B is correct.</strong> You cannot encrypt an existing unencrypted volume in-place. The documented process is snapshot → encrypted copy → new volume → swap. <strong>A</strong> is not a real capability — <code>modify-volume</code> changes size/type/IOPS, not encryption. <strong>C</strong> would work but requires launching an entirely new instance, meaning a new IP, new instance ID — more disruption. <strong>D</strong> only affects newly created volumes, not existing ones.
+        </div>
+      </div>
+    </div>
+
+    <div class="quiz-block" data-quiz="5">
+      <div class="quiz-header">
+        <span class="q-badge">Q5</span>
+        <span class="q-label">Multi-Attach</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">A company needs to share a single block storage volume between four EC2 instances to run a clustered database. The instances are spread across two Availability Zones in the same Region. Which solution meets this requirement?</div>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">A.</span> Use an io2 EBS volume with Multi-Attach enabled</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">B.</span> Use an EFS file system mounted on all four instances</button>
+        <button class="option" data-correct="true" onclick="checkAnswer(this)"><span class="opt-letter">C.</span> The requirement cannot be met with a single block storage volume because Multi-Attach only works within a single AZ. The architecture should be redesigned to place all instances in one AZ or use a shared file system instead.</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">D.</span> Use a gp3 volume with Multi-Attach in each AZ</button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>C is correct.</strong> Multi-Attach is limited to a single AZ. Since the instances are in two AZs, you cannot share one EBS volume across them. <strong>A</strong> would work if all instances were in the same AZ. <strong>B</strong> uses EFS, which is a file system (NFS), not block storage — the question specifically says "block storage." <strong>D</strong> is wrong because gp3 does not support Multi-Attach at all.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 3 ===== -->
+  <div class="section" id="s3">
+    <div class="section-num">Section 03</div>
+    <h2>Instance Store vs EBS</h2>
+
+    <p>Instance store volumes are physically attached to the host machine. They provide <strong>extremely high I/O performance</strong> — often millions of IOPS — but with a critical trade-off: the data is <strong>ephemeral</strong>. If the underlying instance stops, terminates, or the hardware fails, all data is lost.</p>
+
+    <div class="vs-box">
+      <div>
+        <h4>Instance Store</h4>
+        <ul>
+          <li>Physically attached disk (NVMe SSD)</li>
+          <li>Very high IOPS (millions)</li>
+          <li>Ephemeral — data lost on stop/terminate</li>
+          <li>Cannot be detached/reattached</li>
+          <li>Free (included with instance)</li>
+          <li>Good for: caches, buffers, temp data</li>
+        </ul>
+      </div>
+      <div>
+        <h4>EBS Volume</h4>
+        <ul>
+          <li>Network-attached storage</li>
+          <li>Up to 256K IOPS (io2 Block Express)</li>
+          <li>Persistent — survives stop/restart</li>
+          <li>Can be detached and moved</li>
+          <li>Pay per provisioned GiB/IOPS</li>
+          <li>Good for: databases, OS, anything persistent</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="exam-tip">If the question mentions "temporary storage," "scratch space," "cache," or "buffer" and wants the highest performance, think instance store. If it mentions "must persist after stop" or "durable," think EBS. If it says "highest possible IOPS" without durability requirements, instance store wins over any EBS type.</div>
+
+    <div class="quiz-block" data-quiz="6">
+      <div class="quiz-header">
+        <span class="q-badge">Q6</span>
+        <span class="q-label">Instance Store vs EBS</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">An application processes video transcoding jobs. Each job downloads a large file, processes it (requiring very high disk I/O), and uploads the result to S3. The intermediate files do not need to be kept after upload. The team wants to minimize cost while maximizing I/O performance. Which storage configuration is BEST?</div>
+        <button class="option" data-correct="true" onclick="checkAnswer(this)"><span class="opt-letter">A.</span> Use an EC2 instance with instance store volumes for temporary processing</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">B.</span> Use an io2 Block Express volume for maximum IOPS</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">C.</span> Use an EFS file system so multiple instances can share the work</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">D.</span> Use gp3 volumes with provisioned IOPS set to 16,000</button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>A is correct.</strong> The data is temporary (uploaded to S3 after processing), so persistence isn't needed. Instance store is included with the instance (no extra cost) and provides the highest possible I/O. <strong>B</strong> works but is expensive and unnecessary for ephemeral data. <strong>C</strong> adds latency and complexity. <strong>D</strong> costs more than instance store for lower performance.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 4 ===== -->
+  <div class="section" id="s4">
+    <div class="section-num">Section 04</div>
+    <h2>EFS — Elastic File System</h2>
+
+    <p>Amazon EFS is a fully managed, elastic NFS file system that can be mounted on <strong>multiple EC2 instances simultaneously</strong> across multiple AZs. It automatically grows and shrinks as you add and remove files — no pre-provisioning needed.</p>
+
+    <h3>Key Characteristics</h3>
+    <ul class="content-list">
+      <li><strong>Protocol:</strong> NFSv4.1 — works with Linux only (not Windows).</li>
+      <li><strong>Scaling:</strong> Scales automatically to petabytes. Supports thousands of concurrent connections.</li>
+      <li><strong>Performance Modes:</strong> General Purpose (latency-sensitive, default) and Max I/O (higher throughput, higher latency — for highly parallelized workloads like big data).</li>
+      <li><strong>Throughput Modes:</strong> Bursting (scales with file system size), Provisioned/Enhanced (decouple throughput from size), and Elastic (automatically scales throughput up/down based on workload — recommended for spiky workloads).</li>
+      <li><strong>Storage Classes:</strong> Standard, Infrequent Access (EFS-IA), One Zone, One Zone-IA. Use lifecycle policies to move files to IA automatically. One Zone stores data in a single AZ at ~47% lower cost.</li>
+      <li><strong>Encryption:</strong> At rest (KMS) and in transit (TLS) supported.</li>
+    </ul>
+
+    <div class="key-point">
+      <strong>EFS is Linux-only.</strong> If the question mentions Windows instances or SMB protocol, EFS is eliminated. Use FSx for Windows File Server instead.
+    </div>
+
+    <div class="exam-tip">EFS is the default answer when you see: "shared file system," "NFS," "multiple EC2 instances need access," "auto-scaling storage," or "Linux workload." The exception is high-performance computing — that's FSx for Lustre territory.</div>
+
+    <div class="quiz-block" data-quiz="7">
+      <div class="quiz-header">
+        <span class="q-badge">Q7</span>
+        <span class="q-label">EFS</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">A company runs a content management system on a fleet of Amazon Linux 2 EC2 instances behind an Application Load Balancer. The instances span three Availability Zones. All instances need shared access to the same set of uploaded media files. The access pattern is unpredictable — sometimes very heavy, sometimes nearly idle. Which storage solution is MOST cost-effective?</div>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">A.</span> Amazon EFS with Provisioned throughput mode</button>
+        <button class="option" data-correct="true" onclick="checkAnswer(this)"><span class="opt-letter">B.</span> Amazon EFS with Elastic throughput mode and lifecycle policy to EFS-IA</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">C.</span> Amazon S3 with s3fs-fuse mount on each instance</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">D.</span> Amazon FSx for Windows File Server with Multi-AZ deployment</button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>B is correct.</strong> EFS with Elastic throughput mode automatically scales to match the unpredictable workload — you only pay for what you use. Adding a lifecycle policy to move infrequently accessed files to EFS-IA further reduces cost. <strong>A</strong> requires you to pre-provision throughput, which wastes money during idle periods. <strong>C</strong> is not a recommended production solution — s3fs-fuse has limited POSIX compatibility and performance issues. <strong>D</strong> is for Windows workloads using SMB, not Linux instances.
+        </div>
+      </div>
+    </div>
+
+    <div class="quiz-block" data-quiz="8">
+      <div class="quiz-header">
+        <span class="q-badge">Q8</span>
+        <span class="q-label">EFS</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">A solutions architect is designing shared storage for a web application. The application runs on Linux EC2 instances in a single AZ and stores mostly static assets that are read frequently but rarely updated. Minimizing storage cost is the top priority, and high availability across AZs is NOT required. Which solution is MOST cost-effective?</div>
+        <button class="option" data-correct="true" onclick="checkAnswer(this)"><span class="opt-letter">A.</span> Amazon EFS One Zone-IA storage class</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">B.</span> Amazon EFS Standard storage class</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">C.</span> Amazon FSx for Lustre linked to an S3 bucket</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">D.</span> An EBS gp3 volume shared via NFS from one instance</button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>A is correct.</strong> EFS One Zone-IA is the cheapest EFS option — combining single-AZ pricing (~47% cheaper than Standard) with infrequent access pricing. Since multi-AZ HA isn't required and files are rarely updated, this is ideal. <strong>B</strong> costs more due to multi-AZ replication. <strong>C</strong> is overkill — Lustre is for HPC, not static web assets. <strong>D</strong> creates a single point of failure and requires manual NFS server management.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 5 ===== -->
+  <div class="section" id="s5">
+    <div class="section-num">Section 05</div>
+    <h2>FSx Family</h2>
+
+    <p>Amazon FSx provides fully managed third-party file systems. There are four variants, each purpose-built for different workloads:</p>
+
+    <h3>FSx for Lustre</h3>
+    <p>A high-performance parallel file system designed for <strong>HPC, machine learning, video processing, financial modeling,</strong> and any compute-intensive workload that needs massive throughput. Lustre is a Linux-native file system used in the world's largest supercomputers.</p>
+    <ul class="content-list">
+      <li>Throughput up to <strong>hundreds of GB/s</strong> and millions of IOPS.</li>
+      <li>Native integration with <strong>S3</strong>: can transparently present S3 objects as files. Changes can be lazily loaded or written back to S3.</li>
+      <li>Supports <strong>POSIX-compliant</strong> file operations.</li>
+      <li>Two deployment types: <strong>Scratch</strong> (temporary, highest performance, no replication) and <strong>Persistent</strong> (long-term, data replicated within single AZ).</li>
+    </ul>
+
+    <h3>FSx for Windows File Server</h3>
+    <p>A fully managed Windows-native file system built on <strong>Windows Server</strong> with full <strong>SMB protocol</strong> support.</p>
+    <ul class="content-list">
+      <li>Supports <strong>Active Directory</strong> integration, ACLs, user quotas, DFS namespaces.</li>
+      <li>Accessible from Windows and Linux instances (via SMB).</li>
+      <li>Supports <strong>Multi-AZ</strong> deployment for high availability.</li>
+      <li>Use case: any time the question mentions <strong>SMB, Windows, Active Directory, or NTFS</strong>.</li>
+    </ul>
+
+    <h3>FSx for NetApp ONTAP</h3>
+    <p>Managed NetApp ONTAP file system — supports <strong>NFS, SMB, and iSCSI</strong>. Great for migrating existing NetApp workloads to AWS. Features include snapshots, cloning, replication, compression, deduplication, and tiering.</p>
+
+    <h3>FSx for OpenZFS</h3>
+    <p>Managed ZFS file system. Supports NFS protocol, point-in-time snapshots, and data compression. Up to 1,000,000 IOPS with low latency. Used for migrating ZFS workloads or when you need ZFS features (snapshots, clones).</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>FSx Lustre</th>
+            <th>FSx Windows</th>
+            <th>FSx ONTAP</th>
+            <th>FSx OpenZFS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Protocol</td>
+            <td>POSIX (Lustre client)</td>
+            <td>SMB</td>
+            <td>NFS, SMB, iSCSI</td>
+            <td>NFS</td>
+          </tr>
+          <tr>
+            <td>OS Support</td>
+            <td>Linux</td>
+            <td>Windows + Linux</td>
+            <td>Windows + Linux + macOS</td>
+            <td>Linux + macOS</td>
+          </tr>
+          <tr>
+            <td>S3 Integration</td>
+            <td class="highlight">Yes (native)</td>
+            <td>No</td>
+            <td>No</td>
+            <td>No</td>
+          </tr>
+          <tr>
+            <td>Multi-AZ</td>
+            <td>No (single AZ)</td>
+            <td class="highlight">Yes</td>
+            <td>Yes</td>
+            <td>No</td>
+          </tr>
+          <tr>
+            <td>Key Use Case</td>
+            <td>HPC, ML, big compute</td>
+            <td>Windows enterprise</td>
+            <td>Multi-protocol, migration</td>
+            <td>ZFS migration</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="quiz-block" data-quiz="9">
+      <div class="quiz-header">
+        <span class="q-badge">Q9</span>
+        <span class="q-label">FSx</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">A financial services company needs to run Monte Carlo simulations on a Linux-based HPC cluster of 200 EC2 instances. The workload requires a shared file system with sub-millisecond latency and hundreds of GB/s throughput. Input datasets are stored in Amazon S3. Which storage solution should a solutions architect recommend?</div>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">A.</span> Amazon EFS with Max I/O performance mode</button>
+        <button class="option" data-correct="true" onclick="checkAnswer(this)"><span class="opt-letter">B.</span> Amazon FSx for Lustre linked to the S3 bucket</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">C.</span> Amazon FSx for NetApp ONTAP with tiering to S3</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">D.</span> Amazon S3 accessed directly via the AWS SDK from each instance</button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>B is correct.</strong> FSx for Lustre is purpose-built for HPC workloads, delivering hundreds of GB/s and millions of IOPS. Its native S3 integration allows the simulation to transparently read input data from S3 and write results back. <strong>A</strong> provides much lower throughput than Lustre. <strong>C</strong> supports NFS/SMB/iSCSI but isn't optimized for HPC-scale parallelism. <strong>D</strong> uses object storage, which doesn't provide the POSIX file system interface needed by HPC applications and lacks the performance.
+        </div>
+      </div>
+    </div>
+
+    <div class="quiz-block" data-quiz="10">
+      <div class="quiz-header">
+        <span class="q-badge">Q10</span>
+        <span class="q-label">FSx</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">A company is migrating a legacy Windows application to AWS. The application requires a shared file system with SMB protocol support, integration with the on-premises Active Directory, and high availability. Which AWS service should the solutions architect use?</div>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">A.</span> Amazon EFS</button>
+        <button class="option" data-correct="true" onclick="checkAnswer(this)"><span class="opt-letter">B.</span> Amazon FSx for Windows File Server configured for Multi-AZ</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">C.</span> Amazon FSx for Lustre</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">D.</span> Amazon FSx for NetApp ONTAP</button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>B is correct.</strong> FSx for Windows File Server provides native SMB support, Active Directory integration, and Multi-AZ deployment for HA — exactly what the question asks for. <strong>A</strong> uses NFS, not SMB, and doesn't support AD. <strong>C</strong> is for Linux HPC workloads. <strong>D</strong> supports SMB but isn't purpose-built for Windows enterprise workloads with AD — FSx for Windows is the primary choice when the question specifically mentions Windows + SMB + AD.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 6 ===== -->
+  <div class="section" id="s6">
+    <div class="section-num">Section 06</div>
+    <h2>EFS vs FSx for Lustre — When to Use Which</h2>
+
+    <p>This is a critical exam distinction. Both are shared Linux file systems, but they serve very different purposes.</p>
+
+    <div class="vs-box">
+      <div>
+        <h4>Choose EFS When</h4>
+        <ul>
+          <li>General-purpose shared file storage</li>
+          <li>Content management, web serving</li>
+          <li>Multi-AZ availability needed</li>
+          <li>Auto-scaling storage size</li>
+          <li>Simple NFS mounts</li>
+          <li>Moderate throughput is sufficient</li>
+          <li>Elastic or bursting throughput</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Choose FSx for Lustre When</h4>
+        <ul>
+          <li>HPC, ML training, genomics</li>
+          <li>Need hundreds of GB/s throughput</li>
+          <li>Sub-millisecond latency required</li>
+          <li>Data lives in S3 (transparent integration)</li>
+          <li>POSIX compliance for compute workloads</li>
+          <li>Financial modeling, video rendering</li>
+          <li>Parallel I/O across many nodes</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="key-point">
+      <strong>The decision rule is simple:</strong> if the question mentions HPC, machine learning, financial simulations, genomics, video rendering, or phrases like "high throughput" / "compute-intensive" + "shared Linux storage" → FSx for Lustre. For everything else that needs shared Linux storage → EFS.
+    </div>
+
+    <div class="exam-tip">S3 integration is a strong differentiator. If the question says "data is in S3 and needs to be processed by a compute cluster as a file system," that's FSx for Lustre. EFS has no native S3 integration.</div>
+
+    <div class="quiz-block" data-quiz="11">
+      <div class="quiz-header">
+        <span class="q-badge">Q11</span>
+        <span class="q-label">EFS vs FSx for Lustre</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">A genomics research company processes DNA sequencing data. Hundreds of Linux compute nodes need to read large datasets from a shared file system with extremely high throughput. The raw data is stored in Amazon S3 and results must be written back to S3. The processing is a one-time batch job that takes 48 hours. Which storage solution is MOST appropriate?</div>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">A.</span> Amazon EFS with Max I/O performance mode and Provisioned throughput</button>
+        <button class="option" data-correct="true" onclick="checkAnswer(this)"><span class="opt-letter">B.</span> Amazon FSx for Lustre with Scratch deployment type linked to the S3 bucket</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">C.</span> Amazon FSx for Lustre with Persistent deployment type linked to the S3 bucket</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">D.</span> Each node downloads its portion from S3 to a local instance store volume</button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>B is correct.</strong> FSx for Lustre Scratch deployment is designed for temporary, high-performance workloads — it provides the highest throughput without the cost of data replication. Since this is a one-time batch job, persistence isn't needed, making Scratch ideal. The S3 linkage lets the cluster read data transparently. <strong>A</strong> cannot match Lustre's throughput. <strong>C</strong> works but Persistent costs more and isn't needed for a temporary job. <strong>D</strong> is complex to orchestrate and doesn't provide a shared file system view.
+        </div>
+      </div>
+    </div>
+
+    <div class="quiz-block" data-quiz="12">
+      <div class="quiz-header">
+        <span class="q-badge">Q12</span>
+        <span class="q-label">EFS vs FSx for Lustre</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">A media company has a fleet of Amazon Linux instances that serve a WordPress site. The instances are in an Auto Scaling group across three AZs. They need shared storage for uploaded images and theme files. Traffic is moderate and unpredictable. Which storage is BEST?</div>
+        <button class="option" data-correct="true" onclick="checkAnswer(this)"><span class="opt-letter">A.</span> Amazon EFS with Elastic throughput mode</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">B.</span> Amazon FSx for Lustre</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">C.</span> Amazon S3 with CloudFront</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">D.</span> Amazon EBS with rsync between instances</span></button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>A is correct.</strong> WordPress needs a POSIX-compatible shared file system for uploads and themes. EFS provides multi-AZ NFS access, and Elastic throughput handles unpredictable traffic patterns. <strong>B</strong> is overkill — Lustre is for HPC, not web serving. <strong>C</strong> doesn't provide a POSIX file system that WordPress can write to natively. <strong>D</strong> is fragile and introduces replication lag.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 7 ===== -->
+  <div class="section" id="s7">
+    <div class="section-num">Section 07</div>
+    <h2>S3 Storage Classes & Lifecycle</h2>
+
+    <p>S3 offers multiple storage classes optimized for different access patterns. Understanding when to use each — and how lifecycle rules automate transitions — is heavily tested.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Storage Class</th>
+            <th>Availability</th>
+            <th>Min Duration</th>
+            <th>Retrieval Fee</th>
+            <th>Use Case</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>S3 Standard</td>
+            <td>99.99%</td>
+            <td>None</td>
+            <td>None</td>
+            <td>Frequently accessed data</td>
+          </tr>
+          <tr>
+            <td>S3 Intelligent-Tiering</td>
+            <td>99.9%</td>
+            <td>None</td>
+            <td>None</td>
+            <td>Unknown/changing access patterns</td>
+          </tr>
+          <tr>
+            <td>S3 Standard-IA</td>
+            <td>99.9%</td>
+            <td>30 days</td>
+            <td>Per GB retrieved</td>
+            <td>Infrequent but rapid access</td>
+          </tr>
+          <tr>
+            <td>S3 One Zone-IA</td>
+            <td>99.5%</td>
+            <td>30 days</td>
+            <td>Per GB retrieved</td>
+            <td>Recreatable infrequent data</td>
+          </tr>
+          <tr>
+            <td>S3 Glacier Instant Retrieval</td>
+            <td>99.9%</td>
+            <td>90 days</td>
+            <td>Per GB retrieved</td>
+            <td>Quarterly access, millisecond retrieval</td>
+          </tr>
+          <tr>
+            <td>S3 Glacier Flexible Retrieval</td>
+            <td>99.99%</td>
+            <td>90 days</td>
+            <td>Per GB + per request</td>
+            <td>Archive: mins to hours retrieval</td>
+          </tr>
+          <tr>
+            <td>S3 Glacier Deep Archive</td>
+            <td>99.99%</td>
+            <td>180 days</td>
+            <td>Per GB + per request</td>
+            <td>Long-term archive: 12-48 hrs retrieval</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>S3 Lifecycle Rules</h3>
+    <p>Lifecycle rules automate object transitions between storage classes or expiration (deletion). Two types of actions:</p>
+    <ul class="content-list">
+      <li><strong>Transition actions:</strong> Move objects to another storage class after a specified number of days (e.g., move to Standard-IA after 30 days, Glacier after 90 days).</li>
+      <li><strong>Expiration actions:</strong> Delete objects after a specified period, delete old versions, or clean up incomplete multipart uploads.</li>
+    </ul>
+
+    <div class="key-point">
+      <strong>S3 Intelligent-Tiering</strong> is the "I don't know the access pattern" answer. It automatically moves objects between frequent and infrequent access tiers (and optionally archive tiers) with no retrieval fees and no performance impact. There's a small monthly monitoring fee per object.
+    </div>
+
+    <h3>S3 Versioning & Replication</h3>
+    <ul class="content-list">
+      <li><strong>Versioning</strong> must be enabled before setting up replication.</li>
+      <li><strong>Cross-Region Replication (CRR):</strong> Replicate objects to a bucket in a different region for compliance, lower latency, or DR.</li>
+      <li><strong>Same-Region Replication (SRR):</strong> Replicate within the same region for log aggregation, live replication between production and test accounts.</li>
+      <li>Replication is <strong>not retroactive</strong>. Only new objects after enabling replication are copied. Use <strong>S3 Batch Replication</strong> for existing objects.</li>
+      <li>Delete markers are <strong>not replicated by default</strong> (can be enabled).</li>
+    </ul>
+
+    <div class="quiz-block" data-quiz="13">
+      <div class="quiz-header">
+        <span class="q-badge">Q13</span>
+        <span class="q-label">S3 Storage Classes</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">A healthcare company stores patient imaging files in Amazon S3. Regulations require the data to be retained for 7 years. The images are accessed frequently during the first 30 days, then rarely for the next year, and almost never after that. The company wants to minimize storage costs while meeting retrieval requirements (images must be accessible within 12 hours). Which lifecycle configuration is MOST cost-effective?</div>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">A.</span> S3 Standard → S3 Glacier Flexible Retrieval after 30 days → Delete after 7 years</button>
+        <button class="option" data-correct="true" onclick="checkAnswer(this)"><span class="opt-letter">B.</span> S3 Standard → S3 Standard-IA after 30 days → S3 Glacier Deep Archive after 365 days → Delete after 2,555 days</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">C.</span> S3 Intelligent-Tiering for the entire 7-year retention</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">D.</span> S3 Standard → S3 One Zone-IA after 30 days → S3 Glacier Deep Archive after 365 days</button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>B is correct.</strong> This matches the access pattern perfectly: Standard for the first 30 days of frequent access, Standard-IA for the next ~11 months of rare access (with immediate retrieval when needed), and Glacier Deep Archive for years 2-7 (12-48 hour retrieval meets the 12-hour requirement via Expedited or Standard retrieval). <strong>A</strong> skips the IA tier — Glacier Flexible Retrieval is more expensive than needed during the "rare but still accessed" year. <strong>C</strong> uses monitoring fees for 7 years and doesn't leverage the cheapest archive tier. <strong>D</strong> uses One Zone-IA, which stores data in a single AZ — risky for regulated healthcare data that must be retained for 7 years.
+        </div>
+      </div>
+    </div>
+
+    <div class="quiz-block" data-quiz="14">
+      <div class="quiz-header">
+        <span class="q-badge">Q14</span>
+        <span class="q-label">S3 Replication</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">A company enables Cross-Region Replication (CRR) on an existing S3 bucket that already contains 500,000 objects. After enabling CRR, they notice that none of the existing objects appear in the destination bucket. Only newly uploaded objects are replicated. What should the architect do to replicate existing objects?</div>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">A.</span> Delete and re-enable CRR to trigger a full resync</button>
+        <button class="option" data-correct="true" onclick="checkAnswer(this)"><span class="opt-letter">B.</span> Use S3 Batch Replication to copy existing objects to the destination bucket</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">C.</span> Enable versioning on the destination bucket — this triggers replication of existing objects</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">D.</span> Use <code>aws s3 sync</code> from the source to destination, then re-enable CRR for ongoing replication</button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>B is correct.</strong> S3 replication is not retroactive — it only applies to new objects uploaded after the rule is created. S3 Batch Replication is the AWS-native solution for replicating existing objects. <strong>A</strong> doesn't change the behavior — CRR is always forward-only. <strong>C</strong> is incorrect — versioning is a prerequisite for CRR but doesn't trigger retroactive replication. <strong>D</strong> would work technically but is not the recommended AWS-native approach and uses CLI instead of a managed service.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 8 ===== -->
+  <div class="section" id="s8">
+    <div class="section-num">Section 08</div>
+    <h2>Session State Management</h2>
+
+    <p>This topic appears repeatedly on the SAA-C03. The core principle is straightforward: <strong>always externalize session state</strong>. Never rely on sticky sessions (session affinity) because they create single points of failure and prevent true horizontal scaling.</p>
+
+    <h3>The Problem with Sticky Sessions</h3>
+    <p>When a load balancer uses sticky sessions, it routes all requests from a user to the same instance. This means:</p>
+    <ul class="content-list">
+      <li>If that instance fails, the user's session is <strong>lost</strong>.</li>
+      <li>Traffic distribution becomes <strong>uneven</strong> — some instances get overloaded while others sit idle.</li>
+      <li>Auto Scaling becomes less effective because sessions are pinned to specific instances.</li>
+      <li>You <strong>cannot do rolling deployments</strong> smoothly because killing an instance kills its sessions.</li>
+    </ul>
+
+    <h3>The Solution: External Session Stores</h3>
+    <p>Move session data out of the EC2 instances and into a shared, external data store. The two primary options on the exam are:</p>
+
+    <div class="vs-box">
+      <div>
+        <h4>ElastiCache (Redis)</h4>
+        <ul>
+          <li>Sub-millisecond latency</li>
+          <li>In-memory key-value store</li>
+          <li>Supports TTL for auto-expiration</li>
+          <li>Cluster mode for high availability</li>
+          <li>Best for: most web app sessions</li>
+        </ul>
+      </div>
+      <div>
+        <h4>DynamoDB</h4>
+        <ul>
+          <li>Single-digit millisecond latency</li>
+          <li>Fully managed, serverless option</li>
+          <li>TTL feature for auto-expiration</li>
+          <li>Built-in HA across 3 AZs</li>
+          <li>Best for: serverless architectures, when you need persistence beyond cache</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="key-point">
+      <strong>Exam pattern:</strong> Any time you see "stateful application," "user sessions," "session data," or "sticky sessions causing issues" in a question → the answer involves externalizing sessions to ElastiCache Redis or DynamoDB. The question might also say "make the application stateless" — same answer.
+    </div>
+
+    <div class="exam-tip">ElastiCache Redis is preferred over Memcached on the exam for session stores because Redis supports replication, persistence, and cluster mode for HA. Memcached is simpler but doesn't persist data and doesn't support Multi-AZ. If the question asks for a "highly available session store," pick Redis.</div>
+
+    <h3>Other Considerations</h3>
+    <ul class="content-list">
+      <li><strong>API Gateway + Lambda:</strong> These are inherently stateless. If using a serverless architecture, DynamoDB is the natural session store.</li>
+      <li><strong>Cookies:</strong> Storing session data in client-side cookies is an option for small amounts of data, but it has size limits (4KB) and security concerns.</li>
+      <li><strong>S3 is NOT a session store.</strong> It's an object store with much higher latency — never pick S3 for session management.</li>
+    </ul>
+
+    <div class="quiz-block" data-quiz="15">
+      <div class="quiz-header">
+        <span class="q-badge">Q15</span>
+        <span class="q-label">Session State</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">A web application uses an Application Load Balancer with sticky sessions enabled. During peak traffic, the Auto Scaling group launches new instances, but users continue to be routed to overloaded instances because of session affinity. Some users lose their sessions when instances are terminated during scale-in events. How should the architect redesign the application to resolve BOTH issues?</div>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">A.</span> Replace the ALB with a Network Load Balancer and increase the stickiness duration</button>
+        <button class="option" data-correct="true" onclick="checkAnswer(this)"><span class="opt-letter">B.</span> Store session data in Amazon ElastiCache for Redis and disable sticky sessions on the ALB</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">C.</span> Store session data on an EBS volume and use Multi-Attach to share it across instances</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">D.</span> Configure the Auto Scaling group to use a longer cooldown period to prevent premature scale-in</button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>B is correct.</strong> Externalizing sessions to ElastiCache Redis and disabling sticky sessions solves both problems: traffic distributes evenly across all instances (including newly launched ones), and session data survives instance termination because it's stored externally. <strong>A</strong> NLB operates at Layer 4 and doesn't solve the session problem. <strong>C</strong> EBS Multi-Attach is for block storage in a single AZ and is not designed for session state. <strong>D</strong> delays scale-in but doesn't fix the root cause — sessions are still lost when instances eventually terminate.
+        </div>
+      </div>
+    </div>
+
+    <div class="quiz-block" data-quiz="16">
+      <div class="quiz-header">
+        <span class="q-badge">Q16</span>
+        <span class="q-label">Session State</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">A company is building a new serverless application using Amazon API Gateway and AWS Lambda. The application needs to maintain user session data between requests with single-digit millisecond latency. The data must be automatically expired after 24 hours. Which solution is MOST operationally efficient?</div>
+        <button class="option" data-correct="true" onclick="checkAnswer(this)"><span class="opt-letter">A.</span> Amazon DynamoDB with TTL enabled set to 24 hours</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">B.</span> Amazon ElastiCache for Redis with key expiration set to 24 hours</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">C.</span> Amazon S3 with a lifecycle rule to delete objects after 1 day</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">D.</span> Store session data in encrypted cookies on the client side</button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>A is correct.</strong> For a serverless architecture (API Gateway + Lambda), DynamoDB is the most operationally efficient choice because it's also serverless — no infrastructure to manage. DynamoDB TTL automatically deletes expired items. <strong>B</strong> would work but ElastiCache requires you to manage a cluster (VPC, nodes, scaling), adding operational overhead in a serverless architecture. <strong>C</strong> has too much latency for session data. <strong>D</strong> has a 4KB size limit and security concerns.
+        </div>
+      </div>
+    </div>
+
+    <div class="quiz-block" data-quiz="17">
+      <div class="quiz-header">
+        <span class="q-badge">Q17</span>
+        <span class="q-label">Session State</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">A solutions architect is reviewing an application that stores user sessions in memory on each EC2 instance. The team reports that during a recent deployment, all user sessions were lost when instances were replaced. The architect needs a solution that provides sub-millisecond latency, supports automatic failover, and persists session data even if all application instances are replaced. Which solution meets ALL requirements?</div>
+        <button class="option" data-correct="true" onclick="checkAnswer(this)"><span class="opt-letter">A.</span> Amazon ElastiCache for Redis with Multi-AZ and automatic failover enabled</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">B.</span> Amazon ElastiCache for Memcached with Auto Discovery enabled</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">C.</span> Amazon DynamoDB with DynamoDB Accelerator (DAX)</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">D.</span> Amazon RDS MySQL with a read replica for session reads</button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>A is correct.</strong> Redis with Multi-AZ provides sub-millisecond latency, automatic failover (via replica promotion), and data persistence (Redis supports snapshots and AOF). <strong>B</strong> Memcached does not support persistence, replication, or failover — if a node fails, data is lost. <strong>C</strong> provides single-digit ms (not sub-ms) at the DynamoDB layer; DAX adds microsecond caching but is designed for DynamoDB read acceleration, making the setup more complex than needed. <strong>D</strong> RDS has much higher latency than in-memory stores.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 9 ===== -->
+  <div class="section" id="s9">
+    <div class="section-num">Section 09</div>
+    <h2>AWS Storage Gateway</h2>
+
+    <p>Storage Gateway is a hybrid storage service that connects on-premises environments to AWS cloud storage. It deploys as a VM or hardware appliance in your data center and presents standard storage interfaces (NFS, SMB, iSCSI, iSCSI VTL) while backing data to S3, S3 Glacier, or EBS.</p>
+
+    <h3>Three Gateway Types</h3>
+
+    <ul class="content-list">
+      <li><strong>S3 File Gateway:</strong> Presents an NFS/SMB interface to on-premises applications. Files are stored as objects in S3, with a local cache for low-latency access to recently used data. Great for extending on-premises file shares to the cloud.</li>
+      <li><strong>FSx File Gateway:</strong> Provides local cache access to a fully managed FSx for Windows File Server. Useful when on-premises Windows users need low-latency access to a cloud-based Windows file share with AD integration.</li>
+      <li><strong>Volume Gateway:</strong> Presents iSCSI block storage backed by S3. Two modes: <strong>Cached volumes</strong> (primary data in S3 with local cache) and <strong>Stored volumes</strong> (primary data on-premises with async backup to S3). Used for hybrid block storage and disaster recovery.</li>
+      <li><strong>Tape Gateway:</strong> Presents a Virtual Tape Library (VTL) via iSCSI to backup applications like Veeam, Veritas, etc. Tapes are stored in S3 and can be archived to S3 Glacier or Glacier Deep Archive. Used for replacing physical tape infrastructure.</li>
+    </ul>
+
+    <div class="exam-tip">If the question mentions "on-premises backup software" or "tape backups" and migrating to AWS, the answer is Tape Gateway. If it mentions "on-premises file shares accessing S3," that's S3 File Gateway. If it mentions "on-premises Windows file shares with Active Directory," that's FSx File Gateway.</div>
+
+    <div class="quiz-block" data-quiz="18">
+      <div class="quiz-header">
+        <span class="q-badge">Q18</span>
+        <span class="q-label">Storage Gateway</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">A manufacturing company uses Veritas NetBackup for on-premises backups with physical tape libraries. They want to eliminate tape infrastructure and move backups to AWS, but their backup administrators are familiar with the existing tape workflow and don't want to retrain. Which solution allows them to migrate with MINIMAL changes to their backup process?</div>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">A.</span> AWS Backup with an S3 backup vault</button>
+        <button class="option" data-correct="true" onclick="checkAnswer(this)"><span class="opt-letter">B.</span> AWS Storage Gateway — Tape Gateway with virtual tapes stored in S3 Glacier</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">C.</span> AWS Storage Gateway — S3 File Gateway with NFS mount points</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">D.</span> AWS DataSync to transfer backup files to S3 on a schedule</button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>B is correct.</strong> Tape Gateway presents a standard iSCSI VTL interface to backup software like NetBackup. The admins continue using their existing backup workflows with virtual tapes instead of physical ones — minimal retraining. Virtual tapes are stored in S3 and can be archived to Glacier. <strong>A</strong> would require reconfiguring the backup process. <strong>C</strong> uses NFS, not the tape interface that NetBackup expects. <strong>D</strong> transfers files but doesn't integrate with the tape-based backup workflow.
+        </div>
+      </div>
+    </div>
+
+    <div class="quiz-block" data-quiz="19">
+      <div class="quiz-header">
+        <span class="q-badge">Q19</span>
+        <span class="q-label">Storage Gateway</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">A company has an on-premises application that writes files to an NFS share. They want to make these files accessible in Amazon S3 for analytics while keeping a low-latency local cache for the on-premises application. Which solution is MOST appropriate?</div>
+        <button class="option" data-correct="true" onclick="checkAnswer(this)"><span class="opt-letter">A.</span> Deploy an S3 File Gateway on-premises with NFS mount points</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">B.</span> Use AWS DataSync to continuously sync the NFS share to S3</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">C.</span> Mount an EFS file system from on-premises via AWS Direct Connect</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">D.</span> Use S3 Transfer Acceleration to upload files from on-premises</button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>A is correct.</strong> S3 File Gateway presents an NFS interface locally (so the app doesn't change), caches frequently accessed files for low latency, and stores all data as S3 objects for analytics. <strong>B</strong> would sync files but doesn't provide a local cache or transparent NFS integration. <strong>C</strong> uses EFS, not S3, so files aren't directly accessible in S3 for analytics. <strong>D</strong> is for optimizing uploads to S3 but doesn't provide a local NFS interface or cache.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 10 ===== -->
+  <div class="section" id="s10">
+    <div class="section-num">Section 10</div>
+    <h2>Data Transfer & Migration</h2>
+
+    <p>AWS provides several tools for moving data into and within the cloud. The choice depends on data volume, network bandwidth, and whether the transfer is one-time or ongoing.</p>
+
+    <h3>AWS Snow Family</h3>
+    <ul class="content-list">
+      <li><strong>Snowcone:</strong> 8 TB (HDD) or 14 TB (SSD) usable storage. Smallest and most portable. Can run EC2 instances and IoT Greengrass. Good for edge computing and small migrations in harsh environments.</li>
+      <li><strong>Snowball Edge Storage Optimized:</strong> 80 TB usable storage. For large-scale data transfers when network transfer would take too long. Can run EC2 and Lambda@Edge.</li>
+      <li><strong>Snowball Edge Compute Optimized:</strong> 42 TB usable storage + powerful compute. For edge computing use cases with pre-processing before transfer.</li>
+      <li><strong>Snowmobile:</strong> Up to 100 PB per Snowmobile (a literal truck). For exabyte-scale migrations.</li>
+    </ul>
+
+    <div class="key-point">
+      <strong>Rule of thumb:</strong> If the estimated network transfer time exceeds 1 week (considering available bandwidth), use Snow Family. If the data is >10 TB and bandwidth is limited, Snowball is likely the answer.
+    </div>
+
+    <h3>AWS DataSync</h3>
+    <p>An online data transfer service for moving large amounts of data between on-premises storage and AWS (or between AWS services). Uses a software agent on-premises. Supports NFS, SMB, HDFS, and self-managed object storage as sources. Destinations include S3, EFS, and FSx. Can transfer up to <strong>10 Gbps per agent</strong> and handles scheduling, integrity checks, encryption, and bandwidth throttling.</p>
+
+    <h3>AWS Transfer Family</h3>
+    <p>Managed service for file transfers into/out of S3 or EFS using <strong>SFTP, FTPS, FTP, and AS2</strong> protocols. Used when external partners or systems need to exchange files using legacy protocols.</p>
+
+    <div class="exam-tip">DataSync is for large-scale, scheduled, or one-time data migrations over the network. Transfer Family is for ongoing file exchange with partners using SFTP/FTP. Snow Family is for offline transfer when network is too slow.</div>
+
+    <div class="quiz-block" data-quiz="20">
+      <div class="quiz-header">
+        <span class="q-badge">Q20</span>
+        <span class="q-label">Data Transfer</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">A company needs to migrate 60 TB of data from an on-premises NAS to Amazon S3. They have a 100 Mbps Direct Connect link. The migration must be completed within one week. At 100 Mbps, transferring 60 TB would take approximately 55 days. Which migration strategy should the architect recommend?</div>
+        <button class="option" data-correct="true" onclick="checkAnswer(this)"><span class="opt-letter">A.</span> Order an AWS Snowball Edge Storage Optimized device, load the data, and ship it to AWS</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">B.</span> Use AWS DataSync over the Direct Connect link with bandwidth throttling disabled</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">C.</span> Upload the data using S3 multipart upload with S3 Transfer Acceleration</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">D.</span> Use multiple AWS DataSync agents in parallel to increase transfer speed</button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>A is correct.</strong> The math is clear: 60 TB over 100 Mbps = ~55 days, which exceeds the 1-week deadline by far. Snowball Edge can be loaded locally and shipped, typically completing a transfer in about 1 week (including shipping). <strong>B</strong> can't overcome the 100 Mbps bandwidth limit — full utilization still takes 55 days. <strong>C</strong> still limited by the 100 Mbps pipe. <strong>D</strong> multiple agents doesn't increase the bandwidth of the Direct Connect link itself.
+        </div>
+      </div>
+    </div>
+
+    <div class="quiz-block" data-quiz="21">
+      <div class="quiz-header">
+        <span class="q-badge">Q21</span>
+        <span class="q-label">Data Transfer</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">A media company receives daily video uploads from hundreds of external contributors via SFTP. The company wants to migrate this workflow to AWS and store the videos in Amazon S3 for processing, without requiring contributors to change their upload method. Which AWS service should the architect use?</div>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">A.</span> AWS DataSync with an agent deployed at each contributor's location</button>
+        <button class="option" data-correct="true" onclick="checkAnswer(this)"><span class="opt-letter">B.</span> AWS Transfer Family configured with SFTP protocol and S3 as the backend</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">C.</span> Amazon S3 pre-signed URLs distributed to each contributor</button>
+        <button class="option" data-correct="false" onclick="checkAnswer(this)"><span class="opt-letter">D.</span> AWS Storage Gateway — S3 File Gateway deployed at the company's office</button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>B is correct.</strong> AWS Transfer Family provides a fully managed SFTP endpoint backed by S3. Contributors continue using their existing SFTP clients — no workflow change required. <strong>A</strong> would require deploying agents at each contributor's site — impractical for hundreds of external parties. <strong>C</strong> requires contributors to use HTTP/HTTPS, not SFTP. <strong>D</strong> is for on-premises integration, not for external contributors.
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- container -->
+
+<!-- Score Panel -->
+<div id="score-panel">
+  <div class="score-title">Exam Score</div>
+  <div class="score-row"><span>Correct</span><span class="correct" id="correct-count">0</span></div>
+  <div class="score-row"><span>Wrong</span><span class="wrong" id="wrong-count">0</span></div>
+  <div class="score-row"><span>Total</span><span class="total" id="total-display">0 / 21</span></div>
+  <div style="margin-top: 10px; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden;">
+    <div id="score-bar" style="height: 100%; width: 0%; background: var(--green); transition: width 0.3s;"></div>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    SAA-C03 Storage Study Guide — 10 Sections, 21 Questions<br>
+    Keep reviewing until you consistently score 90%+
+  </div>
+</footer>
+
+<script>
+let correct = 0;
+let wrong = 0;
+let answered = 0;
+const totalQ = 21;
+
+function checkAnswer(btn) {
+  const quizBody = btn.closest('.quiz-body');
+  const options = quizBody.querySelectorAll('.option');
+  
+  // Prevent double-answering
+  if ([...options].some(o => o.classList.contains('correct') || o.classList.contains('wrong'))) return;
+
+  const isCorrect = btn.dataset.correct === 'true';
+  
+  if (isCorrect) {
+    btn.classList.add('correct');
+    correct++;
+  } else {
+    btn.classList.add('wrong');
+    wrong++;
+    // Reveal the correct answer
+    options.forEach(o => {
+      if (o.dataset.correct === 'true') o.classList.add('reveal-correct');
+    });
+  }
+
+  answered++;
+  
+  // Disable all options
+  options.forEach(o => o.disabled = true);
+  
+  // Show explanation
+  quizBody.querySelector('.explanation').style.display = 'block';
+  
+  // Update score panel
+  document.getElementById('correct-count').textContent = correct;
+  document.getElementById('wrong-count').textContent = wrong;
+  document.getElementById('total-display').textContent = answered + ' / ' + totalQ;
+  
+  const pct = answered > 0 ? (correct / answered) * 100 : 0;
+  document.getElementById('score-bar').style.width = pct + '%';
+  document.getElementById('score-bar').style.background = pct >= 72 ? 'var(--green)' : 'var(--red)';
+}
+
+// Progress bar on scroll
+window.addEventListener('scroll', () => {
+  const winH = document.documentElement.scrollHeight - window.innerHeight;
+  const scrolled = (window.scrollY / winH) * 100;
+  document.getElementById('progress-bar').style.width = scrolled + '%';
+});
+</script>
+</body>
+</html>

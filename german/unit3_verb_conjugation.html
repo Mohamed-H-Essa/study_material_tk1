@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit 3: Verb Conjugation — Present Tense</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#1a1a2e;color:#e0e0e0;font-family:Georgia,'Times New Roman',serif;line-height:1.8;font-size:17px}
+::selection{background:#4a4a8a;color:#fff}
+.wrap{max-width:720px;margin:0 auto;padding:30px 20px 80px}
+h1{font-size:28px;color:#e8d5b7;margin-bottom:6px;font-weight:normal}
+h2{font-size:21px;color:#c9a96e;margin:40px 0 16px;padding-bottom:6px;border-bottom:1px solid #2a2a4a;font-weight:normal}
+h3{font-size:17px;color:#9db8d4;margin:24px 0 10px;font-weight:normal}
+p{margin-bottom:14px}
+.subtitle{color:#888;font-size:15px;margin-bottom:30px}
+.de{color:#7ec8e3;font-weight:bold}
+.en{color:#b0b0b0}
+.end{color:#e8d5b7;font-weight:bold}
+.stem{color:#7ec8e3}
+.note{color:#c9a96e;font-style:italic;font-size:15px}
+.tip{background:#1e2a3a;border-left:3px solid #4a90d9;padding:12px 16px;margin:16px 0;border-radius:0 4px 4px 0;font-size:15px}
+.warn{background:#2a1a1a;border-left:3px solid #d94a4a;padding:12px 16px;margin:16px 0;border-radius:0 4px 4px 0;font-size:15px}
+.conj-table{width:100%;border-collapse:collapse;margin:14px 0 20px;font-size:15px}
+.conj-table th{background:#0f3460;color:#c9a96e;padding:8px 12px;text-align:left;font-weight:normal;font-size:13px;text-transform:uppercase;letter-spacing:1px}
+.conj-table td{padding:8px 12px;border-bottom:1px solid #2a2a4a}
+.conj-table tr:nth-child(even) td{background:#16213e}
+.conj-table .pronoun{color:#888;min-width:50px}
+.conj-table .ending{color:#e8d5b7;font-weight:bold}
+.conj-table .form{color:#7ec8e3}
+.conj-table .irregular{color:#f0a050}
+.example{background:#16213e;border-radius:6px;padding:14px 16px;margin:12px 0;font-size:15px}
+.example .de-line{color:#7ec8e3;font-size:16px;margin-bottom:4px}
+.example .en-line{color:#888;font-size:14px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:14px 0}
+.grid-2 .card{background:#16213e;border:1px solid #2a2a4a;border-radius:6px;padding:14px}
+.grid-2 .card h4{color:#9db8d4;font-size:14px;font-weight:normal;margin-bottom:8px}
+.section-nav{position:fixed;top:0;left:0;right:0;background:#12122a;border-bottom:1px solid #2a2a4a;padding:8px 16px;z-index:100;display:flex;align-items:center;gap:12px;font-size:13px;overflow-x:auto}
+.section-nav .sn-title{color:#888;margin-right:auto;white-space:nowrap}
+.section-nav .sn-item{color:#555;cursor:pointer;padding:2px 8px;border-radius:3px;white-space:nowrap}
+.section-nav .sn-item:hover{color:#aaa}
+.section-nav .sn-item.active{color:#7ec8e3;background:#1e2a3a}
+.vim-help{position:fixed;bottom:12px;right:12px;background:#12122a;border:1px solid #2a2a4a;border-radius:6px;padding:10px 14px;font-size:12px;color:#666;font-family:monospace;z-index:100}
+.vim-help kbd{background:#2a2a4a;padding:1px 5px;border-radius:3px;color:#999;font-size:11px}
+.vim-help .vk-row{margin:2px 0}
+
+.quiz-section{background:#12122a;border:1px solid #2a2a4a;border-radius:8px;padding:24px;margin:20px 0}
+.quiz-progress{font-size:13px;color:#666;margin-bottom:4px;text-align:right}
+.quiz-progress-bar{height:4px;background:#2a2a4a;border-radius:2px;margin-bottom:16px}
+.quiz-progress-fill{height:100%;background:#4a90d9;border-radius:2px;transition:width .3s}
+.quiz-q{font-size:16px;color:#e0e0e0;margin-bottom:6px;line-height:1.6}
+.quiz-type{font-size:12px;color:#666;margin-bottom:12px}
+.quiz-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.quiz-opt{padding:10px 14px;background:#1a1a2e;border:1px solid #2a2a4a;border-radius:6px;cursor:pointer;font-size:15px;color:#c0c0c0;text-align:left;transition:border-color .15s}
+.quiz-opt:hover{border-color:#4a4a8a}
+.quiz-opt.qsel{border-color:#4a90d9;color:#7ec8e3;background:#1e2a3a}
+.quiz-opt.qright{border-color:#22c55e;color:#4ade80;background:#0f2a1a}
+.quiz-opt.qwrong{border-color:#ef4444;color:#f87171;background:#2a0f0f}
+.quiz-opt.qmissed{border-color:#22c55e;color:#4ade80;background:#0f2a1a;opacity:.6}
+.quiz-input{width:100%;padding:10px 14px;background:#1a1a2e;border:1px solid #2a2a4a;border-radius:6px;color:#e0e0e0;font-size:15px;font-family:inherit;outline:none;margin-bottom:12px}
+.quiz-input:focus{border-color:#4a90d9}
+.quiz-feedback{font-size:14px;margin:10px 0;min-height:20px}
+.quiz-fb-right{color:#4ade80}
+.quiz-fb-wrong{color:#f87171}
+.quiz-nav{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+.qbtn{padding:8px 18px;border:1px solid #2a2a4a;border-radius:6px;background:#1a1a2e;color:#c0c0c0;cursor:pointer;font-size:14px}
+.qbtn:hover{border-color:#4a4a8a;color:#e0e0e0}
+.qbtn:disabled{opacity:.3;cursor:default}
+.qbtn.primary{background:#4a90d9;border-color:#4a90d9;color:#fff}
+.qbtn.primary:hover{background:#3a7bc8}
+.quiz-results{text-align:center;padding:20px}
+.quiz-score{font-size:48px;color:#e8d5b7;font-weight:bold}
+.quiz-score-label{color:#888;font-size:14px;margin-bottom:20px}
+.quiz-breakdown{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:20px 0}
+.qb-card{background:#1a1a2e;border:1px solid #2a2a4a;border-radius:6px;padding:12px}
+.qb-num{font-size:22px;font-weight:bold}.qb-lbl{font-size:12px;color:#888;margin-top:2px}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.bar-label{font-size:13px;min-width:100px;color:#666}
+.bar-bg{flex:1;height:8px;background:#2a2a4a;border-radius:4px;overflow:hidden}
+.bar-fg{height:100%;border-radius:4px}
+.bar-pct{font-size:12px;color:#888;width:40px;text-align:right}
+.quiz-dl{width:100%;padding:12px;background:#4a90d9;color:#fff;border:none;border-radius:6px;font-size:14px;cursor:pointer;margin-top:12px}
+.quiz-dl:hover{background:#3a7bc8}
+.hidden{display:none}
+
+/* Conjugation drill */
+.drill-area{background:#16213e;border:1px solid #2a2a4a;border-radius:8px;padding:20px;margin:16px 0;text-align:center}
+.drill-verb{font-size:13px;color:#888;margin-bottom:4px}
+.drill-prompt{font-size:24px;color:#e0e0e0;margin-bottom:16px}
+.drill-prompt .dp-pronoun{color:#c9a96e}
+.drill-prompt .dp-verb{color:#555}
+.drill-input{width:200px;padding:10px 14px;background:#1a1a2e;border:1px solid #2a2a4a;border-radius:6px;color:#e0e0e0;font-size:18px;font-family:inherit;outline:none;text-align:center}
+.drill-input:focus{border-color:#4a90d9}
+.drill-fb{font-size:15px;margin-top:10px;min-height:24px}
+.drill-controls{display:flex;justify-content:center;gap:10px;margin-top:14px}
+.drill-score{font-size:13px;color:#666;margin-top:10px}
+</style>
+</head>
+<body>
+
+<div class="section-nav" id="sectionNav">
+  <span class="sn-title">Unit 3</span>
+  <span class="sn-item active" data-s="intro">Intro</span>
+  <span class="sn-item" data-s="regular">Regular</span>
+  <span class="sn-item" data-s="stems">Stem changers</span>
+  <span class="sn-item" data-s="big3">sein/haben/werden</span>
+  <span class="sn-item" data-s="spelling">Spelling rules</span>
+  <span class="sn-item" data-s="usage">Usage</span>
+  <span class="sn-item" data-s="drill">Drill</span>
+  <span class="sn-item" data-s="quiz">Quiz</span>
+</div>
+
+<div class="vim-help" id="vimHelp">
+  <div class="vk-row"><kbd>j</kbd>/<kbd>k</kbd> scroll</div>
+  <div class="vk-row"><kbd>gg</kbd> top · <kbd>G</kbd> bottom</div>
+  <div class="vk-row"><kbd>n</kbd>/<kbd>N</kbd> next/prev section</div>
+  <div class="vk-row"><kbd>1</kbd>–<kbd>4</kbd> quiz options</div>
+  <div class="vk-row"><kbd>Enter</kbd> confirm · <kbd>?</kbd> help</div>
+</div>
+
+<div class="wrap">
+
+<!-- INTRO -->
+<section id="intro">
+<h1>Unit 3: Verb Conjugation — Present Tense</h1>
+<p class="subtitle">The engine of every sentence — how German verbs change shape for each person</p>
+
+<p>In your assessment, you nailed <span class="de">ich bin</span> confidently. That's the hardest irregular verb in German, and you already own it. The present tense is where you build from here — it's not just "what's happening now" but also "what will happen" (German often uses present tense for future), "what generally happens" (habits), and even "what has been happening" (with seit + present tense).</p>
+
+<p>Every German verb in the dictionary ends in <span class="de">-en</span> (or rarely <span class="de">-n</span>). That's the infinitive: <span class="de">machen</span> (to make), <span class="de">lernen</span> (to learn), <span class="de">sprechen</span> (to speak). To conjugate, you chop off the <span class="de">-en</span> to get the stem, then add the right ending.</p>
+
+<div class="tip">
+  <strong>The good news:</strong> Regular conjugation covers about 80% of German verbs. Learn one pattern and you can conjugate hundreds of verbs. The irregulars that matter are surprisingly few — maybe 20 verbs you'll actually use daily.
+</div>
+</section>
+
+<!-- REGULAR -->
+<section id="regular">
+<h2>1. Regular Conjugation Pattern</h2>
+
+<p>Take <span class="de">machen</span> (to make/do). The stem is <span class="stem">mach</span>. Now add endings:</p>
+
+<table class="conj-table">
+  <tr><th>Pronoun</th><th>Ending</th><th>Form</th><th>English</th></tr>
+  <tr><td class="pronoun">ich</td><td class="ending">-e</td><td class="form">mach<span class="end">e</span></td><td class="en">I make</td></tr>
+  <tr><td class="pronoun">du</td><td class="ending">-st</td><td class="form">mach<span class="end">st</span></td><td class="en">you make (informal)</td></tr>
+  <tr><td class="pronoun">er/sie/es</td><td class="ending">-t</td><td class="form">mach<span class="end">t</span></td><td class="en">he/she/it makes</td></tr>
+  <tr><td class="pronoun">wir</td><td class="ending">-en</td><td class="form">mach<span class="end">en</span></td><td class="en">we make</td></tr>
+  <tr><td class="pronoun">ihr</td><td class="ending">-t</td><td class="form">mach<span class="end">t</span></td><td class="en">you all make</td></tr>
+  <tr><td class="pronoun">sie/Sie</td><td class="ending">-en</td><td class="form">mach<span class="end">en</span></td><td class="en">they/you (formal) make</td></tr>
+</table>
+
+<div class="warn">
+  <strong>The shortcut that saves you:</strong> Only 3 endings to actually memorize: <span class="end">-e</span> (ich), <span class="end">-st</span> (du), and <span class="end">-t</span> (er/sie/es and ihr). The wir and sie/Sie forms are identical to the infinitive — <span class="de">machen</span>. So half the table is free.
+</div>
+
+<p>This exact pattern works for all of these (and hundreds more):</p>
+
+<div class="grid-2">
+  <div class="card">
+    <h4>Common regular verbs</h4>
+    <p style="font-size:14px;line-height:2">
+      <span class="de">lernen</span> — to learn<br>
+      <span class="de">spielen</span> — to play<br>
+      <span class="de">kaufen</span> — to buy<br>
+      <span class="de">wohnen</span> — to live (reside)<br>
+      <span class="de">fragen</span> — to ask<br>
+      <span class="de">sagen</span> — to say<br>
+      <span class="de">suchen</span> — to search<br>
+      <span class="de">hören</span> — to hear
+    </p>
+  </div>
+  <div class="card">
+    <h4>Try one: spielen</h4>
+    <p style="font-size:14px;line-height:2">
+      ich <span class="form">spiel<span class="end">e</span></span><br>
+      du <span class="form">spiel<span class="end">st</span></span><br>
+      er <span class="form">spiel<span class="end">t</span></span><br>
+      wir <span class="form">spiel<span class="end">en</span></span><br>
+      ihr <span class="form">spiel<span class="end">t</span></span><br>
+      sie <span class="form">spiel<span class="end">en</span></span>
+    </p>
+  </div>
+</div>
+
+<div class="example">
+  <div class="de-line">Ich lerne Deutsch. Wir spielen Fußball. Er kauft Brot.</div>
+  <div class="en-line">I learn German. We play football. He buys bread.</div>
+</div>
+</section>
+
+<!-- STEM CHANGERS -->
+<section id="stems">
+<h2>2. Stem-Changing Verbs</h2>
+
+<p>About 50 common verbs change their stem vowel in the <span class="de">du</span> and <span class="de">er/sie/es</span> forms only. The endings stay the same (-st, -t) — it's just the vowel inside the stem that shifts. There are three patterns:</p>
+
+<h3>Pattern A: e → i</h3>
+
+<table class="conj-table">
+  <tr><th>Pronoun</th><th>sprechen (to speak)</th><th>geben (to give)</th><th>helfen (to help)</th></tr>
+  <tr><td class="pronoun">ich</td><td>sprech<span class="end">e</span></td><td>geb<span class="end">e</span></td><td>helf<span class="end">e</span></td></tr>
+  <tr><td class="pronoun">du</td><td><span class="irregular">sprichst</span></td><td><span class="irregular">gibst</span></td><td><span class="irregular">hilfst</span></td></tr>
+  <tr><td class="pronoun">er/sie/es</td><td><span class="irregular">spricht</span></td><td><span class="irregular">gibt</span></td><td><span class="irregular">hilft</span></td></tr>
+  <tr><td class="pronoun">wir</td><td>sprech<span class="end">en</span></td><td>geb<span class="end">en</span></td><td>helf<span class="end">en</span></td></tr>
+  <tr><td class="pronoun">ihr</td><td>sprech<span class="end">t</span></td><td>geb<span class="end">t</span></td><td>helf<span class="end">t</span></td></tr>
+  <tr><td class="pronoun">sie/Sie</td><td>sprech<span class="end">en</span></td><td>geb<span class="end">en</span></td><td>helf<span class="end">en</span></td></tr>
+</table>
+
+<p class="note">Notice: the change only hits du and er/sie/es. Everyone else keeps the original stem. "Du sprichst Deutsch" but "Wir sprechen Deutsch."</p>
+
+<h3>Pattern B: e → ie</h3>
+
+<table class="conj-table">
+  <tr><th>Pronoun</th><th>lesen (to read)</th><th>sehen (to see)</th></tr>
+  <tr><td class="pronoun">ich</td><td>les<span class="end">e</span></td><td>seh<span class="end">e</span></td></tr>
+  <tr><td class="pronoun">du</td><td><span class="irregular">liest</span></td><td><span class="irregular">siehst</span></td></tr>
+  <tr><td class="pronoun">er/sie/es</td><td><span class="irregular">liest</span></td><td><span class="irregular">sieht</span></td></tr>
+  <tr><td class="pronoun">wir</td><td>les<span class="end">en</span></td><td>seh<span class="end">en</span></td></tr>
+  <tr><td class="pronoun">ihr</td><td>les<span class="end">t</span></td><td>seh<span class="end">t</span></td></tr>
+  <tr><td class="pronoun">sie/Sie</td><td>les<span class="end">en</span></td><td>seh<span class="end">en</span></td></tr>
+</table>
+
+<p class="note">Fun fact: "du liest" — the stem becomes "lies" and with the -st ending it should be "liesst," but German drops the double s. So du liest and er liest look identical.</p>
+
+<h3>Pattern C: a → ä</h3>
+
+<table class="conj-table">
+  <tr><th>Pronoun</th><th>fahren (to drive)</th><th>schlafen (to sleep)</th><th>tragen (to wear/carry)</th></tr>
+  <tr><td class="pronoun">ich</td><td>fahr<span class="end">e</span></td><td>schlaf<span class="end">e</span></td><td>trag<span class="end">e</span></td></tr>
+  <tr><td class="pronoun">du</td><td><span class="irregular">fährst</span></td><td><span class="irregular">schläfst</span></td><td><span class="irregular">trägst</span></td></tr>
+  <tr><td class="pronoun">er/sie/es</td><td><span class="irregular">fährt</span></td><td><span class="irregular">schläft</span></td><td><span class="irregular">trägt</span></td></tr>
+  <tr><td class="pronoun">wir</td><td>fahr<span class="end">en</span></td><td>schlaf<span class="end">en</span></td><td>trag<span class="end">en</span></td></tr>
+  <tr><td class="pronoun">ihr</td><td>fahr<span class="end">t</span></td><td>schlaf<span class="end">t</span></td><td>trag<span class="end">t</span></td></tr>
+  <tr><td class="pronoun">sie/Sie</td><td>fahr<span class="end">en</span></td><td>schlaf<span class="end">en</span></td><td>trag<span class="end">en</span></td></tr>
+</table>
+
+<div class="tip">
+  <strong>How to remember which verbs change:</strong> Unfortunately, there's no rule — you just learn them as you meet them. But here's the pattern to internalize: if a verb changes, it ONLY changes in du and er/sie/es. The ich, wir, ihr, sie/Sie forms are always regular. That cuts your memorization in half.
+</div>
+
+<p>Here's the full list of common stem-changers worth knowing at A2:</p>
+
+<div class="grid-2">
+  <div class="card">
+    <h4>e → i</h4>
+    <p style="font-size:14px;line-height:2">
+      <span class="de">sprechen</span> → spricht<br>
+      <span class="de">geben</span> → gibt<br>
+      <span class="de">helfen</span> → hilft<br>
+      <span class="de">treffen</span> → trifft<br>
+      <span class="de">nehmen</span> → nimmt<br>
+      <span class="de">essen</span> → isst<br>
+      <span class="de">werfen</span> → wirft<br>
+      <span class="de">vergessen</span> → vergisst
+    </p>
+  </div>
+  <div class="card">
+    <h4>e → ie &nbsp;/&nbsp; a → ä</h4>
+    <p style="font-size:14px;line-height:2">
+      <span class="de">lesen</span> → liest<br>
+      <span class="de">sehen</span> → sieht<br>
+      <span class="de">empfehlen</span> → empfiehlt<br>
+      ──<br>
+      <span class="de">fahren</span> → fährt<br>
+      <span class="de">schlafen</span> → schläft<br>
+      <span class="de">tragen</span> → trägt<br>
+      <span class="de">fallen</span> → fällt<br>
+      <span class="de">laufen</span> → läuft
+    </p>
+  </div>
+</div>
+
+<div class="warn">
+  <strong>nehmen is extra weird:</strong> du <span class="irregular">nimmst</span>, er <span class="irregular">nimmt</span>. It doesn't just change e→i, it also doubles the m and drops the h. It's one of a kind — just memorize it.
+</div>
+</section>
+
+<!-- BIG 3 -->
+<section id="big3">
+<h2>3. The Big Three Irregulars: sein, haben, werden</h2>
+
+<p>These are the most important verbs in German. Not because of their own meaning, but because they build other tenses: <span class="de">haben</span> and <span class="de">sein</span> build the Perfekt (past), <span class="de">werden</span> builds the future and the passive. You need them cold.</p>
+
+<h3>sein — to be</h3>
+
+<table class="conj-table">
+  <tr><th>Pronoun</th><th>Form</th><th>Example</th></tr>
+  <tr><td class="pronoun">ich</td><td class="irregular">bin</td><td class="en">Ich bin müde. (I am tired.)</td></tr>
+  <tr><td class="pronoun">du</td><td class="irregular">bist</td><td class="en">Du bist nett. (You are nice.)</td></tr>
+  <tr><td class="pronoun">er/sie/es</td><td class="irregular">ist</td><td class="en">Es ist kalt. (It is cold.)</td></tr>
+  <tr><td class="pronoun">wir</td><td class="irregular">sind</td><td class="en">Wir sind hier. (We are here.)</td></tr>
+  <tr><td class="pronoun">ihr</td><td class="irregular">seid</td><td class="en">Ihr seid spät. (You all are late.)</td></tr>
+  <tr><td class="pronoun">sie/Sie</td><td class="irregular">sind</td><td class="en">Sie sind Ingenieur. (You are an engineer. [formal])</td></tr>
+</table>
+
+<p class="note">You already got "ich bin" right on the assessment. Now extend it to all six forms. Notice: wir sind = sie sind = Sie sind — three pronouns, same form.</p>
+
+<h3>haben — to have</h3>
+
+<table class="conj-table">
+  <tr><th>Pronoun</th><th>Form</th><th>Example</th></tr>
+  <tr><td class="pronoun">ich</td><td class="irregular">habe</td><td class="en">Ich habe Hunger. (I'm hungry. — lit. "I have hunger")</td></tr>
+  <tr><td class="pronoun">du</td><td class="irregular">hast</td><td class="en">Hast du Zeit? (Do you have time?)</td></tr>
+  <tr><td class="pronoun">er/sie/es</td><td class="irregular">hat</td><td class="en">Er hat ein Auto. (He has a car.)</td></tr>
+  <tr><td class="pronoun">wir</td><td class="irregular">haben</td><td class="en">Wir haben ein Problem. (We have a problem.)</td></tr>
+  <tr><td class="pronoun">ihr</td><td class="irregular">habt</td><td class="en">Habt ihr Kinder? (Do you all have kids?)</td></tr>
+  <tr><td class="pronoun">sie/Sie</td><td class="irregular">haben</td><td class="en">Sie haben recht. (You are right. [formal])</td></tr>
+</table>
+
+<p class="note">The irregularity is mild: du hast (drops the b), er hat (drops b and e). Everything else follows the regular pattern. This is the verb you'll use most for Perfekt later: "Ich habe gegessen."</p>
+
+<h3>werden — to become (also: will/future)</h3>
+
+<table class="conj-table">
+  <tr><th>Pronoun</th><th>Form</th><th>Example</th></tr>
+  <tr><td class="pronoun">ich</td><td class="irregular">werde</td><td class="en">Ich werde Ingenieur. (I'm becoming an engineer.)</td></tr>
+  <tr><td class="pronoun">du</td><td class="irregular">wirst</td><td class="en">Du wirst müde. (You're getting tired.)</td></tr>
+  <tr><td class="pronoun">er/sie/es</td><td class="irregular">wird</td><td class="en">Es wird kalt. (It's getting cold.)</td></tr>
+  <tr><td class="pronoun">wir</td><td class="irregular">werden</td><td class="en">Wir werden besser. (We're getting better.)</td></tr>
+  <tr><td class="pronoun">ihr</td><td class="irregular">werdet</td><td class="en">Ihr werdet sehen. (You all will see.)</td></tr>
+  <tr><td class="pronoun">sie/Sie</td><td class="irregular">werden</td><td class="en">Sie werden kommen. (They will come.)</td></tr>
+</table>
+
+<div class="tip">
+  <strong>werden = the Swiss army knife.</strong> By itself it means "to become" (Es wird kalt). With an infinitive, it makes the future tense (Ich werde lernen = I will learn). With Partizip II, it makes the passive (Das Buch wird gelesen = The book is being read). You'll encounter all three uses, but for now just learn the conjugation.
+</div>
+</section>
+
+<!-- SPELLING RULES -->
+<section id="spelling">
+<h2>4. Spelling Adjustments</h2>
+
+<p>Some perfectly regular verbs need a small spelling tweak to stay pronounceable. These aren't irregular — they follow the same endings, just with a helper vowel or a dropped letter.</p>
+
+<h3>Stems ending in -t, -d, -chn, -ffn, -gn: add an extra "e"</h3>
+
+<p>When the stem ends in a consonant cluster that would be unpronounceable with -st or -t tacked on, German inserts an <span class="end">e</span> as a buffer.</p>
+
+<table class="conj-table">
+  <tr><th>Pronoun</th><th>arbeiten (to work)</th><th>finden (to find)</th><th>öffnen (to open)</th></tr>
+  <tr><td class="pronoun">ich</td><td>arbeit<span class="end">e</span></td><td>find<span class="end">e</span></td><td>öffn<span class="end">e</span></td></tr>
+  <tr><td class="pronoun">du</td><td>arbeit<span class="end">est</span></td><td>find<span class="end">est</span></td><td>öffn<span class="end">est</span></td></tr>
+  <tr><td class="pronoun">er/sie/es</td><td>arbeit<span class="end">et</span></td><td>find<span class="end">et</span></td><td>öffn<span class="end">et</span></td></tr>
+  <tr><td class="pronoun">wir</td><td>arbeit<span class="end">en</span></td><td>find<span class="end">en</span></td><td>öffn<span class="end">en</span></td></tr>
+  <tr><td class="pronoun">ihr</td><td>arbeit<span class="end">et</span></td><td>find<span class="end">et</span></td><td>öffn<span class="end">et</span></td></tr>
+  <tr><td class="pronoun">sie/Sie</td><td>arbeit<span class="end">en</span></td><td>find<span class="end">en</span></td><td>öffn<span class="end">en</span></td></tr>
+</table>
+
+<p class="note">Try saying "arbeitst" fast — it's a tongue-twister. "Arbeitest" is pronounceable. That's the entire reason for the extra e. Other common verbs: warten (to wait) → du wartest, antworten (to answer) → du antwortest.</p>
+
+<h3>Stems ending in -s, -ß, -z, -x: du form drops the s from -st</h3>
+
+<table class="conj-table">
+  <tr><th>Verb</th><th>du form</th><th>Why</th></tr>
+  <tr><td>reisen (to travel)</td><td>du reis<span class="end">t</span></td><td>reisST would double the S sound</td></tr>
+  <tr><td>heißen (to be called)</td><td>du heiß<span class="end">t</span></td><td>heißST is unpronounceable</td></tr>
+  <tr><td>sitzen (to sit)</td><td>du sitz<span class="end">t</span></td><td>sitzST is a mess</td></tr>
+</table>
+
+<p class="note">This is purely phonetic — German avoids hissing consonant pileups. The result: du reist looks like er reist. Context tells you which is which.</p>
+</section>
+
+<!-- USAGE -->
+<section id="usage">
+<h2>5. What Present Tense Actually Covers</h2>
+
+<p>German present tense does more work than English present tense. It covers four situations:</p>
+
+<h3>A. Current actions (like English)</h3>
+<div class="example">
+  <div class="de-line">Ich lerne Deutsch.</div>
+  <div class="en-line">I'm learning German. / I learn German.</div>
+</div>
+<p class="note">German doesn't distinguish between "I learn" and "I am learning" — both are just "Ich lerne." There is no "-ing" form in German.</p>
+
+<h3>B. Future (with time word)</h3>
+<div class="example">
+  <div class="de-line">Ich fahre morgen nach Berlin.</div>
+  <div class="en-line">I'm going to Berlin tomorrow.</div>
+</div>
+<p class="note">No need for "werde" (will) here. The time word "morgen" makes the future meaning clear. This is how most Germans express near-future plans — it sounds more natural than using werden.</p>
+
+<h3>C. Ongoing states (seit + present tense)</h3>
+<div class="example">
+  <div class="de-line">Ich wohne seit drei Jahren in Kairo.</div>
+  <div class="en-line">I have been living in Cairo for three years.</div>
+</div>
+
+<div class="warn">
+  <strong>This trips up every English speaker.</strong> English uses present perfect ("have been living") for actions that started in the past and continue now. German uses present tense + seit (since/for). "Ich lerne seit einem Jahr Deutsch" = "I have been learning German for one year." NOT "Ich habe gelernt" — that would mean you stopped.
+</div>
+
+<h3>D. General truths / habits</h3>
+<div class="example">
+  <div class="de-line">Die Sonne geht im Osten auf.</div>
+  <div class="en-line">The sun rises in the east.</div>
+</div>
+
+<h3>Questions: just invert</h3>
+<p>To make a yes/no question, swap the subject and verb:</p>
+<div class="example">
+  <div class="de-line">Du sprichst Deutsch. → Sprichst du Deutsch?</div>
+  <div class="en-line">You speak German. → Do you speak German?</div>
+</div>
+<p class="note">No "do" helper needed. Just flip the order. This is one thing German does more simply than English.</p>
+
+<h3>du vs. ihr vs. Sie — which "you"?</h3>
+<div class="grid-2">
+  <div class="card">
+    <h4>du — one person, informal</h4>
+    <p style="font-size:14px">Friends, family, kids, colleagues you're close with. You'll use this most.</p>
+  </div>
+  <div class="card">
+    <h4>ihr — multiple people, informal</h4>
+    <p style="font-size:14px">"You guys / you all." Talking to a group of friends.</p>
+  </div>
+</div>
+<div class="grid-2">
+  <div class="card">
+    <h4>Sie — formal (one or many)</h4>
+    <p style="font-size:14px">Strangers, officials, your boss (initially). Always capitalized. Conjugates like sie (they).</p>
+  </div>
+  <div class="card">
+    <h4>The rule in Germany</h4>
+    <p style="font-size:14px">Default to Sie with strangers. Most workplaces switch to du quickly. When in doubt, match what they use with you.</p>
+  </div>
+</div>
+</section>
+
+<!-- DRILL -->
+<section id="drill">
+<h2>Conjugation Drill</h2>
+<p>Type the correct conjugated form. Press <kbd>Enter</kbd> to check, then <kbd>Enter</kbd> again for the next one. Covers all verb types from this unit.</p>
+
+<div class="drill-area">
+  <div class="drill-verb" id="drillInf"></div>
+  <div class="drill-prompt" id="drillPrompt"></div>
+  <input class="drill-input" id="drillInput" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="type here...">
+  <div class="drill-fb" id="drillFb"></div>
+  <div class="drill-controls">
+    <button class="qbtn" onclick="drillCheck()" id="drillBtn">Check</button>
+    <button class="qbtn" onclick="drillReset()">Reset score</button>
+  </div>
+  <div class="drill-score" id="drillScore">0 / 0</div>
+</div>
+</section>
+
+<!-- QUIZ -->
+<section id="quiz">
+<h2>Quiz</h2>
+<p style="margin-bottom:16px">30 questions — conjugation fill-in, pick the correct form, identify the error, and translate. <kbd>1</kbd>–<kbd>4</kbd> to select, <kbd>Enter</kbd> to confirm.</p>
+
+<div class="quiz-section" id="quizArea">
+  <div class="quiz-progress" id="qzProgress">1 / 30</div>
+  <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="qzFill" style="width:0%"></div></div>
+  <div class="quiz-type" id="qzType"></div>
+  <div class="quiz-q" id="qzQ"></div>
+  <div id="qzBody"></div>
+  <div class="quiz-feedback" id="qzFb"></div>
+  <div class="quiz-nav">
+    <span id="qzScore" style="font-size:13px;color:#666"></span>
+    <button class="qbtn primary" id="qzNext" onclick="qzConfirm()">Check</button>
+  </div>
+</div>
+<div class="quiz-section hidden" id="quizResults"></div>
+</section>
+
+</div>
+
+<script>
+// ===== VERB DATA =====
+const verbs = {
+  // Regular
+  machen:{type:'regular',en:'to make/do',forms:{ich:'mache',du:'machst','er/sie/es':'macht',wir:'machen',ihr:'macht','sie/Sie':'machen'}},
+  lernen:{type:'regular',en:'to learn',forms:{ich:'lerne',du:'lernst','er/sie/es':'lernt',wir:'lernen',ihr:'lernt','sie/Sie':'lernen'}},
+  spielen:{type:'regular',en:'to play',forms:{ich:'spiele',du:'spielst','er/sie/es':'spielt',wir:'spielen',ihr:'spielt','sie/Sie':'spielen'}},
+  kaufen:{type:'regular',en:'to buy',forms:{ich:'kaufe',du:'kaufst','er/sie/es':'kauft',wir:'kaufen',ihr:'kauft','sie/Sie':'kaufen'}},
+  wohnen:{type:'regular',en:'to live',forms:{ich:'wohne',du:'wohnst','er/sie/es':'wohnt',wir:'wohnen',ihr:'wohnt','sie/Sie':'wohnen'}},
+  fragen:{type:'regular',en:'to ask',forms:{ich:'frage',du:'fragst','er/sie/es':'fragt',wir:'fragen',ihr:'fragt','sie/Sie':'fragen'}},
+  hören:{type:'regular',en:'to hear',forms:{ich:'höre',du:'hörst','er/sie/es':'hört',wir:'hören',ihr:'hört','sie/Sie':'hören'}},
+  // Spelling adjustment
+  arbeiten:{type:'spelling',en:'to work',forms:{ich:'arbeite',du:'arbeitest','er/sie/es':'arbeitet',wir:'arbeiten',ihr:'arbeitet','sie/Sie':'arbeiten'}},
+  finden:{type:'spelling',en:'to find',forms:{ich:'finde',du:'findest','er/sie/es':'findet',wir:'finden',ihr:'findet','sie/Sie':'finden'}},
+  warten:{type:'spelling',en:'to wait',forms:{ich:'warte',du:'wartest','er/sie/es':'wartet',wir:'warten',ihr:'wartet','sie/Sie':'warten'}},
+  // Stem e->i
+  sprechen:{type:'stem_ei',en:'to speak',forms:{ich:'spreche',du:'sprichst','er/sie/es':'spricht',wir:'sprechen',ihr:'sprecht','sie/Sie':'sprechen'}},
+  geben:{type:'stem_ei',en:'to give',forms:{ich:'gebe',du:'gibst','er/sie/es':'gibt',wir:'geben',ihr:'gebt','sie/Sie':'geben'}},
+  helfen:{type:'stem_ei',en:'to help',forms:{ich:'helfe',du:'hilfst','er/sie/es':'hilft',wir:'helfen',ihr:'helft','sie/Sie':'helfen'}},
+  essen:{type:'stem_ei',en:'to eat',forms:{ich:'esse',du:'isst','er/sie/es':'isst',wir:'essen',ihr:'esst','sie/Sie':'essen'}},
+  nehmen:{type:'stem_ei',en:'to take',forms:{ich:'nehme',du:'nimmst','er/sie/es':'nimmt',wir:'nehmen',ihr:'nehmt','sie/Sie':'nehmen'}},
+  treffen:{type:'stem_ei',en:'to meet',forms:{ich:'treffe',du:'triffst','er/sie/es':'trifft',wir:'treffen',ihr:'trefft','sie/Sie':'treffen'}},
+  vergessen:{type:'stem_ei',en:'to forget',forms:{ich:'vergesse',du:'vergisst','er/sie/es':'vergisst',wir:'vergessen',ihr:'vergesst','sie/Sie':'vergessen'}},
+  // Stem e->ie
+  lesen:{type:'stem_eie',en:'to read',forms:{ich:'lese',du:'liest','er/sie/es':'liest',wir:'lesen',ihr:'lest','sie/Sie':'lesen'}},
+  sehen:{type:'stem_eie',en:'to see',forms:{ich:'sehe',du:'siehst','er/sie/es':'sieht',wir:'sehen',ihr:'seht','sie/Sie':'sehen'}},
+  // Stem a->ä
+  fahren:{type:'stem_aae',en:'to drive',forms:{ich:'fahre',du:'fährst','er/sie/es':'fährt',wir:'fahren',ihr:'fahrt','sie/Sie':'fahren'}},
+  schlafen:{type:'stem_aae',en:'to sleep',forms:{ich:'schlafe',du:'schläfst','er/sie/es':'schläft',wir:'schlafen',ihr:'schlaft','sie/Sie':'schlafen'}},
+  tragen:{type:'stem_aae',en:'to wear/carry',forms:{ich:'trage',du:'trägst','er/sie/es':'trägt',wir:'tragen',ihr:'tragt','sie/Sie':'tragen'}},
+  laufen:{type:'stem_aae',en:'to run/walk',forms:{ich:'laufe',du:'läufst','er/sie/es':'läuft',wir:'laufen',ihr:'lauft','sie/Sie':'laufen'}},
+  // Big 3
+  sein:{type:'irregular',en:'to be',forms:{ich:'bin',du:'bist','er/sie/es':'ist',wir:'sind',ihr:'seid','sie/Sie':'sind'}},
+  haben:{type:'irregular',en:'to have',forms:{ich:'habe',du:'hast','er/sie/es':'hat',wir:'haben',ihr:'habt','sie/Sie':'haben'}},
+  werden:{type:'irregular',en:'to become',forms:{ich:'werde',du:'wirst','er/sie/es':'wird',wir:'werden',ihr:'werdet','sie/Sie':'werden'}},
+};
+
+const pronouns = ['ich','du','er/sie/es','wir','ihr','sie/Sie'];
+const verbKeys = Object.keys(verbs);
+
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
+function pick(arr,n){return shuffle(arr).slice(0,n)}
+function randItem(arr){return arr[Math.floor(Math.random()*arr.length)]}
+
+// ===== VIM =====
+const sections=['intro','regular','stems','big3','spelling','usage','drill','quiz'];
+let curSection=0, gPressed=false, vimHelpVisible=true;
+
+function scrollToSection(i){if(i<0)i=0;if(i>=sections.length)i=sections.length-1;curSection=i;document.getElementById(sections[i]).scrollIntoView({behavior:'smooth'});updateNav()}
+function updateNav(){document.querySelectorAll('.sn-item').forEach((el,i)=>el.classList.toggle('active',i===curSection))}
+document.querySelectorAll('.sn-item').forEach((el,i)=>{el.onclick=()=>scrollToSection(i)});
+
+const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){const i=sections.indexOf(e.target.id);if(i>=0){curSection=i;updateNav()}}})},{threshold:0.3});
+sections.forEach(s=>{const el=document.getElementById(s);if(el)obs.observe(el)});
+
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT'){if(e.key==='Enter'){e.preventDefault();if(e.target.id==='drillInput')drillCheck();else qzConfirm()}return}
+  const k=e.key;
+  if(k==='j'){window.scrollBy(0,80);e.preventDefault()}
+  else if(k==='k'){window.scrollBy(0,-80);e.preventDefault()}
+  else if(k==='G'&&!gPressed){window.scrollTo(0,document.body.scrollHeight);e.preventDefault()}
+  else if(k==='g'){if(gPressed){window.scrollTo(0,0);gPressed=false;e.preventDefault()}else{gPressed=true;setTimeout(()=>gPressed=false,500)}}
+  else if(k==='n'){scrollToSection(curSection+1);e.preventDefault()}
+  else if(k==='N'){scrollToSection(curSection-1);e.preventDefault()}
+  else if(k==='?'){vimHelpVisible=!vimHelpVisible;document.getElementById('vimHelp').style.display=vimHelpVisible?'block':'none'}
+  else if(k>='1'&&k<='4'){qzSelectByKey(parseInt(k)-1);e.preventDefault()}
+  else if(k==='Enter'){qzConfirm();e.preventDefault()}
+});
+
+// ===== DRILL =====
+let drillCorrect=0, drillTotal=0, drillAnswered=false;
+
+function drillNext(){
+  const vk=randItem(verbKeys);
+  const v=verbs[vk];
+  const p=randItem(pronouns);
+  document.getElementById('drillInf').textContent=vk+' ('+v.en+') — '+v.type.replace('_',' ');
+  document.getElementById('drillPrompt').innerHTML='<span class="dp-pronoun">'+p+'</span> <span class="dp-verb">___</span>';
+  document.getElementById('drillInput').value='';
+  document.getElementById('drillInput').dataset.answer=v.forms[p];
+  document.getElementById('drillInput').dataset.verb=vk;
+  document.getElementById('drillInput').dataset.pronoun=p;
+  document.getElementById('drillFb').textContent='';
+  document.getElementById('drillBtn').textContent='Check';
+  drillAnswered=false;
+  document.getElementById('drillInput').focus();
+}
+
+function drillCheck(){
+  if(drillAnswered){drillNext();return}
+  const inp=document.getElementById('drillInput');
+  const val=inp.value.trim().toLowerCase();
+  if(!val) return;
+  const ans=inp.dataset.answer;
+  drillTotal++;
+  drillAnswered=true;
+  if(val===ans){
+    drillCorrect++;
+    document.getElementById('drillFb').innerHTML='<span style="color:#4ade80">✓ Correct!</span>';
+  } else {
+    document.getElementById('drillFb').innerHTML='<span style="color:#f87171">✗ '+ans+'</span>';
+  }
+  document.getElementById('drillScore').textContent=drillCorrect+' / '+drillTotal;
+  document.getElementById('drillBtn').textContent='Next';
+}
+
+function drillReset(){drillCorrect=0;drillTotal=0;document.getElementById('drillScore').textContent='0 / 0';drillNext()}
+drillNext();
+
+// ===== QUIZ =====
+function genQuiz(){
+  const qs=[];
+
+  // Type 1: Pick the correct conjugated form (10)
+  for(let i=0;i<10;i++){
+    const vk=randItem(verbKeys);
+    const v=verbs[vk];
+    const p=randItem(pronouns);
+    const correct=v.forms[p];
+    // generate plausible wrong answers
+    const wrongPool=new Set();
+    pronouns.forEach(pr=>{if(pr!==p) wrongPool.add(v.forms[pr])});
+    // add forms from other verbs for same pronoun
+    pick(verbKeys,5).forEach(vk2=>{if(vk2!==vk) wrongPool.add(verbs[vk2].forms[p])});
+    wrongPool.delete(correct);
+    const wrong=pick([...wrongPool],3);
+    const opts=shuffle([correct,...wrong]);
+    qs.push({type:'pick',q:`Conjugate "${vk}" for ${p}:`,opts,ans:opts.indexOf(correct),topic:v.type,verb:vk});
+  }
+
+  // Type 2: Fill in the blank in a sentence (8)
+  const sentences=[
+    {s:'Ich ___ jeden Tag Deutsch.',vk:'lernen',p:'ich',en:'I learn German every day.'},
+    {s:'Du ___ sehr schnell.',vk:'laufen',p:'du',en:'You run very fast.'},
+    {s:'Er ___ ein Buch.',vk:'lesen',p:'er/sie/es',en:'He reads a book.'},
+    {s:'Wir ___ in Berlin.',vk:'wohnen',p:'wir',en:'We live in Berlin.'},
+    {s:'___ du Deutsch?',vk:'sprechen',p:'du',en:'Do you speak German?'},
+    {s:'Sie ___ Ingenieurin.',vk:'sein',p:'er/sie/es',en:'She is an engineer.'},
+    {s:'Ich ___ Hunger.',vk:'haben',p:'ich',en:'I am hungry.'},
+    {s:'Er ___ das Buch.',vk:'nehmen',p:'er/sie/es',en:'He takes the book.'},
+    {s:'Ihr ___ zu spät.',vk:'sein',p:'ihr',en:'You all are too late.'},
+    {s:'Wir ___ morgen nach München.',vk:'fahren',p:'wir',en:'We drive to Munich tomorrow.'},
+    {s:'Du ___ zu viel.',vk:'essen',p:'du',en:'You eat too much.'},
+    {s:'Es ___ kalt.',vk:'werden',p:'er/sie/es',en:'It is getting cold.'},
+    {s:'Sie ___ den Kindern.',vk:'helfen',p:'sie/Sie',en:'They help the children.'},
+    {s:'Er ___ im Büro.',vk:'arbeiten',p:'er/sie/es',en:'He works in the office.'},
+    {s:'Du ___ einen Bruder.',vk:'haben',p:'du',en:'You have a brother.'},
+  ];
+  const fillSentences = pick(sentences,8);
+  fillSentences.forEach(s=>{
+    const v=verbs[s.vk];
+    const correct=v.forms[s.p];
+    qs.push({type:'fill',q:s.s+'\n('+s.vk+' — '+v.en+')',answer:correct,hint:s.en,topic:v.type,verb:s.vk});
+  });
+
+  // Type 3: What does this sentence mean? (6)
+  const translations=[
+    {de:'Er spricht Deutsch.',opts:['He speaks German.','He spoke German.','He will speak German.','He is speaking to German.'],ans:0,vk:'sprechen'},
+    {de:'Wir fahren morgen.',opts:['We drove tomorrow.','We are driving tomorrow.','We will have driven.','We drive yesterday.'],ans:1,vk:'fahren'},
+    {de:'Ich wohne seit zwei Jahren hier.',opts:['I lived here two years ago.','I have been living here for two years.','I will live here for two years.','I lived here in two years.'],ans:1,vk:'wohnen'},
+    {de:'Siehst du das?',opts:['Did you see that?','Do you see that?','Will you see that?','Can you see that?'],ans:1,vk:'sehen'},
+    {de:'Sie wird Ärztin.',opts:['She was a doctor.','She has a doctor.','She is becoming a doctor.','She sees a doctor.'],ans:2,vk:'werden'},
+    {de:'Er gibt mir das Buch.',opts:['He gave me the book.','He gives me the book.','He will give me the book.','He finds me the book.'],ans:1,vk:'geben'},
+    {de:'Du trägst eine Jacke.',opts:['You carried a jacket.','You are wearing a jacket.','You buy a jacket.','You need a jacket.'],ans:1,vk:'tragen'},
+    {de:'Ihr esst zu schnell.',opts:['You all eat too quickly.','You all ate too quickly.','He eats too quickly.','We eat too quickly.'],ans:0,vk:'essen'},
+  ];
+  const transQs=pick(translations,6);
+  transQs.forEach(t=>{
+    const opts=shuffle([...t.opts]);
+    qs.push({type:'translate',q:'What does this mean?\n"'+t.de+'"',opts,ans:opts.indexOf(t.opts[t.ans]),topic:'translation',verb:t.vk});
+  });
+
+  // Type 4: Spot the error (6)
+  const errors=[
+    {wrong:'Du sprecht Deutsch.',right:'Du sprichst Deutsch.',explain:'"sprechen" changes to sprichst for du (e→i stem change)',topic:'stem_ei'},
+    {wrong:'Er habe ein Auto.',right:'Er hat ein Auto.',explain:'"haben" conjugates to hat for er/sie/es',topic:'irregular'},
+    {wrong:'Ich arbeitte jeden Tag.',right:'Ich arbeite jeden Tag.',explain:'"arbeiten" → ich arbeite (not arbeitte)',topic:'spelling'},
+    {wrong:'Du fahrst nach Berlin.',right:'Du fährst nach Berlin.',explain:'"fahren" changes a→ä for du (stem change)',topic:'stem_aae'},
+    {wrong:'Er wirst müde.',right:'Er wird müde.',explain:'"werden" conjugates to wird for er/sie/es (not wirst — that\'s du)',topic:'irregular'},
+    {wrong:'Wir sprecht Deutsch.',right:'Wir sprechen Deutsch.',explain:'wir always gets -en ending, not -t',topic:'stem_ei'},
+    {wrong:'Du lesst ein Buch.',right:'Du liest ein Buch.',explain:'"lesen" changes to liest for du (e→ie)',topic:'stem_eie'},
+    {wrong:'Er nimmst das Buch.',right:'Er nimmt das Buch.',explain:'"nehmen" → er nimmt (nimmst is the du form)',topic:'stem_ei'},
+  ];
+  const errorQs=pick(errors,6);
+  errorQs.forEach(er=>{
+    const opts=shuffle([er.wrong, er.right]);
+    qs.push({type:'error',q:'Which sentence is CORRECT?',opts,ans:opts.indexOf(er.right),explain:er.explain,topic:er.topic,verb:''});
+  });
+
+  return shuffle(qs);
+}
+
+let quiz=genQuiz(), qIdx=0, qScore=0, qAnswered=false, qSel=-1;
+const qResults=[];
+
+function renderQuiz(){
+  const q=quiz[qIdx];
+  document.getElementById('qzProgress').textContent=(qIdx+1)+' / '+quiz.length;
+  document.getElementById('qzFill').style.width=((qIdx+1)/quiz.length*100)+'%';
+  document.getElementById('qzFb').textContent='';document.getElementById('qzFb').className='quiz-feedback';
+  document.getElementById('qzNext').textContent='Check';
+  qAnswered=false;qSel=-1;
+  document.getElementById('qzScore').textContent='Score: '+qScore+'/'+qIdx;
+
+  const typeLabels={pick:'Pick the correct form',fill:'Fill in the blank',translate:'Translate',error:'Spot the error'};
+  document.getElementById('qzType').textContent=typeLabels[q.type]||'';
+  document.getElementById('qzQ').innerHTML=q.q.replace(/\n/g,'<br>');
+
+  if(q.type==='fill'){
+    document.getElementById('qzBody').innerHTML='<input class="quiz-input" id="qzInput" placeholder="Type the conjugated form..." autocomplete="off" autocapitalize="off" spellcheck="false">'+(q.hint?'<div style="font-size:13px;color:#555">'+q.hint+'</div>':'');
+    document.getElementById('qzInput').focus();
+  } else {
+    document.getElementById('qzBody').innerHTML='<div class="quiz-opts" id="qzOpts">'+
+      q.opts.map((o,i)=>`<button class="quiz-opt" onclick="qzSelect(${i})" id="qo${i}">${o}</button>`).join('')+'</div>';
+  }
+}
+
+function qzSelect(i){if(qAnswered)return;qSel=i;document.querySelectorAll('.quiz-opt').forEach((el,j)=>el.classList.toggle('qsel',j===i))}
+function qzSelectByKey(i){const q=quiz[qIdx];if(q.type==='fill'||qAnswered)return;if(i<q.opts.length)qzSelect(i)}
+
+function qzConfirm(){
+  const q=quiz[qIdx];
+  if(!qAnswered){
+    if(q.type==='fill'){
+      const inp=document.getElementById('qzInput');
+      if(!inp)return;
+      const val=inp.value.trim().toLowerCase();
+      if(!val)return;
+      const correct=val===q.answer.toLowerCase();
+      if(correct){
+        qScore++;
+        document.getElementById('qzFb').textContent='✓ Correct!';
+        document.getElementById('qzFb').className='quiz-feedback quiz-fb-right';
+        inp.style.borderColor='#22c55e';inp.style.color='#4ade80';
+      } else {
+        document.getElementById('qzFb').textContent='✗ The answer is: '+q.answer;
+        document.getElementById('qzFb').className='quiz-feedback quiz-fb-wrong';
+        inp.style.borderColor='#ef4444';inp.style.color='#f87171';
+      }
+      qResults.push({q:q.q,type:q.type,yours:val,correct:q.answer,right:correct,topic:q.topic});
+    } else {
+      if(qSel<0)return;
+      const correct=qSel===q.ans;
+      if(correct){
+        qScore++;
+        document.getElementById('qo'+qSel).classList.add('qright');
+        document.getElementById('qzFb').textContent='✓ Correct!'+(q.explain?' — '+q.explain:'');
+        document.getElementById('qzFb').className='quiz-feedback quiz-fb-right';
+      } else {
+        document.getElementById('qo'+qSel).classList.add('qwrong');
+        document.getElementById('qo'+q.ans).classList.add('qmissed');
+        document.getElementById('qzFb').textContent='✗ '+(q.explain||'Correct: '+q.opts[q.ans]);
+        document.getElementById('qzFb').className='quiz-feedback quiz-fb-wrong';
+      }
+      qResults.push({q:q.q,type:q.type,yours:q.opts[qSel],correct:q.opts[q.ans],right:correct,topic:q.topic});
+    }
+    qAnswered=true;
+    document.getElementById('qzNext').textContent=qIdx===quiz.length-1?'See results':'Next →';
+    document.getElementById('qzScore').textContent='Score: '+qScore+'/'+(qIdx+1);
+  } else {
+    qIdx++;
+    if(qIdx>=quiz.length){showQuizResults();return}
+    renderQuiz();
+  }
+}
+
+function showQuizResults(){
+  document.getElementById('quizArea').classList.add('hidden');
+  const r=document.getElementById('quizResults');r.classList.remove('hidden');
+  const total=quiz.length,pct=Math.round(qScore/total*100);
+
+  const byTopic={};
+  qResults.forEach(r=>{const t=r.topic||'other';if(!byTopic[t])byTopic[t]={c:0,t:0};byTopic[t].t++;if(r.right)byTopic[t].c++});
+  const topicLabels={regular:'Regular verbs',spelling:'Spelling adjustments',stem_ei:'Stem change e→i',stem_eie:'Stem change e→ie',stem_aae:'Stem change a→ä',irregular:'sein/haben/werden',translation:'Translation'};
+  const mistakes=qResults.filter(r=>!r.right);
+
+  r.innerHTML=`<div class="quiz-results">
+    <div class="quiz-score">${pct}%</div>
+    <div class="quiz-score-label">${qScore} of ${total} correct</div>
+    <div class="quiz-breakdown">
+      <div class="qb-card"><div class="qb-num" style="color:#4ade80">${qScore}</div><div class="qb-lbl">Correct</div></div>
+      <div class="qb-card"><div class="qb-num" style="color:#f87171">${total-qScore}</div><div class="qb-lbl">Wrong</div></div>
+      <div class="qb-card"><div class="qb-num" style="color:#7ec8e3">${total}</div><div class="qb-lbl">Total</div></div>
+    </div>
+    <h3 style="color:#9db8d4;margin:20px 0 10px;text-align:left">By topic</h3>
+    ${Object.entries(byTopic).map(([t,v])=>{
+      const p2=v.t?Math.round(v.c/v.t*100):0;
+      const col=p2>=80?'#4ade80':p2>=50?'#facc15':'#f87171';
+      return `<div class="bar-row"><span class="bar-label">${topicLabels[t]||t}</span><div class="bar-bg"><div class="bar-fg" style="width:${p2}%;background:${col}"></div></div><span class="bar-pct">${p2}%</span></div>`;
+    }).join('')}
+    ${mistakes.length?`<h3 style="color:#9db8d4;margin:20px 0 10px;text-align:left">Review</h3>
+    <div style="text-align:left;font-size:14px;color:#b0b0b0">${mistakes.map(m=>`<div style="margin:8px 0;padding:8px 12px;background:#1a1a2e;border-radius:4px;border-left:3px solid #f87171">
+      <div style="color:#e0e0e0">${m.q.replace(/\n/g,' ')}</div>
+      <div>You: <span style="color:#f87171">${m.yours}</span> · Answer: <span style="color:#4ade80">${m.correct}</span></div>
+    </div>`).join('')}</div>`:''}
+    <button class="quiz-dl" onclick="dlCSV()">⬇ Download results CSV</button>
+    <button class="quiz-dl" style="background:#1e2a3a;color:#7ec8e3;margin-top:8px" onclick="retake()">↻ Retake (new questions)</button>
+  </div>`;
+}
+
+function retake(){quiz=genQuiz();qIdx=0;qScore=0;qResults.length=0;document.getElementById('quizArea').classList.remove('hidden');document.getElementById('quizResults').classList.add('hidden');renderQuiz()}
+
+function dlCSV(){
+  const rows=[['Question','Type','Your Answer','Correct Answer','Correct?','Topic']];
+  qResults.forEach(r=>rows.push(['"'+r.q.replace(/\n/g,' ')+'"',r.type,'"'+r.yours+'"','"'+r.correct+'"',r.right?'Yes':'No',r.topic]));
+  const csv=rows.map(r=>r.join(',')).join('\n');
+  const b=new Blob([csv],{type:'text/csv'});const u=URL.createObjectURL(b);
+  const a=document.createElement('a');a.href=u;a.download='unit3_quiz_results.csv';a.click();URL.revokeObjectURL(u);
+}
+
+renderQuiz();
+</script>
+</body>
+</html>

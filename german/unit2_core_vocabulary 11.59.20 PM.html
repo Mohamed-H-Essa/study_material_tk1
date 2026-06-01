@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit 2: Core Vocabulary — The 100 Words That Matter</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#1a1a2e;color:#e0e0e0;font-family:Georgia,'Times New Roman',serif;line-height:1.8;font-size:17px}
+::selection{background:#4a4a8a;color:#fff}
+.wrap{max-width:720px;margin:0 auto;padding:30px 20px 80px}
+h1{font-size:28px;color:#e8d5b7;margin-bottom:6px;font-weight:normal}
+h2{font-size:21px;color:#c9a96e;margin:40px 0 16px;padding-bottom:6px;border-bottom:1px solid #2a2a4a;font-weight:normal}
+h3{font-size:17px;color:#9db8d4;margin:24px 0 10px;font-weight:normal}
+p{margin-bottom:14px}
+.subtitle{color:#888;font-size:15px;margin-bottom:30px}
+.de{color:#7ec8e3;font-weight:bold}
+.en{color:#b0b0b0}
+.note{color:#c9a96e;font-style:italic;font-size:15px}
+.tip{background:#1e2a3a;border-left:3px solid #4a90d9;padding:12px 16px;margin:16px 0;border-radius:0 4px 4px 0;font-size:15px}
+.vocab-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#2a2a4a;border-radius:6px;overflow:hidden;margin:14px 0 20px}
+.vocab-grid div{padding:10px 14px;font-size:15px}
+.vocab-grid .vg-de{background:#16213e}
+.vocab-grid .vg-en{background:#1a1a2e}
+.vocab-grid .vg-head{background:#0f3460;color:#c9a96e;font-size:13px;text-transform:uppercase;letter-spacing:1px;padding:8px 14px}
+.num-table{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:#2a2a4a;border-radius:6px;overflow:hidden;margin:14px 0 20px}
+.num-table div{background:#16213e;padding:8px;text-align:center;font-size:14px}
+.num-table .nt-num{color:#7ec8e3;font-weight:bold;font-size:15px}
+.num-table .nt-word{color:#b0b0b0;font-size:13px}
+.section-nav{position:fixed;top:0;left:0;right:0;background:#12122a;border-bottom:1px solid #2a2a4a;padding:8px 16px;z-index:100;display:flex;align-items:center;gap:12px;font-size:13px}
+.section-nav .sn-title{color:#888;margin-right:auto}
+.section-nav .sn-item{color:#555;cursor:pointer;padding:2px 8px;border-radius:3px}
+.section-nav .sn-item:hover{color:#aaa}
+.section-nav .sn-item.active{color:#7ec8e3;background:#1e2a3a}
+.vim-help{position:fixed;bottom:12px;right:12px;background:#12122a;border:1px solid #2a2a4a;border-radius:6px;padding:10px 14px;font-size:12px;color:#666;font-family:monospace;z-index:100}
+.vim-help kbd{background:#2a2a4a;padding:1px 5px;border-radius:3px;color:#999;font-size:11px}
+.vim-help .vk-row{margin:2px 0}
+
+/* Quiz styles */
+.quiz-section{background:#12122a;border:1px solid #2a2a4a;border-radius:8px;padding:24px;margin:20px 0}
+.quiz-progress{font-size:13px;color:#666;margin-bottom:4px;text-align:right}
+.quiz-progress-bar{height:4px;background:#2a2a4a;border-radius:2px;margin-bottom:16px}
+.quiz-progress-fill{height:100%;background:#4a90d9;border-radius:2px;transition:width .3s}
+.quiz-q{font-size:16px;color:#e0e0e0;margin-bottom:6px}
+.quiz-type{font-size:12px;color:#666;margin-bottom:12px}
+.quiz-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.quiz-opt{padding:10px 14px;background:#1a1a2e;border:1px solid #2a2a4a;border-radius:6px;cursor:pointer;font-size:15px;color:#c0c0c0;text-align:left;transition:border-color .15s}
+.quiz-opt:hover{border-color:#4a4a8a}
+.quiz-opt.qsel{border-color:#4a90d9;color:#7ec8e3;background:#1e2a3a}
+.quiz-opt.qright{border-color:#22c55e;color:#4ade80;background:#0f2a1a}
+.quiz-opt.qwrong{border-color:#ef4444;color:#f87171;background:#2a0f0f}
+.quiz-opt.qmissed{border-color:#22c55e;color:#4ade80;background:#0f2a1a;opacity:.6}
+.quiz-input{width:100%;padding:10px 14px;background:#1a1a2e;border:1px solid #2a2a4a;border-radius:6px;color:#e0e0e0;font-size:15px;font-family:inherit;outline:none;margin-bottom:12px}
+.quiz-input:focus{border-color:#4a90d9}
+.quiz-feedback{font-size:14px;margin:10px 0;min-height:20px}
+.quiz-fb-right{color:#4ade80}
+.quiz-fb-wrong{color:#f87171}
+.quiz-nav{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+.qbtn{padding:8px 18px;border:1px solid #2a2a4a;border-radius:6px;background:#1a1a2e;color:#c0c0c0;cursor:pointer;font-size:14px}
+.qbtn:hover{border-color:#4a4a8a;color:#e0e0e0}
+.qbtn:disabled{opacity:.3;cursor:default}
+.qbtn.primary{background:#4a90d9;border-color:#4a90d9;color:#fff}
+.qbtn.primary:hover{background:#3a7bc8}
+.quiz-results{text-align:center;padding:20px}
+.quiz-score{font-size:48px;color:#e8d5b7;font-weight:bold}
+.quiz-score-label{color:#888;font-size:14px;margin-bottom:20px}
+.quiz-breakdown{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:20px 0}
+.qb-card{background:#1a1a2e;border:1px solid #2a2a4a;border-radius:6px;padding:12px}
+.qb-num{font-size:22px;font-weight:bold}.qb-lbl{font-size:12px;color:#888;margin-top:2px}
+.quiz-dl{width:100%;padding:12px;background:#4a90d9;color:#fff;border:none;border-radius:6px;font-size:14px;cursor:pointer;margin-top:12px}
+.quiz-dl:hover{background:#3a7bc8}
+
+/* Flashcard styles */
+.fc-area{text-align:center;padding:20px 0}
+.fc-card{background:#16213e;border:1px solid #2a2a4a;border-radius:8px;padding:40px 20px;margin:16px auto;max-width:400px;cursor:pointer;min-height:140px;display:flex;align-items:center;justify-content:center;flex-direction:column;transition:transform .15s;user-select:none}
+.fc-card:hover{transform:scale(1.01)}
+.fc-front{font-size:28px;color:#7ec8e3;font-weight:bold}
+.fc-back{font-size:22px;color:#e8d5b7}
+.fc-cat{font-size:12px;color:#666;margin-top:8px}
+.fc-controls{display:flex;justify-content:center;gap:12px;margin-top:12px}
+.fc-count{font-size:13px;color:#666;margin-top:8px}
+.fc-dir{font-size:13px;color:#555;margin-bottom:8px}
+
+/* Reveal toggle */
+.reveal-wrap{margin:14px 0 20px}
+.reveal-btn{padding:8px 16px;background:#1e2a3a;border:1px solid #2a2a4a;border-radius:6px;color:#7ec8e3;cursor:pointer;font-size:14px;font-family:inherit}
+.reveal-btn:hover{border-color:#4a4a8a}
+.reveal-content{display:none;margin-top:12px}
+.reveal-content.show{display:block}
+</style>
+</head>
+<body>
+
+<div class="section-nav" id="sectionNav">
+  <span class="sn-title">Unit 2</span>
+  <span class="sn-item active" data-s="intro">Intro</span>
+  <span class="sn-item" data-s="greetings">Greetings</span>
+  <span class="sn-item" data-s="colors">Colors</span>
+  <span class="sn-item" data-s="numbers">Numbers</span>
+  <span class="sn-item" data-s="days">Days</span>
+  <span class="sn-item" data-s="family">Family</span>
+  <span class="sn-item" data-s="food">Food</span>
+  <span class="sn-item" data-s="body">Body</span>
+  <span class="sn-item" data-s="house">House</span>
+  <span class="sn-item" data-s="clothing">Clothing</span>
+  <span class="sn-item" data-s="weather">Weather</span>
+  <span class="sn-item" data-s="flashcards">Cards</span>
+  <span class="sn-item" data-s="quiz">Quiz</span>
+</div>
+
+<div class="vim-help" id="vimHelp">
+  <div class="vk-row"><kbd>j</kbd> / <kbd>k</kbd> scroll</div>
+  <div class="vk-row"><kbd>gg</kbd> top · <kbd>G</kbd> bottom</div>
+  <div class="vk-row"><kbd>n</kbd> / <kbd>N</kbd> next/prev section</div>
+  <div class="vk-row"><kbd>f</kbd> flashcards · <kbd>q</kbd> quiz</div>
+  <div class="vk-row"><kbd>?</kbd> toggle help</div>
+</div>
+
+<div class="wrap">
+
+<!-- INTRO -->
+<section id="intro">
+<h1>Unit 2: Core Vocabulary</h1>
+<p class="subtitle">The 100 words that matter — grouped by theme, drilled both ways</p>
+
+<p>Your assessment showed solid A1 vocabulary overall, but with specific holes: you confused <span class="de">schwarz</span> (black) with white, and <span class="de">Guten Tag</span> (good day) with good evening. These aren't random mistakes — they're signs that some word groups were learned partially, with gaps where similar-sounding or thematically-related words blur together.</p>
+
+<p>This unit doesn't throw 500 words at you. It gives you exactly 100 high-frequency words across 10 categories. Every word here appears constantly in A1–A2 German. The goal is zero hesitation in both directions: you see the German, you know the English instantly, and vice versa.</p>
+
+<div class="tip">
+  <strong>How to use this page:</strong> Read through each category. Pay attention to the notes — they flag common confusion points and patterns. After all 10 categories, use the flashcard trainer to drill, then take the quiz. The quiz mixes three types: matching, fill-in-the-blank, and odd-one-out.
+</div>
+</section>
+
+<!-- GREETINGS -->
+<section id="greetings">
+<h2>1. Greetings & Time of Day</h2>
+
+<p>This is where you tripped up on the assessment. The issue is simple: <span class="de">Morgen</span>, <span class="de">Tag</span>, and <span class="de">Abend</span> map directly to morning, day, and evening. But when you learned "Guten Tag" as a single chunk meaning "hello," you may have lost the individual word meanings. Let's fix that.</p>
+
+<div class="vocab-grid">
+  <div class="vg-head">German</div><div class="vg-head">English</div>
+  <div class="vg-de">Guten Morgen</div><div class="vg-en">Good morning</div>
+  <div class="vg-de">Guten Tag</div><div class="vg-en">Good day / Hello (formal, daytime)</div>
+  <div class="vg-de">Guten Abend</div><div class="vg-en">Good evening</div>
+  <div class="vg-de">Gute Nacht</div><div class="vg-en">Good night (only when going to sleep)</div>
+  <div class="vg-de">Hallo</div><div class="vg-en">Hello (informal, any time)</div>
+  <div class="vg-de">Tschüss</div><div class="vg-en">Bye (informal)</div>
+  <div class="vg-de">Auf Wiedersehen</div><div class="vg-en">Goodbye (formal)</div>
+  <div class="vg-de">Bitte</div><div class="vg-en">Please / You're welcome</div>
+  <div class="vg-de">Danke</div><div class="vg-en">Thank you</div>
+  <div class="vg-de">Entschuldigung</div><div class="vg-en">Excuse me / Sorry</div>
+</div>
+
+<p class="note">Notice: "Guten" is accusative masculine of "gut" (good). "Gute Nacht" uses feminine because "die Nacht" is feminine. You don't need to worry about why yet — just notice the pattern so it's not random.</p>
+
+<div class="tip">
+  <strong>The confusion trap:</strong> "Guten Tag" is used roughly from 10am to 6pm. "Guten Abend" starts around 6pm. "Guten Morgen" is until about 10am. If you default to "Hallo," you'll never be wrong — but in formal situations (doctor's office, job interview), Germans expect the time-appropriate greeting.
+</div>
+</section>
+
+<!-- COLORS -->
+<section id="colors">
+<h2>2. Colors</h2>
+
+<p>You said <span class="de">schwarz</span> means white. It means black. <span class="de">Weiß</span> means white. Let's burn every color into memory by pairing them as opposites — that's how your brain naturally wants to store them anyway.</p>
+
+<div class="vocab-grid">
+  <div class="vg-head">German</div><div class="vg-head">English</div>
+  <div class="vg-de">schwarz</div><div class="vg-en">black ← this is the one you got wrong</div>
+  <div class="vg-de">weiß</div><div class="vg-en">white</div>
+  <div class="vg-de">rot</div><div class="vg-en">red</div>
+  <div class="vg-de">blau</div><div class="vg-en">blue</div>
+  <div class="vg-de">grün</div><div class="vg-en">green</div>
+  <div class="vg-de">gelb</div><div class="vg-en">yellow</div>
+  <div class="vg-de">grau</div><div class="vg-en">gray</div>
+  <div class="vg-de">braun</div><div class="vg-en">brown</div>
+  <div class="vg-de">orange</div><div class="vg-en">orange (same word!)</div>
+  <div class="vg-de">lila / violett</div><div class="vg-en">purple / violet</div>
+</div>
+
+<p class="note">Mnemonic for schwarz: the "schw-" sound is heavy and dark. Think of it like a heavy shadow. "Weiß" sounds like "vice" — think of a white vise grip. Or just remember: Schwarzenegger → "black" + "plowman" (literally "black plowman").</p>
+
+<div class="tip">
+  <strong>Opposite pairs to drill:</strong> schwarz↔weiß, rot↔grün (traffic lights), blau↔gelb (Swedish flag). Pairing them as opposites makes both stick.
+</div>
+</section>
+
+<!-- NUMBERS -->
+<section id="numbers">
+<h2>3. Numbers 1–100</h2>
+
+<p>You got <span class="de">zwanzig</span> (20) correct and confidently. But numbers in German have a twist that trips up every learner: for 21–99, the ones digit comes BEFORE the tens digit, joined by "und."</p>
+
+<p><span class="de">25 = fünfundzwanzig</span> → literally "five-and-twenty." Like old English ("four and twenty blackbirds"). You read it backwards compared to how you'd say it in English or Arabic.</p>
+
+<h3>1–12: Just memorize these</h3>
+<div class="num-table">
+  <div><span class="nt-num">1</span><br><span class="nt-word">eins</span></div>
+  <div><span class="nt-num">2</span><br><span class="nt-word">zwei</span></div>
+  <div><span class="nt-num">3</span><br><span class="nt-word">drei</span></div>
+  <div><span class="nt-num">4</span><br><span class="nt-word">vier</span></div>
+  <div><span class="nt-num">5</span><br><span class="nt-word">fünf</span></div>
+  <div><span class="nt-num">6</span><br><span class="nt-word">sechs</span></div>
+  <div><span class="nt-num">7</span><br><span class="nt-word">sieben</span></div>
+  <div><span class="nt-num">8</span><br><span class="nt-word">acht</span></div>
+  <div><span class="nt-num">9</span><br><span class="nt-word">neun</span></div>
+  <div><span class="nt-num">10</span><br><span class="nt-word">zehn</span></div>
+  <div><span class="nt-num">11</span><br><span class="nt-word">elf</span></div>
+  <div><span class="nt-num">12</span><br><span class="nt-word">zwölf</span></div>
+</div>
+
+<h3>13–19: [digit]zehn</h3>
+<div class="num-table">
+  <div><span class="nt-num">13</span><br><span class="nt-word">dreizehn</span></div>
+  <div><span class="nt-num">14</span><br><span class="nt-word">vierzehn</span></div>
+  <div><span class="nt-num">15</span><br><span class="nt-word">fünfzehn</span></div>
+  <div><span class="nt-num">16</span><br><span class="nt-word">sechzehn</span></div>
+  <div><span class="nt-num">17</span><br><span class="nt-word">siebzehn</span></div>
+</div>
+<p class="note">Notice: sechzehn (not sechszehn) and siebzehn (not siebenzehn) — they drop letters for easier pronunciation.</p>
+
+<h3>Tens</h3>
+<div class="num-table">
+  <div><span class="nt-num">20</span><br><span class="nt-word">zwanzig</span></div>
+  <div><span class="nt-num">30</span><br><span class="nt-word">dreißig</span></div>
+  <div><span class="nt-num">40</span><br><span class="nt-word">vierzig</span></div>
+  <div><span class="nt-num">50</span><br><span class="nt-word">fünfzig</span></div>
+  <div><span class="nt-num">60</span><br><span class="nt-word">sechzig</span></div>
+  <div><span class="nt-num">70</span><br><span class="nt-word">siebzig</span></div>
+  <div><span class="nt-num">80</span><br><span class="nt-word">achtzig</span></div>
+  <div><span class="nt-num">90</span><br><span class="nt-word">neunzig</span></div>
+  <div><span class="nt-num">100</span><br><span class="nt-word">(ein)hundert</span></div>
+</div>
+<p class="note">All tens end in -zig except dreißig (-ßig). Just memorize that one exception.</p>
+
+<h3>The backwards rule: 21–99</h3>
+<p>ones + und + tens. Always. No exceptions.</p>
+<div class="vocab-grid">
+  <div class="vg-head">Number</div><div class="vg-head">German (literally)</div>
+  <div class="vg-de">21</div><div class="vg-en">einundzwanzig (one-and-twenty)</div>
+  <div class="vg-de">34</div><div class="vg-en">vierunddreißig (four-and-thirty)</div>
+  <div class="vg-de">57</div><div class="vg-en">siebenundfünfzig (seven-and-fifty)</div>
+  <div class="vg-de">83</div><div class="vg-en">dreiundachtzig (three-and-eighty)</div>
+  <div class="vg-de">99</div><div class="vg-en">neunundneunzig (nine-and-ninety)</div>
+</div>
+
+<div class="tip">
+  <strong>Practice trick:</strong> Look at digital clocks, prices, phone numbers throughout your day and say them in German. "That costs 47 pounds" → siebenundvierzig. Force the backwards construction until it's automatic.
+</div>
+</section>
+
+<!-- DAYS/MONTHS -->
+<section id="days">
+<h2>4. Days & Months</h2>
+
+<h3>Days of the week</h3>
+<div class="vocab-grid">
+  <div class="vg-head">German</div><div class="vg-head">English</div>
+  <div class="vg-de">Montag</div><div class="vg-en">Monday</div>
+  <div class="vg-de">Dienstag</div><div class="vg-en">Tuesday</div>
+  <div class="vg-de">Mittwoch</div><div class="vg-en">Wednesday (literally "mid-week")</div>
+  <div class="vg-de">Donnerstag</div><div class="vg-en">Thursday (Donner = thunder → Thor's day)</div>
+  <div class="vg-de">Freitag</div><div class="vg-en">Friday (Freya's day)</div>
+  <div class="vg-de">Samstag</div><div class="vg-en">Saturday</div>
+  <div class="vg-de">Sonntag</div><div class="vg-en">Sunday (Sonne = sun)</div>
+</div>
+<p class="note">All days are masculine (der Montag, der Dienstag…). "Am Montag" = on Monday.</p>
+
+<h3>Months</h3>
+<div class="vocab-grid">
+  <div class="vg-head">German</div><div class="vg-head">English</div>
+  <div class="vg-de">Januar</div><div class="vg-en">January</div>
+  <div class="vg-de">Februar</div><div class="vg-en">February</div>
+  <div class="vg-de">März</div><div class="vg-en">March</div>
+  <div class="vg-de">April</div><div class="vg-en">April</div>
+  <div class="vg-de">Mai</div><div class="vg-en">May</div>
+  <div class="vg-de">Juni</div><div class="vg-en">June</div>
+  <div class="vg-de">Juli</div><div class="vg-en">July</div>
+  <div class="vg-de">August</div><div class="vg-en">August</div>
+  <div class="vg-de">September</div><div class="vg-en">September</div>
+  <div class="vg-de">Oktober</div><div class="vg-en">October</div>
+  <div class="vg-de">November</div><div class="vg-en">November</div>
+  <div class="vg-de">Dezember</div><div class="vg-en">December</div>
+</div>
+<p class="note">Months are almost identical to English — German got them from the same Latin roots. All months are masculine (der Januar, der Februar…). "Im Januar" = in January.</p>
+
+<div class="tip">
+  <strong>Key phrases:</strong> "Welcher Tag ist heute?" (What day is today?) — "Heute ist Montag." / "Wann hast du Geburtstag?" (When is your birthday?) — "Im Mai."
+</div>
+</section>
+
+<!-- FAMILY -->
+<section id="family">
+<h2>5. Family</h2>
+
+<div class="vocab-grid">
+  <div class="vg-head">German</div><div class="vg-head">English</div>
+  <div class="vg-de">die Familie</div><div class="vg-en">family</div>
+  <div class="vg-de">die Mutter (die Mama)</div><div class="vg-en">mother (mom)</div>
+  <div class="vg-de">der Vater (der Papa)</div><div class="vg-en">father (dad)</div>
+  <div class="vg-de">die Eltern</div><div class="vg-en">parents (plural only)</div>
+  <div class="vg-de">der Bruder</div><div class="vg-en">brother</div>
+  <div class="vg-de">die Schwester</div><div class="vg-en">sister</div>
+  <div class="vg-de">die Geschwister</div><div class="vg-en">siblings (plural only)</div>
+  <div class="vg-de">der Sohn</div><div class="vg-en">son</div>
+  <div class="vg-de">die Tochter</div><div class="vg-en">daughter</div>
+  <div class="vg-de">das Kind</div><div class="vg-en">child</div>
+  <div class="vg-de">der Mann</div><div class="vg-en">man / husband</div>
+  <div class="vg-de">die Frau</div><div class="vg-en">woman / wife</div>
+</div>
+
+<p class="note">Notice the genders follow biology here: male family = der, female family = die. The exceptions are das Kind (child, neuter) and die Eltern / die Geschwister (plural-only words).</p>
+
+<div class="tip">
+  <strong>Common question:</strong> "Hast du Geschwister?" (Do you have siblings?) — "Ja, ich habe einen Bruder und eine Schwester." Note the accusative: einen Bruder (masc.), eine Schwester (fem.).
+</div>
+</section>
+
+<!-- FOOD -->
+<section id="food">
+<h2>6. Food & Drink</h2>
+
+<p>Given your dietary restrictions, you'll need food vocabulary more than most learners — especially if you end up in Germany ordering at restaurants or reading labels.</p>
+
+<div class="vocab-grid">
+  <div class="vg-head">German</div><div class="vg-head">English</div>
+  <div class="vg-de">das Brot</div><div class="vg-en">bread</div>
+  <div class="vg-de">der Reis</div><div class="vg-en">rice</div>
+  <div class="vg-de">das Fleisch</div><div class="vg-en">meat</div>
+  <div class="vg-de">der Fisch</div><div class="vg-en">fish</div>
+  <div class="vg-de">das Gemüse</div><div class="vg-en">vegetables (collective, singular)</div>
+  <div class="vg-de">das Obst</div><div class="vg-en">fruit (collective, singular)</div>
+  <div class="vg-de">der Apfel</div><div class="vg-en">apple</div>
+  <div class="vg-de">das Ei / die Eier</div><div class="vg-en">egg / eggs</div>
+  <div class="vg-de">das Wasser</div><div class="vg-en">water</div>
+  <div class="vg-de">der Kaffee</div><div class="vg-en">coffee</div>
+  <div class="vg-de">der Tee</div><div class="vg-en">tea</div>
+  <div class="vg-de">die Milch</div><div class="vg-en">milk</div>
+</div>
+
+<div class="tip">
+  <strong>For your diet specifically:</strong> "ohne Gluten" (without gluten), "ohne Milch" (without milk), "Haben Sie etwas ohne Milchprodukte?" (Do you have something without dairy products?). "Milchprodukte" = dairy products. "Nachtschattengewächse" = nightshades (yes, it's that long — literally "night-shadow-plants").
+</div>
+</section>
+
+<!-- BODY -->
+<section id="body">
+<h2>7. Body</h2>
+
+<div class="vocab-grid">
+  <div class="vg-head">German</div><div class="vg-head">English</div>
+  <div class="vg-de">der Kopf</div><div class="vg-en">head</div>
+  <div class="vg-de">das Auge / die Augen</div><div class="vg-en">eye / eyes</div>
+  <div class="vg-de">die Nase</div><div class="vg-en">nose</div>
+  <div class="vg-de">der Mund</div><div class="vg-en">mouth</div>
+  <div class="vg-de">das Ohr / die Ohren</div><div class="vg-en">ear / ears</div>
+  <div class="vg-de">die Hand / die Hände</div><div class="vg-en">hand / hands</div>
+  <div class="vg-de">der Arm</div><div class="vg-en">arm</div>
+  <div class="vg-de">das Bein</div><div class="vg-en">leg</div>
+  <div class="vg-de">der Fuß / die Füße</div><div class="vg-en">foot / feet</div>
+  <div class="vg-de">der Rücken</div><div class="vg-en">back</div>
+</div>
+
+<p class="note">German plurals are chaotic — Auge→Augen, Hand→Hände (umlaut!), Fuß→Füße (umlaut!). There's no single rule. For now, learn each plural alongside the singular. This is one area where brute-force memorization beats pattern-seeking.</p>
+
+<div class="tip">
+  <strong>At the doctor:</strong> "Mein Rücken tut weh" (my back hurts), "Ich habe Kopfschmerzen" (I have a headache — literally "head-pains"). Useful given your hospital visits.
+</div>
+</section>
+
+<!-- HOUSE -->
+<section id="house">
+<h2>8. House & Home</h2>
+
+<div class="vocab-grid">
+  <div class="vg-head">German</div><div class="vg-head">English</div>
+  <div class="vg-de">das Haus</div><div class="vg-en">house</div>
+  <div class="vg-de">die Wohnung</div><div class="vg-en">apartment / flat</div>
+  <div class="vg-de">das Zimmer</div><div class="vg-en">room</div>
+  <div class="vg-de">die Küche</div><div class="vg-en">kitchen</div>
+  <div class="vg-de">das Bad / das Badezimmer</div><div class="vg-en">bathroom</div>
+  <div class="vg-de">das Schlafzimmer</div><div class="vg-en">bedroom (Schlaf = sleep)</div>
+  <div class="vg-de">das Wohnzimmer</div><div class="vg-en">living room (wohnen = to live)</div>
+  <div class="vg-de">der Tisch</div><div class="vg-en">table</div>
+  <div class="vg-de">der Stuhl</div><div class="vg-en">chair</div>
+  <div class="vg-de">die Tür</div><div class="vg-en">door</div>
+  <div class="vg-de">das Fenster</div><div class="vg-en">window</div>
+  <div class="vg-de">das Bett</div><div class="vg-en">bed</div>
+</div>
+
+<p class="note">German loves compound nouns: Schlafzimmer = Schlaf (sleep) + Zimmer (room). Badezimmer = Bad (bath) + Zimmer. Wohnzimmer = Wohn- (living) + Zimmer. The gender is always determined by the LAST word: das Zimmer → das Schlafzimmer, das Wohnzimmer.</p>
+
+<div class="tip">
+  <strong>Apartment hunting in Germany:</strong> You'll see "2-Zimmer-Wohnung" — that means 2-room apartment (bedroom + living room; kitchen and bathroom don't count as Zimmer in listings). Important for when you actually move there.
+</div>
+</section>
+
+<!-- CLOTHING -->
+<section id="clothing">
+<h2>9. Clothing</h2>
+
+<div class="vocab-grid">
+  <div class="vg-head">German</div><div class="vg-head">English</div>
+  <div class="vg-de">die Kleidung</div><div class="vg-en">clothing (collective)</div>
+  <div class="vg-de">das Hemd</div><div class="vg-en">shirt</div>
+  <div class="vg-de">das T-Shirt</div><div class="vg-en">T-shirt</div>
+  <div class="vg-de">die Hose</div><div class="vg-en">pants/trousers (singular in German!)</div>
+  <div class="vg-de">die Jacke</div><div class="vg-en">jacket</div>
+  <div class="vg-de">der Mantel</div><div class="vg-en">coat</div>
+  <div class="vg-de">der Schuh / die Schuhe</div><div class="vg-en">shoe / shoes</div>
+  <div class="vg-de">die Socke / die Socken</div><div class="vg-en">sock / socks</div>
+  <div class="vg-de">die Mütze</div><div class="vg-en">beanie / winter hat</div>
+  <div class="vg-de">der Hut</div><div class="vg-en">hat (brimmed)</div>
+</div>
+
+<p class="note">Trap: "die Hose" is SINGULAR in German — one pair of pants = eine Hose. English treats "pants" as plural; German doesn't. "Ich kaufe eine Hose" = I'm buying pants.</p>
+</section>
+
+<!-- WEATHER -->
+<section id="weather">
+<h2>10. Weather</h2>
+
+<div class="vocab-grid">
+  <div class="vg-head">German</div><div class="vg-head">English</div>
+  <div class="vg-de">das Wetter</div><div class="vg-en">weather</div>
+  <div class="vg-de">die Sonne</div><div class="vg-en">sun</div>
+  <div class="vg-de">der Regen</div><div class="vg-en">rain</div>
+  <div class="vg-de">der Schnee</div><div class="vg-en">snow</div>
+  <div class="vg-de">der Wind</div><div class="vg-en">wind</div>
+  <div class="vg-de">warm</div><div class="vg-en">warm</div>
+  <div class="vg-de">kalt</div><div class="vg-en">cold</div>
+  <div class="vg-de">heiß</div><div class="vg-en">hot</div>
+  <div class="vg-de">Es regnet.</div><div class="vg-en">It's raining.</div>
+  <div class="vg-de">Es schneit.</div><div class="vg-en">It's snowing.</div>
+</div>
+
+<p class="note">Weather uses "es" (it) as a dummy subject, just like English: "Es ist kalt" (It is cold), "Es regnet" (It rains/It's raining). "Wie ist das Wetter?" = How is the weather?</p>
+
+<div class="tip">
+  <strong>Coming from Cairo:</strong> You'll actually need these in Germany. "Es ist kalt" and "Es regnet" will be your two most-used weather sentences. Not something you'd say much in Egypt.
+</div>
+</section>
+
+<!-- FLASHCARDS -->
+<section id="flashcards">
+<h2>Flashcard Trainer</h2>
+<p>Click the card to flip. Use the buttons (or <kbd>h</kbd>/<kbd>l</kbd>) to go back/forward. Press <kbd>r</kbd> to shuffle. Press <kbd>d</kbd> to switch direction (DE→EN or EN→DE).</p>
+
+<div class="fc-area">
+  <div class="fc-dir" id="fcDir">German → English</div>
+  <div class="fc-card" id="fcCard" onclick="flipCard()">
+    <div class="fc-front" id="fcFront"></div>
+    <div class="fc-back" id="fcBack" style="display:none"></div>
+    <div class="fc-cat" id="fcCat"></div>
+  </div>
+  <div class="fc-count" id="fcCount"></div>
+  <div class="fc-controls">
+    <button class="qbtn" onclick="fcNav(-1)">← Prev</button>
+    <button class="qbtn" onclick="shuffleCards()">Shuffle</button>
+    <button class="qbtn" onclick="toggleFcDir()">Flip direction</button>
+    <button class="qbtn" onclick="fcNav(1)">Next →</button>
+  </div>
+</div>
+</section>
+
+<!-- QUIZ -->
+<section id="quiz">
+<h2>Quiz</h2>
+<p style="margin-bottom:16px">30 questions — matching, fill-in-the-blank, and odd-one-out. Press <kbd>1</kbd>–<kbd>4</kbd> to select options, <kbd>Enter</kbd> to confirm/next.</p>
+
+<div class="quiz-section" id="quizArea">
+  <div class="quiz-progress" id="qzProgress">1 / 30</div>
+  <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="qzFill" style="width:0%"></div></div>
+  <div class="quiz-type" id="qzType"></div>
+  <div class="quiz-q" id="qzQ"></div>
+  <div id="qzBody"></div>
+  <div class="quiz-feedback" id="qzFb"></div>
+  <div class="quiz-nav">
+    <span id="qzScore" style="font-size:13px;color:#666"></span>
+    <button class="qbtn primary" id="qzNext" onclick="qzConfirm()">Check</button>
+  </div>
+</div>
+<div class="quiz-section hidden" id="quizResults"></div>
+</section>
+
+</div><!-- /wrap -->
+
+<script>
+// ===== ALL VOCABULARY DATA =====
+const allWords = [
+  {de:"Guten Morgen",en:"Good morning",cat:"Greetings"},
+  {de:"Guten Tag",en:"Good day / Hello",cat:"Greetings"},
+  {de:"Guten Abend",en:"Good evening",cat:"Greetings"},
+  {de:"Gute Nacht",en:"Good night",cat:"Greetings"},
+  {de:"Hallo",en:"Hello",cat:"Greetings"},
+  {de:"Tschüss",en:"Bye",cat:"Greetings"},
+  {de:"Auf Wiedersehen",en:"Goodbye",cat:"Greetings"},
+  {de:"Bitte",en:"Please",cat:"Greetings"},
+  {de:"Danke",en:"Thank you",cat:"Greetings"},
+  {de:"Entschuldigung",en:"Excuse me",cat:"Greetings"},
+  {de:"schwarz",en:"black",cat:"Colors"},
+  {de:"weiß",en:"white",cat:"Colors"},
+  {de:"rot",en:"red",cat:"Colors"},
+  {de:"blau",en:"blue",cat:"Colors"},
+  {de:"grün",en:"green",cat:"Colors"},
+  {de:"gelb",en:"yellow",cat:"Colors"},
+  {de:"grau",en:"gray",cat:"Colors"},
+  {de:"braun",en:"brown",cat:"Colors"},
+  {de:"orange",en:"orange",cat:"Colors"},
+  {de:"lila",en:"purple",cat:"Colors"},
+  {de:"Montag",en:"Monday",cat:"Days"},
+  {de:"Dienstag",en:"Tuesday",cat:"Days"},
+  {de:"Mittwoch",en:"Wednesday",cat:"Days"},
+  {de:"Donnerstag",en:"Thursday",cat:"Days"},
+  {de:"Freitag",en:"Friday",cat:"Days"},
+  {de:"Samstag",en:"Saturday",cat:"Days"},
+  {de:"Sonntag",en:"Sunday",cat:"Days"},
+  {de:"Januar",en:"January",cat:"Months"},
+  {de:"März",en:"March",cat:"Months"},
+  {de:"Juni",en:"June",cat:"Months"},
+  {de:"Oktober",en:"October",cat:"Months"},
+  {de:"Dezember",en:"December",cat:"Months"},
+  {de:"die Mutter",en:"mother",cat:"Family"},
+  {de:"der Vater",en:"father",cat:"Family"},
+  {de:"der Bruder",en:"brother",cat:"Family"},
+  {de:"die Schwester",en:"sister",cat:"Family"},
+  {de:"der Sohn",en:"son",cat:"Family"},
+  {de:"die Tochter",en:"daughter",cat:"Family"},
+  {de:"das Kind",en:"child",cat:"Family"},
+  {de:"der Mann",en:"man / husband",cat:"Family"},
+  {de:"die Frau",en:"woman / wife",cat:"Family"},
+  {de:"die Eltern",en:"parents",cat:"Family"},
+  {de:"das Brot",en:"bread",cat:"Food"},
+  {de:"der Reis",en:"rice",cat:"Food"},
+  {de:"das Fleisch",en:"meat",cat:"Food"},
+  {de:"der Fisch",en:"fish",cat:"Food"},
+  {de:"das Gemüse",en:"vegetables",cat:"Food"},
+  {de:"das Obst",en:"fruit",cat:"Food"},
+  {de:"das Ei",en:"egg",cat:"Food"},
+  {de:"das Wasser",en:"water",cat:"Food"},
+  {de:"der Kaffee",en:"coffee",cat:"Food"},
+  {de:"die Milch",en:"milk",cat:"Food"},
+  {de:"der Kopf",en:"head",cat:"Body"},
+  {de:"das Auge",en:"eye",cat:"Body"},
+  {de:"die Nase",en:"nose",cat:"Body"},
+  {de:"der Mund",en:"mouth",cat:"Body"},
+  {de:"die Hand",en:"hand",cat:"Body"},
+  {de:"der Arm",en:"arm",cat:"Body"},
+  {de:"das Bein",en:"leg",cat:"Body"},
+  {de:"der Fuß",en:"foot",cat:"Body"},
+  {de:"der Rücken",en:"back",cat:"Body"},
+  {de:"das Haus",en:"house",cat:"House"},
+  {de:"die Wohnung",en:"apartment",cat:"House"},
+  {de:"die Küche",en:"kitchen",cat:"House"},
+  {de:"das Schlafzimmer",en:"bedroom",cat:"House"},
+  {de:"der Tisch",en:"table",cat:"House"},
+  {de:"der Stuhl",en:"chair",cat:"House"},
+  {de:"die Tür",en:"door",cat:"House"},
+  {de:"das Fenster",en:"window",cat:"House"},
+  {de:"das Bett",en:"bed",cat:"House"},
+  {de:"die Hose",en:"pants",cat:"Clothing"},
+  {de:"die Jacke",en:"jacket",cat:"Clothing"},
+  {de:"der Schuh",en:"shoe",cat:"Clothing"},
+  {de:"die Mütze",en:"beanie",cat:"Clothing"},
+  {de:"das Hemd",en:"shirt",cat:"Clothing"},
+  {de:"der Mantel",en:"coat",cat:"Clothing"},
+  {de:"die Sonne",en:"sun",cat:"Weather"},
+  {de:"der Regen",en:"rain",cat:"Weather"},
+  {de:"der Schnee",en:"snow",cat:"Weather"},
+  {de:"der Wind",en:"wind",cat:"Weather"},
+  {de:"warm",en:"warm",cat:"Weather"},
+  {de:"kalt",en:"cold",cat:"Weather"},
+  {de:"heiß",en:"hot",cat:"Weather"},
+];
+
+const cats = [...new Set(allWords.map(w=>w.cat))];
+
+// ===== VIM MOTIONS =====
+const sections = ['intro','greetings','colors','numbers','days','family','food','body','house','clothing','weather','flashcards','quiz'];
+let curSection = 0;
+let gPressed = false;
+
+function scrollToSection(idx) {
+  if(idx<0) idx=0; if(idx>=sections.length) idx=sections.length-1;
+  curSection = idx;
+  document.getElementById(sections[idx]).scrollIntoView({behavior:'smooth'});
+  updateNav();
+}
+
+function updateNav() {
+  document.querySelectorAll('.sn-item').forEach((el,i)=>{
+    el.classList.toggle('active', i===curSection);
+  });
+}
+
+document.querySelectorAll('.sn-item').forEach((el,i)=>{
+  el.onclick = ()=> scrollToSection(i);
+});
+
+let vimHelpVisible = true;
+document.addEventListener('keydown', (e)=>{
+  // Don't capture if typing in input
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA') {
+    if(e.key==='Enter') { e.preventDefault(); qzConfirm(); }
+    return;
+  }
+
+  const k = e.key;
+  if(k==='j'){window.scrollBy(0,80);e.preventDefault()}
+  else if(k==='k'){window.scrollBy(0,-80);e.preventDefault()}
+  else if(k==='G'&&!gPressed){window.scrollTo(0,document.body.scrollHeight);e.preventDefault()}
+  else if(k==='g'){
+    if(gPressed){window.scrollTo(0,0);gPressed=false;e.preventDefault()}
+    else{gPressed=true;setTimeout(()=>gPressed=false,500)}
+  }
+  else if(k==='n'){scrollToSection(curSection+1);e.preventDefault()}
+  else if(k==='N'){scrollToSection(curSection-1);e.preventDefault()}
+  else if(k==='f'){scrollToSection(sections.indexOf('flashcards'));e.preventDefault()}
+  else if(k==='q'&&!e.ctrlKey){scrollToSection(sections.indexOf('quiz'));e.preventDefault()}
+  else if(k==='?'){vimHelpVisible=!vimHelpVisible;document.getElementById('vimHelp').style.display=vimHelpVisible?'block':'none'}
+  // Flashcard keys
+  else if(k==='h'){fcNav(-1);e.preventDefault()}
+  else if(k==='l'&&!e.ctrlKey){fcNav(1);e.preventDefault()}
+  else if(k===' '&&document.getElementById('flashcards').getBoundingClientRect().top<200){flipCard();e.preventDefault()}
+  else if(k==='r'){shuffleCards();e.preventDefault()}
+  else if(k==='d'){toggleFcDir();e.preventDefault()}
+  // Quiz keys
+  else if(k>='1'&&k<='4'){qzSelectByKey(parseInt(k)-1);e.preventDefault()}
+  else if(k==='Enter'){qzConfirm();e.preventDefault()}
+});
+
+// Track which section is visible
+const observer = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      const idx=sections.indexOf(e.target.id);
+      if(idx>=0){curSection=idx;updateNav()}
+    }
+  });
+},{threshold:0.3});
+sections.forEach(s=>{const el=document.getElementById(s);if(el)observer.observe(el)});
+
+// ===== FLASHCARDS =====
+let fcWords = [...allWords];
+let fcIdx = 0;
+let fcFlipped = false;
+let fcDeToEn = true;
+
+function renderCard(){
+  const w=fcWords[fcIdx];
+  fcFlipped=false;
+  document.getElementById('fcFront').textContent = fcDeToEn ? w.de : w.en;
+  document.getElementById('fcFront').style.display='block';
+  document.getElementById('fcBack').style.display='none';
+  document.getElementById('fcCat').textContent = w.cat;
+  document.getElementById('fcCount').textContent = (fcIdx+1)+' / '+fcWords.length;
+  document.getElementById('fcDir').textContent = fcDeToEn ? 'German → English' : 'English → German';
+}
+
+function flipCard(){
+  const w=fcWords[fcIdx];
+  fcFlipped=!fcFlipped;
+  if(fcFlipped){
+    document.getElementById('fcFront').style.display='none';
+    document.getElementById('fcBack').style.display='block';
+    document.getElementById('fcBack').textContent = fcDeToEn ? w.en : w.de;
+  } else {
+    document.getElementById('fcFront').style.display='block';
+    document.getElementById('fcBack').style.display='none';
+  }
+}
+
+function fcNav(d){fcIdx+=d;if(fcIdx<0)fcIdx=fcWords.length-1;if(fcIdx>=fcWords.length)fcIdx=0;renderCard()}
+function shuffleCards(){for(let i=fcWords.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[fcWords[i],fcWords[j]]=[fcWords[j],fcWords[i]]}fcIdx=0;renderCard()}
+function toggleFcDir(){fcDeToEn=!fcDeToEn;renderCard()}
+renderCard();
+
+// ===== QUIZ ENGINE =====
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
+function pick(arr,n){return shuffle(arr).slice(0,n)}
+
+function genQuiz(){
+  const qs=[];
+
+  // Type 1: DE→EN matching (8 questions)
+  const deEnWords = pick(allWords,8);
+  deEnWords.forEach(w=>{
+    const wrong = pick(allWords.filter(x=>x.en!==w.en),3).map(x=>x.en);
+    const opts = shuffle([w.en,...wrong]);
+    qs.push({type:'match_de_en',q:`What does "${w.de}" mean?`,opts,ans:opts.indexOf(w.en),cat:w.cat});
+  });
+
+  // Type 2: EN→DE matching (8 questions)
+  const enDeWords = pick(allWords,8);
+  enDeWords.forEach(w=>{
+    const wrong = pick(allWords.filter(x=>x.de!==w.de),3).map(x=>x.de);
+    const opts = shuffle([w.de,...wrong]);
+    qs.push({type:'match_en_de',q:`How do you say "${w.en}" in German?`,opts,ans:opts.indexOf(w.de),cat:w.cat});
+  });
+
+  // Type 3: Odd one out (7 questions)
+  const usedCats = new Set();
+  const catList = shuffle(cats);
+  catList.forEach(cat=>{
+    if(usedCats.size>=7) return;
+    const inCat = allWords.filter(x=>x.cat===cat);
+    const outCat = allWords.filter(x=>x.cat!==cat);
+    if(inCat.length<3||outCat.length<1) return;
+    const three = pick(inCat,3);
+    const odd = pick(outCat,1)[0];
+    const opts = shuffle([...three.map(x=>x.de),odd.de]);
+    qs.push({type:'odd',q:`Which word does NOT belong to the "${cat}" category?`,opts,ans:opts.indexOf(odd.de),cat});
+    usedCats.add(cat);
+  });
+
+  // Type 4: Fill in the blank (7 questions)
+  const fillWords = pick(allWords.filter(w=>!w.de.includes(' ')||w.de.length<12),7);
+  fillWords.forEach(w=>{
+    qs.push({type:'fill',q:`Type the German word for: "${w.en}"`,answer:w.de.toLowerCase().replace(/^(der|die|das)\s+/,''),fullDe:w.de,cat:w.cat});
+  });
+
+  return shuffle(qs);
+}
+
+let quiz=genQuiz();
+let qIdx=0, qScore=0, qAnswered=false, qSel=-1;
+const qResults=[];
+
+function renderQuiz(){
+  const q=quiz[qIdx];
+  document.getElementById('qzProgress').textContent=(qIdx+1)+' / '+quiz.length;
+  document.getElementById('qzFill').style.width=((qIdx+1)/quiz.length*100)+'%';
+  document.getElementById('qzQ').textContent=q.q;
+  document.getElementById('qzFb').textContent='';
+  document.getElementById('qzFb').className='quiz-feedback';
+  document.getElementById('qzNext').textContent='Check';
+  qAnswered=false;qSel=-1;
+  document.getElementById('qzScore').textContent='Score: '+qScore+'/'+qIdx;
+
+  const typeLabels={match_de_en:'German → English',match_en_de:'English → German',odd:'Odd one out',fill:'Fill in the blank'};
+  document.getElementById('qzType').textContent=typeLabels[q.type]||'';
+
+  if(q.type==='fill'){
+    document.getElementById('qzBody').innerHTML='<input class="quiz-input" id="qzInput" placeholder="Type your answer..." autocomplete="off" autocapitalize="off" spellcheck="false">';
+    document.getElementById('qzInput').focus();
+  } else {
+    document.getElementById('qzBody').innerHTML='<div class="quiz-opts" id="qzOpts">'+
+      q.opts.map((o,i)=>`<button class="quiz-opt" onclick="qzSelect(${i})" id="qo${i}">${o}</button>`).join('')+'</div>';
+  }
+}
+
+function qzSelect(i){
+  if(qAnswered) return;
+  qSel=i;
+  document.querySelectorAll('.quiz-opt').forEach((el,j)=>{el.classList.toggle('qsel',j===i)});
+}
+
+function qzSelectByKey(i){
+  const q=quiz[qIdx];
+  if(q.type==='fill'||qAnswered) return;
+  if(i<q.opts.length) qzSelect(i);
+}
+
+function qzConfirm(){
+  const q=quiz[qIdx];
+  if(!qAnswered){
+    // Check answer
+    if(q.type==='fill'){
+      const input=document.getElementById('qzInput');
+      if(!input) return;
+      const val=input.value.trim().toLowerCase().replace(/^(der|die|das)\s+/,'');
+      if(!val) return;
+      const correct = val===q.answer;
+      if(correct){
+        qScore++;
+        document.getElementById('qzFb').textContent='✓ Correct!';
+        document.getElementById('qzFb').className='quiz-feedback quiz-fb-right';
+        input.style.borderColor='#22c55e';input.style.color='#4ade80';
+      } else {
+        document.getElementById('qzFb').textContent='✗ The answer is: '+q.fullDe;
+        document.getElementById('qzFb').className='quiz-feedback quiz-fb-wrong';
+        input.style.borderColor='#ef4444';input.style.color='#f87171';
+      }
+      qResults.push({q:q.q,type:q.type,yours:val,correct:q.answer,right:correct,cat:q.cat});
+    } else {
+      if(qSel<0) return;
+      const correct = qSel===q.ans;
+      if(correct){
+        qScore++;
+        document.getElementById('qo'+qSel).classList.add('qright');
+        document.getElementById('qzFb').textContent='✓ Correct!';
+        document.getElementById('qzFb').className='quiz-feedback quiz-fb-right';
+      } else {
+        document.getElementById('qo'+qSel).classList.add('qwrong');
+        document.getElementById('qo'+q.ans).classList.add('qmissed');
+        document.getElementById('qzFb').textContent='✗ The correct answer is: '+q.opts[q.ans];
+        document.getElementById('qzFb').className='quiz-feedback quiz-fb-wrong';
+      }
+      qResults.push({q:q.q,type:q.type,yours:q.opts[qSel],correct:q.opts[q.ans],right:correct,cat:q.cat});
+    }
+    qAnswered=true;
+    document.getElementById('qzNext').textContent=qIdx===quiz.length-1?'See results':'Next →';
+    document.getElementById('qzScore').textContent='Score: '+qScore+'/'+(qIdx+1);
+  } else {
+    // Move to next
+    qIdx++;
+    if(qIdx>=quiz.length){showQuizResults();return}
+    renderQuiz();
+  }
+}
+
+function showQuizResults(){
+  document.getElementById('quizArea').classList.add('hidden');
+  const r=document.getElementById('quizResults');
+  r.classList.remove('hidden');
+
+  const total=quiz.length;
+  const pct=Math.round(qScore/total*100);
+
+  // Category breakdown
+  const byCat={};
+  qResults.forEach(r=>{
+    if(!byCat[r.cat]) byCat[r.cat]={c:0,t:0};
+    byCat[r.cat].t++;
+    if(r.right) byCat[r.cat].c++;
+  });
+
+  // Mistakes list
+  const mistakes = qResults.filter(r=>!r.right);
+
+  r.innerHTML=`
+    <div class="quiz-results">
+      <div class="quiz-score">${pct}%</div>
+      <div class="quiz-score-label">${qScore} out of ${total} correct</div>
+      <div class="quiz-breakdown">
+        <div class="qb-card"><div class="qb-num" style="color:#4ade80">${qScore}</div><div class="qb-lbl">Correct</div></div>
+        <div class="qb-card"><div class="qb-num" style="color:#f87171">${total-qScore}</div><div class="qb-lbl">Wrong</div></div>
+        <div class="qb-card"><div class="qb-num" style="color:#7ec8e3">${total}</div><div class="qb-lbl">Total</div></div>
+      </div>
+      <h3 style="color:#9db8d4;margin:20px 0 10px;text-align:left">By category</h3>
+      ${Object.entries(byCat).map(([cat,v])=>{
+        const p=v.t?Math.round(v.c/v.t*100):0;
+        const col=p>=80?'#4ade80':p>=50?'#facc15':'#f87171';
+        return `<div class="bar-row"><span class="bar-label">${cat}</span><div class="bar-bg"><div class="bar-fg" style="width:${p}%;background:${col}"></div></div><span class="bar-pct">${p}%</span></div>`;
+      }).join('')}
+      ${mistakes.length>0?`
+        <h3 style="color:#9db8d4;margin:20px 0 10px;text-align:left">Review these</h3>
+        <div style="text-align:left;font-size:14px;color:#b0b0b0">
+          ${mistakes.map(m=>`<div style="margin:8px 0;padding:8px 12px;background:#1a1a2e;border-radius:4px;border-left:3px solid #f87171">
+            <div style="color:#e0e0e0">${m.q}</div>
+            <div>You said: <span style="color:#f87171">${m.yours}</span> · Correct: <span style="color:#4ade80">${m.correct}</span></div>
+          </div>`).join('')}
+        </div>
+      `:''}
+      <button class="quiz-dl" onclick="dlQuizCSV()">⬇ Download results CSV</button>
+      <button class="quiz-dl" style="background:#1e2a3a;color:#7ec8e3;margin-top:8px" onclick="retakeQuiz()">↻ Retake quiz (new questions)</button>
+    </div>
+  `;
+}
+
+function retakeQuiz(){
+  quiz=genQuiz();qIdx=0;qScore=0;qResults.length=0;
+  document.getElementById('quizArea').classList.remove('hidden');
+  document.getElementById('quizResults').classList.add('hidden');
+  renderQuiz();
+}
+
+function dlQuizCSV(){
+  const rows=[['Question','Type','Your Answer','Correct Answer','Correct?','Category']];
+  qResults.forEach(r=>{
+    rows.push(['"'+r.q+'"',r.type,'"'+r.yours+'"','"'+r.correct+'"',r.right?'Yes':'No',r.cat]);
+  });
+  const csv=rows.map(r=>r.join(',')).join('\n');
+  const b=new Blob([csv],{type:'text/csv'});
+  const u=URL.createObjectURL(b);
+  const a=document.createElement('a');a.href=u;a.download='unit2_quiz_results.csv';a.click();URL.revokeObjectURL(u);
+}
+
+renderQuiz();
+</script>
+</body>
+</html>

@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAA-C03 Study Guide</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#1a1a2e;color:#e0e0e0;font-family:'Courier New',monospace;line-height:1.7;padding:20px;max-width:900px;margin:0 auto}
+h1{color:#00ff88;border-bottom:2px solid #00ff88;padding-bottom:10px;margin-bottom:30px;font-size:1.6em}
+h2{color:#00ccff;margin:40px 0 15px;font-size:1.3em;border-left:4px solid #00ccff;padding-left:12px}
+h3{color:#ffaa00;margin:20px 0 10px;font-size:1.1em}
+p,li{margin-bottom:8px}
+ul,ol{padding-left:24px;margin-bottom:15px}
+code{background:#2a2a4a;padding:2px 6px;border-radius:3px;color:#ff6b6b}
+table{width:100%;border-collapse:collapse;margin:15px 0}
+th,td{border:1px solid #444;padding:8px 12px;text-align:left}
+th{background:#2a2a4a;color:#00ff88}
+.section{margin-bottom:50px;padding:20px;background:#16213e;border-radius:8px}
+.quiz{background:#1a1a3e;border:1px solid #444;border-radius:8px;padding:20px;margin:20px 0}
+.quiz h3{color:#ff6b6b;margin-top:0}
+.question{margin-bottom:25px;padding:15px;background:#1e1e3e;border-radius:6px;border-left:3px solid #666}
+.question.correct{border-left-color:#00ff88}
+.question.wrong{border-left-color:#ff4444}
+.question p.q{font-weight:bold;margin-bottom:10px;color:#fff}
+.option{display:block;padding:6px 12px;margin:4px 0;cursor:pointer;border-radius:4px;border:1px solid transparent}
+.option:hover{background:#2a2a5a}
+.option.selected{background:#2a2a5a;border-color:#00ccff}
+.option.reveal-correct{background:#0a3a0a;border-color:#00ff88;color:#00ff88}
+.option.reveal-wrong{background:#3a0a0a;border-color:#ff4444;color:#ff4444}
+.explanation{display:none;margin-top:10px;padding:10px;background:#0a0a2e;border-radius:4px;color:#aaa;font-size:0.9em}
+.explanation.show{display:block}
+.btn{background:#2a2a4a;color:#00ccff;border:1px solid #00ccff;padding:8px 16px;border-radius:4px;cursor:pointer;font-family:inherit;font-size:0.9em;margin:4px}
+.btn:hover{background:#00ccff;color:#000}
+.score-bar{position:fixed;top:0;left:0;right:0;background:#0a0a1e;padding:8px 20px;display:flex;justify-content:space-between;align-items:center;z-index:100;border-bottom:1px solid #333;font-size:0.85em}
+.score-bar span{color:#00ff88}
+.vim-help{position:fixed;bottom:10px;right:10px;background:#0a0a2e;border:1px solid #444;padding:10px;border-radius:6px;font-size:0.75em;color:#888;max-width:220px;z-index:100}
+.vim-help kbd{background:#2a2a4a;padding:1px 5px;border-radius:3px;color:#ffaa00;border:1px solid #555}
+.toc{margin:20px 0 40px;padding:15px;background:#16213e;border-radius:8px}
+.toc a{color:#00ccff;text-decoration:none;display:block;padding:4px 0}
+.toc a:hover{color:#00ff88}
+.highlight{background:#2a2a0a;padding:10px;border-radius:4px;border-left:3px solid #ffaa00;margin:10px 0}
+body{padding-top:50px}
+.current-q{outline:2px solid #00ccff;outline-offset:2px}
+</style>
+</head>
+<body>
+
+<div class="score-bar">
+  <span id="progress">Section: 0/5 | Questions: 0/0 answered</span>
+  <span id="score">Score: 0/0</span>
+  <span id="mode" style="color:#ffaa00">NORMAL</span>
+</div>
+
+<div class="vim-help" id="vimHelp">
+  <strong style="color:#00ccff">Vim Keys</strong><br>
+  <kbd>j</kbd>/<kbd>k</kbd> next/prev question<br>
+  <kbd>1</kbd>-<kbd>4</kbd> select option A-D<br>
+  <kbd>Enter</kbd> submit answer<br>
+  <kbd>g</kbd><kbd>g</kbd> top / <kbd>G</kbd> bottom<br>
+  <kbd>n</kbd>/<kbd>N</kbd> next/prev section<br>
+  <kbd>/</kbd> search<br>
+  <kbd>?</kbd> toggle this help<br>
+  <kbd>r</kbd> reset all answers
+</div>
+
+<h1>SAA-C03 Cram Guide</h1>
+<p>5 high-yield topics with exam-style MCQs after each. Use vim keys to navigate.</p>
+
+<div class="toc" id="toc">
+  <h3 style="color:#00ff88;margin-top:0">Table of Contents</h3>
+  <a href="#s1">1. DR Strategies & the RTO Ladder</a>
+  <a href="#s2">2. SQS FIFO vs Standard</a>
+  <a href="#s3">3. DynamoDB On-Demand vs Provisioned</a>
+  <a href="#s4">4. RDS Proxy for Lambda</a>
+  <a href="#s5">5. Cost Optimization Tools</a>
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION 1: DR STRATEGIES -->
+<!-- ============================================================ -->
+<div class="section" id="s1">
+<h2>1. Disaster Recovery Strategies — The RTO Ladder</h2>
+
+<p>AWS defines four DR strategies ordered from <strong>cheapest/slowest</strong> to <strong>most expensive/fastest</strong>. The exam WILL test you on picking the right one given RTO/RPO constraints and cost concerns.</p>
+
+<h3>The Ladder (memorize this order)</h3>
+<table>
+<tr><th>Strategy</th><th>RTO</th><th>RPO</th><th>Cost</th><th>Key Idea</th></tr>
+<tr><td>Backup &amp; Restore</td><td>Hours</td><td>Hours</td><td>$</td><td>Just backups (S3, snapshots). Restore from scratch when disaster hits.</td></tr>
+<tr><td>Pilot Light</td><td>10s of minutes</td><td>Minutes</td><td>$$</td><td>Core DB/data replication running. App servers OFF. Turn them on when needed.</td></tr>
+<tr><td>Warm Standby</td><td>Minutes</td><td>Seconds-Minutes</td><td>$$$</td><td>Scaled-down but FULLY FUNCTIONAL copy running. Scale up on failover.</td></tr>
+<tr><td>Multi-Site / Hot Standby</td><td>Near-zero (seconds)</td><td>Near-zero</td><td>$$$$</td><td>Full production clone running. Route53 or Global Accelerator for instant failover.</td></tr>
+</table>
+
+<div class="highlight">
+<strong>Exam Traps:</strong>
+<ul>
+<li><strong>Pilot Light vs Warm Standby</strong> — Pilot Light has servers OFF (only data layer runs). Warm Standby has everything running at reduced capacity. If the question says "minimal running infrastructure" → Pilot Light. If it says "scaled-down version of production" → Warm Standby.</li>
+<li><strong>"Cost-effective" + "RTO of a few hours"</strong> → Backup &amp; Restore.</li>
+<li><strong>"RTO must be under 1 minute"</strong> → Multi-Site Active-Active.</li>
+<li><strong>RPO of near-zero</strong> usually implies synchronous replication → Multi-Site or Aurora Global Database.</li>
+<li><strong>Route 53 failover routing</strong> is a common component in Warm Standby and Multi-Site.</li>
+</ul>
+</div>
+
+<h3>Key Services per Strategy</h3>
+<ul>
+<li><strong>Backup &amp; Restore:</strong> AWS Backup, S3 Cross-Region Replication, EBS Snapshots, RDS automated backups, AMIs copied cross-region.</li>
+<li><strong>Pilot Light:</strong> RDS read replica (cross-region), DynamoDB Global Tables, Aurora Global Database (data running; compute off).</li>
+<li><strong>Warm Standby:</strong> Same as Pilot Light + EC2/ECS running at minimum capacity behind an ALB + Route 53 failover.</li>
+<li><strong>Multi-Site:</strong> Full mirrored environment + Route 53 active-active (weighted/latency routing), Global Accelerator, Aurora Global Database with <1s replication lag.</li>
+</ul>
+
+<h3>Aurora Global Database</h3>
+<p>Frequently tested. Provides cross-region replication with <strong>&lt;1 second replication lag</strong>. The secondary region can be promoted in <strong>&lt;1 minute</strong>. This is the go-to for "near-zero RPO, RTO under 1 minute for RDS/Aurora" scenarios.</p>
+
+<h3>CloudEndure / AWS Elastic Disaster Recovery (DRS)</h3>
+<p>Block-level continuous replication of on-prem or cloud servers to AWS. Provides <strong>RPO of seconds, RTO of minutes</strong>. If the question mentions migrating on-prem DR to AWS with low RPO/RTO → think DRS.</p>
+
+<div class="quiz">
+<h3>Section 1 Quiz — DR Strategies</h3>
+
+<div class="question" data-correct="1">
+<p class="q">Q1. A company runs a critical e-commerce application in us-east-1. They need a DR strategy with an RTO of less than 1 minute and near-zero RPO. Cost is not a primary concern. Which strategy should they use?</p>
+<label class="option" data-idx="0">A. Backup and Restore with cross-region S3 replication</label>
+<label class="option" data-idx="1">B. Multi-Site Active-Active with Route 53 and Aurora Global Database</label>
+<label class="option" data-idx="2">C. Pilot Light with RDS cross-region read replicas</label>
+<label class="option" data-idx="3">D. Warm Standby with Auto Scaling in a secondary region</label>
+<div class="explanation">RTO < 1 min + near-zero RPO + cost not a concern = Multi-Site Active-Active. Aurora Global Database gives <1s replication and <1 min promotion. Pilot Light/Warm Standby can't reliably hit sub-minute RTO. Backup & Restore is hours.</div>
+</div>
+
+<div class="question" data-correct="2">
+<p class="q">Q2. A startup wants the MOST cost-effective DR solution. They can tolerate an RTO of several hours and RPO of 24 hours. Their application runs on EC2 with an RDS MySQL database. Which approach is best?</p>
+<label class="option" data-idx="0">A. Warm Standby in another region with minimum-capacity EC2</label>
+<label class="option" data-idx="1">B. Pilot Light with a cross-region RDS read replica</label>
+<label class="option" data-idx="2">C. Backup and Restore using automated RDS snapshots copied cross-region and AMIs</label>
+<label class="option" data-idx="3">D. Multi-Site Active-Active with Route 53 weighted routing</label>
+<div class="explanation">"Most cost-effective" + hours of RTO + 24hr RPO = Backup & Restore. Daily snapshots copied cross-region + AMIs stored in S3. No running infrastructure in the DR region. Pilot Light still runs a DB continuously (costs more). Warm Standby and Multi-Site are overkill.</div>
+</div>
+
+<div class="question" data-correct="0">
+<p class="q">Q3. A company uses a Pilot Light DR strategy. Which components are expected to be running in the DR region BEFORE a disaster occurs?</p>
+<label class="option" data-idx="0">A. Database with cross-region replication; application servers are stopped</label>
+<label class="option" data-idx="1">B. Both database and application servers running at full capacity</label>
+<label class="option" data-idx="2">C. Application servers running at minimum capacity; database is restored from snapshots on failover</label>
+<label class="option" data-idx="3">D. Nothing is running; everything is restored from backups</label>
+<div class="explanation">Pilot Light = data layer (DB) is live and replicating. Compute (app servers) is OFF. On disaster, you spin up app servers using pre-configured AMIs/launch templates. B = Multi-Site, C is backwards (that would be compute on, DB off which isn't a real strategy), D = Backup & Restore.</div>
+</div>
+
+<div class="question" data-correct="3">
+<p class="q">Q4. A company needs to migrate their on-premises VMware-based DR to AWS. They require continuous replication with RPO in seconds and RTO in minutes. Which AWS service should they use?</p>
+<label class="option" data-idx="0">A. AWS Migration Hub</label>
+<label class="option" data-idx="1">B. AWS DataSync</label>
+<label class="option" data-idx="2">C. AWS Server Migration Service (SMS)</label>
+<label class="option" data-idx="3">D. AWS Elastic Disaster Recovery (DRS)</label>
+<div class="explanation">AWS DRS (formerly CloudEndure Disaster Recovery) provides continuous block-level replication, RPO of seconds, RTO of minutes. It's purpose-built for this. Migration Hub is an orchestration/tracking tool. DataSync is for data transfer (NFS, S3, etc.), not full server replication. SMS is deprecated.</div>
+</div>
+
+<div class="question" data-correct="1">
+<p class="q">Q5. An architect is designing a Warm Standby DR strategy. Which of the following BEST describes the DR environment?</p>
+<label class="option" data-idx="0">A. Only the database tier is replicated; all other resources are provisioned on failover</label>
+<label class="option" data-idx="1">B. A fully functional but scaled-down version of the production environment is always running</label>
+<label class="option" data-idx="2">C. An identical copy of production runs at full scale in the DR region</label>
+<label class="option" data-idx="3">D. Periodic backups are stored in the DR region and restored on failover</label>
+<div class="explanation">Warm Standby = fully functional but at reduced capacity. It handles some traffic or can be scaled up quickly. A = Pilot Light, C = Multi-Site, D = Backup & Restore.</div>
+</div>
+
+<div class="question" data-correct="2">
+<p class="q">Q6. A company uses Aurora MySQL in us-east-1. They need cross-region DR with the ability to promote a secondary region in under 1 minute. Which feature should they use?</p>
+<label class="option" data-idx="0">A. RDS cross-region read replica with manual promotion</label>
+<label class="option" data-idx="1">B. Aurora Multi-AZ deployment</label>
+<label class="option" data-idx="2">C. Aurora Global Database</label>
+<label class="option" data-idx="3">D. RDS automated backups with cross-region copy</label>
+<div class="explanation">Aurora Global Database provides <1s replication lag and can promote a secondary region in <1 minute. RDS cross-region read replicas take longer to promote. Multi-AZ is same-region only. Automated backups need full restore (hours).</div>
+</div>
+</div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION 2: SQS FIFO vs Standard -->
+<!-- ============================================================ -->
+<div class="section" id="s2">
+<h2>2. SQS — FIFO vs Standard</h2>
+
+<p>SQS is heavily tested. You need to know when to pick FIFO vs Standard and the specific limits/behaviors of each.</p>
+
+<table>
+<tr><th>Feature</th><th>Standard</th><th>FIFO</th></tr>
+<tr><td>Ordering</td><td>Best-effort (no guarantee)</td><td>Strict FIFO within message group</td></tr>
+<tr><td>Delivery</td><td>At-least-once (duplicates possible)</td><td>Exactly-once processing</td></tr>
+<tr><td>Throughput</td><td>Nearly unlimited</td><td>300 msg/s (3,000 with batching) without high-throughput; 70,000 msg/s with high-throughput mode</td></tr>
+<tr><td>Deduplication</td><td>None built-in</td><td>5-minute deduplication window (content-based or explicit dedup ID)</td></tr>
+<tr><td>Queue Name</td><td>Any name</td><td>Must end in <code>.fifo</code></td></tr>
+<tr><td>Use Case</td><td>Decoupling, fan-out, high throughput</td><td>Order-sensitive: financial txns, command sequences</td></tr>
+</table>
+
+<h3>Message Group ID (FIFO only)</h3>
+<p>Messages within the same <code>MessageGroupId</code> are delivered in strict order. Different group IDs can be processed in parallel. Think of it as "ordered lanes." If you have 5 group IDs, you can have 5 consumers processing in parallel — each lane is FIFO within itself.</p>
+
+<h3>Deduplication (FIFO only)</h3>
+<p>Two methods: (1) <strong>Content-based deduplication</strong> — SQS hashes the body and rejects duplicates within 5 min. (2) <strong>Explicit MessageDeduplicationId</strong> — you provide a unique ID per message. If the same dedup ID is sent within 5 min, it's discarded.</p>
+
+<h3>Key Exam Patterns</h3>
+<div class="highlight">
+<ul>
+<li><strong>"Messages must be processed in order"</strong> → FIFO queue.</li>
+<li><strong>"No duplicate processing"</strong> → FIFO (exactly-once).</li>
+<li><strong>"Maximum throughput / high volume"</strong> → Standard queue.</li>
+<li><strong>"Financial transactions in sequence"</strong> → FIFO with MessageGroupId per account.</li>
+<li><strong>"Decouple microservices"</strong> + no ordering requirement → Standard.</li>
+<li><strong>FIFO + SNS</strong>: SNS FIFO topic can only send to SQS FIFO queues (not standard). SNS Standard can send to both.</li>
+</ul>
+</div>
+
+<h3>DLQ (Dead-Letter Queue)</h3>
+<p>Both Standard and FIFO support DLQs. The DLQ must be the same type as the source queue (Standard→Standard, FIFO→FIFO). Messages that fail processing after <code>maxReceiveCount</code> times go to the DLQ. The exam loves pairing DLQ with Lambda error handling.</p>
+
+<h3>Visibility Timeout</h3>
+<p>Default 30 seconds. When a consumer receives a message, it becomes invisible to other consumers for this duration. If the consumer doesn't delete it in time, it reappears. If your Lambda takes 5 minutes → set visibility timeout > 5 minutes. Common exam trap: messages being processed twice → increase visibility timeout.</p>
+
+<h3>Long Polling vs Short Polling</h3>
+<p><code>WaitTimeSeconds</code> > 0 enables long polling (up to 20s). Reduces empty responses and API calls → saves cost. The exam expects you to know this as a cost optimization for SQS.</p>
+
+<div class="quiz">
+<h3>Section 2 Quiz — SQS</h3>
+
+<div class="question" data-correct="1">
+<p class="q">Q1. A financial services company processes stock trades. Each trade for a given account must be processed in the exact order received, and no trade should be processed more than once. Which SQS configuration is correct?</p>
+<label class="option" data-idx="0">A. Standard queue with a Lambda consumer using idempotency tokens</label>
+<label class="option" data-idx="1">B. FIFO queue with MessageGroupId set to the account ID</label>
+<label class="option" data-idx="2">C. Standard queue with message deduplication enabled</label>
+<label class="option" data-idx="3">D. FIFO queue with a single MessageGroupId for all trades</label>
+<div class="explanation">Order per account + no duplicates = FIFO. Setting MessageGroupId to account ID ensures per-account ordering while allowing parallel processing across accounts. A single group ID (D) would serialize ALL trades, destroying throughput. Standard queues (A, C) don't guarantee ordering. Standard queues don't have built-in deduplication (C is invalid).</div>
+</div>
+
+<div class="question" data-correct="3">
+<p class="q">Q2. A development team notices their SQS Standard queue consumers are processing some messages twice. The application cannot tolerate duplicate processing. They cannot change the queue type. What should they do?</p>
+<label class="option" data-idx="0">A. Enable content-based deduplication on the Standard queue</label>
+<label class="option" data-idx="1">B. Set the visibility timeout to 0</label>
+<label class="option" data-idx="2">C. Enable long polling with WaitTimeSeconds of 20</label>
+<label class="option" data-idx="3">D. Implement idempotency in the consumer application using a DynamoDB tracking table</label>
+<div class="explanation">Standard queues are at-least-once — duplicates are inherent. Content-based deduplication is FIFO-only (A is wrong). Since they can't change queue type, the fix is consumer-side idempotency. A DynamoDB table tracking processed message IDs is the standard pattern. Visibility timeout of 0 (B) would make things worse. Long polling (C) reduces cost but doesn't prevent duplicates.</div>
+</div>
+
+<div class="question" data-correct="0">
+<p class="q">Q3. An SNS FIFO topic needs to fan out messages to multiple subscribers. Which subscriber types are supported?</p>
+<label class="option" data-idx="0">A. Only SQS FIFO queues</label>
+<label class="option" data-idx="1">B. SQS Standard and FIFO queues</label>
+<label class="option" data-idx="2">C. SQS FIFO queues and Lambda functions</label>
+<label class="option" data-idx="3">D. SQS FIFO queues, Lambda functions, and HTTP/S endpoints</label>
+<div class="explanation">SNS FIFO topics can ONLY deliver to SQS FIFO queues. They do not support Lambda, HTTP, email, or any other subscriber type. This is a common exam gotcha. If you need Lambda + ordering, you'd subscribe Lambda to the SQS FIFO queue, not directly to the SNS FIFO topic.</div>
+</div>
+
+<div class="question" data-correct="2">
+<p class="q">Q4. A company's Lambda function processes messages from an SQS queue. They notice messages appear in the queue again after being processed. The Lambda function takes approximately 3 minutes to complete. The queue's visibility timeout is 30 seconds. What is the MOST likely cause and fix?</p>
+<label class="option" data-idx="0">A. The Lambda function is not deleting messages; add delete logic</label>
+<label class="option" data-idx="1">B. The queue needs to be changed to FIFO; switch queue type</label>
+<label class="option" data-idx="2">C. The visibility timeout is too short; increase it to at least 3 minutes</label>
+<label class="option" data-idx="3">D. Enable long polling to reduce duplicate deliveries</label>
+<div class="explanation">Lambda takes 3 min but visibility timeout is 30s. After 30s, SQS assumes the message wasn't processed and makes it visible again → another Lambda invocation picks it up. Fix: increase visibility timeout to at least 6x the Lambda timeout (AWS recommendation) or at minimum longer than processing time. Best practice: set it to 6× the function timeout.</div>
+</div>
+
+<div class="question" data-correct="1">
+<p class="q">Q5. A solutions architect is optimizing SQS costs. The application polls the queue frequently but most polls return empty. Which change reduces costs the most?</p>
+<label class="option" data-idx="0">A. Switch to a FIFO queue</label>
+<label class="option" data-idx="1">B. Enable long polling by setting WaitTimeSeconds to 20</label>
+<label class="option" data-idx="2">C. Increase the message retention period</label>
+<label class="option" data-idx="3">D. Enable server-side encryption</label>
+<div class="explanation">Long polling (WaitTimeSeconds > 0, max 20) makes the ReceiveMessage call wait until a message arrives or the timeout expires. This eliminates empty responses → fewer API calls → lower cost. FIFO queues cost more per API call. Retention period and encryption don't affect polling costs.</div>
+</div>
+
+<div class="question" data-correct="3">
+<p class="q">Q6. A company uses an SQS FIFO queue. They need to increase throughput beyond 300 messages per second without batching. What should they enable?</p>
+<label class="option" data-idx="0">A. Auto Scaling on the queue</label>
+<label class="option" data-idx="1">B. Provisioned throughput mode</label>
+<label class="option" data-idx="2">C. Switch to Standard queue</label>
+<label class="option" data-idx="3">D. High throughput mode for SQS FIFO</label>
+<div class="explanation">SQS FIFO high throughput mode supports up to 70,000 messages/second per queue (per API action). This is the direct answer. There's no "auto scaling" or "provisioned throughput" for SQS. Switching to Standard loses ordering guarantees.</div>
+</div>
+</div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION 3: DynamoDB On-Demand vs Provisioned -->
+<!-- ============================================================ -->
+<div class="section" id="s3">
+<h2>3. DynamoDB — On-Demand vs Provisioned Capacity</h2>
+
+<h3>On-Demand Mode</h3>
+<ul>
+<li>Pay per request (read/write). No capacity planning needed.</li>
+<li>Scales instantly to handle any traffic level.</li>
+<li>More expensive per request than provisioned (roughly 5-7x at steady state).</li>
+<li>Best for: unpredictable/spiky workloads, new tables with unknown traffic, dev/test environments.</li>
+<li>You CAN switch between modes (once every 24 hours).</li>
+</ul>
+
+<h3>Provisioned Mode</h3>
+<ul>
+<li>You specify Read Capacity Units (RCU) and Write Capacity Units (WCU).</li>
+<li>1 RCU = 1 strongly consistent read/s for items up to 4KB, or 2 eventually consistent reads/s for items up to 4KB.</li>
+<li>1 WCU = 1 write/s for items up to 1KB.</li>
+<li>Can enable <strong>Auto Scaling</strong> to adjust RCU/WCU based on utilization targets.</li>
+<li>Supports <strong>Reserved Capacity</strong> (1-year or 3-year commitment) for significant discounts.</li>
+<li>Best for: predictable workloads, cost optimization on steady traffic.</li>
+</ul>
+
+<h3>When the Exam Tests This</h3>
+<div class="highlight">
+<ul>
+<li><strong>"Unpredictable traffic spikes"</strong> → On-Demand.</li>
+<li><strong>"Cost optimize a table with steady, predictable traffic"</strong> → Provisioned + Auto Scaling (+ Reserved Capacity for even more savings).</li>
+<li><strong>"New application, unknown traffic patterns"</strong> → On-Demand initially, switch to provisioned once patterns emerge.</li>
+<li><strong>"ProvisionedThroughputExceededException"</strong> → Either increase provisioned capacity, enable auto scaling, switch to on-demand, or use DAX for reads.</li>
+<li><strong>"Burst capacity"</strong> → DynamoDB reserves unused capacity for bursts (up to 5 minutes of unused capacity). If you exhaust burst → throttling.</li>
+</ul>
+</div>
+
+<h3>DynamoDB Global Tables</h3>
+<p>Multi-region, multi-active replication. Requires DynamoDB Streams enabled. Provides <strong>sub-second replication</strong> across regions. Any region can accept writes. This is the DynamoDB DR strategy — exam pairs this with "multi-region active-active" requirements.</p>
+
+<h3>DAX (DynamoDB Accelerator)</h3>
+<p>In-memory cache for DynamoDB. Microsecond read latency. Sits between your app and DynamoDB — no code changes needed (same API). Use for read-heavy workloads. Does NOT help with writes. If the question mentions "reduce DynamoDB read costs" or "microsecond latency for reads" → DAX.</p>
+
+<h3>DynamoDB Streams</h3>
+<p>Ordered log of item-level changes. Can trigger Lambda functions. Used for: replication (Global Tables uses it), aggregation pipelines, cross-service sync. Retention: 24 hours.</p>
+
+<div class="quiz">
+<h3>Section 3 Quiz — DynamoDB</h3>
+
+<div class="question" data-correct="2">
+<p class="q">Q1. A gaming company launches a new mobile game. They have no idea what traffic will look like — it could be 100 users or 10 million in the first week. They use DynamoDB. Which capacity mode should they start with?</p>
+<label class="option" data-idx="0">A. Provisioned with high RCU/WCU to be safe</label>
+<label class="option" data-idx="1">B. Provisioned with Auto Scaling and aggressive scaling policies</label>
+<label class="option" data-idx="2">C. On-Demand mode</label>
+<label class="option" data-idx="3">D. Provisioned with Reserved Capacity for cost savings</label>
+<div class="explanation">Unknown traffic + potential massive spikes = On-Demand. It scales instantly with no capacity planning. Provisioned with high values wastes money if traffic is low. Auto Scaling has lag and may not react fast enough for sudden viral spikes. Reserved Capacity requires commitment with unknown traffic — risky.</div>
+</div>
+
+<div class="question" data-correct="1">
+<p class="q">Q2. A company has a DynamoDB table with steady, predictable traffic of 5,000 reads/s and 2,000 writes/s. They want to MINIMIZE costs. Which approach is best?</p>
+<label class="option" data-idx="0">A. On-Demand mode for simplicity</label>
+<label class="option" data-idx="1">B. Provisioned mode with Auto Scaling and Reserved Capacity</label>
+<label class="option" data-idx="2">C. On-Demand mode with DAX caching</label>
+<label class="option" data-idx="3">D. Provisioned mode without Auto Scaling at exactly 5,000 RCU / 2,000 WCU</label>
+<div class="explanation">Steady predictable traffic = Provisioned is cheaper. Adding Auto Scaling handles minor fluctuations. Reserved Capacity (1 or 3 year) gives the biggest discount on top. On-Demand would be 5-7x more expensive at this steady rate. D without Auto Scaling risks throttling during minor spikes.</div>
+</div>
+
+<div class="question" data-correct="0">
+<p class="q">Q3. An application experiences ProvisionedThroughputExceededException errors during peak hours but the table is idle at night. The team wants an automated solution. What should they do?</p>
+<label class="option" data-idx="0">A. Enable DynamoDB Auto Scaling with a target utilization of 70%</label>
+<label class="option" data-idx="1">B. Switch to On-Demand mode permanently</label>
+<label class="option" data-idx="2">C. Add a DAX cluster to absorb the excess reads</label>
+<label class="option" data-idx="3">D. Manually increase provisioned capacity before peak hours daily</label>
+<div class="explanation">Predictable peak/idle pattern = Provisioned + Auto Scaling is cost-optimal. It scales up for peaks and down at night automatically. On-Demand would work but is more expensive for a predictable pattern. DAX only helps reads, and the error could be from writes too. Manual changes (D) don't scale.</div>
+</div>
+
+<div class="question" data-correct="3">
+<p class="q">Q4. A social media company needs their DynamoDB-backed application to serve users across US, Europe, and Asia with single-digit millisecond reads in each region. Users in any region can write data. Which feature should they use?</p>
+<label class="option" data-idx="0">A. DynamoDB with DAX clusters in each region</label>
+<label class="option" data-idx="1">B. DynamoDB with cross-region read replicas</label>
+<label class="option" data-idx="2">C. DynamoDB Streams with Lambda replication</label>
+<label class="option" data-idx="3">D. DynamoDB Global Tables</label>
+<div class="explanation">Multi-region + writes in any region = Global Tables. It's multi-active (read/write in all regions) with sub-second replication. DAX is single-region cache. DynamoDB doesn't have "cross-region read replicas" as a native feature (B is made up). Streams + Lambda replication is what Global Tables does under the hood, but you shouldn't build it yourself.</div>
+</div>
+
+<div class="question" data-correct="2">
+<p class="q">Q5. A reporting application reads the same DynamoDB items thousands of times per minute. The data rarely changes. The team wants to reduce DynamoDB read costs and improve latency. What should they add?</p>
+<label class="option" data-idx="0">A. ElastiCache Redis cluster in front of DynamoDB</label>
+<label class="option" data-idx="1">B. CloudFront distribution caching DynamoDB responses</label>
+<label class="option" data-idx="2">C. DAX cluster in the same VPC</label>
+<label class="option" data-idx="3">D. DynamoDB Streams to a pre-computed results table</label>
+<div class="explanation">Read-heavy, same items, rarely changing = DAX is the purpose-built answer. It's a DynamoDB-native cache with microsecond reads and requires no code changes (same DynamoDB API). ElastiCache works but requires code changes and isn't DynamoDB-specific. CloudFront can't directly cache DynamoDB API calls. Streams + pre-compute is over-engineering.</div>
+</div>
+
+<div class="question" data-correct="1">
+<p class="q">Q6. A company has a DynamoDB table in on-demand mode. After 6 months, they observe consistent traffic of 1,000 RCU and 500 WCU with minimal variation. A solutions architect recommends switching to provisioned mode. How often can they switch capacity modes?</p>
+<label class="option" data-idx="0">A. Once per hour</label>
+<label class="option" data-idx="1">B. Once per 24 hours</label>
+<label class="option" data-idx="2">C. Unlimited switches at any time</label>
+<label class="option" data-idx="3">D. Once per billing cycle (monthly)</label>
+<div class="explanation">DynamoDB allows switching between on-demand and provisioned once every 24 hours. Not unlimited, not monthly — 24 hours is the specific limit the exam tests.</div>
+</div>
+</div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION 4: RDS Proxy for Lambda -->
+<!-- ============================================================ -->
+<div class="section" id="s4">
+<h2>4. RDS Proxy for Lambda</h2>
+
+<h3>The Problem</h3>
+<p>Lambda functions scale horizontally — 1,000 concurrent invocations means 1,000 separate database connections. Relational databases (RDS, Aurora) have connection limits. At scale, you get <code>TooManyConnections</code> errors, the DB becomes CPU-bound managing connections, and everything falls over.</p>
+
+<h3>The Solution: RDS Proxy</h3>
+<p>RDS Proxy sits between Lambda and RDS/Aurora. It <strong>pools and shares database connections</strong>. Instead of each Lambda opening its own connection, they all go through the proxy which reuses a smaller pool of connections to the database.</p>
+
+<h3>Key Benefits</h3>
+<ul>
+<li><strong>Connection pooling:</strong> Multiplexes many Lambda connections onto fewer DB connections.</li>
+<li><strong>Failover:</strong> Reduces Aurora/RDS failover time by up to 66% by keeping connections alive during failover.</li>
+<li><strong>IAM authentication:</strong> Lambda can use IAM roles to authenticate to the proxy instead of storing DB credentials.</li>
+<li><strong>Secrets Manager integration:</strong> Proxy pulls DB credentials from Secrets Manager — no credentials in Lambda code.</li>
+</ul>
+
+<h3>Architecture</h3>
+<p>Lambda → RDS Proxy (in VPC) → RDS/Aurora. The proxy MUST be in the same VPC as the database. Lambda must also be configured with VPC access (ENI in the VPC subnets).</p>
+
+<h3>Supported Engines</h3>
+<p>RDS Proxy supports MySQL, PostgreSQL, MariaDB, and SQL Server (Aurora MySQL and Aurora PostgreSQL too).</p>
+
+<h3>Exam Patterns</h3>
+<div class="highlight">
+<ul>
+<li><strong>"Lambda + RDS + connection issues / TooManyConnections"</strong> → RDS Proxy.</li>
+<li><strong>"Reduce database failover time for Aurora"</strong> → RDS Proxy.</li>
+<li><strong>"Lambda needs to securely access RDS without storing credentials"</strong> → RDS Proxy + IAM auth + Secrets Manager.</li>
+<li><strong>"Serverless application connecting to relational database at scale"</strong> → RDS Proxy.</li>
+<li>RDS Proxy is NOT needed for DynamoDB (it's only for relational DBs). If the question mentions DynamoDB → RDS Proxy is a distractor.</li>
+<li>RDS Proxy does NOT support RDS for Oracle at the time of exam scope.</li>
+</ul>
+</div>
+
+<h3>When NOT RDS Proxy</h3>
+<p>If the workload is read-heavy → consider Aurora Read Replicas. If traffic is unpredictable + NoSQL is acceptable → consider DynamoDB. RDS Proxy solves the connection problem specifically, not performance or scaling of the DB itself.</p>
+
+<div class="quiz">
+<h3>Section 4 Quiz — RDS Proxy</h3>
+
+<div class="question" data-correct="1">
+<p class="q">Q1. A company's serverless application uses Lambda functions to write to an Aurora MySQL database. During peak hours, they see TooManyConnections errors and the database becomes unresponsive. What should the solutions architect recommend?</p>
+<label class="option" data-idx="0">A. Increase the Aurora instance size to handle more connections</label>
+<label class="option" data-idx="1">B. Deploy an RDS Proxy between Lambda and Aurora</label>
+<label class="option" data-idx="2">C. Reduce Lambda concurrency to limit connections</label>
+<label class="option" data-idx="3">D. Switch to DynamoDB</label>
+<div class="explanation">Lambda + Aurora + TooManyConnections = RDS Proxy. Increasing instance size raises the connection limit marginally but doesn't fix the fundamental problem. Reducing Lambda concurrency limits throughput. Switching to DynamoDB is a redesign, not a solution to the stated problem.</div>
+</div>
+
+<div class="question" data-correct="2">
+<p class="q">Q2. A solutions architect wants Lambda functions to authenticate to RDS without hardcoded database credentials. The solution should follow AWS security best practices. Which approach is correct?</p>
+<label class="option" data-idx="0">A. Store credentials in Lambda environment variables encrypted with KMS</label>
+<label class="option" data-idx="1">B. Store credentials in Systems Manager Parameter Store as a SecureString</label>
+<label class="option" data-idx="2">C. Use RDS Proxy with IAM authentication and Secrets Manager for credential rotation</label>
+<label class="option" data-idx="3">D. Use Lambda Layers to share a credential file across functions</label>
+<div class="explanation">Best practice: RDS Proxy + IAM authentication. Lambda authenticates to Proxy via IAM role (no credentials in code). Proxy gets DB credentials from Secrets Manager with auto-rotation. A and B store credentials, which is less ideal. D is a terrible pattern.</div>
+</div>
+
+<div class="question" data-correct="3">
+<p class="q">Q3. A company uses Aurora PostgreSQL with Multi-AZ. During a failover event, their application experiences 30+ seconds of downtime. They want to reduce failover impact. What should they implement?</p>
+<label class="option" data-idx="0">A. Aurora Global Database</label>
+<label class="option" data-idx="1">B. ElastiCache as a read-through cache</label>
+<label class="option" data-idx="2">C. Aurora Serverless v2</label>
+<label class="option" data-idx="3">D. RDS Proxy</label>
+<div class="explanation">RDS Proxy reduces failover time by up to 66% by maintaining connection pools and transparently routing to the new primary. The application doesn't need to re-establish connections. Aurora Global Database is for cross-region DR, not in-region failover improvement. ElastiCache doesn't help with failover. Serverless v2 is about scaling, not failover speed.</div>
+</div>
+
+<div class="question" data-correct="0">
+<p class="q">Q4. A Lambda function connects to an RDS MySQL instance through RDS Proxy. Where must the RDS Proxy be deployed?</p>
+<label class="option" data-idx="0">A. In the same VPC as the RDS instance</label>
+<label class="option" data-idx="1">B. In any VPC with VPC peering to the RDS VPC</label>
+<label class="option" data-idx="2">C. Outside a VPC as a managed service endpoint</label>
+<label class="option" data-idx="3">D. In a public subnet with an internet gateway</label>
+<div class="explanation">RDS Proxy must be in the same VPC as the target RDS/Aurora database. It can't be in a separate VPC. It's not a public internet endpoint. Lambda must also be VPC-configured to reach the proxy.</div>
+</div>
+
+<div class="question" data-correct="2">
+<p class="q">Q5. A serverless application uses Lambda with API Gateway. The backend is a PostgreSQL database. The team needs to handle sudden spikes from 100 to 10,000 concurrent requests while keeping database connections manageable. The solution must minimize operational overhead. Which architecture is best?</p>
+<label class="option" data-idx="0">A. API Gateway → Lambda → ElastiCache → RDS PostgreSQL</label>
+<label class="option" data-idx="1">B. API Gateway → ECS Fargate (fixed task count) → RDS PostgreSQL</label>
+<label class="option" data-idx="2">C. API Gateway → Lambda → RDS Proxy → Aurora PostgreSQL</label>
+<label class="option" data-idx="3">D. API Gateway → Lambda → DynamoDB (migrate from PostgreSQL)</label>
+<div class="explanation">Lambda scales automatically for the spike. RDS Proxy handles connection pooling. Aurora PostgreSQL is managed. This ticks all boxes: serverless, handles spikes, manages connections, low ops overhead. ElastiCache (A) doesn't solve write connection problems. ECS fixed tasks (B) won't handle the spike. Migration to DynamoDB (D) is a rewrite.</div>
+</div>
+</div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION 5: Cost Optimization Tools -->
+<!-- ============================================================ -->
+<div class="section" id="s5">
+<h2>5. Cost Optimization Tools</h2>
+
+<p>Multiple AWS services help with cost management. The exam tests which tool to use for which situation.</p>
+
+<h3>AWS Cost Explorer</h3>
+<ul>
+<li>Visualize, understand, and manage AWS costs and usage over time.</li>
+<li>Shows up to 12 months of historical data.</li>
+<li>Can forecast future costs (up to 12 months ahead).</li>
+<li>Granularity: monthly, daily, or hourly (hourly only for last 14 days).</li>
+<li>Built-in <strong>Reserved Instance / Savings Plan recommendations</strong>.</li>
+<li>Filter and group by service, account, tag, region, etc.</li>
+<li>Exam keyword: "analyze spending trends" or "forecast costs" → Cost Explorer.</li>
+</ul>
+
+<h3>AWS Budgets</h3>
+<ul>
+<li>Set custom budgets and get <strong>alerts</strong> when costs/usage exceed thresholds.</li>
+<li>4 budget types: Cost, Usage, Reservation, Savings Plans.</li>
+<li>Can trigger <strong>actions</strong>: apply IAM policy, apply SCP, stop EC2 instances.</li>
+<li>Supports SNS notifications and Chatbot integration.</li>
+<li>Exam keyword: "alert when spending exceeds $X" or "automate response to overspending" → AWS Budgets.</li>
+</ul>
+
+<h3>AWS Cost and Usage Report (CUR)</h3>
+<ul>
+<li>The MOST detailed cost dataset. Line-item granularity.</li>
+<li>Delivered to S3 as CSV/Parquet. Can be queried with Athena, Redshift, or QuickSight.</li>
+<li>Includes resource-level IDs (which specific EC2 instance, which S3 bucket).</li>
+<li>Exam keyword: "most detailed billing data" or "resource-level cost breakdown" or "query billing data with Athena" → CUR.</li>
+</ul>
+
+<h3>AWS Trusted Advisor</h3>
+<ul>
+<li>Automated best practice checks across 5 categories: Cost Optimization, Performance, Security, Fault Tolerance, Service Limits.</li>
+<li><strong>Free tier (Basic/Developer):</strong> Only core security checks + service limits.</li>
+<li><strong>Business/Enterprise Support:</strong> Full set of checks including cost optimization.</li>
+<li>Cost examples: idle EC2 instances, underutilized EBS volumes, unassociated Elastic IPs, idle RDS instances.</li>
+<li>Exam keyword: "identify idle/underutilized resources" or "best practice recommendations" → Trusted Advisor.</li>
+</ul>
+
+<h3>AWS Compute Optimizer</h3>
+<ul>
+<li>Uses ML to analyze utilization metrics and recommend <strong>right-sizing</strong> for: EC2 instances, EBS volumes, Lambda functions, ECS on Fargate.</li>
+<li>Tells you if instances are over-provisioned or under-provisioned.</li>
+<li>Exam keyword: "right-size EC2 instances" or "optimal instance type" → Compute Optimizer.</li>
+</ul>
+
+<h3>Savings Plans & Reserved Instances</h3>
+<ul>
+<li><strong>Savings Plans:</strong> Commit to a consistent amount of usage ($/hr) for 1 or 3 years. More flexible than RIs. Two types: Compute Savings Plans (any region, any instance family, any OS) and EC2 Instance Savings Plans (specific region + instance family).</li>
+<li><strong>Reserved Instances:</strong> Commit to specific instance type in a specific region. Standard RIs (up to 72% off) or Convertible RIs (up to 66% off, can change instance family).</li>
+<li>Exam keyword: "reduce EC2 costs for steady-state workloads" → Savings Plans or RIs. If they want flexibility → Savings Plans. If they want maximum discount + know the instance type → Standard RI.</li>
+</ul>
+
+<h3>S3 Cost Optimization</h3>
+<ul>
+<li><strong>S3 Intelligent-Tiering:</strong> Automatically moves objects between access tiers based on usage. No retrieval fees. Small monthly monitoring fee. Best for unknown/changing access patterns.</li>
+<li><strong>S3 Lifecycle Policies:</strong> Rule-based transition (e.g., move to IA after 30 days, Glacier after 90, delete after 365).</li>
+<li><strong>S3 Storage Lens:</strong> Org-wide visibility into S3 usage and activity trends. Identifies cost optimization opportunities.</li>
+<li>Exam pattern: "unknown access patterns" → Intelligent-Tiering. "Known pattern, automate transitions" → Lifecycle policies.</li>
+</ul>
+
+<h3>Quick Reference: Which Tool When</h3>
+<table>
+<tr><th>Need</th><th>Tool</th></tr>
+<tr><td>Visualize past spending / forecast future</td><td>Cost Explorer</td></tr>
+<tr><td>Alert on budget thresholds</td><td>AWS Budgets</td></tr>
+<tr><td>Most granular billing data / Athena queries</td><td>Cost and Usage Report</td></tr>
+<tr><td>Find idle/underutilized resources</td><td>Trusted Advisor</td></tr>
+<tr><td>Right-size EC2/Lambda/EBS</td><td>Compute Optimizer</td></tr>
+<tr><td>Reduce steady-state compute costs</td><td>Savings Plans / RIs</td></tr>
+<tr><td>S3 cost with unknown access patterns</td><td>S3 Intelligent-Tiering</td></tr>
+</table>
+
+<div class="quiz">
+<h3>Section 5 Quiz — Cost Optimization</h3>
+
+<div class="question" data-correct="1">
+<p class="q">Q1. A company wants to receive an email notification whenever their monthly AWS spend exceeds $10,000. They also want to automatically restrict non-production IAM users from launching new EC2 instances when spending exceeds $15,000. Which service should they use?</p>
+<label class="option" data-idx="0">A. AWS Cost Explorer with CloudWatch alarms</label>
+<label class="option" data-idx="1">B. AWS Budgets with budget actions</label>
+<label class="option" data-idx="2">C. AWS Trusted Advisor with SNS notifications</label>
+<label class="option" data-idx="3">D. AWS Cost and Usage Report with Lambda triggers</label>
+<div class="explanation">AWS Budgets supports alerts AND automated actions (apply IAM policies, SCPs, stop instances). Budget actions can restrict IAM permissions when thresholds are breached. Cost Explorer doesn't have built-in actions. Trusted Advisor doesn't do budget alerts. CUR + Lambda is over-engineering.</div>
+</div>
+
+<div class="question" data-correct="2">
+<p class="q">Q2. A finance team needs to query their AWS billing data at the individual resource level using Amazon Athena. They want to identify which specific EC2 instances and S3 buckets are the most expensive. Which tool provides this data?</p>
+<label class="option" data-idx="0">A. AWS Cost Explorer</label>
+<label class="option" data-idx="1">B. AWS Budgets</label>
+<label class="option" data-idx="2">C. AWS Cost and Usage Report (CUR) delivered to S3</label>
+<label class="option" data-idx="3">D. AWS Trusted Advisor</label>
+<div class="explanation">CUR provides the most granular billing data with resource-level IDs. It's delivered to S3 as Parquet/CSV and can be queried with Athena. Cost Explorer doesn't support Athena queries and has less granularity. Budgets is for alerts, not analysis. Trusted Advisor doesn't provide billing line items.</div>
+</div>
+
+<div class="question" data-correct="3">
+<p class="q">Q3. A company runs a fleet of EC2 instances with varying utilization. Some instances are consistently at 5% CPU utilization while others run at 90%. They want an automated recommendation on which instances to downsize or terminate. Which service should they use?</p>
+<label class="option" data-idx="0">A. AWS Cost Explorer</label>
+<label class="option" data-idx="1">B. AWS Trusted Advisor</label>
+<label class="option" data-idx="2">C. Amazon CloudWatch with custom dashboards</label>
+<label class="option" data-idx="3">D. AWS Compute Optimizer</label>
+<div class="explanation">Compute Optimizer uses ML to analyze CloudWatch metrics and recommends optimal instance types (right-sizing). It tells you exactly which instances are over/under-provisioned and what to change to. Trusted Advisor flags idle instances but doesn't recommend specific right-sizing. Cost Explorer shows spend but not instance-level recommendations. CloudWatch shows metrics but doesn't recommend actions.</div>
+</div>
+
+<div class="question" data-correct="0">
+<p class="q">Q4. A solutions architect wants to reduce EC2 costs for a workload that runs 24/7 across multiple regions, and may need to change instance families as requirements evolve. Which purchasing option provides the best balance of savings and flexibility?</p>
+<label class="option" data-idx="0">A. Compute Savings Plans</label>
+<label class="option" data-idx="1">B. EC2 Instance Savings Plans</label>
+<label class="option" data-idx="2">C. Standard Reserved Instances</label>
+<label class="option" data-idx="3">D. Convertible Reserved Instances</label>
+<div class="explanation">Compute Savings Plans offer the most flexibility — any region, any instance family, any OS, even Fargate and Lambda. EC2 Instance Savings Plans are locked to a region + instance family. Standard RIs are the most rigid. Convertible RIs allow changing but give less discount than Savings Plans and are more operationally complex.</div>
+</div>
+
+<div class="question" data-correct="1">
+<p class="q">Q5. A company stores 50 TB of data in S3 Standard. Some objects are accessed frequently for the first month, then rarely. Some objects are never accessed after upload. They want automatic cost optimization without managing lifecycle rules. Which storage class should they use?</p>
+<label class="option" data-idx="0">A. S3 Standard-IA with lifecycle policies</label>
+<label class="option" data-idx="1">B. S3 Intelligent-Tiering</label>
+<label class="option" data-idx="2">C. S3 One Zone-IA</label>
+<label class="option" data-idx="3">D. S3 Glacier Instant Retrieval</label>
+<div class="explanation">"Automatic" + "without managing lifecycle rules" + varying access patterns = S3 Intelligent-Tiering. It automatically moves objects between frequent and infrequent access tiers (and archive tiers if configured) based on actual usage. No retrieval fees, just a small monitoring fee per object. Lifecycle policies (A) require manual rule management which they want to avoid.</div>
+</div>
+
+<div class="question" data-correct="2">
+<p class="q">Q6. A company with AWS Enterprise Support wants to identify unassociated Elastic IP addresses, idle RDS instances, and underutilized EBS volumes across their accounts. Which service provides these checks out of the box?</p>
+<label class="option" data-idx="0">A. AWS Compute Optimizer</label>
+<label class="option" data-idx="1">B. AWS Cost Explorer</label>
+<label class="option" data-idx="2">C. AWS Trusted Advisor</label>
+<label class="option" data-idx="3">D. Amazon Inspector</label>
+<div class="explanation">Trusted Advisor with Business/Enterprise support provides cost optimization checks including: idle ELBs, unassociated EIPs, underutilized EBS, idle RDS instances, and more. Compute Optimizer is for right-sizing compute. Cost Explorer shows spend trends. Inspector is for security vulnerabilities.</div>
+</div>
+</div>
+</div>
+
+<div style="text-align:center;padding:40px;color:#666">
+  <p>End of guide. <kbd>g</kbd><kbd>g</kbd> to go back to top. Good luck on the exam ya Moe.</p>
+</div>
+
+<script>
+// STATE
+let questions = [];
+let currentQIdx = 0;
+let answered = 0;
+let correct = 0;
+let ggPending = false;
+
+// INIT
+document.addEventListener('DOMContentLoaded', () => {
+  questions = Array.from(document.querySelectorAll('.question'));
+  questions.forEach((q, i) => {
+    q.dataset.qidx = i;
+    q.querySelectorAll('.option').forEach(opt => {
+      opt.addEventListener('click', () => selectOption(q, opt));
+    });
+  });
+  updateStatus();
+  highlightCurrent();
+});
+
+function selectOption(q, opt) {
+  if (q.dataset.answered) return;
+  q.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+  opt.classList.add('selected');
+  q.dataset.selected = opt.dataset.idx;
+}
+
+function submitAnswer(q) {
+  if (q.dataset.answered || q.dataset.selected === undefined) return;
+  q.dataset.answered = '1';
+  answered++;
+  const correctIdx = q.dataset.correct;
+  const selectedIdx = q.dataset.selected;
+  const isCorrect = correctIdx === selectedIdx;
+  if (isCorrect) correct++;
+
+  q.querySelectorAll('.option').forEach(o => {
+    if (o.dataset.idx === correctIdx) o.classList.add('reveal-correct');
+    if (o.dataset.idx === selectedIdx && !isCorrect) o.classList.add('reveal-wrong');
+    o.classList.remove('selected');
+  });
+
+  q.classList.add(isCorrect ? 'correct' : 'wrong');
+  q.querySelector('.explanation').classList.add('show');
+  updateStatus();
+}
+
+function updateStatus() {
+  const section = getCurrentSection();
+  document.getElementById('progress').textContent = `Section: ${section}/5 | Questions: ${answered}/${questions.length} answered`;
+  document.getElementById('score').textContent = `Score: ${correct}/${answered}`;
+}
+
+function getCurrentSection() {
+  if (questions.length === 0) return 0;
+  const q = questions[currentQIdx];
+  const sec = q.closest('.section');
+  const sections = Array.from(document.querySelectorAll('.section'));
+  return sections.indexOf(sec) + 1;
+}
+
+function highlightCurrent() {
+  questions.forEach(q => q.classList.remove('current-q'));
+  if (questions[currentQIdx]) {
+    questions[currentQIdx].classList.add('current-q');
+  }
+}
+
+function scrollToCurrent() {
+  if (questions[currentQIdx]) {
+    questions[currentQIdx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
+
+function nextQuestion() {
+  if (currentQIdx < questions.length - 1) {
+    currentQIdx++;
+    highlightCurrent();
+    scrollToCurrent();
+  }
+}
+
+function prevQuestion() {
+  if (currentQIdx > 0) {
+    currentQIdx--;
+    highlightCurrent();
+    scrollToCurrent();
+  }
+}
+
+function nextSection() {
+  const currentSec = questions[currentQIdx]?.closest('.section');
+  const sections = Array.from(document.querySelectorAll('.section'));
+  const secIdx = sections.indexOf(currentSec);
+  if (secIdx < sections.length - 1) {
+    const nextSec = sections[secIdx + 1];
+    const firstQ = nextSec.querySelector('.question');
+    if (firstQ) {
+      currentQIdx = parseInt(firstQ.dataset.qidx);
+      highlightCurrent();
+      scrollToCurrent();
+    }
+  }
+}
+
+function prevSection() {
+  const currentSec = questions[currentQIdx]?.closest('.section');
+  const sections = Array.from(document.querySelectorAll('.section'));
+  const secIdx = sections.indexOf(currentSec);
+  if (secIdx > 0) {
+    const prevSec = sections[secIdx - 1];
+    const firstQ = prevSec.querySelector('.question');
+    if (firstQ) {
+      currentQIdx = parseInt(firstQ.dataset.qidx);
+      highlightCurrent();
+      scrollToCurrent();
+    }
+  }
+}
+
+function resetAll() {
+  if (!confirm('Reset all answers?')) return;
+  questions.forEach(q => {
+    delete q.dataset.answered;
+    delete q.dataset.selected;
+    q.classList.remove('correct', 'wrong');
+    q.querySelectorAll('.option').forEach(o => {
+      o.classList.remove('selected', 'reveal-correct', 'reveal-wrong');
+    });
+    q.querySelector('.explanation').classList.remove('show');
+  });
+  answered = 0;
+  correct = 0;
+  currentQIdx = 0;
+  highlightCurrent();
+  scrollToCurrent();
+  updateStatus();
+}
+
+// VIM KEYBINDINGS
+let searchMode = false;
+document.addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+  // search mode
+  if (e.key === '/' && !searchMode) {
+    e.preventDefault();
+    const q = prompt('Search:');
+    if (q) {
+      window.find(q);
+    }
+    return;
+  }
+
+  // gg
+  if (e.key === 'g' && !e.ctrlKey) {
+    if (ggPending) {
+      ggPending = false;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      currentQIdx = 0;
+      highlightCurrent();
+      return;
+    }
+    ggPending = true;
+    setTimeout(() => { ggPending = false; }, 500);
+    return;
+  } else {
+    ggPending = false;
+  }
+
+  switch(e.key) {
+    case 'j': nextQuestion(); break;
+    case 'k': prevQuestion(); break;
+    case 'G': 
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+      currentQIdx = questions.length - 1;
+      highlightCurrent();
+      break;
+    case '1': selectByKey(0); break;
+    case '2': selectByKey(1); break;
+    case '3': selectByKey(2); break;
+    case '4': selectByKey(3); break;
+    case 'Enter':
+      e.preventDefault();
+      if (questions[currentQIdx]) submitAnswer(questions[currentQIdx]);
+      break;
+    case 'n': nextSection(); break;
+    case 'N': prevSection(); break;
+    case '?':
+      const h = document.getElementById('vimHelp');
+      h.style.display = h.style.display === 'none' ? 'block' : 'none';
+      break;
+    case 'r': resetAll(); break;
+  }
+});
+
+function selectByKey(idx) {
+  const q = questions[currentQIdx];
+  if (!q || q.dataset.answered) return;
+  const opts = q.querySelectorAll('.option');
+  if (opts[idx]) selectOption(q, opts[idx]);
+}
+</script>
+</body>
+</html>
