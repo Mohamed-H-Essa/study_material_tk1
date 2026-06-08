@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAA-C03 Networking, IAM & Security — Exam Prep</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,300;8..60,400;8..60,600;8..60,700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0e1117;
+  --surface: #161b22;
+  --surface-2: #1c2333;
+  --border: #2a3142;
+  --text: #c9d1d9;
+  --text-dim: #8b949e;
+  --text-bright: #e6edf3;
+  --accent: #f0883e;
+  --accent-dim: #f0883e33;
+  --green: #3fb950;
+  --green-dim: #3fb95022;
+  --red: #f85149;
+  --red-dim: #f8514922;
+  --blue: #58a6ff;
+  --blue-dim: #58a6ff22;
+  --purple: #bc8cff;
+  --yellow: #d29922;
+  --yellow-dim: #d2992222;
+  --mono: 'IBM Plex Mono', monospace;
+  --serif: 'Source Serif 4', Georgia, serif;
+  --sans: 'DM Sans', system-ui, sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 17px;
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* === PROGRESS BAR === */
+#progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--yellow), var(--green));
+  z-index: 1000;
+  transition: width 0.15s;
+  width: 0%;
+}
+
+/* === HEADER === */
+header {
+  border-bottom: 1px solid var(--border);
+  padding: 60px 0 50px;
+  text-align: center;
+  background: linear-gradient(180deg, #131820 0%, var(--bg) 100%);
+}
+header .badge {
+  display: inline-block;
+  background: var(--accent-dim);
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 6px 16px;
+  border-radius: 4px;
+  border: 1px solid var(--accent);
+  margin-bottom: 20px;
+}
+header h1 {
+  font-family: var(--serif);
+  font-size: clamp(32px, 5vw, 52px);
+  font-weight: 700;
+  color: var(--text-bright);
+  line-height: 1.15;
+  max-width: 750px;
+  margin: 0 auto 16px;
+}
+header p {
+  color: var(--text-dim);
+  font-size: 17px;
+  max-width: 580px;
+  margin: 0 auto;
+}
+
+/* === SCORE PANEL === */
+#score-panel {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 22px;
+  z-index: 999;
+  font-family: var(--mono);
+  font-size: 13px;
+  box-shadow: 0 8px 32px #00000066;
+  min-width: 180px;
+}
+#score-panel .score-title {
+  color: var(--text-dim);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+#score-panel .score-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 4px 0;
+}
+#score-panel .correct { color: var(--green); }
+#score-panel .wrong { color: var(--red); }
+#score-panel .total { color: var(--text-bright); font-weight: 600; }
+
+/* === LAYOUT === */
+.container {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 0 28px;
+}
+
+/* === SECTIONS === */
+.section {
+  padding: 60px 0;
+  border-bottom: 1px solid var(--border);
+}
+.section-num {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--accent);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.section h2 {
+  font-family: var(--serif);
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--text-bright);
+  margin-bottom: 24px;
+  line-height: 1.3;
+}
+.section h3 {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-bright);
+  margin: 36px 0 16px;
+}
+.section p {
+  margin-bottom: 16px;
+}
+
+/* === TABLES === */
+.table-wrap {
+  overflow-x: auto;
+  margin: 24px 0;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  font-family: var(--mono);
+}
+thead th {
+  background: var(--surface-2);
+  color: var(--accent);
+  font-weight: 600;
+  text-align: left;
+  padding: 12px 16px;
+  border-bottom: 2px solid var(--border);
+  white-space: nowrap;
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--surface-2); }
+td.highlight {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* === KEY POINTS === */
+.key-point {
+  background: var(--surface);
+  border-left: 3px solid var(--accent);
+  padding: 16px 20px;
+  margin: 20px 0;
+  border-radius: 0 8px 8px 0;
+  font-size: 15px;
+}
+.key-point strong {
+  color: var(--accent);
+}
+
+.exam-tip {
+  background: var(--yellow-dim);
+  border-left: 3px solid var(--yellow);
+  padding: 16px 20px;
+  margin: 20px 0;
+  border-radius: 0 8px 8px 0;
+  font-size: 15px;
+}
+.exam-tip::before {
+  content: '⚠ EXAM TIP: ';
+  color: var(--yellow);
+  font-weight: 700;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+
+.vs-box {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 20px 0;
+}
+.vs-box > div {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 18px;
+}
+.vs-box > div h4 {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--blue);
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+}
+.vs-box > div ul {
+  list-style: none;
+  padding: 0;
+}
+.vs-box > div ul li {
+  font-size: 14px;
+  padding: 3px 0;
+  color: var(--text);
+}
+.vs-box > div ul li::before {
+  content: '→ ';
+  color: var(--text-dim);
+}
+
+code {
+  font-family: var(--mono);
+  background: var(--surface-2);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 14px;
+  color: var(--purple);
+}
+
+ul.content-list {
+  padding-left: 20px;
+  margin: 12px 0;
+}
+ul.content-list li {
+  margin: 6px 0;
+  color: var(--text);
+}
+ul.content-list li strong {
+  color: var(--text-bright);
+}
+
+/* === MCQ === */
+.quiz-block {
+  margin: 40px 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.quiz-header {
+  background: var(--surface-2);
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.quiz-header .q-badge {
+  background: var(--accent);
+  color: var(--bg);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 4px;
+  letter-spacing: 1px;
+}
+.quiz-header .q-label {
+  font-size: 13px;
+  color: var(--text-dim);
+  font-family: var(--mono);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.quiz-body {
+  padding: 22px;
+}
+.quiz-body .question-text {
+  font-size: 16px;
+  color: var(--text-bright);
+  margin-bottom: 18px;
+  line-height: 1.6;
+}
+.quiz-body .option {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 8px 0;
+  color: var(--text);
+  font-size: 15px;
+  font-family: var(--sans);
+  cursor: pointer;
+  transition: all 0.15s;
+  line-height: 1.5;
+}
+.quiz-body .option:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+.quiz-body .option .opt-letter {
+  font-family: var(--mono);
+  font-weight: 600;
+  color: var(--accent);
+  margin-right: 10px;
+}
+.quiz-body .option.correct {
+  border-color: var(--green);
+  background: var(--green-dim);
+  color: var(--green);
+}
+.quiz-body .option.wrong {
+  border-color: var(--red);
+  background: var(--red-dim);
+  color: var(--red);
+}
+.quiz-body .option.reveal-correct {
+  border-color: var(--green);
+  background: var(--green-dim);
+}
+.quiz-body .explanation {
+  display: none;
+  margin-top: 16px;
+  padding: 16px;
+  background: var(--bg);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--text);
+}
+.quiz-body .explanation .exp-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--yellow);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+.quiz-body .explanation strong {
+  color: var(--text-bright);
+}
+
+/* === TOC === */
+.toc {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 30px;
+  margin: 40px 0;
+}
+.toc h3 {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 18px;
+}
+.toc a {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 8px 0;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 15px;
+  transition: color 0.15s;
+  border-bottom: 1px solid var(--border);
+}
+.toc a:last-child { border-bottom: none; }
+.toc a:hover { color: var(--accent); }
+.toc a .toc-num {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-dim);
+  min-width: 28px;
+}
+
+/* === FOOTER === */
+footer {
+  padding: 40px 0;
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 13px;
+  font-family: var(--mono);
+}
+
+@media (max-width: 640px) {
+  .vs-box { grid-template-columns: 1fr; }
+  #score-panel { bottom: 12px; right: 12px; left: 12px; min-width: unset; }
+  .container { padding: 0 16px; }
+  .section { padding: 40px 0; }
+}
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<header>
+  <div class="badge">AWS SAA-C03 Exam Prep</div>
+  <h1>Networking, IAM & Security Deep Dive</h1>
+  <p>VPC connectivity, Direct Connect, Lambda networking, IAM federation, and the full security services lineup — with exam-style questions after every section.</p>
+</header>
+
+<div class="container">
+
+  <!-- TOC -->
+  <div class="toc">
+    <h3>Table of Contents</h3>
+    <a href="#s1"><span class="toc-num">01</span> VPC Fundamentals & Subnets</a>
+    <a href="#s2"><span class="toc-num">02</span> VPC Peering vs Transit Gateway</a>
+    <a href="#s3"><span class="toc-num">03</span> Direct Connect & Encryption</a>
+    <a href="#s4"><span class="toc-num">04</span> Lambda in a VPC</a>
+    <a href="#s5"><span class="toc-num">05</span> VPC Endpoints (Gateway & Interface)</a>
+    <a href="#s6"><span class="toc-num">06</span> IAM Essentials & Instance Profiles</a>
+    <a href="#s7"><span class="toc-num">07</span> Secrets Manager vs Parameter Store</a>
+    <a href="#s8"><span class="toc-num">08</span> STS & SAML Federation</a>
+    <a href="#s9"><span class="toc-num">09</span> WAF, Shield & DDoS Protection</a>
+    <a href="#s10"><span class="toc-num">10</span> GuardDuty, Inspector & Security Hub</a>
+    <a href="#s11"><span class="toc-num">11</span> Systems Manager Session Manager</a>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 1: VPC FUNDAMENTALS -->
+  <!-- ============================================================ -->
+  <div class="section" id="s1">
+    <div class="section-num">Section 01</div>
+    <h2>VPC Fundamentals & Subnets</h2>
+
+    <p>A <strong>Virtual Private Cloud (VPC)</strong> is your isolated network within AWS. Every VPC spans a single Region and is defined by a CIDR block (e.g., <code>10.0.0.0/16</code>). Inside the VPC you create <strong>subnets</strong>, each mapped to a single Availability Zone.</p>
+
+    <h3>Public vs Private Subnets</h3>
+    <p>The only difference between a public and private subnet is routing. A <strong>public subnet</strong> has a route to an <strong>Internet Gateway (IGW)</strong> in its route table, plus instances need a public or Elastic IP. A <strong>private subnet</strong> has no IGW route — resources here can only reach the internet through a <strong>NAT Gateway</strong> (or NAT instance) sitting in a public subnet.</p>
+
+    <div class="key-point">
+      <strong>Core pattern:</strong> Public subnet → route to IGW. Private subnet → route to NAT Gateway (in a public subnet) → NAT Gateway routes to IGW. Resources in private subnets initiate outbound traffic but cannot be reached from the internet.
+    </div>
+
+    <h3>Security Groups vs NACLs</h3>
+    <div class="vs-box">
+      <div>
+        <h4>Security Groups</h4>
+        <ul>
+          <li>Instance-level (ENI-level)</li>
+          <li><strong>Stateful</strong> — return traffic auto-allowed</li>
+          <li>Allow rules only, no deny</li>
+          <li>All rules evaluated before decision</li>
+          <li>Default: deny all inbound, allow all outbound</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Network ACLs</h4>
+        <ul>
+          <li>Subnet-level</li>
+          <li><strong>Stateless</strong> — must allow return traffic explicitly</li>
+          <li>Allow and deny rules</li>
+          <li>Rules evaluated in number order, first match wins</li>
+          <li>Default NACL: allow all in/out</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="exam-tip">If the exam says "block a specific IP address," you need a <strong>NACL deny rule</strong>. Security groups have no deny rules.</div>
+
+    <!-- Q1 -->
+    <div class="quiz-block">
+      <div class="quiz-header">
+        <span class="q-badge">Q1</span>
+        <span class="q-label">VPC Subnets</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">An application runs on EC2 instances in a private subnet. The application needs to download patches from the internet but must NOT be accessible from the internet. What architecture allows this?</div>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">A</span>Attach an Internet Gateway and assign each instance a public IP</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="true"><span class="opt-letter">B</span>Deploy a NAT Gateway in a public subnet and add a route from the private subnet to the NAT Gateway</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">C</span>Create a VPC endpoint for the patch server</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">D</span>Peer the VPC with another VPC that has internet access</button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>B is correct.</strong> A NAT Gateway allows instances in private subnets to initiate outbound internet connections (for patches) while remaining unreachable from the internet. <strong>A</strong> would make instances publicly accessible, violating the requirement. <strong>C</strong> only works for specific AWS services, not general internet patches. <strong>D</strong> — VPC peering does not transitively route internet traffic.
+        </div>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="quiz-block">
+      <div class="quiz-header">
+        <span class="q-badge">Q2</span>
+        <span class="q-label">Security Groups vs NACLs</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">A security audit finds that a specific IP address is sending malicious requests to your web servers. You need to block all traffic from this IP across an entire subnet. What should you use?</div>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">A</span>Add a deny rule to the security group attached to the instances</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="true"><span class="opt-letter">B</span>Add a deny rule in the Network ACL associated with the subnet</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">C</span>Modify the route table to blackhole traffic from that IP</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">D</span>Use AWS Shield to block the IP address</button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>B is correct.</strong> NACLs support deny rules and operate at the subnet level, making them ideal for blocking specific IPs. <strong>A</strong> is wrong because security groups only support allow rules — there is no deny. <strong>C</strong> — route tables don't support per-IP blocking. <strong>D</strong> — Shield is for DDoS protection, not IP-level blocking.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 2: VPC PEERING vs TRANSIT GATEWAY -->
+  <!-- ============================================================ -->
+  <div class="section" id="s2">
+    <div class="section-num">Section 02</div>
+    <h2>VPC Peering vs Transit Gateway</h2>
+
+    <h3>VPC Peering</h3>
+    <p>A VPC peering connection creates a <strong>one-to-one, point-to-point</strong> link between two VPCs. Traffic stays on the AWS backbone (not the internet). Key constraints: peering is <strong>non-transitive</strong> — if VPC A peers with VPC B and VPC B peers with VPC C, A cannot reach C through B. CIDRs must not overlap. Peering works across accounts and across regions (inter-region peering).</p>
+
+    <p>For two VPCs this is simple. But the number of connections scales as <code>n(n−1)/2</code>. With 5 VPCs you need 10 peering connections. With 10 VPCs you need 45. It becomes unmanageable.</p>
+
+    <h3>Transit Gateway</h3>
+    <p><strong>AWS Transit Gateway</strong> is a regional hub-and-spoke network. You attach VPCs, VPN connections, and Direct Connect gateways to the Transit Gateway, and it routes traffic between all attachments. It supports <strong>transitive routing</strong> — attach 50 VPCs and they all reach each other through the single hub. It also supports route tables, enabling segmented architectures (e.g., production VPCs can't talk to dev VPCs).</p>
+
+    <div class="vs-box">
+      <div>
+        <h4>VPC Peering</h4>
+        <ul>
+          <li>Best for: 2–3 VPCs</li>
+          <li>Non-transitive</li>
+          <li>No bandwidth bottleneck</li>
+          <li>No additional cost per GB</li>
+          <li>Cross-region supported</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Transit Gateway</h4>
+        <ul>
+          <li>Best for: many VPCs (10+)</li>
+          <li>Transitive routing, hub-and-spoke</li>
+          <li>Supports VPN + Direct Connect</li>
+          <li>Route table segmentation</li>
+          <li>Per-attachment + per-GB cost</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="exam-tip">The exam's trigger words are clear: "two VPCs need to communicate" → <strong>VPC peering</strong>. "Multiple VPCs" / "hundreds of VPCs" / "hub-and-spoke" / "transitive routing" → <strong>Transit Gateway</strong>.</div>
+
+    <!-- Q3 -->
+    <div class="quiz-block">
+      <div class="quiz-header">
+        <span class="q-badge">Q3</span>
+        <span class="q-label">VPC Connectivity</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">A company has 30 VPCs across three AWS accounts. They need all VPCs to communicate with each other and with their on-premises data center via a single VPN connection. Which solution minimizes operational overhead?</div>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">A</span>Create VPC peering connections between all 30 VPCs and set up individual VPN connections for each</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="true"><span class="opt-letter">B</span>Deploy a Transit Gateway, attach all 30 VPCs, and connect the VPN to the Transit Gateway</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">C</span>Use AWS PrivateLink to connect the VPCs and a separate VPN for the data center</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">D</span>Set up a single VPC with 30 subnets instead of 30 VPCs</button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>B is correct.</strong> Transit Gateway acts as a hub — attach all 30 VPCs and the VPN once. Transitive routing handles the rest. <strong>A</strong> would require 435 peering connections (30×29/2) plus 30 VPN connections — operationally impossible. <strong>C</strong> — PrivateLink exposes specific services, not full VPC connectivity. <strong>D</strong> — consolidating into one VPC breaks isolation and is architecturally unsound.
+        </div>
+      </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="quiz-block">
+      <div class="quiz-header">
+        <span class="q-badge">Q4</span>
+        <span class="q-label">Peering Constraints</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">VPC A (10.0.0.0/16) peers with VPC B (10.1.0.0/16). VPC B peers with VPC C (10.2.0.0/16). A resource in VPC A tries to reach a resource in VPC C. What happens?</div>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">A</span>Traffic flows through VPC B automatically</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="true"><span class="opt-letter">B</span>Traffic fails — VPC peering is non-transitive</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">C</span>Traffic flows but with higher latency due to the hop through VPC B</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">D</span>Traffic flows only if the CIDRs do not overlap</button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>B is correct.</strong> VPC peering is strictly non-transitive. A-to-B and B-to-C exist, but A cannot reach C through B. You would need a direct A-to-C peering connection, or a Transit Gateway.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 3: DIRECT CONNECT & ENCRYPTION -->
+  <!-- ============================================================ -->
+  <div class="section" id="s3">
+    <div class="section-num">Section 03</div>
+    <h2>Direct Connect & Encryption</h2>
+
+    <h3>AWS Direct Connect</h3>
+    <p><strong>Direct Connect</strong> establishes a dedicated, private physical connection between your on-premises data center and AWS. It bypasses the public internet, providing <strong>consistent latency, higher throughput</strong> (1 Gbps, 10 Gbps, or 100 Gbps), and reduced bandwidth costs for large data transfers. You connect to a Direct Connect location (colocation facility) and establish a cross-connect to your AWS port.</p>
+
+    <p>There are two types of virtual interfaces (VIFs): a <strong>Private VIF</strong> connects to VPCs (via a Virtual Private Gateway or Direct Connect Gateway), while a <strong>Public VIF</strong> gives access to AWS public services (like S3) without going through the internet.</p>
+
+    <h3>The Encryption Problem</h3>
+    <p>Here's the critical exam fact: <strong>Direct Connect does NOT encrypt data in transit.</strong> It is a private, dedicated line — but the traffic flowing over it is unencrypted. If you need encryption (and many compliance frameworks require it), you must layer a <strong>Site-to-Site VPN on top of Direct Connect</strong>.</p>
+
+    <div class="key-point">
+      <strong>Pattern:</strong> Direct Connect alone = private but unencrypted. Direct Connect + VPN = private AND encrypted. This is established by running an IPsec VPN tunnel over the Direct Connect connection via a Public VIF.
+    </div>
+
+    <h3>Direct Connect Gateway</h3>
+    <p>A <strong>Direct Connect Gateway</strong> allows a single Direct Connect connection to reach VPCs in <strong>multiple Regions</strong>. Without it, a Direct Connect connection only reaches VPCs in the Region of its Direct Connect location. With it, one connection can fan out globally.</p>
+
+    <div class="exam-tip">Any time the exam mentions "dedicated connection" + "encryption," the answer is Direct Connect + VPN. If it just says "dedicated, consistent, low-latency," Direct Connect alone is sufficient.</div>
+
+    <!-- Q5 -->
+    <div class="quiz-block">
+      <div class="quiz-header">
+        <span class="q-badge">Q5</span>
+        <span class="q-label">Direct Connect Encryption</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">A financial company uses AWS Direct Connect for a private 10 Gbps link to their AWS environment. A compliance audit requires all data in transit to be encrypted. What is the MOST operationally efficient solution?</div>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">A</span>Enable encryption on the Direct Connect connection settings in the AWS console</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="true"><span class="opt-letter">B</span>Establish a Site-to-Site VPN connection over the Direct Connect link</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">C</span>Replace Direct Connect with a Site-to-Site VPN over the internet</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">D</span>Use AWS CloudHSM to encrypt all data before sending it over Direct Connect</button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>B is correct.</strong> Direct Connect does not natively encrypt traffic. The standard approach is to layer an IPsec VPN on top. <strong>A</strong> is wrong — there is no such console setting. <strong>C</strong> abandons Direct Connect's latency and bandwidth benefits. <strong>D</strong> would encrypt data at rest, but doesn't address transport-level encryption for compliance.
+        </div>
+      </div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="quiz-block">
+      <div class="quiz-header">
+        <span class="q-badge">Q6</span>
+        <span class="q-label">Direct Connect Architecture</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">A company has a Direct Connect connection in us-east-1 and needs to access VPCs in us-west-2 and eu-west-1 using the same connection. What should they use?</div>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">A</span>Set up VPC peering between the VPCs across all three regions</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="true"><span class="opt-letter">B</span>Use a Direct Connect Gateway associated with Virtual Private Gateways in each region</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">C</span>Establish separate Direct Connect connections in each region</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">D</span>Use a Transit Gateway in us-east-1 with inter-region peering</button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>B is correct.</strong> A Direct Connect Gateway enables a single Direct Connect connection to access VPCs in multiple Regions. You associate the VPGWs from each region's VPCs to the Direct Connect Gateway. <strong>A</strong> doesn't solve the on-premises connectivity problem. <strong>C</strong> works but is not cost-effective. <strong>D</strong> — while Transit Gateway supports Direct Connect, the simplest solution here is a Direct Connect Gateway.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 4: LAMBDA IN A VPC -->
+  <!-- ============================================================ -->
+  <div class="section" id="s4">
+    <div class="section-num">Section 04</div>
+    <h2>Lambda in a VPC</h2>
+
+    <p>By default, Lambda functions run in an <strong>AWS-managed VPC</strong> and have internet access but cannot access resources inside your VPC (like RDS databases or ElastiCache clusters). When you configure a Lambda function to run inside your VPC, it gets an ENI (Elastic Network Interface) in the subnets you specify.</p>
+
+    <h3>The Connectivity Trap</h3>
+    <p>Once a Lambda function is placed in a <strong>private subnet</strong>, it loses internet access. This is critical: it can now reach your RDS, your ElastiCache, and your other private resources — but it cannot reach the internet (for external API calls, downloading packages, etc.) or even AWS services that have public endpoints (like DynamoDB, S3 via public endpoint, or SES).</p>
+
+    <p>To restore internet access: place the Lambda in a <strong>private subnet</strong> and route outbound traffic through a <strong>NAT Gateway</strong> in a public subnet — exactly like any other private-subnet resource. Never put Lambda in a public subnet thinking it will get internet access; Lambda functions do not get assigned public IPs, even in public subnets.</p>
+
+    <div class="key-point">
+      <strong>Lambda in VPC recipe:</strong> Lambda → private subnet → route table points 0.0.0.0/0 to NAT Gateway → NAT Gateway in public subnet → IGW. For AWS services specifically, you can also use <strong>VPC endpoints</strong> instead of going through the NAT (cheaper and faster).
+    </div>
+
+    <div class="exam-tip">If the exam says "Lambda function times out when calling DynamoDB" or "Lambda can't reach an external API after being placed in a VPC" — the answer is almost always: <strong>add a NAT Gateway</strong> (or a VPC endpoint for AWS services).</div>
+
+    <!-- Q7 -->
+    <div class="quiz-block">
+      <div class="quiz-header">
+        <span class="q-badge">Q7</span>
+        <span class="q-label">Lambda VPC Networking</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">A developer configures a Lambda function to run inside a VPC to access an RDS PostgreSQL instance. After deployment, the function successfully queries the database but times out when trying to call an external payment API over HTTPS. What should the developer do?</div>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">A</span>Move the Lambda function to a public subnet and assign it an Elastic IP</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="true"><span class="opt-letter">B</span>Ensure the Lambda is in a private subnet with a route to a NAT Gateway in a public subnet</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">C</span>Add an Internet Gateway route to the Lambda function's subnet</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">D</span>Remove the VPC configuration from the Lambda function</button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>B is correct.</strong> Lambda in a VPC needs a NAT Gateway for internet access. <strong>A</strong> won't work — Lambda doesn't support Elastic IPs or public IPs even in public subnets. <strong>C</strong> — adding an IGW route makes it a public subnet, but Lambda still won't get a public IP. <strong>D</strong> would restore internet access but break the RDS connection, which is the whole reason it's in the VPC.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 5: VPC ENDPOINTS -->
+  <!-- ============================================================ -->
+  <div class="section" id="s5">
+    <div class="section-num">Section 05</div>
+    <h2>VPC Endpoints (Gateway & Interface)</h2>
+
+    <p>VPC endpoints let resources in your VPC access AWS services <strong>without traversing the internet</strong>, without a NAT Gateway, and without a VPN. Traffic stays entirely on the AWS network. There are two types:</p>
+
+    <div class="vs-box">
+      <div>
+        <h4>Gateway Endpoint</h4>
+        <ul>
+          <li><strong>S3 and DynamoDB only</strong></li>
+          <li>Free of charge</li>
+          <li>Added as a target in the route table</li>
+          <li>Does not use an ENI</li>
+          <li>Controlled by endpoint policies</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Interface Endpoint (PrivateLink)</h4>
+        <ul>
+          <li>Supports 100+ AWS services</li>
+          <li>Hourly + per-GB cost</li>
+          <li>Creates an ENI in your subnet</li>
+          <li>Uses Security Groups for access control</li>
+          <li>DNS resolves service to private IP</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="exam-tip">Gateway endpoints are free and work for S3 and DynamoDB only. If the exam mentions accessing S3 from a private subnet without a NAT Gateway — <strong>Gateway Endpoint</strong>. For any other service (SQS, SNS, KMS, etc.) — <strong>Interface Endpoint</strong>.</div>
+
+    <!-- Q8 -->
+    <div class="quiz-block">
+      <div class="quiz-header">
+        <span class="q-badge">Q8</span>
+        <span class="q-label">VPC Endpoints</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">An application in a private subnet needs to write objects to S3 without any traffic leaving the AWS network. The solution must have no additional hourly costs. What should you configure?</div>
+        <button class="option" onclick="checkAnswer(this)" data-correct="true"><span class="opt-letter">A</span>Create a Gateway VPC endpoint for S3 and update the route table</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">B</span>Create an Interface VPC endpoint for S3</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">C</span>Deploy a NAT Gateway in a public subnet</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">D</span>Set up an S3 access point with a VPN connection</button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>A is correct.</strong> Gateway endpoints for S3 are free of charge, keep traffic on the AWS network, and are added as a route table entry. <strong>B</strong> works technically but incurs hourly charges ($0.01/hr per AZ) and per-GB fees. <strong>C</strong> — NAT Gateway also has hourly + per-GB costs and routes through the public internet. <strong>D</strong> is an unnecessary complexity.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 6: IAM ESSENTIALS & INSTANCE PROFILES -->
+  <!-- ============================================================ -->
+  <div class="section" id="s6">
+    <div class="section-num">Section 06</div>
+    <h2>IAM Essentials & Instance Profiles</h2>
+
+    <h3>IAM Roles for EC2 (Instance Profiles)</h3>
+    <p>The golden rule: <strong>never store AWS access keys on EC2 instances.</strong> Instead, assign an <strong>IAM role</strong> to the instance via an <strong>instance profile</strong>. The instance profile is a container that delivers temporary credentials to the EC2 instance through the instance metadata service. Applications running on the instance use the AWS SDK, which automatically retrieves and rotates these short-lived credentials.</p>
+
+    <div class="key-point">
+      <strong>Instance Profile = IAM Role delivery mechanism for EC2.</strong> When you "attach a role to EC2" in the console, AWS creates an instance profile behind the scenes. Via CLI/CloudFormation, you create the instance profile explicitly.
+    </div>
+
+    <h3>When to Use What</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Scenario</th><th>Use</th><th>Why</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>EC2 accessing S3</td><td class="highlight">Instance Profile (IAM Role)</td><td>Temporary creds, auto-rotated</td></tr>
+          <tr><td>Lambda accessing DynamoDB</td><td class="highlight">Execution Role</td><td>Lambda's equivalent of instance profile</td></tr>
+          <tr><td>Cross-account access</td><td class="highlight">STS AssumeRole</td><td>Temporary creds in target account</td></tr>
+          <tr><td>On-prem app accessing AWS</td><td class="highlight">STS AssumeRole or Federation</td><td>No long-term keys on-prem</td></tr>
+          <tr><td>CI/CD pipeline (external)</td><td class="highlight">OIDC Federation</td><td>GitHub Actions, GitLab — no stored secrets</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="exam-tip">If an exam question describes an EC2 instance using hardcoded access keys, the answer is always "replace with an IAM role/instance profile." This is a near-guaranteed question.</div>
+
+    <!-- Q9 -->
+    <div class="quiz-block">
+      <div class="quiz-header">
+        <span class="q-badge">Q9</span>
+        <span class="q-label">Instance Profiles</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">A developer has hardcoded AWS access keys in an application config file on an EC2 instance to access an S3 bucket. A security review flags this as a vulnerability. What is the recommended remediation?</div>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">A</span>Encrypt the access keys using AWS KMS and store them in the config file</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">B</span>Move the keys to AWS Systems Manager Parameter Store with encryption</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="true"><span class="opt-letter">C</span>Remove the keys and attach an IAM role with S3 permissions to the EC2 instance via an instance profile</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">D</span>Rotate the access keys every 30 days using a Lambda function</button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>C is correct.</strong> The best practice is to eliminate long-term credentials entirely. An instance profile delivers temporary, automatically rotated credentials via the metadata service. <strong>A</strong> still has keys on the instance. <strong>B</strong> is better than hardcoding but still requires retrieving secrets. <strong>D</strong> is operational overhead and still uses long-term keys.
+        </div>
+      </div>
+    </div>
+
+    <!-- Q10 -->
+    <div class="quiz-block">
+      <div class="quiz-header">
+        <span class="q-badge">Q10</span>
+        <span class="q-label">IAM Best Practices</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">An ECS task needs to read messages from an SQS queue and write results to DynamoDB. How should the permissions be configured?</div>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">A</span>Create an IAM user with SQS and DynamoDB permissions and store the access keys in environment variables</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="true"><span class="opt-letter">B</span>Create an IAM task role with least-privilege SQS and DynamoDB permissions and assign it to the ECS task definition</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">C</span>Assign the permissions to the EC2 instance profile of the ECS container instances</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">D</span>Use a resource-based policy on the SQS queue and DynamoDB table to allow all ECS tasks</button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>B is correct.</strong> ECS uses <strong>task roles</strong> — the equivalent of instance profiles but at the task/container level. This gives each task its own least-privilege permissions. <strong>A</strong> uses long-term keys — never do this. <strong>C</strong> gives all tasks on that instance the same permissions, violating least privilege. <strong>D</strong> is too broad and doesn't support granular per-task control.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 7: SECRETS MANAGER vs PARAMETER STORE -->
+  <!-- ============================================================ -->
+  <div class="section" id="s7">
+    <div class="section-num">Section 07</div>
+    <h2>Secrets Manager vs Parameter Store</h2>
+
+    <h3>AWS Secrets Manager</h3>
+    <p>Secrets Manager is purpose-built for secrets: database credentials, API keys, OAuth tokens. Its killer feature is <strong>automatic rotation</strong>. You enable rotation and Secrets Manager uses a Lambda function to periodically rotate the secret and update the service (e.g., RDS) automatically. It natively integrates with RDS, Redshift, and DocumentDB for built-in rotation templates.</p>
+
+    <h3>Systems Manager Parameter Store</h3>
+    <p>Parameter Store is a general-purpose configuration store. It holds parameters as strings, string lists, or secure strings (encrypted with KMS). It does <strong>not</strong> have built-in automatic rotation. It's cheaper (free tier for standard parameters) and works well for non-secret configuration: feature flags, AMI IDs, license keys, endpoints.</p>
+
+    <div class="vs-box">
+      <div>
+        <h4>Secrets Manager</h4>
+        <ul>
+          <li><strong>Built-in automatic rotation</strong></li>
+          <li>Native RDS/Redshift rotation templates</li>
+          <li>$0.40/secret/month + API calls</li>
+          <li>Cross-account sharing</li>
+          <li>Designed for secrets only</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Parameter Store</h4>
+        <ul>
+          <li>No built-in rotation</li>
+          <li>Free tier (standard), $0.05/advanced</li>
+          <li>Hierarchical structure (/app/prod/db)</li>
+          <li>Up to 8 KB (standard) or 8 KB (advanced)</li>
+          <li>Config + secrets (but no rotation)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="exam-tip">The exam trigger is the word <strong>"rotation."</strong> If the question mentions automatic rotation of database credentials → <strong>Secrets Manager</strong>. If it's general config storage or non-rotating secrets → Parameter Store is fine.</div>
+
+    <!-- Q11 -->
+    <div class="quiz-block">
+      <div class="quiz-header">
+        <span class="q-badge">Q11</span>
+        <span class="q-label">Secrets Management</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">A company stores its RDS MySQL database password in a configuration file. A new compliance policy requires the password to be rotated automatically every 60 days without application downtime. What should the solutions architect recommend?</div>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">A</span>Store the password in SSM Parameter Store and create a cron-triggered Lambda to rotate it</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="true"><span class="opt-letter">B</span>Store the password in AWS Secrets Manager and enable automatic rotation with the built-in RDS rotation template</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">C</span>Use IAM database authentication to eliminate the password entirely</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">D</span>Store the password in an encrypted S3 object and rotate it manually every 60 days</button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>B is correct.</strong> Secrets Manager has built-in rotation with native RDS templates — you set the rotation interval and it handles everything. <strong>A</strong> requires building and maintaining custom rotation logic. <strong>C</strong> is valid for some use cases but IAM DB auth has limitations (max connections, only MySQL/PostgreSQL, token-based). <strong>D</strong> is manual and error-prone.
+        </div>
+      </div>
+    </div>
+
+    <!-- Q12 -->
+    <div class="quiz-block">
+      <div class="quiz-header">
+        <span class="q-badge">Q12</span>
+        <span class="q-label">Config vs Secrets</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">An application needs to store the following: (1) a database connection string with credentials that must auto-rotate, (2) a feature flag toggle value, and (3) the latest approved AMI ID for deployments. What combination provides the MOST cost-effective and operationally efficient solution?</div>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">A</span>Store all three in AWS Secrets Manager</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="true"><span class="opt-letter">B</span>Store the database credentials in Secrets Manager; store the feature flag and AMI ID in SSM Parameter Store</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">C</span>Store all three in SSM Parameter Store using SecureString</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">D</span>Store the credentials in Secrets Manager and the feature flag and AMI ID in a DynamoDB table</button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>B is correct.</strong> Use the right tool for each job: Secrets Manager for the credentials that need rotation; Parameter Store (free tier) for the non-secret config values. <strong>A</strong> works but costs $0.40/secret/month for items that don't need rotation. <strong>C</strong> — Parameter Store has no built-in rotation. <strong>D</strong> — DynamoDB is overkill for simple config values.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 8: STS & SAML FEDERATION -->
+  <!-- ============================================================ -->
+  <div class="section" id="s8">
+    <div class="section-num">Section 08</div>
+    <h2>STS & SAML Federation</h2>
+
+    <h3>AWS Security Token Service (STS)</h3>
+    <p>STS issues <strong>temporary security credentials</strong> (access key, secret key, session token) that expire after a configurable period. The core API calls you need to know:</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>API Call</th><th>Use Case</th><th>Who Calls It</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="highlight">AssumeRole</td><td>Cross-account access, role switching</td><td>IAM users/roles in any account</td></tr>
+          <tr><td class="highlight">AssumeRoleWithSAML</td><td>Enterprise SSO via SAML 2.0 IdP</td><td>On-prem users via SAML assertion</td></tr>
+          <tr><td class="highlight">AssumeRoleWithWebIdentity</td><td>Web/mobile identity federation</td><td>Users authenticated by Google, Facebook, Cognito</td></tr>
+          <tr><td class="highlight">GetSessionToken</td><td>MFA-protected API access</td><td>IAM users needing temp creds with MFA</td></tr>
+          <tr><td class="highlight">GetFederationToken</td><td>Broker-based custom federation</td><td>Federated users via custom identity broker</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>SAML 2.0 Federation (On-Prem to AWS)</h3>
+    <p>The typical enterprise scenario: a company has an on-premises Active Directory and wants employees to access AWS without creating individual IAM users. The flow works like this: the user authenticates with the on-prem IdP (Active Directory + ADFS), the IdP sends a SAML assertion to AWS STS, STS validates the assertion and returns temporary credentials via <code>AssumeRoleWithSAML</code>. The user now has time-limited access to AWS.</p>
+
+    <div class="key-point">
+      <strong>SAML federation flow:</strong> User → authenticate with corporate IdP → receive SAML assertion → call STS AssumeRoleWithSAML → receive temporary AWS credentials → access AWS resources. No IAM users needed for corporate employees.
+    </div>
+
+    <h3>AWS IAM Identity Center (SSO)</h3>
+    <p>For new implementations, AWS recommends <strong>IAM Identity Center</strong> (formerly AWS SSO) over direct SAML federation. It provides a centralized portal for accessing multiple AWS accounts and business applications. It integrates with Active Directory, Okta, and other IdPs, and supports permission sets for managing access across accounts in AWS Organizations.</p>
+
+    <div class="exam-tip">If the question says "on-premises Active Directory" + "SAML" → <strong>STS AssumeRoleWithSAML</strong>. If it says "centralized access to multiple AWS accounts" → <strong>IAM Identity Center</strong>. If it says "mobile app login with Google/Facebook" → <strong>Cognito</strong> (which calls AssumeRoleWithWebIdentity behind the scenes).</div>
+
+    <!-- Q13 -->
+    <div class="quiz-block">
+      <div class="quiz-header">
+        <span class="q-badge">Q13</span>
+        <span class="q-label">SAML Federation</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">A company with 5,000 employees uses on-premises Active Directory for identity management. They want employees to access AWS resources using their existing corporate credentials without creating IAM users. The company uses ADFS as their SAML 2.0 identity provider. What should the solutions architect configure?</div>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">A</span>Create 5,000 IAM users and sync passwords from Active Directory using AWS Directory Service</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="true"><span class="opt-letter">B</span>Configure ADFS as a SAML IdP in IAM, create IAM roles for federated access, and use STS AssumeRoleWithSAML</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">C</span>Use Amazon Cognito User Pools to import all Active Directory users</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">D</span>Set up a custom identity broker that calls STS GetSessionToken for each user</button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>B is correct.</strong> SAML 2.0 federation with ADFS is the standard enterprise pattern. ADFS issues SAML assertions, and STS AssumeRoleWithSAML exchanges them for temporary credentials. No IAM users needed. <strong>A</strong> — creating 5,000 IAM users violates scalability best practices and has a default limit of 5,000. <strong>C</strong> — Cognito is for web/mobile app users, not enterprise SSO. <strong>D</strong> — GetSessionToken is for MFA, not SAML federation.
+        </div>
+      </div>
+    </div>
+
+    <!-- Q14 -->
+    <div class="quiz-block">
+      <div class="quiz-header">
+        <span class="q-badge">Q14</span>
+        <span class="q-label">Cross-Account Access</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">Account A (Development) needs to access an S3 bucket in Account B (Production). The access must use temporary credentials and follow least privilege. What is the correct approach?</div>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">A</span>Create an IAM user in Account B and share the access keys with Account A</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="true"><span class="opt-letter">B</span>Create an IAM role in Account B with S3 permissions and a trust policy allowing Account A to assume it; use STS AssumeRole from Account A</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">C</span>Add a bucket policy on Account B's S3 bucket allowing Account A's root account full access</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">D</span>Enable cross-account VPC peering and access the bucket via a VPC endpoint</button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>B is correct.</strong> Cross-account access via STS AssumeRole is the standard pattern: create a role in the target account, trust the source account, and assume it for temporary credentials. <strong>A</strong> uses long-term keys. <strong>C</strong> grants root-level access — not least privilege. <strong>D</strong> — VPC peering doesn't solve IAM-level access control.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 9: WAF, SHIELD & DDoS PROTECTION -->
+  <!-- ============================================================ -->
+  <div class="section" id="s9">
+    <div class="section-num">Section 09</div>
+    <h2>WAF, Shield & DDoS Protection</h2>
+
+    <h3>AWS WAF (Web Application Firewall)</h3>
+    <p>WAF operates at <strong>Layer 7 (application layer)</strong> and inspects HTTP/HTTPS requests. It protects against application-layer attacks: <strong>SQL injection (SQLi), cross-site scripting (XSS), HTTP flooding,</strong> and bot traffic. You define <strong>Web ACLs</strong> (Access Control Lists) with rules that inspect request headers, body, URI, query strings, and IP addresses.</p>
+
+    <p>WAF deploys in front of <strong>CloudFront, ALB, API Gateway, and AppSync</strong>. It does NOT work with NLB (Layer 4) or Classic Load Balancers. You can use AWS Managed Rules (pre-built rulesets) or create custom rules. Rate-based rules can block IPs exceeding a request threshold.</p>
+
+    <h3>AWS Shield</h3>
+    <p>Shield provides <strong>DDoS protection</strong> at the network and transport layers (Layer 3/4). There are two tiers:</p>
+
+    <div class="vs-box">
+      <div>
+        <h4>Shield Standard</h4>
+        <ul>
+          <li>Free, automatic for all AWS accounts</li>
+          <li>Protects against common L3/L4 attacks</li>
+          <li>SYN floods, UDP reflection, etc.</li>
+          <li>Always-on detection</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Shield Advanced</h4>
+        <ul>
+          <li>$3,000/month + data transfer</li>
+          <li>24/7 DDoS Response Team (DRT)</li>
+          <li>Cost protection (DDoS cost refunds)</li>
+          <li>Advanced metrics, near real-time visibility</li>
+          <li>Works with CloudFront, ALB, EIP, Global Accelerator</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="key-point">
+      <strong>WAF vs Shield decision:</strong> WAF = application-layer attacks (SQLi, XSS, HTTP floods, bot mitigation). Shield = volumetric DDoS attacks (network/transport layer). They complement each other — use both together. Shield Advanced includes WAF at no additional cost.
+    </div>
+
+    <div class="exam-tip">If the exam mentions "SQL injection" or "XSS" → <strong>WAF</strong>. If it mentions "DDoS" → <strong>Shield</strong>. If it mentions both → Shield Advanced (includes WAF). A common distractor is putting WAF in front of an NLB — remember, WAF only works with CloudFront, ALB, API Gateway, and AppSync.</div>
+
+    <!-- Q15 -->
+    <div class="quiz-block">
+      <div class="quiz-header">
+        <span class="q-badge">Q15</span>
+        <span class="q-label">WAF Deployment</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">A web application behind an Application Load Balancer is experiencing SQL injection attacks. The security team needs to block these attacks while allowing legitimate traffic. What should they implement?</div>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">A</span>Enable AWS Shield Advanced on the ALB</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="true"><span class="opt-letter">B</span>Deploy AWS WAF on the ALB with SQL injection match conditions in a Web ACL</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">C</span>Configure a Network ACL to block SQL injection patterns</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">D</span>Enable Amazon GuardDuty to detect and automatically block SQL injection attempts</button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>B is correct.</strong> WAF inspects HTTP requests at Layer 7 and has built-in SQL injection detection rules. Attach a Web ACL to the ALB with SQLi rules. <strong>A</strong> — Shield is for DDoS, not application-layer attacks. <strong>C</strong> — NACLs operate at Layer 3/4 and cannot inspect HTTP payloads. <strong>D</strong> — GuardDuty detects threats but does not block them inline.
+        </div>
+      </div>
+    </div>
+
+    <!-- Q16 -->
+    <div class="quiz-block">
+      <div class="quiz-header">
+        <span class="q-badge">Q16</span>
+        <span class="q-label">DDoS Protection</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">A company serves a global application through CloudFront and ALB. They want protection against large-scale DDoS attacks, access to a 24/7 response team during attacks, and cost protection so they don't pay for DDoS-induced scaling. Which solution meets ALL requirements?</div>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">A</span>AWS Shield Standard + AWS WAF with rate-based rules</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="true"><span class="opt-letter">B</span>AWS Shield Advanced on CloudFront and ALB</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">C</span>Amazon GuardDuty with automated remediation via Lambda</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">D</span>AWS WAF with managed DDoS rule group</button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>B is correct.</strong> Only Shield Advanced provides all three: advanced DDoS protection, 24/7 DDoS Response Team (DRT), and cost protection (AWS credits for DDoS-induced scaling costs). <strong>A</strong> — Shield Standard is free but has no DRT or cost protection. <strong>C</strong> — GuardDuty is detection only. <strong>D</strong> — WAF handles L7 but not volumetric L3/L4 DDoS.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 10: GUARDDUTY, INSPECTOR & SECURITY HUB -->
+  <!-- ============================================================ -->
+  <div class="section" id="s10">
+    <div class="section-num">Section 10</div>
+    <h2>GuardDuty, Inspector & Security Hub</h2>
+
+    <h3>Amazon GuardDuty — Threat Detection</h3>
+    <p>GuardDuty is an intelligent <strong>threat detection</strong> service. It continuously analyzes data sources — <strong>VPC Flow Logs, CloudTrail management/data events, DNS logs, and EKS audit logs</strong> — using machine learning to identify malicious activity. It detects things like: cryptocurrency mining on your instances, compromised EC2 instances communicating with known C&C servers, unusual API calls indicating credential theft, and S3 bucket enumeration by unauthorized actors.</p>
+
+    <p>GuardDuty is <strong>detection only</strong> — it generates <em>findings</em> but does not block or remediate. You integrate it with EventBridge to trigger automated responses (Lambda, SNS, Step Functions). One-click enablement, no agents to install, no infrastructure to manage.</p>
+
+    <h3>Amazon Inspector — Vulnerability Scanning</h3>
+    <p>Inspector performs <strong>automated vulnerability assessments</strong> on your workloads. It scans <strong>EC2 instances, container images in ECR, and Lambda functions</strong> for software vulnerabilities (CVEs) and unintended network exposure. Inspector v2 is agentless for ECR and Lambda, and uses the SSM agent for EC2.</p>
+
+    <div class="vs-box">
+      <div>
+        <h4>GuardDuty</h4>
+        <ul>
+          <li><strong>Threat detection</strong> (what's happening now)</li>
+          <li>Analyzes logs + network traffic</li>
+          <li>Finds: crypto mining, C&C, data exfil</li>
+          <li>No agents needed</li>
+          <li>Generates findings → EventBridge</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Inspector</h4>
+        <ul>
+          <li><strong>Vulnerability scanning</strong> (what could be exploited)</li>
+          <li>Scans: EC2, ECR images, Lambda</li>
+          <li>Finds: CVEs, open ports, missing patches</li>
+          <li>SSM agent for EC2</li>
+          <li>Risk score per finding</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>AWS Security Hub</h3>
+    <p>Security Hub is the <strong>single pane of glass</strong> — it aggregates findings from GuardDuty, Inspector, Macie, Firewall Manager, IAM Access Analyzer, and third-party tools into one dashboard. It also runs automated <strong>compliance checks</strong> against standards like CIS AWS Foundations, PCI DSS, and AWS Foundational Security Best Practices.</p>
+
+    <div class="exam-tip"><strong>GuardDuty</strong> = "Is someone attacking me right now?" <strong>Inspector</strong> = "Am I vulnerable to attack?" <strong>Security Hub</strong> = "Show me everything in one place." These three are frequently confused in exam questions — learn the distinction.</div>
+
+    <!-- Q17 -->
+    <div class="quiz-block">
+      <div class="quiz-header">
+        <span class="q-badge">Q17</span>
+        <span class="q-label">Threat Detection</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">A company's security team discovers that an EC2 instance is communicating with a known cryptocurrency mining command-and-control server. They want to automatically detect such threats across all accounts in their AWS Organization. Which service should they enable?</div>
+        <button class="option" onclick="checkAnswer(this)" data-correct="true"><span class="opt-letter">A</span>Amazon GuardDuty with multi-account support via AWS Organizations</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">B</span>Amazon Inspector with network reachability assessments</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">C</span>AWS Config rules to check for unauthorized outbound connections</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">D</span>Amazon Detective to investigate the malicious behavior</button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>A is correct.</strong> GuardDuty analyzes VPC Flow Logs and DNS logs to detect crypto mining C&C communication. It supports Organization-wide deployment with a delegated administrator. <strong>B</strong> — Inspector scans for vulnerabilities, not active threats. <strong>C</strong> — Config checks resource configuration compliance, not real-time network threats. <strong>D</strong> — Detective is for investigation after a finding, not detection.
+        </div>
+      </div>
+    </div>
+
+    <!-- Q18 -->
+    <div class="quiz-block">
+      <div class="quiz-header">
+        <span class="q-badge">Q18</span>
+        <span class="q-label">Vulnerability Scanning</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">A DevOps team pushes container images to Amazon ECR and deploys them to ECS Fargate. They need automated scanning of images for known CVEs (Common Vulnerabilities and Exposures) before deployment. What is the MOST efficient approach?</div>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">A</span>Enable GuardDuty for ECS runtime monitoring</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="true"><span class="opt-letter">B</span>Enable Amazon Inspector for ECR scanning, which automatically scans images on push</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">C</span>Use AWS Config to verify container image compliance</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">D</span>Run a custom vulnerability scanner in a CodePipeline stage</button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>B is correct.</strong> Inspector v2 natively integrates with ECR and automatically scans container images for CVEs on push and on new CVE publication. It's agentless and requires no custom setup. <strong>A</strong> — GuardDuty's ECS runtime monitoring detects threats at runtime, not CVEs in images. <strong>C</strong> — Config checks resource configuration, not image vulnerabilities. <strong>D</strong> works but is far more operational overhead.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 11: SYSTEMS MANAGER SESSION MANAGER -->
+  <!-- ============================================================ -->
+  <div class="section" id="s11">
+    <div class="section-num">Section 11</div>
+    <h2>Systems Manager Session Manager</h2>
+
+    <h3>Replace SSH Entirely</h3>
+    <p><strong>AWS Systems Manager Session Manager</strong> provides interactive shell access to EC2 instances (and on-premises managed nodes) <strong>without opening inbound ports, without SSH keys, and without bastion hosts</strong>. It uses the SSM Agent (pre-installed on Amazon Linux 2/2023 and Windows AMIs) and communicates outbound over HTTPS to the Systems Manager service endpoint.</p>
+
+    <h3>Why Session Manager > SSH</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Traditional SSH</th><th>Session Manager</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Requires port 22 open in Security Group</td><td class="highlight">No inbound ports needed</td></tr>
+          <tr><td>SSH key management (creation, distribution, rotation)</td><td class="highlight">IAM-based access control</td></tr>
+          <tr><td>Bastion host needed for private instances</td><td class="highlight">Direct access to private subnet instances</td></tr>
+          <tr><td>Limited audit trail</td><td class="highlight">Full session logging to S3/CloudWatch</td></tr>
+          <tr><td>Key-based authentication only</td><td class="highlight">IAM policies + MFA support</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>How It Works</h3>
+    <p>The SSM Agent on the instance initiates an <strong>outbound HTTPS connection</strong> to the Systems Manager endpoint. When a user starts a session (from the console, CLI, or SDK), traffic flows through this existing channel. The instance needs: (1) the SSM Agent installed and running, (2) an <strong>IAM instance profile</strong> with the <code>AmazonSSMManagedInstanceCore</code> policy, and (3) outbound HTTPS (port 443) access to the SSM endpoints (via NAT Gateway or VPC endpoint).</p>
+
+    <div class="key-point">
+      <strong>Session Manager requirements:</strong> SSM Agent + IAM instance profile with SSM permissions + outbound HTTPS to SSM endpoint. No inbound ports, no SSH keys, no bastion. Session logs go to S3 and/or CloudWatch Logs for complete audit trails.
+    </div>
+
+    <div class="exam-tip">If the exam says "access EC2 without opening SSH ports" or "eliminate bastion hosts" or "audit all shell sessions" → <strong>Session Manager</strong>. It's also the answer when the question mentions "private subnet instances" + "no bastion host."</div>
+
+    <!-- Q19 -->
+    <div class="quiz-block">
+      <div class="quiz-header">
+        <span class="q-badge">Q19</span>
+        <span class="q-label">Session Manager</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">A security team mandates that all EC2 instances must: (1) have no inbound SSH ports open, (2) all interactive sessions must be logged for audit, and (3) administrators must authenticate using their IAM credentials, not SSH keys. Which solution meets ALL requirements?</div>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">A</span>Deploy a bastion host with SSH key management and enable VPC Flow Logs</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">B</span>Use EC2 Instance Connect to provide temporary SSH keys</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="true"><span class="opt-letter">C</span>Use Systems Manager Session Manager with session logging to S3 and CloudWatch Logs</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">D</span>Install a third-party PAM (Privileged Access Management) solution on each instance</button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>C is correct.</strong> Session Manager checks every box: no port 22 needed, IAM-based authentication (not SSH keys), and full session logging to S3/CloudWatch. <strong>A</strong> requires port 22 and SSH keys. <strong>B</strong> still requires port 22 open, even though keys are temporary. <strong>D</strong> adds operational complexity and doesn't inherently close port 22.
+        </div>
+      </div>
+    </div>
+
+    <!-- Q20 -->
+    <div class="quiz-block">
+      <div class="quiz-header">
+        <span class="q-badge">Q20</span>
+        <span class="q-label">Session Manager Architecture</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">An EC2 instance in a private subnet with no NAT Gateway needs to be managed via Session Manager. The instance has the SSM Agent installed and an appropriate instance profile. Sessions are failing. What is the MOST likely solution?</div>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">A</span>Open port 22 in the instance's security group</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="true"><span class="opt-letter">B</span>Create VPC Interface Endpoints for ssm, ssmmessages, and ec2messages</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">C</span>Install a bastion host in the public subnet as a relay</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">D</span>Attach an Elastic IP to the instance</button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>B is correct.</strong> Session Manager requires outbound HTTPS connectivity to SSM endpoints. Without a NAT Gateway, the instance can't reach the public SSM endpoints. The solution is to create VPC Interface Endpoints for <code>ssm</code>, <code>ssmmessages</code>, and <code>ec2messages</code>, which allow private connectivity. <strong>A</strong> — Session Manager doesn't use port 22. <strong>C</strong> — bastions are what Session Manager replaces. <strong>D</strong> — EIPs don't help in private subnets without an IGW route.
+        </div>
+      </div>
+    </div>
+
+    <!-- Q21 - COMPREHENSIVE -->
+    <div class="quiz-block">
+      <div class="quiz-header">
+        <span class="q-badge">Q21</span>
+        <span class="q-label">Security Services — Comprehensive</span>
+      </div>
+      <div class="quiz-body">
+        <div class="question-text">Match each security concern to the correct AWS service: (1) Protecting a web application from SQL injection, (2) Detecting an EC2 instance mining cryptocurrency, (3) Scanning Lambda functions for known CVEs, (4) Protecting against a 100 Gbps UDP flood. Which combination is correct?</div>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">A</span>(1) Shield (2) Inspector (3) GuardDuty (4) WAF</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="true"><span class="opt-letter">B</span>(1) WAF (2) GuardDuty (3) Inspector (4) Shield</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">C</span>(1) WAF (2) GuardDuty (3) Inspector (4) WAF with rate-based rules</button>
+        <button class="option" onclick="checkAnswer(this)" data-correct="false"><span class="opt-letter">D</span>(1) GuardDuty (2) Inspector (3) GuardDuty (4) Shield</button>
+        <div class="explanation">
+          <div class="exp-label">Explanation</div>
+          <strong>B is correct.</strong> (1) SQL injection is an application-layer attack → <strong>WAF</strong>. (2) Crypto mining detection uses VPC Flow Logs and DNS analysis → <strong>GuardDuty</strong>. (3) CVE scanning of Lambda functions → <strong>Inspector</strong>. (4) 100 Gbps UDP flood is a volumetric L3/L4 DDoS → <strong>Shield</strong>. <strong>C</strong> is close but WAF rate-based rules can't stop a 100 Gbps volumetric flood — that's infrastructure-layer, not application-layer.
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- container -->
+
+<!-- Score Panel -->
+<div id="score-panel">
+  <div class="score-title">Exam Score</div>
+  <div class="score-row"><span>Correct</span><span class="correct" id="correct-count">0</span></div>
+  <div class="score-row"><span>Wrong</span><span class="wrong" id="wrong-count">0</span></div>
+  <div class="score-row"><span>Total</span><span class="total" id="total-display">0 / 21</span></div>
+  <div style="margin-top: 10px; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden;">
+    <div id="score-bar" style="height: 100%; width: 0%; background: var(--green); transition: width 0.3s;"></div>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    SAA-C03 Networking, IAM & Security Study Guide — 11 Sections, 21 Questions<br>
+    Keep reviewing until you consistently score 90%+
+  </div>
+</footer>
+
+<script>
+let correct = 0;
+let wrong = 0;
+let answered = 0;
+const totalQ = 21;
+
+function checkAnswer(btn) {
+  const quizBody = btn.closest('.quiz-body');
+  const options = quizBody.querySelectorAll('.option');
+  
+  if ([...options].some(o => o.classList.contains('correct') || o.classList.contains('wrong'))) return;
+
+  const isCorrect = btn.dataset.correct === 'true';
+  
+  if (isCorrect) {
+    btn.classList.add('correct');
+    correct++;
+  } else {
+    btn.classList.add('wrong');
+    wrong++;
+    options.forEach(o => {
+      if (o.dataset.correct === 'true') o.classList.add('reveal-correct');
+    });
+  }
+
+  answered++;
+  options.forEach(o => o.disabled = true);
+  quizBody.querySelector('.explanation').style.display = 'block';
+  
+  document.getElementById('correct-count').textContent = correct;
+  document.getElementById('wrong-count').textContent = wrong;
+  document.getElementById('total-display').textContent = answered + ' / ' + totalQ;
+  
+  const pct = answered > 0 ? (correct / answered) * 100 : 0;
+  document.getElementById('score-bar').style.width = pct + '%';
+  document.getElementById('score-bar').style.background = pct >= 72 ? 'var(--green)' : 'var(--red)';
+}
+
+window.addEventListener('scroll', () => {
+  const winH = document.documentElement.scrollHeight - window.innerHeight;
+  const scrolled = (window.scrollY / winH) * 100;
+  document.getElementById('progress-bar').style.width = scrolled + '%';
+});
+</script>
+</body>
+</html>
