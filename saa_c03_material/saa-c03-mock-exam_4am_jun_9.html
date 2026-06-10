@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAA-C03 Mock Exam</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Courier New', monospace; background: #1a1a1a; color: #d4d4d4; padding: 20px; max-width: 900px; margin: 0 auto; }
+.header { border-bottom: 1px solid #444; padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+.header h1 { font-size: 16px; color: #7aa2f7; }
+.progress { color: #888; font-size: 13px; }
+.timer { color: #e0af68; font-size: 14px; }
+.question-type { display: inline-block; background: #2d2d2d; border: 1px solid #555; padding: 2px 8px; font-size: 11px; color: #bb9af7; margin-bottom: 10px; border-radius: 2px; }
+.stem { font-size: 14px; line-height: 1.7; margin-bottom: 20px; color: #c0c0c0; }
+.option { padding: 10px 14px; margin: 4px 0; border: 1px solid #333; cursor: pointer; font-size: 13px; line-height: 1.5; display: flex; align-items: flex-start; gap: 10px; }
+.option.focused { border-color: #7aa2f7; background: #1e2030; }
+.option.selected { border-color: #9ece6a; background: #1a2a1a; }
+.option.selected.focused { border-color: #9ece6a; background: #1a2a1a; }
+.option-letter { color: #7aa2f7; font-weight: bold; min-width: 20px; }
+.nav { margin-top: 20px; display: flex; gap: 10px; justify-content: space-between; }
+.btn { background: #2d2d2d; border: 1px solid #555; color: #d4d4d4; padding: 8px 20px; cursor: pointer; font-family: inherit; font-size: 13px; }
+.btn:hover { background: #3d3d3d; }
+.btn.primary { border-color: #7aa2f7; color: #7aa2f7; }
+.hint { color: #555; font-size: 11px; margin-top: 15px; text-align: center; }
+.flag { color: #e0af68; font-size: 12px; margin-top: 8px; }
+.flagged-indicator { color: #e0af68; }
+/* Review */
+.review-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin: 20px 0; }
+.review-cell { padding: 10px; text-align: center; border: 1px solid #333; font-size: 13px; cursor: pointer; }
+.review-cell.answered { background: #1a2a1a; border-color: #9ece6a; }
+.review-cell.unanswered { background: #2a1a1a; border-color: #f7768e; }
+.review-cell.flagged-cell { border-color: #e0af68; }
+.review-cell.current { border-color: #7aa2f7; border-width: 2px; }
+/* Results */
+.result-correct { color: #9ece6a; }
+.result-wrong { color: #f7768e; }
+.result-item { margin: 16px 0; padding: 14px; border: 1px solid #333; font-size: 13px; line-height: 1.6; }
+.result-item .explanation { color: #888; margin-top: 8px; font-size: 12px; }
+.score-banner { text-align: center; padding: 30px; margin: 20px 0; border: 1px solid #444; }
+.score-banner .score { font-size: 48px; font-weight: bold; }
+.score-banner .label { color: #888; font-size: 14px; margin-top: 5px; }
+.domain-breakdown { margin: 20px 0; }
+.domain-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #2d2d2d; font-size: 13px; }
+.domain-bar { height: 6px; background: #333; margin-top: 4px; border-radius: 2px; overflow: hidden; }
+.domain-fill { height: 100%; background: #7aa2f7; border-radius: 2px; }
+.hidden { display: none; }
+</style>
+</head>
+<body>
+
+<div id="exam-view">
+  <div class="header">
+    <h1>SAA-C03 // Mock Exam</h1>
+    <div class="timer" id="timer">00:00</div>
+    <div class="progress" id="progress"></div>
+  </div>
+  <div id="question-area"></div>
+  <div class="nav">
+    <div>
+      <button class="btn" onclick="prevQ()">[p] Prev</button>
+      <button class="btn" onclick="nextQ()">[n] Next</button>
+      <button class="btn" onclick="toggleFlag()" id="flag-btn">[f] Flag</button>
+    </div>
+    <button class="btn primary" onclick="showReview()">[r] Review</button>
+  </div>
+  <div class="hint">j/k = move focus &nbsp; space = select &nbsp; n/p = next/prev &nbsp; f = flag &nbsp; r = review</div>
+</div>
+
+<div id="review-view" class="hidden">
+  <div class="header"><h1>Review Answers</h1></div>
+  <div class="review-grid" id="review-grid"></div>
+  <div style="margin:10px 0;font-size:12px;color:#888;">
+    <span style="color:#9ece6a;">■</span> Answered &nbsp;
+    <span style="color:#f7768e;">■</span> Unanswered &nbsp;
+    <span style="color:#e0af68;">□</span> Flagged
+  </div>
+  <div class="nav">
+    <button class="btn" onclick="hideReview()">[Esc] Back</button>
+    <button class="btn primary" onclick="submitExam()">Submit Exam</button>
+  </div>
+</div>
+
+<div id="results-view" class="hidden">
+  <div class="header"><h1>Results</h1></div>
+  <div class="score-banner" id="score-banner"></div>
+  <h3 style="color:#7aa2f7;margin:20px 0 10px;font-size:14px;">Domain Breakdown</h3>
+  <div class="domain-breakdown" id="domain-breakdown"></div>
+  <h3 style="color:#7aa2f7;margin:20px 0 10px;font-size:14px;">Question Review</h3>
+  <div id="results-detail"></div>
+  <div style="margin-top:20px;">
+    <button class="btn primary" onclick="downloadCSV()">Download CSV</button>
+  </div>
+</div>
+
+<script>
+const questions = [
+  {
+    id: 1,
+    domain: "Resilient Architectures",
+    type: "single",
+    stem: `A financial services company runs a critical order-processing application on Amazon EC2 instances behind an Application Load Balancer (ALB) in us-east-1. The application writes transaction records to an Amazon RDS for MySQL Multi-AZ DB instance. During a recent Availability Zone outage, the application remained available, but the development team noticed that the Auto Scaling group kept launching instances in the degraded AZ, causing slow health-check recovery. The team wants to ensure that during an AZ impairment, the Auto Scaling group stops launching instances in the affected AZ while continuing to serve traffic from healthy AZs. Which solution meets this requirement with the LEAST operational effort?`,
+    options: [
+      "Enable Amazon EC2 Auto Scaling AZ rebalancing and configure ALB cross-zone load balancing.",
+      "Enable AZ auto-shift in Amazon Application Recovery Controller (ARC) zonal shift for the Auto Scaling group.",
+      "Create an Amazon CloudWatch alarm for AZ health metrics and use a Lambda function to modify the Auto Scaling group's AZ list when an impairment is detected.",
+      "Deploy a separate Auto Scaling group in each AZ behind the same target group and manually remove the impaired AZ's group during an outage."
+    ],
+    answer: [1],
+    explanation: "ARC zonal auto-shift automatically detects AZ impairments and shifts traffic/instances away without manual intervention. AZ rebalancing (A) would actually make the problem worse by launching more instances. The CloudWatch+Lambda approach (C) works but requires custom code and operational overhead. Separate ASGs per AZ (D) is heavy and manual."
+  },
+  {
+    id: 2,
+    domain: "High-Performing Architectures",
+    type: "multi",
+    selectCount: 2,
+    stem: `A genomics research company processes large-scale DNA sequencing datasets. The raw data (FASTQ files, 200–500 GB each) arrives in Amazon S3, needs to be processed by a compute-intensive Linux-based bioinformatics pipeline, and then the results (~2 GB per run) are stored back in S3. Processing requires sub-millisecond latency access to scratch storage during analysis. The pipeline tools use POSIX-compliant file I/O and parallelize reads across hundreds of files in a shared namespace. The company processes 5–10 datasets per day and wants the most cost-effective architecture. (Select TWO.)`,
+    options: [
+      "Use Amazon FSx for Lustre linked to the S3 bucket to provide the scratch file system for processing.",
+      "Use Amazon EFS with Provisioned Throughput mode mounted to all compute nodes.",
+      "Use Amazon EC2 Spot Instances in an Auto Scaling group triggered by S3 event notifications through Amazon EventBridge.",
+      "Use AWS Fargate tasks with ephemeral storage configured to 200 GB per task.",
+      "Use Amazon FSx for Windows File Server with SSD storage to provide low-latency shared access."
+    ],
+    answer: [0, 2],
+    explanation: "FSx for Lustre (A) is purpose-built for HPC/Linux/POSIX workloads with native S3 integration and sub-ms latency — the 'Linux/POSIX + HPC throughput' keywords are the discriminator vs. FSx for Windows (E, which is SMB-based and wrong for Linux pipelines). EFS (B) can do POSIX but Provisioned Throughput is expensive at this scale and doesn't match Lustre's HPC performance. Spot Instances (C) are correct for cost-effective, fault-tolerant batch compute — genomics pipelines are inherently restartable. Fargate (D) maxes out at 200 GB ephemeral storage, which is too small for 500 GB input files."
+  },
+  {
+    id: 3,
+    domain: "Secure Architectures",
+    type: "single",
+    stem: `A company has an existing Amazon RDS for PostgreSQL DB instance that has been running in production for 14 months. The instance stores personally identifiable information (PII), and a new compliance audit requires that the database storage be encrypted at rest using AWS KMS. The DB instance uses a db.r6g.xlarge instance class with 2 TB of data and Multi-AZ deployment. A solutions architect needs to enable encryption with minimal downtime. What should the solutions architect do?`,
+    options: [
+      "Modify the existing RDS instance and enable encryption, selecting the default AWS managed KMS key. RDS will encrypt the storage in place during the next maintenance window.",
+      "Create a read replica of the RDS instance with encryption enabled. Promote the read replica to a standalone instance, then update the application's connection string.",
+      "Create a snapshot of the unencrypted RDS instance. Copy the snapshot and enable encryption with a KMS key during the copy. Restore a new DB instance from the encrypted snapshot. Switch the application endpoint to the new instance.",
+      "Enable encryption on the existing RDS instance by stopping the instance, enabling encryption via the AWS CLI modify-db-instance command with --storage-encrypted, and restarting it."
+    ],
+    answer: [2],
+    explanation: "You CANNOT enable encryption on an already-running unencrypted RDS instance — there is no in-place toggle (A and D are wrong). You also cannot create an encrypted read replica from an unencrypted source (B is wrong). The only path is: snapshot → copy snapshot with encryption → restore from encrypted copy. This is a classic 'you can't do the obvious thing' gotcha."
+  },
+  {
+    id: 4,
+    domain: "Cost-Optimized Architectures",
+    type: "single",
+    stem: `A media company stores 80 TB of video assets in Amazon S3 Standard. Analytics show that 15% of the content is accessed multiple times per week, 25% is accessed roughly once every 30–60 days, and the remaining 60% has not been accessed in over 90 days but must remain retrievable within 5 minutes when requested by content editors. The company wants to reduce storage costs without building custom lifecycle management logic and without impacting retrieval times for any access pattern. Which storage strategy meets these requirements?`,
+    options: [
+      "Enable S3 Intelligent-Tiering on the bucket. Configure the Archive Access Tier and Deep Archive Access Tier.",
+      "Enable S3 Intelligent-Tiering on the bucket. Ensure the Archive Access Tier is NOT activated.",
+      "Create S3 Lifecycle rules to transition objects to S3 Standard-IA after 30 days and S3 Glacier Flexible Retrieval after 90 days.",
+      "Create S3 Lifecycle rules to transition objects to S3 One Zone-IA after 30 days and S3 Glacier Instant Retrieval after 90 days."
+    ],
+    answer: [1],
+    explanation: "S3 Intelligent-Tiering automatically moves objects between Frequent, Infrequent, and Archive Instant Access tiers — but the optional Archive Access and Deep Archive tiers have retrieval times of 3-5 hours and 12 hours respectively. Since the requirement is 5-minute retrieval for ALL objects, you must NOT activate the Archive Access Tier (B is correct). Option A would violate the 5-minute SLA for archived objects. Option C uses Glacier Flexible Retrieval which has 3-5 hour retrieval. Option D uses One Zone-IA which sacrifices availability and Glacier Instant works but lifecycle rules are 'custom logic' the question explicitly avoids."
+  },
+  {
+    id: 5,
+    domain: "Resilient Architectures",
+    type: "multi",
+    selectCount: 2,
+    stem: `A retail company runs a customer-facing web application across two AWS Regions: us-east-1 (primary) and eu-west-1 (disaster recovery). The application uses Amazon Aurora MySQL in us-east-1 with an Aurora Global Database extending to eu-west-1. Static assets are served through Amazon CloudFront with an S3 origin in us-east-1, and the application tier runs on EC2 instances behind ALBs in both regions. The company requires an RPO of 1 second and an RTO of 1 minute for the database tier. During a regional failover, the company needs DNS to automatically route users to eu-west-1 without manual intervention. (Select TWO.)`,
+    options: [
+      "Configure an Amazon Route 53 active-passive failover routing policy with health checks pointing to the ALB endpoint in each Region.",
+      "Configure Amazon Route 53 latency-based routing with health checks so users are served from the closest healthy Region.",
+      "During failover, promote the Aurora secondary Region cluster using the managed planned failover feature, which maintains the Global Database topology.",
+      "During failover, detach the secondary Region from the Aurora Global Database to promote it to a standalone read/write cluster.",
+      "Create a cross-Region S3 replication rule for the static assets bucket and add the eu-west-1 S3 bucket as a second origin in CloudFront with origin failover."
+    ],
+    answer: [0, 3],
+    explanation: "Active-passive failover (A) is correct for DR: it routes to the secondary only when the primary fails health checks, matching the DR (not active-active) architecture. Latency-based (B) is for active-active, not active-passive DR. For unplanned regional failure, you DETACH the secondary cluster (D) — managed planned failover (C) is for planned maintenance/switchover only and requires both regions to be healthy. The S3/CloudFront option (E) is valid but wasn't asked about the database/DNS tier requirements."
+  },
+  {
+    id: 6,
+    domain: "Secure Architectures",
+    type: "single",
+    stem: `A healthcare SaaS company stores patient documents in Amazon S3. Regulatory requirements mandate that objects must be encrypted with keys that the company fully controls, including the ability to immediately disable a key and render all associated data unreadable. The company also needs to log every use of an encryption key and automatically rotate keys annually. The security team has an existing AWS CloudTrail configuration. Which encryption approach satisfies ALL of these requirements?`,
+    options: [
+      "SSE-S3 with Amazon S3 managed keys. Enable S3 Bucket Keys to reduce KMS costs.",
+      "SSE-KMS with an AWS managed KMS key (aws/s3). Enable automatic key rotation.",
+      "SSE-KMS with a customer managed KMS key. Enable automatic key rotation and configure a key policy granting the company's IAM roles access.",
+      "SSE-C (customer-provided keys). Generate keys using AWS CloudHSM and supply them with each S3 API request."
+    ],
+    answer: [2],
+    explanation: "SSE-S3 (A) keys are managed entirely by AWS — the company cannot disable them. AWS managed keys (B) cannot be disabled, deleted, or have their key policies modified — the company does not 'fully control' them. SSE-C (D) would work for control but AWS does NOT log SSE-C key usage in CloudTrail (AWS never possesses the key), so the logging requirement fails. Customer managed KMS keys (C) provide full control: you can disable/revoke, CloudTrail logs every Decrypt/Encrypt call, and automatic annual rotation is a one-click setting."
+  },
+  {
+    id: 7,
+    domain: "High-Performing Architectures",
+    type: "single",
+    stem: `An e-commerce company recently migrated a legacy application to AWS. The application has a product catalog backed by an Amazon RDS for MySQL database with read-heavy traffic patterns. During flash sales, the read queries spike to 50,000 per second — far beyond what the provisioned RDS instance can handle. The queries are mostly identical product-detail lookups that change only when the catalog team publishes updates (roughly twice per day). Adding RDS read replicas helped but introduced 30-second replication lag and still could not handle peak load. The team wants sub-millisecond response times at peak. Which solution BEST addresses this?`,
+    options: [
+      "Migrate to Amazon Aurora MySQL and add up to 15 Aurora Replicas with Aurora Auto Scaling.",
+      "Place Amazon ElastiCache for Redis in front of the database using a lazy-loading (cache-aside) caching strategy with a TTL aligned to catalog update frequency.",
+      "Enable Amazon DynamoDB Accelerator (DAX) in front of the RDS database for automatic caching.",
+      "Use Amazon CloudFront with an Application Load Balancer as the origin to cache API responses at edge locations."
+    ],
+    answer: [1],
+    explanation: "ElastiCache Redis with cache-aside (B) is the textbook answer for read-heavy, infrequently-changing data needing sub-ms latency. Aurora Replicas (A) improve reads but don't provide sub-millisecond — they're still database queries. DAX (C) is a DynamoDB-only accelerator and cannot sit in front of RDS. CloudFront (D) caches HTTP responses at the edge, which can work for public APIs but doesn't give fine-grained cache invalidation tied to catalog updates and adds CDN complexity to internal queries."
+  },
+  {
+    id: 8,
+    domain: "Cost-Optimized Architectures",
+    type: "single",
+    stem: `A data analytics firm runs nightly ETL jobs using a fleet of Amazon EC2 instances. Each job takes 2–4 hours to complete, processes independent shards of data, and can safely be restarted from the beginning if interrupted. The workload is consistent and runs 365 days per year. Job completion is required by 8:00 AM local time, and the pipeline starts at midnight, leaving enough buffer time to retry on interruption. Currently the firm uses On-Demand instances (m5.2xlarge) and is looking to cut costs. Which purchasing strategy provides the GREATEST cost savings?`,
+    options: [
+      "Purchase 1-year Compute Savings Plans to cover the nightly workload and use On-Demand for any overflow.",
+      "Use Spot Instances with diversified instance pools across at least 4 instance types and 3 AZs. Configure Spot placement scores and set up EventBridge rules for Spot interruption notices to trigger replacement.",
+      "Purchase 1-year Reserved Instances (Standard, All Upfront) for the exact instance type used.",
+      "Use a mix of 50% Spot Instances and 50% On-Demand Instances to balance cost and availability."
+    ],
+    answer: [1],
+    explanation: "Spot Instances (B) offer 60-90% savings over On-Demand. The workload is ideal for Spot: fault-tolerant, restartable, with a time buffer. Diversifying pools is best practice to reduce interruption risk. Savings Plans (A) and Reserved Instances (C) give ~30-40% savings but require commitment — and for a purely batch workload that tolerates interruption, Spot gives significantly more savings. A 50/50 mix (D) is unnecessarily conservative when the workload is fully interruptible."
+  },
+  {
+    id: 9,
+    domain: "Resilient Architectures",
+    type: "single",
+    stem: `A logistics company runs a shipment-tracking microservice that publishes events such as "package picked up," "in transit," and "delivered" to downstream consumers. Multiple independent consumer applications — billing, customer notifications, and analytics — each need to receive every event and process them at their own pace. If a consumer falls behind or goes offline for maintenance, it must be able to catch up on missed events without data loss. The system handles ~2,000 events per second with occasional bursts to 8,000. Events must be processed in the order they were produced per shipment tracking number. Which architecture satisfies all requirements?`,
+    options: [
+      "Publish events to an Amazon SNS FIFO topic. Subscribe each consumer via an Amazon SQS FIFO queue using SNS message filtering to route events.",
+      "Publish events to an Amazon Kinesis Data Streams stream with the shipment tracking number as the partition key. Each consumer application reads from the stream using its own Kinesis Client Library (KCL) application with a separate consumer group.",
+      "Publish events to a single Amazon SQS FIFO queue. Each consumer application polls the queue independently.",
+      "Publish events to Amazon EventBridge with rules that fan out each event to separate SQS Standard queues per consumer."
+    ],
+    answer: [1],
+    explanation: "Kinesis Data Streams (B) supports multiple independent consumers via KCL consumer groups (enhanced fan-out), maintains per-partition-key ordering (shipment ID as partition key), and retains data for replay. SQS FIFO (C) delivers each message to ONE consumer only — multiple consumers can't each get every message from the same queue. SNS FIFO → SQS FIFO (A) could work for fan-out but FIFO topics have a 300 msg/sec throughput limit (3,000 with batching), which is insufficient for 8,000 burst. EventBridge → SQS Standard (D) loses per-shipment ordering since Standard queues are best-effort ordered."
+  },
+  {
+    id: 10,
+    domain: "Secure Architectures",
+    type: "multi",
+    selectCount: 2,
+    stem: `A company is deploying a three-tier web application in a VPC. The web tier runs in public subnets, the application tier in private subnets, and the database tier (Amazon RDS) in isolated private subnets. The application tier must call external third-party APIs over HTTPS on the internet. The database tier must access AWS Systems Manager Parameter Store to retrieve configuration values at startup. The security team requires that neither the application tier nor the database tier have public IP addresses, and all traffic to AWS services from the database tier must stay on the AWS private network. (Select TWO.)`,
+    options: [
+      "Deploy a NAT Gateway in a public subnet. Update the private subnet route table for the application tier to route 0.0.0.0/0 to the NAT Gateway.",
+      "Create an interface VPC endpoint for Systems Manager (com.amazonaws.region.ssm) in the database tier's subnets. Attach a VPC endpoint policy restricting access to the ssm:GetParameter action.",
+      "Attach an Internet Gateway to the VPC and add a route in the database tier's route table pointing 0.0.0.0/0 to the Internet Gateway. Use security groups to block inbound traffic.",
+      "Deploy a NAT Gateway in the database tier's private subnet to allow the database instances to reach Systems Manager endpoints over the internet.",
+      "Create a gateway VPC endpoint for Systems Manager and associate it with the database tier's route table."
+    ],
+    answer: [0, 1],
+    explanation: "The application tier needs internet access for third-party APIs but has no public IP → NAT Gateway (A). The database tier needs SSM on the private AWS network → Interface VPC Endpoint for SSM (B). Option C gives the DB tier an internet route, violating the 'no public IP / private network' requirement — security groups don't prevent outbound traffic from traversing the internet. Option D places a NAT Gateway in a private subnet, which is architecturally wrong — NAT Gateways must be in public subnets. Option E is wrong because Systems Manager uses an INTERFACE endpoint, not a gateway endpoint (gateway endpoints are only for S3 and DynamoDB)."
+  },
+  {
+    id: 11,
+    domain: "High-Performing Architectures",
+    type: "single",
+    stem: `A global gaming company runs a real-time leaderboard service. Millions of players submit scores, and the application must return the top 100 leaderboard and any individual player's rank with single-digit millisecond latency. The data model is simple: player ID and score. The current architecture uses Amazon DynamoDB with a GSI on the score attribute, but a Query operation to determine an individual player's rank requires scanning all items with a higher score — which becomes slow at scale. The team needs a purpose-built solution for sorted ranking queries. Which approach resolves the ranking performance issue?`,
+    options: [
+      "Replace DynamoDB with Amazon Aurora MySQL. Use a SQL query with a window function (RANK()) to compute player rank on the fly.",
+      "Add Amazon DynamoDB Accelerator (DAX) in front of DynamoDB to cache leaderboard query results.",
+      "Use Amazon ElastiCache for Redis and maintain the leaderboard using Redis Sorted Sets (ZADD/ZRANK/ZRANGE commands).",
+      "Use Amazon Neptune graph database to model players and scores as vertices and edges, and use graph traversals to compute rank."
+    ],
+    answer: [2],
+    explanation: "Redis Sorted Sets (C) provide O(log(N)) ranking operations (ZRANK returns a player's rank instantly, ZRANGE returns top N) — purpose-built for leaderboard use cases with single-digit ms latency. Aurora (A) can compute RANK() but not at single-digit ms for millions of rows. DAX (B) caches DynamoDB queries but doesn't solve the underlying scan problem — cached stale data and cache misses would still cause slow rank lookups. Neptune (D) is for graph relationships, not sorted numerical ranking."
+  },
+  {
+    id: 12,
+    domain: "Secure Architectures",
+    type: "single",
+    stem: `A company uses AWS Organizations with multiple accounts: a shared-services account, a production account, and a development account. An application in the production account must read objects from an S3 bucket in the shared-services account. The security team mandates that access must use IAM roles (no long-lived credentials), and the bucket policy must explicitly control which accounts can access data. A solutions architect configures a cross-account IAM role in the shared-services account with an S3 read-only policy and a trust policy allowing the production account's application role to assume it. The application correctly calls sts:AssumeRole successfully but receives AccessDenied when calling s3:GetObject. What is the MOST LIKELY cause?`,
+    options: [
+      "The production account's IAM role does not have an inline policy permitting s3:GetObject on the target bucket.",
+      "The S3 bucket policy in the shared-services account does not grant s3:GetObject to the cross-account role's ARN.",
+      "AWS Organizations has a Service Control Policy (SCP) on the production account's OU that denies S3 actions to external buckets.",
+      "The S3 bucket has a CORS configuration that blocks cross-account requests."
+    ],
+    answer: [1],
+    explanation: "For cross-account S3 access, BOTH the IAM role policy AND the resource (bucket) policy must grant access. The question says the cross-account role has an 'S3 read-only policy' (so A is less likely — the role itself has permissions). The bucket policy not granting access to the role's ARN (B) is the classic missing piece in cross-account setups. SCP (C) is possible but less likely as the 'most likely' cause — SCPs typically restrict actions broadly, not specifically 'external buckets.' CORS (D) is a browser/HTTP concept irrelevant to SDK calls."
+  },
+  {
+    id: 13,
+    domain: "Cost-Optimized Architectures",
+    type: "single",
+    stem: `A company runs a web application on Amazon EC2 instances behind an ALB. The application experiences predictable traffic: baseline of 4 instances during weekdays, spikes to 12 instances every weekday between 12:00–14:00 for a lunch rush, drops to 2 instances on weekends, and has one unpredictable flash-sale event per month that may need up to 30 instances for 2–3 hours. The company wants to minimize cost while guaranteeing capacity is available for all patterns. Which combination of purchasing options is MOST cost-effective?`,
+    options: [
+      "Purchase 4 Standard Reserved Instances for the weekday baseline. Use On-Demand for all other capacity.",
+      "Purchase a Compute Savings Plan covering 2 instances (the absolute minimum). Use Scheduled Scaling to add On-Demand instances for the lunch rush and weekends. Use On-Demand for flash sales.",
+      "Purchase a Compute Savings Plan covering 2 instances (the absolute minimum). Use Scheduled Scaling for the lunch rush. Use Spot Instances with On-Demand fallback for flash-sale bursts.",
+      "Purchase 12 Reserved Instances to cover the lunch-rush peak. Scale down outside peak hours — unused RI capacity is wasted but simpler to manage."
+    ],
+    answer: [2],
+    explanation: "The floor across all time periods is 2 instances (weekends), so Compute Savings Plans covering 2 instances (C) give the deepest discount on guaranteed usage without waste. Scheduled Scaling handles the predictable lunch rush. Spot with On-Demand fallback is ideal for flash sales — short, unpredictable bursts where some interruption is tolerable. Option A over-commits RIs to 4 (wastes 2 on weekends). Option B uses On-Demand for flash sales when Spot would be cheaper. Option D wastes 12 RIs most of the day."
+  },
+  {
+    id: 14,
+    domain: "Resilient Architectures",
+    type: "single",
+    stem: `A company needs to deploy a critical stateful application that uses UDP-based protocols with static IP addresses that clients hardcode into their firewall allow-lists. The application runs on Amazon EC2 instances across multiple AZs. If an AZ fails, the system must continue serving traffic on the SAME static IPs without requiring clients to update their firewall rules. The application performs its own health-checking at the application layer. Which load balancing solution meets these requirements?`,
+    options: [
+      "Deploy an Application Load Balancer (ALB) with Elastic IP addresses assigned to each ALB node.",
+      "Deploy a Network Load Balancer (NLB) with Elastic IP addresses assigned in each AZ. Enable cross-zone load balancing.",
+      "Deploy an AWS Global Accelerator with static anycast IP addresses pointing to an ALB in each AZ.",
+      "Deploy a Network Load Balancer (NLB) with Elastic IP addresses. Use AWS Global Accelerator in front of the NLB for additional static IPs."
+    ],
+    answer: [1],
+    explanation: "NLB (B) supports UDP, allows Elastic IP assignment per AZ (static IPs for firewall allow-lists), and with cross-zone load balancing handles AZ failure by distributing traffic to healthy targets in other AZs — all on the same IPs. ALB (A) does NOT support UDP and you cannot assign EIPs to ALB nodes. Global Accelerator (C) provides static IPs but uses an ALB which doesn't support UDP. Option D adds unnecessary complexity — NLB with EIPs already provides static IPs for UDP."
+  },
+  {
+    id: 15,
+    domain: "High-Performing Architectures",
+    type: "multi",
+    selectCount: 2,
+    stem: `A SaaS company exposes a REST API through Amazon API Gateway backed by AWS Lambda functions. The API averages 200 requests/second but spikes to 3,000 requests/second for 5–10 minutes during batch operations triggered by enterprise clients. During these spikes, clients receive intermittent HTTP 429 (throttling) errors. The Lambda functions take 2–3 seconds to initialize due to loading large ML models into memory. The company wants to eliminate both the 429 errors during spikes and the cold-start latency. (Select TWO.)`,
+    options: [
+      "Increase the API Gateway throttling limits (rate and burst) for the API stage to accommodate the 3,000 req/sec spike.",
+      "Request a Lambda concurrency limit increase via AWS Support and configure reserved concurrency on the Lambda function.",
+      "Configure Lambda Provisioned Concurrency to keep a pool of pre-initialized execution environments warm.",
+      "Enable API Gateway caching on GET endpoints with a 60-second TTL to reduce the number of requests reaching Lambda.",
+      "Migrate from Lambda to Amazon ECS Fargate tasks behind an ALB to avoid Lambda throttling limits entirely."
+    ],
+    answer: [0, 2],
+    explanation: "API Gateway has a default 10,000 req/sec account-level throttle but stage-level defaults are lower — increasing stage throttle limits (A) addresses the 429 errors. Provisioned Concurrency (C) pre-initializes Lambda environments so the ML model is already loaded — eliminating cold starts. Reserved concurrency (B) CAPS a function's concurrency (useful for isolation) but doesn't pre-warm — it actually makes throttling worse by setting a ceiling. Caching (D) helps for GET requests but batch operations are likely POST/PUT. Migrating to Fargate (E) works but is not least-effort and the question asks to fix the Lambda setup, not replace it."
+  }
+];
+
+let current = 0;
+let focus = 0;
+let answers = questions.map(() => []);
+let flags = questions.map(() => false);
+let startTime = Date.now();
+let timerInterval;
+let examSubmitted = false;
+
+function startTimer() {
+  timerInterval = setInterval(() => {
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    const m = String(Math.floor(elapsed / 60)).padStart(2, '0');
+    const s = String(elapsed % 60).padStart(2, '0');
+    document.getElementById('timer').textContent = m + ':' + s;
+  }, 1000);
+}
+
+function render() {
+  const q = questions[current];
+  const area = document.getElementById('question-area');
+  const typeLabel = q.type === 'multi' ? `SELECT ${q.selectCount}` : 'SELECT ONE';
+  const flagIcon = flags[current] ? ' ★ FLAGGED' : '';
+  
+  let html = `<div class="question-type">${typeLabel}</div>`;
+  if (flagIcon) html += `<span class="flagged-indicator">${flagIcon}</span>`;
+  html += `<div class="stem">${q.stem}</div>`;
+  
+  const letters = ['A','B','C','D','E'];
+  q.options.forEach((opt, i) => {
+    const focused = i === focus ? ' focused' : '';
+    const selected = answers[current].includes(i) ? ' selected' : '';
+    html += `<div class="option${focused}${selected}" data-idx="${i}" onclick="toggleOption(${i})">
+      <span class="option-letter">${letters[i]}.</span>
+      <span>${opt}</span>
+    </div>`;
+  });
+  
+  area.innerHTML = html;
+  document.getElementById('progress').textContent = `${current + 1} / ${questions.length}`;
+  document.getElementById('flag-btn').textContent = flags[current] ? '[f] Unflag' : '[f] Flag';
+}
+
+function toggleOption(idx) {
+  const q = questions[current];
+  if (q.type === 'single') {
+    answers[current] = [idx];
+  } else {
+    const pos = answers[current].indexOf(idx);
+    if (pos > -1) {
+      answers[current].splice(pos, 1);
+    } else {
+      if (answers[current].length < q.selectCount) {
+        answers[current].push(idx);
+      }
+    }
+  }
+  render();
+}
+
+function nextQ() {
+  if (current < questions.length - 1) { current++; focus = 0; render(); }
+}
+
+function prevQ() {
+  if (current > 0) { current--; focus = 0; render(); }
+}
+
+function toggleFlag() {
+  flags[current] = !flags[current];
+  render();
+}
+
+function showReview() {
+  document.getElementById('exam-view').classList.add('hidden');
+  document.getElementById('review-view').classList.remove('hidden');
+  renderReview();
+}
+
+function hideReview() {
+  document.getElementById('review-view').classList.add('hidden');
+  document.getElementById('exam-view').classList.remove('hidden');
+}
+
+function renderReview() {
+  const grid = document.getElementById('review-grid');
+  let html = '';
+  questions.forEach((q, i) => {
+    const answered = answers[i].length > 0 ? 'answered' : 'unanswered';
+    const flagged = flags[i] ? ' flagged-cell' : '';
+    const cur = i === current ? ' current' : '';
+    html += `<div class="review-cell ${answered}${flagged}${cur}" onclick="jumpTo(${i})">${i + 1}${flags[i] ? ' ★' : ''}</div>`;
+  });
+  grid.innerHTML = html;
+}
+
+function jumpTo(idx) {
+  current = idx;
+  focus = 0;
+  hideReview();
+  render();
+}
+
+function submitExam() {
+  clearInterval(timerInterval);
+  examSubmitted = true;
+  document.getElementById('review-view').classList.add('hidden');
+  document.getElementById('exam-view').classList.add('hidden');
+  document.getElementById('results-view').classList.remove('hidden');
+  renderResults();
+}
+
+function renderResults() {
+  const letters = ['A','B','C','D','E'];
+  let correct = 0;
+  const domains = {};
+
+  questions.forEach((q, i) => {
+    const isCorrect = JSON.stringify([...answers[i]].sort()) === JSON.stringify([...q.answer].sort());
+    if (isCorrect) correct++;
+    if (!domains[q.domain]) domains[q.domain] = { total: 0, correct: 0 };
+    domains[q.domain].total++;
+    if (isCorrect) domains[q.domain].correct++;
+  });
+
+  const pct = Math.round((correct / questions.length) * 100);
+  const pass = pct >= 72;
+  document.getElementById('score-banner').innerHTML = `
+    <div class="score" style="color:${pass ? '#9ece6a' : '#f7768e'}">${pct}%</div>
+    <div class="label">${correct}/${questions.length} correct — ${pass ? 'PASS (≥72%)' : 'BELOW PASSING (72%)'}</div>
+  `;
+
+  let domainHtml = '';
+  for (const [name, d] of Object.entries(domains)) {
+    const dp = Math.round((d.correct / d.total) * 100);
+    const color = dp >= 72 ? '#9ece6a' : dp >= 50 ? '#e0af68' : '#f7768e';
+    domainHtml += `<div class="domain-row"><span>${name}</span><span style="color:${color}">${d.correct}/${d.total} (${dp}%)</span></div>
+    <div class="domain-bar"><div class="domain-fill" style="width:${dp}%;background:${color}"></div></div>`;
+  }
+  document.getElementById('domain-breakdown').innerHTML = domainHtml;
+
+  let detailHtml = '';
+  questions.forEach((q, i) => {
+    const isCorrect = JSON.stringify([...answers[i]].sort()) === JSON.stringify([...q.answer].sort());
+    const icon = isCorrect ? '✓' : '✗';
+    const cls = isCorrect ? 'result-correct' : 'result-wrong';
+    const yourAns = answers[i].length > 0 ? answers[i].map(a => letters[a]).join(', ') : '—';
+    const correctAns = q.answer.map(a => letters[a]).join(', ');
+    detailHtml += `<div class="result-item">
+      <span class="${cls}">${icon}</span> <strong>Q${q.id}</strong> [${q.domain}]<br>
+      Your answer: <strong>${yourAns}</strong> | Correct: <strong>${correctAns}</strong>
+      ${!isCorrect ? `<div class="explanation">${q.explanation}</div>` : ''}
+    </div>`;
+  });
+  document.getElementById('results-detail').innerHTML = detailHtml;
+}
+
+function downloadCSV() {
+  const letters = ['A','B','C','D','E'];
+  let csv = 'Question,Domain,Type,Stem,Option_A,Option_B,Option_C,Option_D,Option_E,Correct_Answer,Your_Answer,Result\n';
+  questions.forEach((q, i) => {
+    const esc = s => '"' + (s || '').replace(/"/g, '""').replace(/\n/g, ' ') + '"';
+    const opts = [0,1,2,3,4].map(j => esc(q.options[j] || ''));
+    const correctAns = q.answer.map(a => letters[a]).join('+');
+    const yourAns = answers[i].length > 0 ? answers[i].map(a => letters[a]).join('+') : '';
+    const isCorrect = JSON.stringify([...answers[i]].sort()) === JSON.stringify([...q.answer].sort());
+    csv += `${q.id},${esc(q.domain)},${q.type},${esc(q.stem)},${opts.join(',')},${correctAns},${yourAns},${isCorrect ? 'Correct' : 'Wrong'}\n`;
+  });
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'saa-c03-mock-results.csv';
+  a.click();
+}
+
+document.addEventListener('keydown', (e) => {
+  if (examSubmitted) return;
+  
+  const reviewVisible = !document.getElementById('review-view').classList.contains('hidden');
+  
+  if (reviewVisible) {
+    if (e.key === 'Escape') { e.preventDefault(); hideReview(); }
+    return;
+  }
+
+  const q = questions[current];
+  const optCount = q.options.length;
+
+  switch(e.key) {
+    case 'j': e.preventDefault(); focus = Math.min(focus + 1, optCount - 1); render(); break;
+    case 'k': e.preventDefault(); focus = Math.max(focus - 1, 0); render(); break;
+    case ' ': e.preventDefault(); toggleOption(focus); break;
+    case 'n': e.preventDefault(); nextQ(); break;
+    case 'p': e.preventDefault(); prevQ(); break;
+    case 'f': e.preventDefault(); toggleFlag(); break;
+    case 'r': e.preventDefault(); showReview(); break;
+    case 'Enter': e.preventDefault(); toggleOption(focus); break;
+  }
+});
+
+startTimer();
+render();
+</script>
+</body>
+</html>

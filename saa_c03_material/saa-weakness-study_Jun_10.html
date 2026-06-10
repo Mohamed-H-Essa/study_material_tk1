@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAA-C03 Weakness Drill — Round 2</title>
+<style>
+:root{
+  --bg:#0e1116; --panel:#161b22; --panel2:#1c2330; --text:#d6dde6; --dim:#8b97a5;
+  --accent:#5ec8a8; --warn:#e0b35a; --bad:#e06c75; --good:#69c46d; --link:#6fb3e0;
+  --border:#2a3342; --code:#11151c;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.65 "JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;padding-bottom:50vh}
+.wrap{max-width:920px;margin:0 auto;padding:0 18px}
+nav{position:sticky;top:0;background:rgba(14,17,22,.95);border-bottom:1px solid var(--border);z-index:10;padding:6px 0;backdrop-filter:blur(4px)}
+nav .wrap{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12.5px}
+nav a{color:var(--dim);text-decoration:none}
+nav a:hover{color:var(--accent)}
+nav a b{color:var(--accent);font-weight:600}
+h1{color:var(--accent);font-size:22px;margin:26px 0 4px}
+h2{color:var(--accent);font-size:18px;border-bottom:1px solid var(--border);padding-bottom:6px;margin-top:48px}
+h2 .k{color:var(--dim);font-size:12px;font-weight:400;float:right}
+h3{color:var(--warn);font-size:15px;margin-top:26px}
+p{margin:10px 0}
+.dim{color:var(--dim)}
+code{background:var(--code);padding:1px 6px;border-radius:4px;font-size:13.5px;color:#a8d3f0}
+table{border-collapse:collapse;width:100%;margin:14px 0;font-size:13.5px}
+th,td{border:1px solid var(--border);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);color:var(--accent);font-weight:600}
+tr:nth-child(even) td{background:var(--panel)}
+.box{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:12px 16px;margin:16px 0}
+.box.warn{border-left-color:var(--warn)}
+.box.bad{border-left-color:var(--bad)}
+.box .t{font-weight:600;font-size:13px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px}
+.box.warn .t{color:var(--warn)} .box .t{color:var(--accent)} .box.bad .t{color:var(--bad)}
+ul,ol{margin:8px 0;padding-left:24px}
+li{margin:5px 0}
+.q{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:16px 20px;margin:26px 0}
+.q.focus{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.q .qh{color:var(--accent);font-weight:600;margin-bottom:8px}
+.q .domain{color:var(--dim);font-size:12px;float:right}
+.opt{display:block;padding:8px 12px;margin:6px 0;border:1px solid var(--border);border-radius:6px;cursor:pointer;background:var(--panel2)}
+.opt:hover{border-color:var(--dim)}
+.opt.sel{border-color:var(--link);background:#1a2738}
+.opt.right{border-color:var(--good);background:#15281a}
+.opt.wrong{border-color:var(--bad);background:#2c171a}
+.opt .L{color:var(--accent);font-weight:600;margin-right:8px}
+.btn{background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:6px 16px;border-radius:6px;cursor:pointer;font:inherit;font-size:13px;margin-top:8px}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.expl{display:none;margin-top:14px;border-top:1px dashed var(--border);padding-top:12px;font-size:14px}
+.expl.show{display:block}
+.verdict{font-weight:600;margin-bottom:8px}
+.verdict.ok{color:var(--good)} .verdict.no{color:var(--bad)}
+.flip{background:var(--code);border-radius:6px;padding:10px 14px;margin:10px 0;border-left:3px solid var(--link)}
+.flip .t{color:var(--link);font-weight:600;font-size:12.5px;text-transform:uppercase;letter-spacing:.5px}
+#help{display:none;position:fixed;bottom:20px;right:20px;background:var(--panel);border:1px solid var(--accent);border-radius:8px;padding:14px 18px;font-size:13px;z-index:99;box-shadow:0 8px 30px rgba(0,0,0,.6)}
+#help.show{display:block}
+#help kbd{background:var(--code);border:1px solid var(--border);border-radius:4px;padding:0 6px;color:var(--accent);margin-right:8px;display:inline-block;min-width:30px;text-align:center}
+.score{position:fixed;bottom:20px;left:20px;background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--dim);z-index:9}
+.score b{color:var(--accent)}
+@media (max-width:600px){body{font-size:14px}.q{padding:12px}}
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+<a href="#overview"><b>0</b> overview</a>
+<a href="#t1"><b>1</b> zonal-shift</a>
+<a href="#t2"><b>2</b> fsx</a>
+<a href="#t3"><b>3</b> aurora-global</a>
+<a href="#t4"><b>4</b> spot-vs-ri</a>
+<a href="#t5"><b>5</b> streaming</a>
+<a href="#t6"><b>6</b> vpc-endpoints</a>
+<a href="#t7"><b>7</b> cross-account</a>
+<a href="#quiz"><b>q</b> quiz</a>
+<a href="#" onclick="toggleHelp();return false"><b>?</b> keys</a>
+</div></nav>
+
+<div class="wrap">
+
+<h1 id="overview">SAA-C03 Weakness Drill — Round 2</h1>
+<p class="dim">Built from saa-c03-mock-results-2.csv · 8/15 (53.3%) · 7 misses analyzed below. Vim keys active — press <code>?</code>.</p>
+
+<table>
+<tr><th>Domain</th><th>Score</th><th>Missed concepts</th></tr>
+<tr><td>Resilient Architectures</td><td style="color:var(--bad)">1/4 (25%)</td><td>ARC Zonal Shift · Aurora Global DB failover · Kinesis vs SNS/SQS fan-out</td></tr>
+<tr><td>Secure Architectures</td><td>2/4</td><td>Gateway vs Interface endpoints · cross-account policy evaluation</td></tr>
+<tr><td>High-Performing</td><td>3/4</td><td>FSx for Lustre vs EFS (repeat offender)</td></tr>
+<tr><td>Cost-Optimized</td><td>2/3</td><td>Spot vs RI decision framework</td></tr>
+</table>
+
+<div class="box bad"><div class="t">The meta-pattern in your misses</div>
+5 of your 7 wrong answers chose a <b>plausible general-purpose tool</b> over a <b>purpose-built or managed one</b>: Lambda automation instead of ARC Zonal Shift, EFS instead of FSx Lustre, RIs instead of Spot, SNS FIFO instead of Kinesis. The SAA-C03 exam is fundamentally a test of "do you know AWS already built this?" When a question says <i>LEAST operational effort</i> or <i>purpose-built</i>, the answer is almost never "write a Lambda function" — that's the distractor for people who only know the 20 classic services.</div>
+
+<h2 id="t1">1 · AZ Impairment: ARC Zonal Shift &amp; Autoshift <span class="k">missed Q1</span></h2>
+
+<p>Picture the AZ that isn't dead, just <i>sick</i> — the dreaded <b>gray failure</b>. Health checks pass 80% of the time, latency is garbage, and your Auto Scaling group keeps cheerfully launching instances into the swamp because, technically, the AZ is "available". This exact scenario is why AWS built <b>Amazon Application Recovery Controller (ARC) Zonal Shift</b>.</p>
+
+<h3>What zonal shift actually does</h3>
+<ul>
+<li><b>Zonal shift</b> = you tell AWS "stop sending traffic to AZ-X for this resource." One API call (<code>start-zonal-shift</code>). Traffic drains from that AZ in minutes; the shift auto-expires (you set a duration, max ~3 days) so you can't forget and leave an AZ disabled forever.</li>
+<li><b>Zonal autoshift</b> = AWS itself starts the shift when <i>its internal telemetry</i> detects an AZ impairment — telemetry you cannot see from CloudWatch. You opt resources in, AWS handles detection and shift. This is the "least operational effort" champion.</li>
+<li>Supported resources: <b>ALB, NLB</b> (cross-zone load balancing <i>off</i> for classic zonal shift behavior), <b>EC2 Auto Scaling groups</b>, and EKS. When applied to an ASG, it also <b>stops launching new instances in the impaired AZ</b> — exactly what Q1 asked for.</li>
+<li>Autoshift includes <b>practice runs</b>: AWS periodically shifts your traffic for ~30 minutes to verify your remaining AZs can carry the load. If you can't survive a practice run, you can't survive a real outage.</li>
+</ul>
+
+<h3>Why your answer (CloudWatch + Lambda) loses</h3>
+<p>It's not <i>wrong</i> in the sense of "won't work" — it's wrong because (a) there is no reliable public CloudWatch metric for "this AZ is impaired" (gray failures are invisible to your metrics by definition), and (b) the question said LEAST operational effort. Custom Lambda = you own the detection logic, the rollback logic, the testing, and the 3 AM pages. Managed feature = a checkbox.</p>
+
+<div class="box warn"><div class="t">Confusion point: ARC has three sub-products</div>
+<ul>
+<li><b>Zonal shift / autoshift</b> — shift traffic away from one <i>AZ</i>. Free. Minutes to act.</li>
+<li><b>ARC routing controls + readiness checks</b> — manual, highly-reliable on/off switches for <i>Region</i>-level failover (works with Route 53 health checks). This is the heavyweight multi-Region DR product.</li>
+<li>If the question is about an <b>AZ</b> → zonal shift. About a <b>Region</b> → routing controls (or plain Route 53 failover). Distractors love to cross these.</li>
+</ul></div>
+
+<div class="box"><div class="t">Exam tips</div>
+<ul>
+<li>Keywords → answer: "gray failure", "AZ impairment", "stop sending traffic to one AZ", "recover before root cause is known" → <b>zonal shift</b>. Add "automatically, without human action" → <b>zonal autoshift</b>.</li>
+<li>"ASG keeps launching into a bad AZ" — the old-school answer was "remove the AZ from the ASG / suspend AZRebalance", and you may still see it on dated practice questions. If ARC zonal shift is among the options, it wins on operational effort.</li>
+<li>NLB/ALB note: zonal shift historically required cross-zone load balancing <b>disabled</b> (each AZ's nodes serve only their AZ). ALB/NLB with cross-zone on is now supported too, but if an option pairs zonal shift with "enable cross-zone load balancing" as the <i>mechanism</i>, be suspicious — cross-zone actually spreads traffic <i>into</i> all AZs including the sick one.</li>
+</ul></div>
+
+<h2 id="t2">2 · The FSx Family vs EFS — your recurring nemesis <span class="k">missed Q2</span></h2>
+
+<p>This cluster has now bitten you in two consecutive mocks, so let's kill it properly. The mental model: <b>EFS is the default Linux NFS share. Every FSx variant exists because EFS is the wrong answer for somebody.</b></p>
+
+<table>
+<tr><th>Service</th><th>It exists because…</th><th>Trigger words in the stem</th></tr>
+<tr><td><b>EFS</b></td><td>You want serverless, elastic NFS for general Linux workloads. Slowest of the bunch for HPC; per-GB priciest for hot data, but zero management.</td><td>"shared across many EC2/Lambda/containers", "elastic", "NFS", general web/app content, no extreme performance numbers</td></tr>
+<tr><td><b>FSx for Lustre</b></td><td>HPC. Hundreds of GB/s throughput, sub-ms latency, millions of IOPS, parallel POSIX access, and — the killer feature — <b>native S3 integration</b> (data repository association): lazy-loads S3 objects as files, writes results back to S3.</td><td>"HPC", "machine learning training", "genomics", "video rendering", "scratch", "sub-millisecond", "data lives in S3", "POSIX", "parallel"</td></tr>
+<tr><td><b>FSx for Windows File Server</b></td><td>Windows shops. SMB protocol, NTFS, <b>Active Directory</b> integration, DFS namespaces. The only correct answer when AD/SMB appears.</td><td>"SMB", "Active Directory", "Windows applications", ".NET legacy", "user home directories on Windows"</td></tr>
+<tr><td><b>FSx for NetApp ONTAP</b></td><td>You're migrating from on-prem NetApp, or you need <b>multi-protocol</b> (NFS + SMB + iSCSI on the same data), instant snapshots, cloning, dedup/compression, or <b>SnapMirror</b> replication from on-prem filers.</td><td>"NetApp", "SnapMirror", "both Linux and Windows clients access the same data", "iSCSI", "storage efficiency"</td></tr>
+<tr><td><b>FSx for OpenZFS</b></td><td>Lift-and-shift from on-prem ZFS/NFS servers needing very low latency and ZFS snapshots/clones, single-AZ style performance.</td><td>"ZFS", "on-prem NFS server migration", "snapshots and clones", low-latency NFS</td></tr>
+</table>
+
+<h3>Replaying Q2 as a story</h3>
+<p>A genomics pipeline: FASTQ files in S3, POSIX tools, parallel reads across hundreds of files, sub-ms scratch latency. Read those requirements like a detective: <b>"POSIX + parallel + sub-ms + data in S3"</b> is a four-word confession that the culprit is Lustre. The S3 link means Lustre <i>presents your bucket as a file system</i> — no copy step, lazy loading on first read, <code>hsm_archive</code> to push results back. EFS Provisioned Throughput (your pick) gives you maybe a few GB/s at painful cost and ~ms latencies — it's the family sedan entered into a drag race. The second correct answer, Spot via EventBridge, follows from "5–10 jobs/day, cost-effective, restartable": batch + interruptible = Spot.</p>
+
+<div class="box warn"><div class="t">Confusion points</div>
+<ul>
+<li><b>Lustre deployment types matter:</b> <i>scratch</i> (cheap, no replication, for temporary processing — perfect for ETL/training runs) vs <i>persistent</i> (replicated within an AZ, for long-lived data). "Scratch storage during analysis" in a stem is literally naming the deployment type.</li>
+<li><b>EFS can't link to S3.</b> If the stem says data arrives in S3 and must be processed via a file interface, Lustre's DRA is the differentiator. (DataSync copying S3→EFS is the clunky distractor.)</li>
+<li><b>FSx for Windows is never the answer for Linux POSIX workloads</b> — SMB ≠ POSIX semantics. It's pure bait in HPC questions (it was option E in your Q2).</li>
+<li><b>EFS One Zone + IA</b> exist for cost questions; <b>EFS Max I/O vs General Purpose</b> for scale questions. If the stem is about <i>thousands of Lambda functions</i> sharing files → EFS, full stop — Lustre doesn't mount on Lambda.</li>
+</ul></div>
+
+<div class="box"><div class="t">Exam tips</div>
+<ul>
+<li>Decision in 3 questions: <b>Windows/AD?</b> → FSx Windows (or ONTAP if mixed protocols). <b>HPC/S3-linked/extreme perf?</b> → Lustre. <b>Otherwise Linux shared storage?</b> → EFS.</li>
+<li>"NetApp" or "SnapMirror" appearing anywhere = FSx for ONTAP, instantly. AWS doesn't put brand names in stems as decoration.</li>
+<li>Numbers are signals: "hundreds of GB/s", "millions of IOPS" → only Lustre delivers. EFS tops out far lower.</li>
+</ul></div>
+
+<h2 id="t3">3 · Aurora Global Database: switchover vs failover vs detach <span class="k">missed Q5</span></h2>
+
+<p>Aurora Global Database = one primary Region (read/write) + up to 5 secondary Regions (read-only) with <b>storage-level replication, typically &lt;1 second lag</b>. The whole exam game here is: <i>how do you make a secondary Region the new primary, and what happens to your data and topology when you do?</i> There are three doors:</p>
+
+<table>
+<tr><th>Mechanism</th><th>When</th><th>RPO</th><th>Topology after</th></tr>
+<tr><td><b>Managed planned failover ("switchover")</b></td><td>Planned events only: DR drills, Region rotation, compliance moves. Requires a <i>healthy</i> primary — it waits for full sync.</td><td><b>0</b> (no data loss, by design)</td><td><b>Preserved</b> — old primary automatically becomes a secondary. Replication relationships intact.</td></tr>
+<tr><td><b>Managed unplanned failover ("failover")</b></td><td>Real regional outage; primary is unreachable. You initiate it against a secondary.</td><td>Whatever the replication lag was (typically ~1s, your RPO requirement)</td><td>Preserved/rebuilt by AWS once the old Region recovers — it re-joins as a secondary.</td></tr>
+<tr><td><b>Detach-and-promote</b></td><td>The classic manual method (and the one most practice exams still expect): remove the secondary from the global database; it becomes a standalone read/write cluster immediately.</td><td>Replication lag (~1s)</td><td><b>Destroyed</b> — you must rebuild the global database (re-add Regions) afterward.</td></tr>
+</table>
+
+<h3>Why Q5 went sideways</h3>
+<p>The stem: real DR with RPO 1s / RTO 1min, automatic DNS. Two things had to click. First, <b>managed <i>planned</i> failover is useless in an actual outage</b> — it needs the primary alive to sync to RPO 0. Option C dangled "maintains the Global Database topology" as the sweetener, but it's the planned-event tool. During an unplanned regional outage, the classic answer is <b>detach and promote</b> (option D). Second, the DNS half: RPO/RTO language + "primary and DR" = <b>active-passive</b> → Route 53 <b>failover routing</b> with health checks (A). Latency-based routing (B) is for <i>active-active</i> — it would happily route EU users to your read-only DR Region during normal operation, where every write fails. You picked A+B, two routing policies for one decision — on Select-TWO questions, if two options answer the <i>same sub-requirement</i>, at most one can be right; the other correct option covers the <i>other</i> sub-requirement.</p>
+
+<div class="box warn"><div class="t">Confusion points</div>
+<ul>
+<li><b>Global Database vs cross-Region read replica:</b> Global DB replicates at the <i>storage layer</i> (~1s lag, dedicated infrastructure); cross-Region Aurora replicas use logical replication (seconds-to-minutes lag). RPO ≤ 1s in a stem ⇒ Global Database.</li>
+<li><b>RTO math:</b> promoting a Global DB secondary takes ~1 minute. Restoring from cross-Region snapshots takes hours. Stems encode the answer in the RTO number.</li>
+<li><b>Write forwarding:</b> secondary Regions can <i>accept</i> writes and forward them to the primary — a perf/UX feature, not a DR feature. Distractor bait.</li>
+<li>If the stem says "no data loss is acceptable, the migration is scheduled for a maintenance window" → that's <i>planned</i> → switchover, RPO 0. The same words "managed failover" flip meaning with context.</li>
+</ul></div>
+
+<div class="box"><div class="t">Exam tips</div>
+<ul>
+<li>Route 53 policy cheat-line: <b>failover</b> = active-passive DR · <b>latency</b> = active-active performance · <b>weighted</b> = canary/blue-green · <b>geolocation</b> = compliance/content rights ("EU users must…") · <b>geoproximity</b> = shift traffic share with a bias dial · <b>multivalue</b> = poor man's load balancing.</li>
+<li>Aurora Global DB supports <b>RPO ~1s / RTO ~1min</b>. Memorize that pair; questions quote it almost verbatim.</li>
+<li>DynamoDB's equivalent story is <b>global tables</b> (active-active, last-writer-wins) — if the stem wants multi-Region <i>active-active writes</i> with no failover ceremony, DynamoDB global tables beat Aurora.</li>
+</ul></div>
+
+<h2 id="t4">4 · Spot vs RI vs Savings Plans: the decision is about interruption, not the calendar <span class="k">missed Q8</span></h2>
+
+<p>Your Q8 miss is a classic anchoring trap. You saw "consistent, 365 days/year" and reached for Reserved Instances. But the purchasing decision tree starts with a different question entirely:</p>
+
+<div class="box"><div class="t">The decision tree (in order)</div>
+<ol>
+<li><b>Can the workload tolerate interruption</b> (stateless / checkpointable / restartable) <b>AND is there schedule slack?</b> → <b>Spot</b>. Up to 90% off. Nothing else comes close. Period.</li>
+<li>If not interruptible: <b>is it steady-state for 1–3 years?</b> → Savings Plans (Compute SP for flexibility across instance family/Region/Fargate/Lambda; EC2 Instance SP for deeper discount, locked to a family+Region) or Standard RIs (similar discount; RIs still matter for capacity reservations and RDS/ElastiCache/Redshift, where Savings Plans don't apply).</li>
+<li>Spiky and not interruptible? → On-Demand for the spikes on top of a committed baseline.</li>
+</ol></div>
+
+<p>Q8's workload: independent shards, <b>safe to restart</b>, runs at midnight with a deadline of 8 AM — i.e., a 2–4 hour job with a 4–6 hour buffer. That buffer is the stem whispering "interruptions are fine, we'll just retry." Spot at ~70–90% off beats a 1-year RI at ~40% off by a mile. The "runs 365 days/year" detail is camouflage — consistency makes RIs <i>possible</i>, not <i>optimal</i>.</p>
+
+<h3>Spot done properly (the part that makes option B "complete")</h3>
+<ul>
+<li><b>Diversify</b>: multiple instance types × multiple AZs = many Spot capacity pools; one pool drying up doesn't kill the fleet. The exam loves "at least N instance types across M AZs".</li>
+<li><b>Allocation strategy</b>: use <code>price-capacity-optimized</code> (or capacity-optimized) — picks pools least likely to be interrupted. <code>lowest-price</code> is the false-economy distractor: cheapest pools get reclaimed most.</li>
+<li><b>2-minute interruption notice</b> via EventBridge → checkpoint or drain gracefully.</li>
+<li><b>Spot placement scores</b>: ask AWS "how likely will I get N instances of these types here?" before committing.</li>
+</ul>
+
+<div class="box warn"><div class="t">Confusion points</div>
+<ul>
+<li><b>"50% Spot / 50% On-Demand"</b> style options are compromise bait — they sound prudent but the stem asked for GREATEST savings on an interruptible workload. Mixed fleets are right only when the stem demands a guaranteed baseline (e.g., "must always have at least X capacity") plus burst.</li>
+<li><b>Savings Plans don't cover RDS.</b> RDS/ElastiCache/Redshift/OpenSearch use Reserved Instances/Reserved Nodes. A stem about committing to database spend → RI, never SP.</li>
+<li><b>Spot Blocks are dead</b> (no longer available). Any option offering "defined-duration Spot" on a current exam is wrong.</li>
+<li><b>Capacity guarantee ≠ discount:</b> On-Demand Capacity Reservations guarantee capacity with zero discount; pair with a Savings Plan to get both. "Must guarantee capacity for a flash sale in a specific AZ" → ODCR, not RI.</li>
+</ul></div>
+
+<div class="box"><div class="t">Exam tips</div>
+<ul>
+<li>Scan stems for the magic words: <i>fault-tolerant, stateless, can be restarted/resumed, checkpoints, flexible deadline, batch</i> → Spot. <i>Cannot be interrupted, stateful, licensing tied to host</i> → never Spot (and "tied to host / per-socket licensing" → Dedicated Host).</li>
+<li>Compute Savings Plan vs EC2 Instance SP: stems that mention "might move to Fargate/Lambda" or "instance family may change" → Compute SP. "Committed to m5 in us-east-1, wants max discount" → EC2 Instance SP.</li>
+</ul></div>
+
+<h2 id="t5">5 · Fan-out, ordering, and replay: Kinesis vs SNS vs SQS <span class="k">missed Q9</span></h2>
+
+<p>Three requirements walked into Q9: <b>(1) every consumer gets every event, (2) ordering per shipment, (3) a consumer that goes down must catch up later.</b> Your SNS FIFO → SQS FIFO answer handles (1) and (2). It dies on a fourth requirement hiding in the numbers — and partially on (3).</p>
+
+<h3>The differentiator nobody internalizes: replay</h3>
+<p>SQS is a <b>destructive read</b>: consume, delete, gone. If billing has a bug and processes 3 days of events incorrectly, those messages no longer exist to re-process. Kinesis is a <b>log</b>: records sit in the stream for 24h (default) up to <b>365 days</b>, and every consumer keeps its own iterator position. A consumer that was down for maintenance just resumes from its checkpoint; a consumer with a bug rewinds and replays. "Catch up on missed events" <i>can</i> be read as mere buffering (SQS does that), but "process at their own pace" + replay semantics + the next point make Kinesis the fit.</p>
+
+<h3>The throughput ceiling that kills SNS FIFO</h3>
+<p>SNS FIFO topics have hard throughput limits — on the order of 300 messages/sec per topic (up to ~3,000/sec in high-throughput mode, region dependent, and per message-group constraints apply). The stem said 2,000/sec sustained with bursts to 8,000. Kinesis scales by adding shards: each shard = 1 MB/s or 1,000 records/sec in; partition key = shipment tracking number gives per-key ordering across any number of shards. When a FIFO option meets the logic but the stem quotes thousands of events per second, check the ceiling.</p>
+
+<table>
+<tr><th>Need</th><th>SQS Std</th><th>SQS FIFO</th><th>SNS→SQS fan-out</th><th>Kinesis Data Streams</th></tr>
+<tr><td>Multiple independent consumers, each gets all events</td><td>✗ (competing consumers)</td><td>✗</td><td>✓</td><td>✓ (each app = own iterator; enhanced fan-out for dedicated 2MB/s per consumer)</td></tr>
+<tr><td>Strict ordering per key</td><td>✗</td><td>✓ (message group ID)</td><td>✓ if FIFO topic+queues</td><td>✓ (partition key → shard)</td></tr>
+<tr><td>Replay / rewind history</td><td>✗</td><td>✗</td><td>✗</td><td>✓ (up to 365 days)</td></tr>
+<tr><td>Very high throughput</td><td>✓</td><td>limited</td><td>FIFO: limited</td><td>✓ (add shards / on-demand mode)</td></tr>
+<tr><td>Per-message delay, DLQ, visibility timeout</td><td>✓</td><td>✓</td><td>via queues</td><td>✗ (consumer manages)</td></tr>
+</table>
+
+<div class="box warn"><div class="t">Confusion points</div>
+<ul>
+<li><b>EventBridge</b> is for <i>routing and filtering events between services</i> (SaaS integrations, cron, rule-based fan-out at modest scale, no ordering guarantee, no replay-as-consumption — its "archive &amp; replay" re-publishes, it isn't a consumer rewind). Stems about reacting to AWS service events or SaaS webhooks → EventBridge. Stems about high-volume ordered data pipelines → Kinesis.</li>
+<li><b>"Each consumer processes at its own pace"</b> fits both SQS (buffer) and Kinesis (iterator). Tie-break with throughput, ordering scope, and replay.</li>
+<li><b>Kinesis vs DynamoDB Streams</b>: changes <i>from a DynamoDB table</i> → DynamoDB Streams (or Kinesis Data Streams for DynamoDB if &gt;2 consumers / longer retention needed).</li>
+<li><b>Data Firehose</b> is delivery (to S3/Redshift/OpenSearch/HTTP), near-real-time, no consumers, no ordering promise, no replay. "Load streaming data into S3 with zero administration" → Firehose. "Multiple applications consume" → Streams.</li>
+</ul></div>
+
+<div class="box"><div class="t">Exam tips</div>
+<ul>
+<li>Keyword map: <i>replay / reprocess / multiple apps read same data / ordered per key at scale / clickstream / IoT telemetry</i> → Kinesis Data Streams. <i>Decouple two services / buffer / retry / exactly-once with FIFO at modest volume</i> → SQS. <i>Push fan-out to many subscribers incl. email/SMS/Lambda</i> → SNS. <i>Filter and route events by content / schedule / SaaS</i> → EventBridge.</li>
+<li>SQS Standard = at-least-once + best-effort ordering. SQS FIFO = exactly-once + ordered, ~300 TPS (3,000 with batching, higher in high-throughput mode). Quota numbers are exam ammunition.</li>
+</ul></div>
+
+<h2 id="t6">6 · VPC Endpoints: gateway is a two-member club <span class="k">missed Q10</span></h2>
+
+<p>This one is brutally memorizable, so let's make it permanent: <b>Gateway endpoints exist for exactly two services — S3 and DynamoDB. Everything else is an interface endpoint.</b> SSM, KMS, SQS, SNS, ECR, CloudWatch, STS, Secrets Manager… all interface. Your Q10 pick (gateway endpoint for SSM) doesn't exist as a product.</p>
+
+<table>
+<tr><th></th><th>Gateway endpoint</th><th>Interface endpoint (PrivateLink)</th></tr>
+<tr><td>Services</td><td><b>S3, DynamoDB only</b></td><td>Nearly everything else (incl. S3 too — see below)</td></tr>
+<tr><td>What it is</td><td>A route-table target (prefix list → endpoint)</td><td>An ENI with a private IP in your subnet</td></tr>
+<tr><td>Cost</td><td><b>Free</b></td><td>~$0.01/hr per AZ + per-GB data</td></tr>
+<tr><td>Reachable from on-prem (DX/VPN)?</td><td><b>No</b> — only from within the VPC's route tables</td><td><b>Yes</b></td></tr>
+<tr><td>Cross-Region / peered VPC?</td><td>No</td><td>Yes (via peering/TGW; ENIs are IPs)</td></tr>
+<tr><td>Security control</td><td>Endpoint policy + route table association</td><td>Endpoint policy + <b>security groups</b> on the ENI</td></tr>
+</table>
+
+<h3>Why S3 has both, and when each wins</h3>
+<p>Inside a VPC and cost-sensitive? <b>Gateway</b> (free) — the default right answer. But the moment the stem says <i>on-premises servers must reach S3 privately over Direct Connect/VPN</i>, or <i>access from a peered VPC</i>, the gateway endpoint silently stops working (it's just a route-table trick, invisible to anything outside the VPC) and the answer flips to an <b>interface endpoint for S3</b>. This flip is one of the exam's favorite traps.</p>
+
+<h3>The SSM detail from Q10</h3>
+<p>Systems Manager actually needs interface endpoints for <code>ssm</code>, <code>ssmmessages</code>, and <code>ec2messages</code> (the latter two for Session Manager). Exam stems usually simplify to "an interface endpoint for SSM" — fine. Bonus from Q10's correct pair: instances in fully isolated subnets reach AWS APIs via interface endpoints; instances needing the <i>public internet</i> (third-party APIs) need NAT Gateway — endpoints can't route to the internet, NAT can't keep AWS traffic private. Two requirements, two tools, hence A+B.</p>
+
+<div class="box warn"><div class="t">Confusion points</div>
+<ul>
+<li>"Traffic must not traverse the internet" alone ⇒ any VPC endpoint qualifies. Add "minimize cost" + S3/DynamoDB ⇒ gateway. Add "from on-prem" ⇒ interface.</li>
+<li>Interface endpoints have <b>private DNS</b>: enable it and the normal service hostname (e.g. <code>sqs.eu-west-1.amazonaws.com</code>) resolves to the ENI's private IP — no app changes. Stems saying "without modifying application code" hint at this.</li>
+<li><b>Gateway endpoint ≠ NAT Gateway ≠ Internet Gateway.</b> Three unrelated things that share a word. NAT GW = private subnet → internet (outbound). IGW = VPC ↔ internet. Gateway VPC endpoint = VPC → S3/DynamoDB privately.</li>
+<li><b>VPC endpoint policies</b> restrict <i>what</i> can be done through the endpoint (e.g., only <code>ssm:GetParameter</code>, or only a specific bucket) — combine with bucket policies using <code>aws:sourceVpce</code> for "only accessible from my VPC" requirements.</li>
+</ul></div>
+
+<h2 id="t7">7 · Cross-account access: both gates must open <span class="k">missed Q12</span></h2>
+
+<p>Think of cross-account access as a door with <b>two locks, one keyed by each account</b>. Within a single account, an IAM identity policy alone can grant access to a bucket. The moment the principal and the resource live in <i>different</i> accounts, the evaluation rule changes: <b>the identity's policy (or the assumed role's permissions) must allow the action AND the resource-based policy (bucket policy, KMS key policy, SQS queue policy…) must allow that principal.</b> Either lock stays shut → <code>AccessDenied</code>.</p>
+
+<h3>Replaying Q12</h3>
+<p>The role assumption succeeded — so trust policy and <code>sts:AssumeRole</code> permissions are fine, and the role <i>has</i> an S3 read-only IAM policy attached. So lock #1 is open. The stem even told you lock #2 must exist: "the bucket policy must explicitly control which accounts can access data" — and then <code>s3:GetObject</code> fails. The missing piece is the bucket policy granting the role's ARN. You picked SCP — but an SCP is a <i>deny-by-omission guardrail</i> the question gave you zero evidence for, while it gave you direct evidence about the bucket policy mandate. On "MOST LIKELY cause" questions, pick the cause the stem planted evidence for, not the exotic one.</p>
+
+<div class="box warn"><div class="t">Confusion points</div>
+<ul>
+<li><b>Wait — if you assume a role IN the bucket's account, do you still need the bucket policy?</b> Subtle but examable: once the production app assumes a role that lives in the shared-services account, it <i>becomes</i> a principal of that account, and same-account rules apply — the role's identity policy alone can suffice <i>unless</i> the bucket policy has explicit denies or, as here, the security mandate requires the bucket policy to be the explicit gate (and a bucket policy that grants only specific principals, combined with the stem's framing, makes B the expected answer). Direct cross-account access (no role assumption, e.g. account A's user hitting account B's bucket) <i>always</i> needs both policies.</li>
+<li><b>KMS is stricter:</b> the key policy is the root of trust. Cross-account use of a CMK requires the key policy to grant the external account/principal AND the external principal's IAM policy to allow the kms: actions. A huge class of "encrypted snapshot/S3 object can't be read cross-account" answers = "the KMS key policy doesn't grant the other account." Default <code>aws/s3</code> managed keys <b>cannot</b> be granted cross-account at all — sharing encrypted data cross-account requires a customer-managed key.</li>
+<li><b>S3 Object Ownership:</b> historically, objects uploaded by another account were owned by the uploader, and the bucket owner couldn't read them (the <code>bucket-owner-full-control</code> ACL dance). Modern answer: set Object Ownership to <b>Bucket owner enforced</b>, which disables ACLs entirely. Old practice exams test the ACL dance; newer ones test the setting.</li>
+<li><b>Explicit deny wins everywhere.</b> Evaluation order: explicit deny → SCP allows? → resource policy / identity policy allow → permission boundary / session policy don't restrict. An SCP never <i>grants</i> anything; it only caps.</li>
+<li><b>External ID</b> belongs in third-party vendor role-assumption stems (confused deputy problem) — if "a partner/SaaS needs access to your account", the trust policy + <code>sts:ExternalId</code> condition is the answer.</li>
+</ul></div>
+
+<div class="box"><div class="t">Exam tips</div>
+<ul>
+<li>Debug-style questions ("works partially, then AccessDenied"): identify which step succeeded, eliminate everything that step already proved, then pick the next gate in the chain.</li>
+<li>Resource-based policy vs role assumption: resource policy = the caller keeps their own identity (good for S3/SQS/SNS/KMS/Lambda). Role assumption = caller switches hats (needed for services without resource policies, e.g. DynamoDB*, and for console access). *DynamoDB now has resource-based policies, but most question banks predate it.</li>
+</ul></div>
+
+<h2 id="quiz">Practice Drill — 14 questions, exam difficulty <span class="k">n/p navigate · 1-5 or a-e select · Enter check</span></h2>
+<p class="dim">Each question targets a missed concept, with distractors built the way AWS builds them: technically real services, plausible logic, one fatal flaw. Answers include "flip scenarios" — the small stem change that would make a distractor correct.</p>
+
+<div id="quizzone"></div>
+
+</div><!--wrap-->
+
+<div id="help">
+<div style="color:var(--accent);font-weight:600;margin-bottom:8px">vim keys</div>
+<div><kbd>j</kbd>/<kbd>k</kbd> scroll · <kbd>d</kbd>/<kbd>u</kbd> half-page</div>
+<div><kbd>gg</kbd> top · <kbd>G</kbd> bottom</div>
+<div><kbd>1</kbd>–<kbd>7</kbd> topic · <kbd>0</kbd> overview · <kbd>q</kbd> quiz</div>
+<div><kbd>n</kbd>/<kbd>p</kbd> next/prev question</div>
+<div><kbd>a</kbd>–<kbd>e</kbd> toggle option · <kbd>⏎</kbd> check</div>
+<div><kbd>?</kbd> toggle this help</div>
+</div>
+<div class="score">drill: <b id="sc">0/0</b></div>
+
+<script>
+const QUESTIONS = [
+{
+ dom:"Resilient", multi:false,
+ stem:"A company runs a payment API on EC2 instances in an Auto Scaling group across three AZs behind an ALB. During an incident, one AZ experiences intermittent packet loss that does not fail ELB health checks, but customer-facing latency triples. The operations team wants the ability to immediately move all traffic out of the suspect AZ with a single action that automatically reverts after a set time, while AWS engineers investigate. The team also wants AWS to perform this traffic move automatically in the future whenever AWS detects an AZ impairment, and wants regular verification that the remaining AZs can absorb the load. Which solution meets these requirements?",
+ opts:[
+ "Configure a CloudWatch composite alarm on per-AZ latency metrics that triggers a Lambda function to deregister the AZ's targets from the ALB target group, and a second Lambda to re-register them after one hour.",
+ "Use Amazon Application Recovery Controller zonal shift for immediate manual shifts, and enable zonal autoshift with practice runs on the ALB.",
+ "Enable ALB cross-zone load balancing so healthy AZs automatically absorb traffic from the impaired AZ, and configure target group health thresholds.",
+ "Create ARC routing controls with readiness checks for each AZ and toggle the routing control state during impairments."
+ ],
+ ans:[1],
+ expl:`<p><b>B.</b> This is the gray-failure script: health checks pass, customers suffer. Zonal shift is the one-action, auto-expiring traffic move; zonal <i>autoshift</i> is the "AWS does it for me" half; <b>practice runs</b> are literally the requested "regular verification that remaining AZs can absorb the load" — when a stem describes a feature's documentation bullet points, it's naming the service.</p>
+ <p><b>Why the others lose:</b> A is the DIY trap — it can work, but you own detection (against an impairment your metrics may not even see cleanly), reversal, and testing; it also can't satisfy "AWS performs this automatically using its own telemetry." C actively makes things worse: cross-zone load balancing sprays traffic from healthy-AZ load balancer nodes <i>into</i> the sick AZ's targets. D confuses ARC's sub-products — routing controls are the Region-level failover switchboard, heavyweight and not AZ-granular in intent.</p>
+ <div class="flip"><div class="t">Flip scenario</div>If the stem were about failing over an entire <b>Region</b> with audited, manual, quorum-protected switches → D (ARC routing controls + readiness checks) becomes correct. AZ ⇒ zonal shift; Region ⇒ routing controls / Route 53 failover.</div>`
+},
+{
+ dom:"Resilient", multi:false,
+ stem:"An Auto Scaling group spans AZs a, b, and c. During a confirmed impairment of AZ-c, the operations team starts an ARC zonal shift for the Auto Scaling group. Which statement describes the behavior during the shift?",
+ opts:[
+ "Existing instances in AZ-c are immediately terminated and replacement instances launch in AZs a and b.",
+ "The Auto Scaling group avoids launching new instances in AZ-c for the duration of the shift, and the shift expires automatically at the configured time.",
+ "The Auto Scaling group is frozen entirely; no scaling activities occur in any AZ until the shift is cancelled.",
+ "The AZ is permanently removed from the Auto Scaling group configuration and must be re-added manually after recovery."
+ ],
+ ans:[1],
+ expl:`<p><b>B.</b> Zonal shift is deliberately gentle and deliberately temporary: stop <i>adding</i> capacity to the sick AZ, let the shift lapse on its own (you set an expiry, extendable) so a 3 AM mitigation can't become a permanent misconfiguration. It does not mass-terminate (A — that would amplify the incident), does not freeze scaling elsewhere (C — healthy AZs keep scaling, which is the whole point), and does not edit your ASG config (D — that's the old manual remediation zonal shift replaces).</p>
+ <div class="flip"><div class="t">Exam angle</div>"Auto-expiring" is the tell that distinguishes zonal shift from manual AZ removal in answer options. AWS designs safety into managed mitigations; options describing destructive or permanent side effects are usually describing the DIY approach's risks.</div>`
+},
+{
+ dom:"High-Performing", multi:false,
+ stem:"A visual-effects studio renders film frames using a 400-node Linux EC2 cluster. Source assets (50 TB) live in Amazon S3. The render farm needs a shared POSIX file system delivering hundreds of GB/s of aggregate throughput and sub-millisecond latency. Jobs run for 6–10 hours; afterward, final frames must land back in S3 and the file system is no longer needed until the next job. The studio wants the LOWEST-cost storage that meets the performance need. Which solution should the architect recommend?",
+ opts:[
+ "Amazon EFS with Max I/O performance mode and Provisioned Throughput, with AWS DataSync jobs copying assets from S3 before each render.",
+ "Amazon FSx for Lustre persistent file system with HDD storage, linked to the S3 bucket.",
+ "Amazon FSx for Lustre scratch file system linked to the S3 bucket with a data repository association, exporting results back to S3 after the job.",
+ "Amazon FSx for NetApp ONTAP multi-AZ file system with NFS exports mounted on all render nodes."
+ ],
+ ans:[2],
+ expl:`<p><b>C.</b> All four Lustre fingerprints are present: POSIX, extreme parallel throughput, data living in S3, temporary scratch use. The deployment-type detail decides between B and C: <b>scratch</b> file systems are cheaper, unreplicated, and built exactly for "spin up, crunch, export to S3, delete" — the stem says the file system is unneeded between jobs. Persistent + HDD (B) is for long-lived, throughput-tolerant data, and HDD contradicts sub-millisecond latency anyway.</p>
+ <p><b>Why A fails twice:</b> EFS can't hit hundreds of GB/s, and the DataSync pre-copy step is the clunky imitation of what a Lustre data repository association does natively (lazy-load on first access — render nodes start in minutes, not after a 50 TB copy). D is real and POSIX-capable but priced and engineered for enterprise NAS workloads, not burst HPC, and has no S3 integration.</p>
+ <div class="flip"><div class="t">Flip scenarios</div>If the cluster also ran <b>Windows</b> nodes needing SMB to the same data → ONTAP (D) enters the chat. If the file system held <b>long-lived</b> shared data that must survive hardware failure → persistent Lustre (B). If the consumers were <b>thousands of Lambda functions</b> → EFS (A) is suddenly the only mountable option.</div>`
+},
+{
+ dom:"High-Performing", multi:false,
+ stem:"A manufacturing company is migrating its on-premises NetApp storage arrays to AWS. The arrays serve engineering data to Linux workstations over NFS and to Windows clients over SMB — the same volumes via both protocols. The company relies on instant volume snapshots and thin clones for test environments, and wants to replicate data from the remaining on-premises NetApp arrays to AWS during a 12-month transition using its existing replication tooling. Which AWS service meets these requirements?",
+ opts:[
+ "Amazon FSx for OpenZFS with NFS exports, using AWS DataSync for ongoing replication from on-premises.",
+ "Amazon FSx for NetApp ONTAP, using SnapMirror replication from the on-premises arrays.",
+ "Amazon EFS with AWS Storage Gateway (File Gateway) providing SMB access for Windows clients.",
+ "Amazon FSx for Windows File Server with multi-protocol access enabled for NFS clients."
+ ],
+ ans:[1],
+ expl:`<p><b>B.</b> Three locks, one key: dual-protocol NFS+SMB on the same data (only ONTAP), snapshots + thin clones (FlexClone — ONTAP's signature), and "existing replication tooling" from NetApp arrays = <b>SnapMirror</b>, which speaks natively to FSx for ONTAP. When a stem names a vendor, AWS is pointing at the lift-and-shift service for that vendor.</p>
+ <p><b>Distractor anatomy:</b> A — OpenZFS does great snapshots/clones but is NFS-only and DataSync ≠ "existing replication tooling." C — EFS has no SMB story; bolting File Gateway onto it is Frankenstein architecture (and File Gateway fronts S3, not EFS). D — FSx for Windows is SMB-only; "multi-protocol access" there is fictional.</p>
+ <div class="flip"><div class="t">Flip scenario</div>Remove the Windows/SMB and NetApp mentions, keep "on-prem ZFS-based NFS server, needs snapshots and low latency" → A (OpenZFS) becomes the answer. The vendor noun is the rudder.</div>`
+},
+{
+ dom:"Resilient", multi:true,
+ stem:"A trading platform uses Amazon Aurora PostgreSQL with an Aurora Global Database: primary in eu-west-1, secondary in us-east-2. Compliance requires quarterly DR exercises that relocate the primary Region with ZERO data loss, and the production runbook must also cover a true regional outage of eu-west-1 with an RPO of about 1 second. Which combination of actions correctly maps mechanisms to scenarios? (Select TWO.)",
+ opts:[
+ "For the quarterly exercise, perform a managed planned failover (switchover), which synchronizes fully before switching and preserves the global database topology.",
+ "For the quarterly exercise, detach the secondary cluster from the global database and promote it, then rebuild replication toward eu-west-1.",
+ "For a true regional outage, perform a managed planned failover (switchover) to us-east-2 to avoid any data loss.",
+ "For a true regional outage, fail over to us-east-2 (promote the secondary), accepting up to the current replication lag (~1 second) as data loss.",
+ "For a true regional outage, restore the latest automated cross-Region snapshot in us-east-2 to meet the 1-second RPO."
+ ],
+ ans:[0,3],
+ expl:`<p><b>A + D.</b> The exact pairing Q5 tested, isolated. Planned exercise + zero data loss + keep topology = <b>switchover</b> (it refuses to proceed until replication is fully caught up — which is also why it's impossible during an outage: there's nothing healthy to catch up <i>from</i>). Real outage = promote the secondary (managed unplanned failover, or classically detach-and-promote) and eat the ~1s of lag — that lag <i>is</i> your RPO.</p>
+ <p><b>Why the rest fail:</b> B does work mechanically but gratuitously destroys topology and forfeits the zero-data-loss guarantee the managed switchover provides — wrong tool for a planned drill. C is the conceptual trap: "planned failover avoids data loss, so use it in the outage!" — it can't run when the primary is down. E: snapshots are hours of RPO; the number in the stem disqualifies it instantly.</p>
+ <div class="flip"><div class="t">Exam tip</div>Match the adjective: <b>planned</b>/maintenance/drill/rotation → switchover, RPO 0. <b>Unplanned</b>/outage/unreachable → failover/promote, RPO = replication lag. Any snapshot-restore option in a sub-minute RPO stem is dead on arrival.</div>`
+},
+{
+ dom:"Resilient", multi:false,
+ stem:"A media company serves a web application from us-east-1 with a warm-standby copy in ap-southeast-1. The standby Region runs a scaled-down but functional stack. The company wants Route 53 to send all traffic to us-east-1 during normal operation and route to ap-southeast-1 only if the primary's ALB fails health checks — and wants to avoid the standby receiving production traffic during normal operation under any circumstances. Which routing configuration meets this?",
+ opts:[
+ "Latency-based routing with health checks on both ALBs.",
+ "Failover routing with the us-east-1 ALB as the primary record and ap-southeast-1 as the secondary record, with a health check on the primary.",
+ "Weighted routing with weights 100 (us-east-1) and 0 (ap-southeast-1) and health checks on both records.",
+ "Geoproximity routing with a positive bias toward us-east-1."
+ ],
+ ans:[1],
+ expl:`<p><b>B.</b> "All traffic to primary, standby only on failure" is the literal definition of failover routing. This is the active-passive half of your Q5 miss, drilled alone.</p>
+ <p><b>The sneaky one is C:</b> weighted 100/0 <i>looks</i> equivalent, and Route 53 even has special handling (weight 0 records can serve if all non-zero records are unhealthy) — but it's an abuse of a feature designed for canary/blue-green splits, fails the "under any circumstances" cleanliness test versus a purpose-built policy, and on the exam the purpose-built policy beats the clever hack every time. A would route Asian users to the standby during <i>normal</i> operation — exactly what was forbidden. D shifts proportions; it cannot express "all or nothing."</p>
+ <div class="flip"><div class="t">Flip scenario</div>Change the requirement to "serve every user from the nearest healthy Region" (true active-active) → A. Change to "shift 10% of traffic to the new Region to test it" → C. The stems differ by one sentence; the policies are unambiguous once you map them.</div>`
+},
+{
+ dom:"Cost-Optimized", multi:false,
+ stem:"A research lab runs a containerized protein-folding simulation on Amazon ECS. The job queue is processed continuously: tasks are stateless, checkpoint to S3 every 5 minutes, and any interrupted task is automatically requeued. Results are needed within days, not hours. The cluster currently runs ~200 vCPUs of On-Demand EC2 capacity 24/7. Which change reduces compute cost the MOST?",
+ opts:[
+ "Purchase a 3-year Compute Savings Plan covering the full 200 vCPUs of usage.",
+ "Move the ECS capacity to EC2 Spot Instances using capacity providers with a diversified set of instance types across multiple AZs and a price-capacity-optimized allocation strategy.",
+ "Move the tasks to Fargate Spot with a 30% On-Demand base to guarantee steady progress.",
+ "Purchase Standard Reserved Instances (3-year, All Upfront) for the specific instance type in use."
+ ],
+ ans:[1],
+ expl:`<p><b>B.</b> Same trap as your Q8, different costume. The stem stacks every interruption-tolerance signal it can: stateless, checkpointed, auto-requeue, deadline measured in days. That combination makes Spot's ~70–90% discount accessible, which beats the ~60% ceiling of even a 3-year all-upfront commitment (A, D) — and commitments charge you whether the science is running or not, for three years, with zero flexibility if the lab pivots.</p>
+ <p><b>C is the nuanced distractor:</b> Fargate Spot is legitimate, but the 30% On-Demand base is unjustified spend — the workload needs no guaranteed progress floor ("days, not hours"), and the stem asked for MOST savings. Mixed baselines are right only when the stem demands minimum guaranteed capacity. Also, at a steady 200 vCPUs, EC2 Spot generally underprices Fargate Spot.</p>
+ <div class="flip"><div class="t">Flip scenarios</div>"Tasks cannot be interrupted and run 24/7 for the next 3 years" → A or D (and between them: Savings Plan for flexibility, EC2 Instance SP/RI for max discount on a fixed family). "Must always maintain at least 60 vCPUs of progress" → C's shape (Spot + On-Demand base) becomes correct.</div>`
+},
+{
+ dom:"Cost-Optimized", multi:true,
+ stem:"A company's AWS bill shows three workloads: (1) a customer-facing API on EC2 with a steady minimum of 10 instances 24/7, growing slowly, where the team is considering moving to Fargate next year; (2) an RDS for PostgreSQL fleet running 24/7 with no platform changes planned for 3 years; (3) a dev/test environment used weekdays 9–19 only. Which combination of purchasing decisions is MOST cost-effective? (Select TWO.)",
+ opts:[
+ "Cover workload 1's baseline with a 1-year Compute Savings Plan.",
+ "Cover workload 1's baseline with 3-year EC2 Instance Savings Plans for the current instance family.",
+ "Cover workload 2 with Reserved Instances for RDS.",
+ "Cover workload 2 with a Compute Savings Plan.",
+ "Cover workload 3 with Standard Reserved Instances and stop instances outside business hours."
+ ],
+ ans:[0,2],
+ expl:`<p><b>A + C.</b> Two quota-knowledge checks disguised as strategy. Workload 1: "might move to Fargate" kills anything locked to EC2 instance families (B) — a <b>Compute</b> Savings Plan follows the spend to Fargate (and Lambda); 1-year matches the uncertainty. Workload 2: <b>Savings Plans do not cover RDS</b> — D is a product that doesn't exist. RDS commitment = RDS Reserved Instances (C), and "no changes for 3 years" makes them safe.</p>
+ <p><b>E is half-smart:</b> stopping dev instances nights/weekends is genuinely the right move, but then committing RIs to instances that run ~30% of hours means paying full-time prices for part-time usage — RIs bill by the hour whether running or not. The right pattern for workload 3 is scheduled stop/start (Instance Scheduler) on On-Demand, no commitment. Half-right options are wrong options.</p>
+ <div class="flip"><div class="t">Memorize</div>Savings Plans: EC2 + Fargate + Lambda (Compute SP) or EC2-only (EC2 Instance SP). RDS / ElastiCache / Redshift / OpenSearch / DynamoDB → their own reserved capacity products. Any option pairing "Savings Plan" with a database service is auto-wrong.</div>`
+},
+{
+ dom:"Resilient", multi:false,
+ stem:"An IoT platform ingests 5,000 sensor readings per second, with bursts to 20,000. Three teams consume the data: real-time anomaly detection (must read with dedicated throughput and minimal latency), a compliance team (must be able to reprocess the last 30 days of raw readings on demand), and a dashboard service. Readings from the same sensor must be processed in order. Which architecture meets ALL requirements?",
+ opts:[
+ "Amazon SNS FIFO topic with message group ID = sensor ID, fanning out to three SQS FIFO queues with 30-day message retention.",
+ "Amazon Kinesis Data Streams with partition key = sensor ID, 30-day retention enabled, and enhanced fan-out registered for the anomaly-detection consumer.",
+ "Amazon EventBridge with three rules targeting per-team SQS queues, plus an EventBridge archive with 30-day retention for replays.",
+ "Amazon MSK (Managed Kafka) is required, because Kinesis cannot retain data for 30 days."
+ ],
+ ans:[1],
+ expl:`<p><b>B.</b> Q9's concept with the dials turned up. Map requirements to features: per-sensor ordering → partition key; reprocess 30 days → extended retention (Kinesis goes to <b>365 days</b>, so D's premise is false); dedicated low-latency throughput for one consumer → <b>enhanced fan-out</b> (2 MB/s per shard per consumer, push via HTTP/2, instead of sharing the 2 MB/s polling pool); 20k records/sec → shards or on-demand mode scale linearly.</p>
+ <p><b>Why A dies:</b> two ceilings. SQS maximum retention is <b>14 days</b> — the 30-day requirement is unmeetable — and SNS FIFO throughput limits collapse far below 20,000 msg/s. <b>C:</b> EventBridge has no ordering guarantee, and its archive/replay re-publishes events through the bus (a batch re-delivery), not a consumer-controlled rewind; plus its throughput quotas are modest. <b>D</b> states a false fact — classic "confident lie" distractor.</p>
+ <div class="flip"><div class="t">Flip scenario</div>Drop the replay and throughput numbers, make it "three teams receive each order event, each filters a different subset, exactly-once processing, ~100 events/sec" → A (SNS FIFO → SQS FIFO with filter policies) becomes the right answer. Volume and replay are the hinges.</div>`
+},
+{
+ dom:"Resilient", multi:false,
+ stem:"A food-delivery app sends order events to a backend that charges cards. Requirements: each order must be processed exactly once, orders for the same customer must process in submission order, failed charges must retry automatically and after 5 failures move aside for manual review without blocking other customers' orders. Peak volume is 250 orders/second. Which solution fits BEST?",
+ opts:[
+ "Amazon Kinesis Data Streams with partition key = customer ID; the consumer tracks processed order IDs in DynamoDB for deduplication and moves failures to a separate stream.",
+ "An SQS FIFO queue with message group ID = customer ID, content-based deduplication enabled, and a redrive policy to a dead-letter queue with maxReceiveCount = 5.",
+ "An SQS Standard queue with a Lambda consumer using idempotency keys, and a dead-letter queue.",
+ "An SNS FIFO topic delivering directly to a Lambda function with reserved concurrency of 1 to enforce ordering."
+ ],
+ ans:[1],
+ expl:`<p><b>B.</b> The mirror-image of the previous question, here to stop you from over-rotating to "Kinesis always wins." Read the requirements as a feature list: exactly-once → FIFO dedup; per-customer ordering → message group ID; retry-then-park → <b>DLQ with maxReceiveCount</b>, which Kinesis simply doesn't have (a "poison pill" record in Kinesis blocks its whole shard until you write custom skip logic — that's option A reinventing SQS badly). 250/sec fits comfortably in FIFO's envelope, especially with high-throughput mode. No replay requirement, no multiple independent consumers → Kinesis's superpowers are unused.</p>
+ <p><b>C</b> loses ordering (Standard = best-effort). <b>D</b> is a trap dressed as cleverness: SNS→Lambda has no DLQ-after-5 retry semantics of this shape, and concurrency=1 serializes <i>all</i> customers globally — a 250/sec workload through a single-file door.</p>
+ <div class="flip"><div class="t">Heuristic</div>Choose by the verbs: <i>replay, multiple readers, analytics, firehose of data</i> → Kinesis. <i>Process once, retry, DLQ, decouple producer from one consumer</i> → SQS. Both order; both scale; the surrounding verbs decide.</div>`
+},
+{
+ dom:"Secure", multi:true,
+ stem:"A company runs analytics EC2 instances in private subnets with no internet route. The instances must (1) read and write large volumes of data to Amazon S3 in the same Region at the lowest possible data-transfer cost, and (2) retrieve database credentials from AWS Secrets Manager. All traffic to AWS services must remain on the AWS network. Which combination meets the requirements? (Select TWO.)",
+ opts:[
+ "Create a gateway VPC endpoint for S3 and add it to the private subnets' route tables.",
+ "Create an interface VPC endpoint for S3 to minimize data-transfer costs.",
+ "Create a gateway VPC endpoint for Secrets Manager and add it to the private subnets' route tables.",
+ "Create an interface VPC endpoint for Secrets Manager in the private subnets.",
+ "Deploy a NAT Gateway and route 0.0.0.0/0 through it so instances can reach both services over TLS."
+ ],
+ ans:[0,3],
+ expl:`<p><b>A + D.</b> Your Q10 inverted: this time S3 takes the gateway (free — "lowest cost" + same-Region + in-VPC is the gateway endpoint's home turf) and Secrets Manager takes an interface endpoint, because <b>gateway endpoints exist only for S3 and DynamoDB</b> — option C describes a product AWS never built, exactly like your wrong pick on the mock.</p>
+ <p><b>B</b> is real (interface endpoints for S3 exist!) but charges hourly + per-GB — it loses a cost question on its price tag; it wins only when the access comes from on-prem or a peered VPC. <b>E</b> fails the constraint outright: NAT Gateway traffic to public service endpoints traverses the internet-facing path, violating "remain on the AWS network" (and costs per-GB).</p>
+ <div class="flip"><div class="t">Flip scenario</div>Add one sentence — "on-premises servers connected via Direct Connect must also access the bucket privately" — and B replaces A: gateway endpoints are invisible outside the VPC's own route tables. This single-sentence flip is a known exam favorite.</div>`
+},
+{
+ dom:"Secure", multi:false,
+ stem:"A company requires that an S3 bucket containing financial reports be accessible ONLY from within its VPC — requests from the public internet, even with valid IAM credentials, must be denied. Instances already reach the bucket through a gateway VPC endpoint. Which additional configuration enforces the requirement?",
+ opts:[
+ "Add a bucket policy with a Deny statement for all principals where the condition aws:SourceVpce does not match the VPC endpoint ID.",
+ "Enable S3 Block Public Access at the account level.",
+ "Configure the VPC endpoint policy to allow only s3:GetObject and s3:PutObject actions.",
+ "Attach a security group to the gateway endpoint that allows inbound traffic only from the VPC CIDR."
+ ],
+ ans:[0],
+ expl:`<p><b>A.</b> The enforcement has to live on the <i>bucket</i>, because the threat is requests that never touch your VPC. A Deny with <code>"StringNotEquals": {"aws:sourceVpce": "vpce-xxx"}</code> slams the door on every path except your endpoint — including a developer's valid keys used from a laptop.</p>
+ <p><b>Why the others miss:</b> B blocks <i>public</i> access (ACLs/policies granting Everyone) — credentialed IAM requests from the internet aren't "public" in that sense. C controls what can be done <i>through the endpoint</i>; it says nothing about requests arriving via other paths — wrong direction entirely. D is impossible: gateway endpoints are route-table entries, not ENIs; <b>they cannot have security groups</b> (interface endpoints can — a detail pair the exam loves to swap).</p>
+ <div class="flip"><div class="t">Pattern</div>"Only from my VPC/network" → resource policy condition (aws:sourceVpce / aws:SourceVpc / aws:SourceIp). Endpoint policies limit what exits your VPC; bucket policies limit what reaches the bucket. You often need both directions in real life — the question tells you which direction it's testing by where the threat originates.</div>`
+},
+{
+ dom:"Secure", multi:false,
+ stem:"Account A (data lake) holds an S3 bucket encrypted with a customer-managed KMS key. Account B runs an EMR job that must read these objects. The architect grants Account B's EMR role s3:GetObject in its IAM policy, and Account A's bucket policy grants s3:GetObject to Account B's role ARN. The EMR job still fails with AccessDenied on every object. What is the MOST LIKELY cause?",
+ opts:[
+ "The KMS key policy in Account A does not grant kms:Decrypt to Account B's role, and/or the role lacks kms:Decrypt in its IAM policy.",
+ "S3 cross-account access additionally requires bucket ACLs granting Account B READ permission.",
+ "EMR cannot assume cross-account permissions; the objects must be replicated into Account B first.",
+ "The bucket policy must reference Account B's account root, not a specific role ARN."
+ ],
+ ans:[0],
+ expl:`<p><b>A.</b> The third lock. S3 said yes twice (identity policy + bucket policy), but every object is wrapped by KMS, and <b>KMS runs its own independent authorization</b>: the key policy must grant the external principal, and the principal needs kms:Decrypt. Both S3 gates open + still AccessDenied + "encrypted with a customer-managed key" in the stem = the answer is KMS, almost mechanically. This is the natural escalation of your Q12 miss: cross-account isn't two locks when encryption is involved — it's three.</p>
+ <p><b>B</b> is obsolete-world bait (ACLs are disabled under Bucket-owner-enforced ownership, the modern default, and were never required when policies grant access). <b>C</b> is false — roles and resource policies work fine cross-account. <b>D</b> is backwards: granting a specific role ARN is <i>more</i> precise and perfectly valid.</p>
+ <div class="flip"><div class="t">Related trap</div>If the bucket used <b>SSE-S3</b> or the AWS-managed <code>aws/s3</code> key, this failure mode changes: SSE-S3 adds no KMS gate, while <code>aws/s3</code> keys <b>cannot be shared cross-account at all</b> — the fix would be re-encrypting with a customer-managed key. "Share encrypted data across accounts" stems are always secretly KMS-key-type questions.</div>`
+},
+{
+ dom:"Secure", multi:false,
+ stem:"A SaaS vendor needs to read CloudWatch metrics from hundreds of customer AWS accounts. A customer's security team is configuring the access and requires protection against the confused-deputy problem, no long-lived credentials, and the ability to revoke the vendor instantly. What should the customer create?",
+ opts:[
+ "An IAM user for the vendor with programmatic access keys, rotated every 90 days via Secrets Manager.",
+ "An IAM role with a trust policy allowing the vendor's AWS account as principal, including an sts:ExternalId condition with a vendor-supplied unique value.",
+ "A resource-based policy on CloudWatch granting the vendor's account read access to metrics.",
+ "An IAM role with a trust policy allowing the vendor's account, protected by an MFA condition."
+ ],
+ ans:[1],
+ expl:`<p><b>B.</b> The phrase "confused deputy" appears in exactly one AWS answer: <b>External ID</b>. The scenario: the vendor assumes roles in hundreds of customer accounts; without a per-customer secret in the trust condition, a malicious customer could trick the vendor into assuming a <i>different</i> customer's role ARN on their behalf. The external ID is the per-customer handshake that prevents it. Revocation = edit/delete one trust policy. No stored credentials = role assumption's whole point.</p>
+ <p><b>A</b> violates "no long-lived credentials" in its first clause — rotation doesn't redeem it. <b>C</b>: CloudWatch doesn't support resource-based policies for this. <b>D</b>: MFA is for humans; a SaaS backend can't tap a phone, and MFA does nothing against the confused deputy.</p>
+ <div class="flip"><div class="t">Pattern lock-in</div>Third party / vendor / partner + cross-account → role + External ID. Your own workforce + existing IdP → IAM Identity Center / SAML federation. Your own services across your own accounts → plain cross-account roles or resource policies. Mobile/web app end-users → Cognito identity pools. Four stems, four non-interchangeable answers.</div>`
+}
+];
+
+// ---- render ----
+const Z = document.getElementById('quizzone');
+QUESTIONS.forEach((q,i)=>{
+  const d=document.createElement('div');d.className='q';d.id='qq'+i;
+  let h=`<div class="domain">${q.dom}${q.multi?' · select TWO':''}</div><div class="qh">Q${i+1}</div><p>${q.stem}</p>`;
+  q.opts.forEach((o,j)=>{h+=`<span class="opt" data-q="${i}" data-o="${j}"><span class="L">${'ABCDE'[j]}</span>${o}</span>`;});
+  h+=`<button class="btn" onclick="check(${i})">check [⏎]</button><div class="expl" id="ex${i}"><div class="verdict" id="vd${i}"></div>${q.expl}</div>`;
+  d.innerHTML=h;Z.appendChild(d);
+});
+const state=QUESTIONS.map(()=>({sel:new Set(),done:false}));
+let cur=-1, attempted=0, correct=0;
+
+document.querySelectorAll('.opt').forEach(el=>{
+  el.onclick=()=>{const qi=+el.dataset.q,oi=+el.dataset.o;if(state[qi].done)return;
+    focusQ(qi);
+    const s=state[qi].sel,max=QUESTIONS[qi].multi?2:1;
+    if(s.has(oi)){s.delete(oi);el.classList.remove('sel');}
+    else{if(!QUESTIONS[qi].multi){s.clear();qEl(qi).querySelectorAll('.opt').forEach(x=>x.classList.remove('sel'));}
+      else if(s.size>=max)return;
+      s.add(oi);el.classList.add('sel');}
+  };
+});
+function qEl(i){return document.getElementById('qq'+i)}
+function check(i){
+  const st=state[i];if(st.done||st.sel.size===0)return;
+  st.done=true;attempted++;
+  const ans=new Set(QUESTIONS[i].ans);
+  const ok=st.sel.size===ans.size&&[...st.sel].every(x=>ans.has(x));
+  if(ok)correct++;
+  qEl(i).querySelectorAll('.opt').forEach(el=>{
+    const oi=+el.dataset.o;
+    if(ans.has(oi))el.classList.add('right');
+    else if(st.sel.has(oi))el.classList.add('wrong');
+  });
+  const ex=document.getElementById('ex'+i);ex.classList.add('show');
+  const vd=document.getElementById('vd'+i);
+  vd.textContent=ok?'✓ correct':'✗ wrong — correct: '+QUESTIONS[i].ans.map(a=>'ABCDE'[a]).join(' + ');
+  vd.className='verdict '+(ok?'ok':'no');
+  document.getElementById('sc').textContent=correct+'/'+attempted;
+}
+function focusQ(i){
+  if(i<0||i>=QUESTIONS.length)return;
+  if(cur>=0)qEl(cur).classList.remove('focus');
+  cur=i;qEl(cur).classList.add('focus');
+}
+function gotoQ(i){focusQ(i);qEl(i).scrollIntoView({behavior:'smooth',block:'start'});}
+
+// ---- vim ----
+let pendingG=false;
+function toggleHelp(){document.getElementById('help').classList.toggle('show')}
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
+  const k=e.key;
+  if(pendingG){pendingG=false;if(k==='g'){window.scrollTo({top:0,behavior:'smooth'});return;}}
+  switch(k){
+    case 'j':window.scrollBy({top:120,behavior:'smooth'});break;
+    case 'k':window.scrollBy({top:-120,behavior:'smooth'});break;
+    case 'd':window.scrollBy({top:innerHeight/2,behavior:'smooth'});break;
+    case 'u':window.scrollBy({top:-innerHeight/2,behavior:'smooth'});break;
+    case 'g':pendingG=true;break;
+    case 'G':window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});break;
+    case '?':toggleHelp();break;
+    case 'q':document.getElementById('quiz').scrollIntoView({behavior:'smooth'});if(cur<0)gotoQ(0);break;
+    case 'n':gotoQ(cur<0?0:Math.min(cur+1,QUESTIONS.length-1));break;
+    case 'p':gotoQ(Math.max((cur<0?0:cur)-1,0));break;
+    case 'Enter':if(cur>=0){check(cur);e.preventDefault();}break;
+    case '0':location.hash='#overview';break;
+    default:
+      if(k>='1'&&k<='7'){location.hash='#t'+k;}
+      else if('abcde'.includes(k)&&cur>=0&&!state[cur].done){
+        const oi='abcde'.indexOf(k);
+        const el=qEl(cur).querySelector(`.opt[data-o="${oi}"]`);
+        if(el)el.click();
+      }
+  }
+});
+</script>
+</body>
+</html>

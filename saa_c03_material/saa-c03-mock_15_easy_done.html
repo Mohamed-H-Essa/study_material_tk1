@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SAA-C03 Mock Exam</title>
+<style>
+  :root { --bg:#1e1e1e; --fg:#d4d4d4; --dim:#808080; --accent:#569cd6;
+          --ok:#6a9955; --bad:#d16969; --sel:#264f78; --line:#3a3a3a;
+          --status:#007acc; }
+  * { box-sizing:border-box; }
+  body { background:var(--bg); color:var(--fg); margin:0;
+         font-family:"SF Mono",Menlo,Consolas,"DejaVu Sans Mono",monospace;
+         font-size:15px; line-height:1.5; padding-bottom:56px; }
+  #wrap { max-width:820px; margin:0 auto; padding:24px 20px; }
+  h1 { font-size:16px; color:var(--accent); font-weight:600; margin:0 0 4px; }
+  .meta { color:var(--dim); font-size:13px; margin-bottom:20px; }
+  .domain { color:var(--dim); font-size:12px; text-transform:uppercase;
+            letter-spacing:1px; margin-bottom:8px; }
+  .qtext { margin:0 0 16px; white-space:pre-wrap; }
+  .opt { padding:8px 12px; border:1px solid var(--line); margin:6px 0;
+         border-radius:3px; cursor:pointer; display:flex; gap:10px; }
+  .opt:hover { border-color:var(--dim); }
+  .opt.sel { background:var(--sel); border-color:var(--accent); }
+  .opt .k { color:var(--accent); font-weight:600; min-width:18px; }
+  .opt.correct { border-color:var(--ok); background:rgba(106,153,85,.15); }
+  .opt.wrong { border-color:var(--bad); background:rgba(209,105,105,.15); }
+  .help { color:var(--dim); font-size:12px; margin-top:22px;
+          border-top:1px solid var(--line); padding-top:12px; }
+  .help b { color:var(--accent); }
+  #status { position:fixed; bottom:0; left:0; right:0; background:var(--status);
+            color:#fff; font-size:13px; padding:5px 14px; display:flex;
+            justify-content:space-between; }
+  #status .mode { font-weight:700; }
+  /* results */
+  .rrow { display:flex; justify-content:space-between; padding:6px 0;
+          border-bottom:1px solid var(--line); }
+  .bar { height:14px; background:var(--line); border-radius:2px; overflow:hidden;
+         flex:1; margin:0 12px; max-width:260px; }
+  .bar i { display:block; height:100%; background:var(--accent); }
+  .score { font-size:28px; color:var(--accent); margin:8px 0; }
+  button { background:none; border:1px solid var(--accent); color:var(--accent);
+           font-family:inherit; font-size:14px; padding:8px 16px; border-radius:3px;
+           cursor:pointer; margin:14px 8px 0 0; }
+  button:hover { background:var(--sel); }
+  .review { margin-top:28px; }
+  .review h2 { font-size:14px; color:var(--dim); }
+  .ri { border-top:1px solid var(--line); padding:12px 0; }
+  .ri .tag { font-size:11px; color:var(--dim); }
+  .ri .ok { color:var(--ok); } .ri .no { color:var(--bad); }
+  a.dl { color:var(--accent); }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <h1>SAA-C03 — Mock Diagnostic</h1>
+  <div class="meta" id="meta"></div>
+  <div id="exam"></div>
+  <div id="results" style="display:none"></div>
+  <div class="help" id="help">
+    <b>j</b>/<b>k</b> next / prev &nbsp; <b>1-4</b> or <b>a-d</b> select &nbsp;
+    <b>gg</b> first &nbsp; <b>G</b> last &nbsp; <b>:</b> jump (e.g. <b>:7</b>) &nbsp;
+    <b>f</b> finish &nbsp; <b>w</b> download CSV (after finish)
+  </div>
+</div>
+<div id="status">
+  <span class="mode" id="mode">NORMAL</span>
+  <span id="pos"></span>
+</div>
+
+<script>
+const QUESTIONS = [
+ { d:"Resilient",
+   q:"An e-commerce app runs on EC2 instances behind an Application Load Balancer. During flash sales the order-processing backend is overwhelmed and some orders are silently dropped. The team needs to make sure every order is captured and processed even when the backend can't keep up, with minimal code changes.\n\nWhat should a solutions architect recommend?",
+   o:["Place an Amazon SQS queue between the web tier and the processing tier so requests are buffered and processed when capacity allows",
+      "Increase the ALB idle timeout and enable connection draining so requests wait longer",
+      "Move the processing tier to a larger instance type with provisioned IOPS storage",
+      "Enable ALB sticky sessions so each user always hits the same backend instance"],
+   a:0 },
+
+ { d:"Secure",
+   q:"A company stores objects in an S3 bucket in Account A. A partner, who owns Account B, needs ongoing read access to those objects. The company wants the least-overhead, most maintainable solution that follows AWS best practices.\n\nWhat should the architect do?",
+   o:["Generate pre-signed URLs for each object and email them to the partner weekly",
+      "Make the bucket public and share the object URLs with the partner",
+      "Create an IAM user in Account A, share its access keys with the partner",
+      "Add a bucket policy in Account A that grants the required s3 read actions to a role/principal in Account B"],
+   a:3 },
+
+ { d:"Cost",
+   q:"A workload runs 24/7 with steady, predictable utilization and the company is committed to running it for the next 3 years. They want the lowest possible compute cost.\n\nWhich purchasing option is most cost-effective?",
+   o:["On-Demand Instances",
+      "Spot Instances",
+      "Standard Reserved Instances with a 3-year, all-upfront term",
+      "Dedicated Hosts billed On-Demand"],
+   a:2 },
+
+ { d:"High-Performing",
+   q:"A static website (HTML, CSS, JS, images) is hosted in an S3 bucket. Users are spread across multiple continents and complain about slow load times. The team wants to reduce latency and offload requests from the origin.\n\nWhat should the architect implement?",
+   o:["Enable S3 Transfer Acceleration on the bucket",
+      "Create a CloudFront distribution with the S3 bucket as the origin",
+      "Replicate the bucket to every AWS Region with Cross-Region Replication",
+      "Host the site on EC2 instances in multiple Regions behind Route 53 latency routing"],
+   a:1 },
+
+ { d:"Secure",
+   q:"A compliance rule requires that all data stored in a new Amazon RDS database be encrypted at rest, with the encryption keys managed and audited centrally and minimal operational effort.\n\nWhat is the recommended approach?",
+   o:["Enable RDS encryption at rest backed by an AWS KMS key when creating the instance",
+      "Encrypt the data in the application before writing it and decrypt on read",
+      "Store the database files on an encrypted EFS volume mounted to RDS",
+      "Use SSL/TLS for connections to the database"],
+   a:0 },
+
+ { d:"High-Performing",
+   q:"A read-heavy reporting application puts a single Amazon RDS MySQL instance under heavy read load, slowing the whole app. Writes are light and must not be impacted. The team wants to scale reads.\n\nWhat should the architect do?",
+   o:["Convert the instance to Multi-AZ deployment",
+      "Increase the instance's allocated storage and IOPS",
+      "Add one or more RDS read replicas and route read traffic to them",
+      "Schedule nightly snapshots and restore them for reporting"],
+   a:2 },
+
+ { d:"High-Performing",
+   q:"A web app repeatedly runs the same expensive read queries against its relational database, causing high DB CPU. The data changes infrequently and slightly stale results are acceptable for these queries.\n\nWhat is the most effective way to reduce database load?",
+   o:["Put an Amazon ElastiCache layer in front of the database to cache query results",
+      "Move the database to a larger instance class",
+      "Enable Multi-AZ on the database",
+      "Add a NAT gateway in front of the database subnet"],
+   a:0 },
+
+ { d:"Secure",
+   q:"An application running on EC2 needs to read and write objects in an S3 bucket. Security policy forbids storing long-lived credentials on the instances.\n\nWhat should the architect configure?",
+   o:["Store IAM access keys in a file on the instance and rotate them monthly",
+      "Attach an IAM role with the required S3 permissions to the EC2 instances",
+      "Hardcode credentials as environment variables in the application",
+      "Put the access keys in Systems Manager Parameter Store and fetch them at boot"],
+   a:1 },
+
+ { d:"Cost",
+   q:"Application logs are written to S3. They are accessed frequently for the first 30 days, rarely afterward, and must be retained for 7 years. Retrieval after 30 days can take several hours. The company wants the lowest storage cost.\n\nWhat should the architect configure?",
+   o:["Keep everything in S3 Standard and delete after 7 years",
+      "Use S3 One Zone-IA for all objects from day one",
+      "Create an S3 Lifecycle rule that transitions objects to S3 Glacier (or Glacier Deep Archive) after 30 days and expires them after 7 years",
+      "Replicate the logs to a second Region for redundancy"],
+   a:2 },
+
+ { d:"Resilient",
+   q:"A web tier must automatically handle large swings in traffic and remain available even if a single Availability Zone fails.\n\nWhich design best meets these requirements?",
+   o:["A single large EC2 instance with an Elastic IP",
+      "EC2 instances in one AZ behind an Application Load Balancer",
+      "An Auto Scaling group spanning multiple AZs behind an Application Load Balancer",
+      "Multiple EC2 instances in one AZ with Route 53 round-robin DNS"],
+   a:2 },
+
+ { d:"High-Performing",
+   q:"A high-traffic application uses Amazon DynamoDB and needs single-digit microsecond read latency for a read-intensive, eventually-consistent workload, without re-architecting the app.\n\nWhat should the architect add?",
+   o:["DynamoDB Accelerator (DAX)",
+      "A DynamoDB global table",
+      "Provisioned capacity with Auto Scaling",
+      "An ElastiCache for Redis cluster the app must query directly"],
+   a:0 },
+
+ { d:"Secure",
+   q:"EC2 instances in a private subnet must download OS patches and call external APIs over the internet, but must not be directly reachable from the internet.\n\nWhat should the architect deploy?",
+   o:["An internet gateway attached to the private subnet's route table",
+      "A NAT gateway in a public subnet, with the private subnet routing 0.0.0.0/0 to it",
+      "A VPC peering connection to a public VPC",
+      "Elastic IP addresses assigned to each private instance"],
+   a:1 },
+
+ { d:"Cost",
+   q:"A development/test database is used intermittently and unpredictably — heavy for a few hours, then idle for days. The team wants to avoid paying for capacity while it sits idle and minimize management.\n\nWhich option fits best?",
+   o:["A right-sized RDS Reserved Instance",
+      "Amazon Aurora Serverless, which scales capacity with load and can pause when idle",
+      "A large On-Demand RDS instance stopped manually each night",
+      "DynamoDB with provisioned capacity"],
+   a:1 },
+
+ { d:"Resilient",
+   q:"A company runs its primary application in us-east-1 and a standby copy in us-west-2. They need DNS to automatically send users to the standby site if the primary becomes unhealthy.\n\nWhat should the architect configure in Amazon Route 53?",
+   o:["Weighted routing split 50/50 between the two Regions",
+      "Simple routing with both Region endpoints listed",
+      "Failover routing with health checks on the primary endpoint",
+      "Geolocation routing based on user country"],
+   a:2 },
+
+ { d:"High-Performing",
+   q:"A high-performance computing (HPC) cluster of Linux EC2 instances needs a shared file system delivering very high throughput and sub-millisecond latency, with a POSIX interface, for processing a large dataset.\n\nWhich storage service is the best fit?",
+   o:["Amazon S3 accessed via the AWS CLI",
+      "Amazon EFS Standard",
+      "Amazon FSx for Lustre",
+      "Amazon EBS gp3 volumes attached to each instance separately"],
+   a:2 }
+];
+
+const LETTERS = ["A","B","C","D"];
+let cur = 0;
+let answers = new Array(QUESTIONS.length).fill(null);
+let finished = false;
+let lastG = 0;          // for gg
+let cmd = null;         // command-line buffer for ':'
+
+const examEl = document.getElementById('exam');
+const resEl  = document.getElementById('results');
+const metaEl = document.getElementById('meta');
+const posEl  = document.getElementById('pos');
+const modeEl = document.getElementById('mode');
+
+metaEl.textContent = QUESTIONS.length + " scenario questions · choose the BEST answer · self-timed";
+
+function render(){
+  if(finished) return;
+  const q = QUESTIONS[cur];
+  let html = `<div class="domain">${q.d}</div>`;
+  html += `<p class="qtext">Q${cur+1}. ${escapeHtml(q.q)}</p>`;
+  q.o.forEach((opt,i)=>{
+    const sel = answers[cur]===i ? ' sel':'';
+    html += `<div class="opt${sel}" data-i="${i}"><span class="k">${LETTERS[i]}</span><span>${escapeHtml(opt)}</span></div>`;
+  });
+  examEl.innerHTML = html;
+  examEl.querySelectorAll('.opt').forEach(el=>{
+    el.onclick = ()=>{ answers[cur]=+el.dataset.i; render(); };
+  });
+  updateStatus();
+}
+
+function updateStatus(){
+  const answered = answers.filter(a=>a!==null).length;
+  if(cmd!==null){
+    modeEl.textContent = "COMMAND";
+    posEl.textContent = cmd;
+  } else {
+    modeEl.textContent = finished ? "RESULTS" : "NORMAL";
+    posEl.textContent = finished ? `${answered}/${QUESTIONS.length} answered`
+      : `Q ${cur+1}/${QUESTIONS.length}  ·  ${answered} answered`;
+  }
+}
+
+function escapeHtml(s){ return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+function finish(){
+  finished = true;
+  examEl.style.display='none';
+  resEl.style.display='block';
+  document.getElementById('help').textContent='';
+
+  // per-domain tally
+  const dom = {};
+  let correct = 0;
+  QUESTIONS.forEach((q,i)=>{
+    dom[q.d] = dom[q.d] || {c:0,t:0};
+    dom[q.d].t++;
+    if(answers[i]===q.a){ dom[q.d].c++; correct++; }
+  });
+  const pct = Math.round(correct/QUESTIONS.length*100);
+
+  let html = `<h1>Results</h1>`;
+  html += `<div class="score">${correct} / ${QUESTIONS.length} &nbsp; (${pct}%)</div>`;
+  html += `<div class="meta">SAA-C03 passing scaled score is ~720/1000. This raw % is a rough indicator, not a 1:1 predictor.</div>`;
+  html += `<h2 style="font-size:14px;color:var(--dim);margin-top:22px">By domain — your weak areas surface here</h2>`;
+
+  // sort weakest first
+  Object.entries(dom).sort((a,b)=> (a[1].c/a[1].t)-(b[1].c/b[1].t)).forEach(([name,v])=>{
+    const p = Math.round(v.c/v.t*100);
+    html += `<div class="rrow"><span>${name}</span>
+      <span class="bar"><i style="width:${p}%"></i></span>
+      <span>${v.c}/${v.t} (${p}%)</span></div>`;
+  });
+
+  html += `<div><button id="dl">w — download CSV</button><button id="rt">retake</button></div>`;
+
+  // review
+  html += `<div class="review"><h2>Review</h2>`;
+  QUESTIONS.forEach((q,i)=>{
+    const ua = answers[i];
+    const right = ua===q.a;
+    html += `<div class="ri"><div class="tag">Q${i+1} · ${q.d} · <span class="${right?'ok':'no'}">${ua===null?'SKIPPED':(right?'CORRECT':'WRONG')}</span></div>`;
+    html += `<p class="qtext">${escapeHtml(q.q)}</p>`;
+    q.o.forEach((opt,j)=>{
+      let cls='';
+      if(j===q.a) cls=' correct';
+      else if(j===ua && !right) cls=' wrong';
+      html += `<div class="opt${cls}"><span class="k">${LETTERS[j]}</span><span>${escapeHtml(opt)}</span></div>`;
+    });
+    html += `</div>`;
+  });
+  html += `</div>`;
+  resEl.innerHTML = html;
+
+  document.getElementById('dl').onclick = downloadCSV;
+  document.getElementById('rt').onclick = ()=>location.reload();
+  updateStatus();
+  window.scrollTo(0,0);
+}
+
+function csvCell(s){ return '"' + String(s).replace(/"/g,'""').replace(/\n/g,' ') + '"'; }
+
+function downloadCSV(){
+  const head = ["Q#","Domain","Question","OptionA","OptionB","OptionC","OptionD",
+                "CorrectAnswer","YourAnswer","Result"];
+  const rows = [head.map(csvCell).join(",")];
+  QUESTIONS.forEach((q,i)=>{
+    const ua = answers[i];
+    const result = ua===null ? "Skipped" : (ua===q.a ? "Correct" : "Wrong");
+    const row = [
+      i+1, q.d, q.q,
+      q.o[0], q.o[1], q.o[2], q.o[3],
+      LETTERS[q.a] + ". " + q.o[q.a],
+      ua===null ? "(none)" : LETTERS[ua] + ". " + q.o[ua],
+      result
+    ];
+    rows.push(row.map(csvCell).join(","));
+  });
+  const blob = new Blob([rows.join("\r\n")], {type:"text/csv;charset=utf-8;"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = "saa-c03-mock-results.csv";
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
+
+document.addEventListener('keydown', e=>{
+  // command-line mode (:)
+  if(cmd!==null){
+    if(e.key==='Enter'){
+      const m = cmd.match(/^:(\d+)$/);
+      if(m){ const n=+m[1]-1; if(n>=0 && n<QUESTIONS.length && !finished){ cur=n; render(); } }
+      cmd=null; updateStatus();
+    } else if(e.key==='Escape'){ cmd=null; updateStatus(); }
+    else if(e.key==='Backspace'){ cmd=cmd.slice(0,-1); if(cmd==='') cmd=null; updateStatus(); }
+    else if(/^[0-9]$/.test(e.key)){ cmd+=e.key; updateStatus(); }
+    e.preventDefault();
+    return;
+  }
+
+  if(finished){
+    if(e.key==='w'){ downloadCSV(); }
+    return;
+  }
+
+  switch(e.key){
+    case 'j': cur=Math.min(cur+1,QUESTIONS.length-1); render(); break;
+    case 'k': cur=Math.max(cur-1,0); render(); break;
+    case 'G': cur=QUESTIONS.length-1; render(); break;
+    case 'g':
+      if(Date.now()-lastG < 400){ cur=0; render(); lastG=0; }
+      else lastG=Date.now();
+      break;
+    case '1': case 'a': answers[cur]=0; render(); break;
+    case '2': case 'b': answers[cur]=1; render(); break;
+    case '3': case 'c': answers[cur]=2; render(); break;
+    case '4': case 'd': answers[cur]=3; render(); break;
+    case 'f': finish(); break;
+    case ':': cmd=':'; updateStatus(); e.preventDefault(); break;
+  }
+});
+
+render();
+</script>
+</body>
+</html>
