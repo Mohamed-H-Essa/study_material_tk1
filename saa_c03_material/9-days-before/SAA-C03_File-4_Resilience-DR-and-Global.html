@@ -582,6 +582,20 @@ const L=["A","B","C","D","E"];
 const state={};
 let total=BANK.length;
 
+/* ---------------- PERSISTENCE ----------------
+   One shared store for all 5 files, keyed by FILE_KEY.
+   Shape: { "file-1": { answers:{ "1.01":[0], ... }, scroll:1234 }, "file-2": {...}, ... } */
+const STORE_KEY="saa_c03_progress";
+const FILE_KEY="file-4";
+function loadStore(){ try{return JSON.parse(localStorage.getItem(STORE_KEY))||{};}catch(e){return {};} }
+function saveStore(s){ try{localStorage.setItem(STORE_KEY,JSON.stringify(s));}catch(e){} }
+function fileData(){ const s=loadStore(); return s[FILE_KEY]||{answers:{},scroll:0}; }
+function writeFileData(fd){ const s=loadStore(); s[FILE_KEY]=fd; saveStore(s); }
+function saveAnswer(id,picks){ const fd=fileData(); fd.answers=fd.answers||{}; fd.answers[id]=picks; writeFileData(fd); }
+function saveScroll(y){ const fd=fileData(); fd.scroll=y; writeFileData(fd); }
+function clearFile(){ const s=loadStore(); delete s[FILE_KEY]; saveStore(s); }
+const SAVED=fileData();
+
 function tagChip(t){
   if(t==="miss") return '<span class="chip miss">↻ your miss</span>';
   if(t==="win")  return '<span class="chip win">✓ lock it in</span>';
@@ -635,6 +649,7 @@ BANK.forEach(item=>{
     rvInner.innerHTML='<div class="verdict '+(ok?'r-ok':'r-no')+'">'+(ok?'Correct':'Not quite')+'</div>'+item.e;
     reveal.classList.add("show");
     state[item.id]={answered:true,correct:ok};
+    if(!window.__saaRestoring) saveAnswer(item.id,[...sel]);
     updateHUD();
   }
 
@@ -650,12 +665,30 @@ BANK.forEach(item=>{
   if(checkBtn)checkBtn.addEventListener("click",()=>{ if(!locked&&sel.size)settle(); });
 });
 
-/* ---------------- VIM PAGE SCROLLING ---------------- */
-let lastG=0;
+/* ---------------- SMOOTH VIM PAGE SCROLLING ---------------- */
+const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+let lastG=0, rafId=null, targetY=window.scrollY;
 const help=document.getElementById("help");
 function toggleHelp(){help.classList.toggle("show");}
-function by(dy){ window.scrollBy({top:dy, behavior:"smooth"}); }
-function to(y){ window.scrollTo({top:y, behavior:"smooth"}); }
+function maxY(){ return Math.max(0, document.documentElement.scrollHeight - window.innerHeight); }
+function tick(){
+  const cur=window.scrollY, diff=targetY-cur;
+  if(Math.abs(diff)<0.6){ window.scrollTo(0,Math.round(targetY)); rafId=null; return; }
+  window.scrollTo(0, cur + diff*0.16);   // eased glide toward target
+  rafId=requestAnimationFrame(tick);
+}
+function glide(dy){
+  if(reduce){ window.scrollBy(0,dy); return; }
+  if(rafId===null) targetY=window.scrollY;
+  targetY=Math.max(0,Math.min(maxY(),targetY+dy));
+  if(rafId===null) rafId=requestAnimationFrame(tick);
+}
+function glideTo(y){
+  if(reduce){ window.scrollTo(0,y); return; }
+  targetY=Math.max(0,Math.min(maxY(),y));
+  if(rafId===null) rafId=requestAnimationFrame(tick);
+}
+["wheel","touchmove"].forEach(ev=>window.addEventListener(ev,()=>{ if(rafId){cancelAnimationFrame(rafId);rafId=null;} },{passive:true}));
 
 document.addEventListener("keydown",e=>{
   const tag=(e.target.tagName||"").toLowerCase();
@@ -668,14 +701,14 @@ document.addEventListener("keydown",e=>{
 
   const vh=window.innerHeight;
   switch(e.key){
-    case"j":e.preventDefault();by(95);break;
-    case"k":e.preventDefault();by(-95);break;
-    case"d":e.preventDefault();by(vh*0.5);break;
-    case"u":e.preventDefault();by(-vh*0.5);break;
-    case"f":e.preventDefault();by(vh*0.9);break;
-    case"b":e.preventDefault();by(-vh*0.9);break;
-    case"G":e.preventDefault();to(document.body.scrollHeight);break;
-    case"g":{const now=Date.now();if(now-lastG<500){e.preventDefault();to(0);lastG=0;}else lastG=now;break;}
+    case"j":e.preventDefault();glide(80);break;
+    case"k":e.preventDefault();glide(-80);break;
+    case"d":e.preventDefault();glide(vh*0.5);break;
+    case"u":e.preventDefault();glide(-vh*0.5);break;
+    case"f":e.preventDefault();glide(vh*0.9);break;
+    case"b":e.preventDefault();glide(-vh*0.9);break;
+    case"G":e.preventDefault();glideTo(maxY());break;
+    case"g":{const now=Date.now();if(now-lastG<500){e.preventDefault();glideTo(0);lastG=0;}else lastG=now;break;}
   }
 });
 document.getElementById("h-help").addEventListener("click",toggleHelp);
@@ -711,8 +744,37 @@ function jump(id){
   const el=[...document.querySelectorAll(".q")].find(q=>q.dataset.id===id);
   if(el)el.scrollIntoView({behavior:"smooth",block:"center"});
 }
-document.getElementById("h-reset").addEventListener("click",()=>location.reload());
+document.getElementById("h-reset").addEventListener("click",()=>{clearFile();location.reload();});
 updateHUD();
+
+/* ---------------- RESTORE SAVED ANSWERS ----------------
+   Replay each saved answer by simulating the same option clicks the user made.
+   The __saaRestoring flag stops settle() from re-saving during replay. */
+function restoreAnswers(){
+  const answers=SAVED.answers||{};
+  window.__saaRestoring=true;
+  document.querySelectorAll(".q").forEach(card=>{
+    const picks=answers[card.dataset.id];
+    if(!Array.isArray(picks)||!picks.length)return;
+    const opts=[...card.querySelectorAll(".opt")];
+    picks.forEach(i=>{ if(opts[i])opts[i].click(); });          // single-select settles on the click
+    const checkBtn=card.querySelector(".checkbtn");             // multi-select needs the explicit check
+    if(checkBtn&&checkBtn.style.display!=="none")checkBtn.click();
+  });
+  window.__saaRestoring=false;
+}
+restoreAnswers();
+
+/* ---------------- SCROLL POSITION ---------------- */
+if(SAVED.scroll){
+  const y=SAVED.scroll;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>window.scrollTo(0,y)));
+}
+let scrollTimer=null;
+window.addEventListener("scroll",()=>{
+  if(scrollTimer)return;
+  scrollTimer=setTimeout(()=>{scrollTimer=null;saveScroll(window.scrollY||window.pageYOffset||0);},250);
+},{passive:true});
 </script>
 </body>
 </html>

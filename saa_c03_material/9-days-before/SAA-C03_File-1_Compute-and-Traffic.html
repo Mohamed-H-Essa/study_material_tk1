@@ -6,12 +6,13 @@
 <title>SAA-C03 · File 1 · Compute &amp; Traffic</title>
 <style>
   :root{
-    --ink:#16202e; --ink-soft:#46566a; --muted:#7b8a9c;
-    --paper:#fafbfc; --panel:#ffffff; --line:#e4e8ed; --line-strong:#cfd6de;
-    --accent:#e8821e; --accent-deep:#b25e10; --accent-tint:#fdf3e7;
-    --navy:#1c2b3e; --navy-tint:#eef2f7;
-    --ok:#157a55; --ok-bg:#e6f3ec; --ok-line:#aedcc4;
-    --no:#bb392c; --no-bg:#fbeae7; --no-line:#f0c2ba;
+    /* dark theme — palette shared with File 5 */
+    --ink:#e7eef6; --ink-soft:#a3b5c7; --muted:#6f8298;
+    --paper:#0e1620; --panel:#15212e; --panel2:#1a2836; --panel3:#1f2f40; --line:#26384a; --line-strong:#36506a;
+    --accent:#f59e3c; --accent-2:#f7b260; --accent-deep:#f7b260; --accent-tint:rgba(245,158,60,.12);
+    --navy:#1a2836; --navy-tint:#1f2f40;
+    --ok:#3fcf8e; --ok-bg:rgba(63,207,142,.13); --ok-line:rgba(63,207,142,.45);
+    --no:#ff7062; --no-bg:rgba(255,112,98,.13); --no-line:rgba(255,112,98,.45);
     --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
     --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   }
@@ -20,6 +21,7 @@
   body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
     line-height:1.62;font-size:17px;-webkit-font-smoothing:antialiased}
   .wrap{max-width:860px;margin:0 auto;padding:0 22px}
+  ::selection{background:rgba(245,158,60,.3)}
 
   /* ---------- HUD ---------- */
   .hud{position:sticky;top:0;z-index:50;background:rgba(28,43,62,.97);color:#fff;
@@ -62,8 +64,8 @@
   h3{font-size:18.5px;margin:30px 0 8px;font-weight:700;letter-spacing:-.01em}
   p{margin:13px 0}
   .sub{color:var(--ink-soft);font-size:16px;margin-top:2px}
-  code{font-family:var(--mono);font-size:.86em;background:#eef1f4;padding:1.5px 6px;border-radius:5px;
-    color:#243; white-space:nowrap}
+  code{font-family:var(--mono);font-size:.86em;background:var(--panel2,#1f2f40);padding:1.5px 6px;border-radius:5px;
+    color:#cfe0d6; white-space:nowrap}
   strong{font-weight:700}
   ul.tight{margin:12px 0;padding-left:20px}
   ul.tight li{margin:7px 0}
@@ -73,7 +75,7 @@
     background:var(--panel);position:relative;overflow:hidden}
   .box .lab{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
     margin:0 0 6px;font-weight:600}
-  .box.key{border-color:#f3d9b6;background:var(--accent-tint)}
+  .box.key{border-color:rgba(245,158,60,.4);background:var(--accent-tint)}
   .box.key:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent)}
   .box.key .lab{color:var(--accent-deep)}
   .box.trap{border-color:var(--no-line);background:var(--no-bg)}
@@ -108,18 +110,18 @@
   .qid{font-family:var(--mono);font-size:11.5px;color:var(--muted);font-weight:600}
   .chip{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
     padding:2px 7px;border-radius:5px;font-weight:700}
-  .chip.drill{background:#eaf0f6;color:#3a566f}
-  .chip.exam{background:#1c2b3e;color:#fff}
+  .chip.drill{background:#22323f;color:#9fc0d8}
+  .chip.exam{background:#36506a;color:#eaf2fb}
   .chip.mixed{background:var(--accent-tint);color:var(--accent-deep)}
-  .chip.two{background:#efe7f6;color:#6a3fa0}
+  .chip.two{background:rgba(154,118,224,.18);color:#bba6e8}
   .chip.miss{background:var(--no-bg);color:var(--no);border:1px solid var(--no-line)}
   .chip.win{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-line)}
   .stem{font-size:16.5px;margin:2px 0 13px;line-height:1.5}
   .opts{list-style:none;margin:0;padding:0}
   .opt{display:flex;gap:11px;align-items:flex-start;width:100%;text-align:left;cursor:pointer;
-    border:1px solid var(--line);background:#fff;border-radius:9px;padding:11px 13px;margin:7px 0;
+    border:1px solid var(--line);background:var(--navy-tint);border-radius:9px;padding:11px 13px;margin:7px 0;
     font:inherit;font-size:15.5px;color:var(--ink);transition:border-color .12s,background .12s}
-  .opt:hover:not(:disabled){border-color:var(--line-strong);background:#fafcff}
+  .opt:hover:not(:disabled){border-color:var(--line-strong);background:#243749}
   .opt:disabled{cursor:default}
   .opt .ltr{flex:none;font-family:var(--mono);font-weight:700;font-size:13px;color:var(--accent-deep);
     width:18px;text-align:center;padding-top:1px}
@@ -160,11 +162,22 @@
     margin:0 4px;display:inline-block}
   .foot{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:center;margin-top:30px}
 
+  /* ---------- vim help overlay ---------- */
+  #help{position:fixed;inset:0;z-index:90;background:rgba(6,11,17,.72);display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+  #help.show{display:flex}
+  .help-card{background:var(--panel2);border:1px solid var(--line-strong);border-radius:14px;padding:24px 26px;max-width:380px;width:calc(100% - 44px)}
+  .help-card h4{margin:0 0 4px;font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+  .help-card .hk{display:flex;justify-content:space-between;gap:14px;padding:6px 0;font-size:14.5px;border-bottom:1px solid var(--line)}
+  .help-card .hk:last-of-type{border-bottom:none}
+  .help-card kbd{font-family:var(--mono);background:var(--panel3);border:1px solid var(--line-strong);border-bottom-width:2px;border-radius:5px;padding:1px 8px;color:var(--accent-2);font-weight:600}
+  .help-card .close{margin-top:14px;font-family:var(--mono);font-size:12px;color:var(--muted);text-align:center}
+  .q.current{border-color:var(--accent)}
+
   @media (max-width:560px){
     body{font-size:16px} h1{font-size:31px} h2{font-size:23px}
     .hud-inner{font-size:11px;gap:10px} .stem{font-size:15.5px}
   }
-  @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto}}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
 </style>
 </head>
 <body>
@@ -175,9 +188,21 @@
     <span class="stat"><b id="h-ans">0</b>/<span id="h-tot">0</span> answered</span>
     <span class="stat"><b id="h-pct">—</b> correct</span>
     <div class="bar"><i id="h-bar"></i></div>
+    <button id="h-help">? keys</button>
     <button id="h-reset">reset</button>
   </div>
 </div>
+
+<div id="help"><div class="help-card">
+  <h4>Vim scrolling · smooth</h4>
+  <div class="hk"><span>Glide down / up (hold to flow)</span><span><kbd>j</kbd> <kbd>k</kbd></span></div>
+  <div class="hk"><span>Half page down / up</span><span><kbd>d</kbd> <kbd>u</kbd></span></div>
+  <div class="hk"><span>Full page down / up</span><span><kbd>f</kbd> <kbd>b</kbd></span></div>
+  <div class="hk"><span>Top of page</span><span><kbd>g</kbd><kbd>g</kbd></span></div>
+  <div class="hk"><span>Bottom of page</span><span><kbd>G</kbd></span></div>
+  <div class="hk"><span>Toggle this help</span><span><kbd>?</kbd></span></div>
+  <div class="close">Answer questions by clicking · esc closes help</div>
+</div></div>
 
 <div class="wrap">
 <header class="top">
@@ -553,6 +578,20 @@ const L=["A","B","C","D","E"];
 const state={}; // id -> {answered, correct}
 let total=BANK.length;
 
+/* ---------------- PERSISTENCE ----------------
+   One shared store for all 5 files, keyed by FILE_KEY.
+   Shape: { "file-1": { answers:{ "1.01":[0], ... }, scroll:1234 }, "file-2": {...}, ... } */
+const STORE_KEY="saa_c03_progress";
+const FILE_KEY="file-1";
+function loadStore(){ try{return JSON.parse(localStorage.getItem(STORE_KEY))||{};}catch(e){return {};} }
+function saveStore(s){ try{localStorage.setItem(STORE_KEY,JSON.stringify(s));}catch(e){} }
+function fileData(){ const s=loadStore(); return s[FILE_KEY]||{answers:{},scroll:0}; }
+function writeFileData(fd){ const s=loadStore(); s[FILE_KEY]=fd; saveStore(s); }
+function saveAnswer(id,picks){ const fd=fileData(); fd.answers=fd.answers||{}; fd.answers[id]=picks; writeFileData(fd); }
+function saveScroll(y){ const fd=fileData(); fd.scroll=y; writeFileData(fd); }
+function clearFile(){ const s=loadStore(); delete s[FILE_KEY]; saveStore(s); }
+const SAVED=fileData();
+
 function tagChip(t){
   if(t==="miss") return '<span class="chip miss">↻ your miss</span>';
   if(t==="win")  return '<span class="chip win">✓ lock it in</span>';
@@ -608,6 +647,7 @@ BANK.forEach(item=>{
     rvInner.innerHTML='<div class="verdict '+(ok?'r-ok':'r-no')+'">'+(ok?'Correct':'Not quite')+'</div>'+item.e;
     reveal.classList.add("show");
     state[item.id]={answered:true,correct:ok};
+    if(!window.__saaRestoring) saveAnswer(item.id,userArr);
     updateHUD();
   }
 
@@ -669,8 +709,86 @@ function jump(id){
   const el=[...document.querySelectorAll(".q")].find(q=>q.dataset.id===id);
   if(el){el.scrollIntoView({behavior:"smooth",block:"center"});el.focus({preventScroll:true});}
 }
-document.getElementById("h-reset").addEventListener("click",()=>{location.reload()});
+document.getElementById("h-reset").addEventListener("click",()=>{clearFile();location.reload()});
 updateHUD();
+
+/* ---------------- SMOOTH VIM PAGE SCROLLING ---------------- */
+const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+let lastG=0, rafId=null, targetY=window.scrollY;
+const help=document.getElementById("help");
+function toggleHelp(){help.classList.toggle("show");}
+function maxY(){ return Math.max(0, document.documentElement.scrollHeight - window.innerHeight); }
+function tick(){
+  const cur=window.scrollY, diff=targetY-cur;
+  if(Math.abs(diff)<0.6){ window.scrollTo(0,Math.round(targetY)); rafId=null; return; }
+  window.scrollTo(0, cur + diff*0.16);   // eased glide toward target
+  rafId=requestAnimationFrame(tick);
+}
+function glide(dy){
+  if(reduce){ window.scrollBy(0,dy); return; }
+  if(rafId===null) targetY=window.scrollY;
+  targetY=Math.max(0,Math.min(maxY(),targetY+dy));
+  if(rafId===null) rafId=requestAnimationFrame(tick);
+}
+function glideTo(y){
+  if(reduce){ window.scrollTo(0,y); return; }
+  targetY=Math.max(0,Math.min(maxY(),y));
+  if(rafId===null) rafId=requestAnimationFrame(tick);
+}
+["wheel","touchmove"].forEach(ev=>window.addEventListener(ev,()=>{ if(rafId){cancelAnimationFrame(rafId);rafId=null;} },{passive:true}));
+document.addEventListener("keydown",e=>{
+  const tag=(e.target.tagName||"").toLowerCase();
+  if(tag==="input"||tag==="textarea")return;
+  if(e.metaKey||e.ctrlKey||e.altKey)return;
+  if(e.key==="Escape"){help.classList.remove("show");return;}
+  if(e.key==="?"){e.preventDefault();toggleHelp();return;}
+  if(help.classList.contains("show"))return;
+  // 1-5 / a-e are handled per-card (when a card is focused); let them through
+  if((e.key>="1"&&e.key<="5") || (e.key.length===1 && e.key.toLowerCase()>="a" && e.key.toLowerCase()<="e")) return;
+  const vh=window.innerHeight;
+  switch(e.key){
+    case"j":e.preventDefault();glide(80);break;
+    case"k":e.preventDefault();glide(-80);break;
+    case"d":e.preventDefault();glide(vh*0.5);break;
+    case"u":e.preventDefault();glide(-vh*0.5);break;
+    case"f":e.preventDefault();glide(vh*0.9);break;
+    case"b":e.preventDefault();glide(-vh*0.9);break;
+    case"G":e.preventDefault();glideTo(maxY());break;
+    case"g":{const now=Date.now();if(now-lastG<500){e.preventDefault();glideTo(0);lastG=0;}else lastG=now;break;}
+  }
+});
+document.getElementById("h-help").addEventListener("click",toggleHelp);
+
+/* ---------------- RESTORE SAVED ANSWERS ----------------
+   Replay each saved answer by simulating the same option clicks the user made.
+   The __saaRestoring flag stops settle() from re-saving during replay. */
+function restoreAnswers(){
+  const answers=SAVED.answers||{};
+  window.__saaRestoring=true;
+  document.querySelectorAll(".q").forEach(card=>{
+    const picks=answers[card.dataset.id];
+    if(!Array.isArray(picks)||!picks.length)return;
+    const opts=[...card.querySelectorAll(".opt")];
+    picks.forEach(i=>{ if(opts[i])opts[i].click(); });          // single-select settles on the click
+    const checkBtn=card.querySelector(".checkbtn");             // multi-select needs the explicit check
+    if(checkBtn&&checkBtn.style.display!=="none")checkBtn.click();
+  });
+  window.__saaRestoring=false;
+}
+restoreAnswers();
+
+/* ---------------- SCROLL POSITION ---------------- */
+// restore scroll after the DOM (and replayed answers) are laid out
+if(SAVED.scroll){
+  const y=SAVED.scroll;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>window.scrollTo(0,y)));
+}
+// save scroll position, throttled
+let scrollTimer=null;
+window.addEventListener("scroll",()=>{
+  if(scrollTimer)return;
+  scrollTimer=setTimeout(()=>{scrollTimer=null;saveScroll(window.scrollY||window.pageYOffset||0);},250);
+},{passive:true});
 </script>
 </body>
 </html>

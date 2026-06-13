@@ -553,6 +553,20 @@ e:`<b>AWS Budgets</b> sets cost/usage ceilings, sends alerts, and can trigger bu
 const L=["A","B","C","D","E"];
 const state={};
 let total=BANK.length;
+
+/* ---------------- PERSISTENCE ----------------
+   One shared store for all 5 files, keyed by FILE_KEY.
+   Shape: { "file-1": { answers:{ "1.01":[0], ... }, scroll:1234 }, "file-2": {...}, ... } */
+const STORE_KEY="saa_c03_progress";
+const FILE_KEY="file-5";
+function loadStore(){ try{return JSON.parse(localStorage.getItem(STORE_KEY))||{};}catch(e){return {};} }
+function saveStore(s){ try{localStorage.setItem(STORE_KEY,JSON.stringify(s));}catch(e){} }
+function fileData(){ const s=loadStore(); return s[FILE_KEY]||{answers:{},scroll:0}; }
+function writeFileData(fd){ const s=loadStore(); s[FILE_KEY]=fd; saveStore(s); }
+function saveAnswer(id,picks){ const fd=fileData(); fd.answers=fd.answers||{}; fd.answers[id]=picks; writeFileData(fd); }
+function saveScroll(y){ const fd=fileData(); fd.scroll=y; writeFileData(fd); }
+function clearFile(){ const s=loadStore(); delete s[FILE_KEY]; saveStore(s); }
+const SAVED=fileData();
 function tagChip(t){ return t==="miss"?'<span class="chip miss">↻ your miss</span>':t==="win"?'<span class="chip win">✓ lock it in</span>':""; }
 function diffChip(d,multi){
   let base = d==="exam"?'<span class="chip exam">exam</span>':d==="mixed"?'<span class="chip mixed">mixed</span>':'<span class="chip drill">drill</span>';
@@ -594,6 +608,7 @@ BANK.forEach(item=>{
     rvInner.innerHTML='<div class="verdict '+(ok?'r-ok':'r-no')+'">'+(ok?'Correct':'Not quite')+'</div>'+item.e;
     reveal.classList.add("show");
     state[item.id]={answered:true,correct:ok};
+    if(!window.__saaRestoring) saveAnswer(item.id,[...sel]);
     updateHUD();
   }
   function select(i){
@@ -682,8 +697,37 @@ function jump(id){
   const el=[...document.querySelectorAll(".q")].find(q=>q.dataset.id===id);
   if(el)el.scrollIntoView({behavior:"smooth",block:"center"});
 }
-document.getElementById("h-reset").addEventListener("click",()=>location.reload());
+document.getElementById("h-reset").addEventListener("click",()=>{clearFile();location.reload();});
 updateHUD();
+
+/* ---------------- RESTORE SAVED ANSWERS ----------------
+   Replay each saved answer by simulating the same option clicks the user made.
+   The __saaRestoring flag stops settle() from re-saving during replay. */
+function restoreAnswers(){
+  const answers=SAVED.answers||{};
+  window.__saaRestoring=true;
+  document.querySelectorAll(".q").forEach(card=>{
+    const picks=answers[card.dataset.id];
+    if(!Array.isArray(picks)||!picks.length)return;
+    const opts=[...card.querySelectorAll(".opt")];
+    picks.forEach(i=>{ if(opts[i])opts[i].click(); });          // single-select settles on the click
+    const checkBtn=card.querySelector(".checkbtn");             // multi-select needs the explicit check
+    if(checkBtn&&checkBtn.style.display!=="none")checkBtn.click();
+  });
+  window.__saaRestoring=false;
+}
+restoreAnswers();
+
+/* ---------------- SCROLL POSITION ---------------- */
+if(SAVED.scroll){
+  const y=SAVED.scroll;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>window.scrollTo(0,y)));
+}
+let scrollTimer=null;
+window.addEventListener("scroll",()=>{
+  if(scrollTimer)return;
+  scrollTimer=setTimeout(()=>{scrollTimer=null;saveScroll(window.scrollY||window.pageYOffset||0);},250);
+},{passive:true});
 </script>
 </body>
 </html>
