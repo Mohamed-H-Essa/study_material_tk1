@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SAA-C03 · File 4 · Resilience, DR &amp; Global Architecture</title>
+<style>
+  :root{
+    --bg:#0e1620; --bg2:#0a1019; --panel:#15212e; --panel2:#1a2836; --panel3:#1f2f40;
+    --line:#26384a; --line-strong:#36506a;
+    --text:#e7eef6; --soft:#a3b5c7; --muted:#6f8298;
+    --accent:#f59e3c; --accent-2:#f7b260; --accent-tint:rgba(245,158,60,.12);
+    --ok:#3fcf8e; --ok-bg:rgba(63,207,142,.13); --ok-line:rgba(63,207,142,.45);
+    --no:#ff7062; --no-bg:rgba(255,112,98,.13); --no-line:rgba(255,112,98,.45);
+    --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);
+    line-height:1.62;font-size:17px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:860px;margin:0 auto;padding:0 22px}
+  ::selection{background:rgba(245,158,60,.3)}
+
+  .hud{position:sticky;top:0;z-index:50;background:rgba(10,16,25,.96);
+    border-bottom:1px solid #1d2c3c;backdrop-filter:saturate(1.2) blur(7px)}
+  .hud-inner{max-width:860px;margin:0 auto;padding:9px 22px;display:flex;gap:16px;
+    align-items:center;font-family:var(--mono);font-size:12.5px;flex-wrap:wrap}
+  .hud .dot{color:var(--accent);font-weight:700;letter-spacing:.04em}
+  .hud .stat b{color:var(--text);font-weight:700}
+  .hud .stat{color:var(--muted)}
+  .bar{flex:1;min-width:110px;height:7px;background:#10202f;border-radius:99px;overflow:hidden}
+  .bar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    transition:width .35s ease}
+  .hud button{font-family:var(--mono);font-size:11.5px;color:var(--soft);background:transparent;
+    border:1px solid #2c4055;border-radius:6px;padding:3px 9px;cursor:pointer}
+  .hud button:hover{color:var(--text);border-color:var(--accent)}
+
+  header.top{padding:54px 0 30px;border-bottom:1px solid var(--line)}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--accent);margin:0 0 14px}
+  h1{font-size:40px;line-height:1.05;margin:0 0 12px;font-weight:800;letter-spacing:-.018em}
+  h1 .thin{font-weight:400;color:var(--soft)}
+  .lede{font-size:18px;color:var(--soft);margin:0;max-width:60ch}
+  .filechips{display:flex;gap:7px;flex-wrap:wrap;margin-top:22px;font-family:var(--mono);font-size:11.5px}
+  .fc{padding:4px 10px;border:1px solid var(--line-strong);border-radius:99px;color:var(--muted)}
+  .fc.here{background:var(--accent);color:#1a1206;border-color:var(--accent);font-weight:700}
+  .fc.done{color:var(--soft);border-color:var(--line);text-decoration:line-through;text-decoration-color:var(--muted)}
+
+  .legend{margin:26px 0 0;padding:16px 18px;background:var(--panel);border:1px solid var(--line);
+    border-radius:12px;font-size:14px;color:var(--soft)}
+  .legend b{color:var(--text)}
+  .legend .row{display:flex;gap:10px;align-items:baseline;margin:7px 0}
+  .legend .tg{flex:none}
+  .keys{margin-top:13px;padding-top:12px;border-top:1px solid var(--line);
+    font-family:var(--mono);font-size:13px;color:var(--soft);display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:5px 18px}
+  .keys b{color:var(--text);font-weight:600}
+  .keys kbd{background:var(--panel3);border:1px solid var(--line-strong);border-bottom-width:2px;
+    border-radius:5px;padding:1px 7px;color:var(--accent-2);font-weight:600;margin-right:7px;
+    display:inline-block;min-width:20px;text-align:center}
+
+  section{padding:46px 0;border-bottom:1px solid var(--line)}
+  .sec-tag{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--accent);display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .sec-tag .n{background:var(--accent);color:#1a1206;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700}
+  h2{font-size:28px;line-height:1.12;margin:0 0 6px;font-weight:800;letter-spacing:-.015em}
+  h3{font-size:18.5px;margin:30px 0 8px;font-weight:700;letter-spacing:-.01em;color:var(--text)}
+  p{margin:13px 0}
+  .sub{color:var(--soft);font-size:16px;margin-top:2px}
+  code{font-family:var(--mono);font-size:.85em;background:#0c1a27;border:1px solid var(--line);
+    padding:1px 6px;border-radius:5px;color:var(--accent-2);white-space:nowrap}
+  strong{font-weight:700;color:var(--text)}
+  ul.tight{margin:12px 0;padding-left:20px}
+  ul.tight li{margin:7px 0}
+  em{color:var(--soft)}
+
+  .box{margin:22px 0;border-radius:12px;padding:16px 18px 16px 20px;border:1px solid var(--line);
+    background:var(--panel);position:relative;overflow:hidden}
+  .box .lab{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+    margin:0 0 6px;font-weight:700}
+  .box.key{border-color:rgba(245,158,60,.4);background:var(--accent-tint)}
+  .box.key:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent)}
+  .box.key .lab{color:var(--accent-2)}
+  .box.trap{border-color:var(--no-line);background:var(--no-bg)}
+  .box.trap:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--no)}
+  .box.trap .lab{color:var(--no)}
+  .box.field{background:var(--panel3);border-color:var(--line-strong)}
+  .box.field:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent)}
+  .box.field .lab{color:var(--accent)}
+  .box p:first-of-type{margin-top:0}.box p:last-child{margin-bottom:0}
+
+  .tw{overflow-x:auto;margin:22px 0}
+  table{border-collapse:collapse;width:100%;font-size:14.5px}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;
+    color:var(--muted);font-weight:600;border-bottom:2px solid var(--line-strong)}
+  td b{color:var(--text)}
+  tr:last-child td{border-bottom:none}
+
+  .quizhead{display:flex;align-items:center;gap:10px;margin:34px 0 4px;flex-wrap:wrap}
+  .quizhead .ttl{font-family:var(--mono);font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--text);font-weight:700}
+  .quizhead .meta{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  .quizhead .rule{flex:1;height:1px;background:var(--line)}
+
+  .q{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:18px 18px 6px;
+    margin:16px 0;position:relative}
+  .qtop{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:9px}
+  .qid{font-family:var(--mono);font-size:11.5px;color:var(--muted);font-weight:600}
+  .chip{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+    padding:2px 7px;border-radius:5px;font-weight:700}
+  .chip.drill{background:#1c2c3b;color:#8fb4d6}
+  .chip.exam{background:var(--accent);color:#1a1206}
+  .chip.mixed{background:var(--accent-tint);color:var(--accent-2);border:1px solid rgba(245,158,60,.4)}
+  .chip.two{background:rgba(150,110,210,.18);color:#bfa3e8;border:1px solid rgba(150,110,210,.4)}
+  .chip.miss{background:var(--no-bg);color:var(--no);border:1px solid var(--no-line)}
+  .chip.win{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-line)}
+  .stem{font-size:16.5px;margin:2px 0 13px;line-height:1.5;color:var(--text)}
+  .opts{list-style:none;margin:0;padding:0}
+  .opt{display:flex;gap:11px;align-items:flex-start;width:100%;text-align:left;cursor:pointer;
+    border:1px solid var(--line);background:var(--panel2);border-radius:9px;padding:11px 13px;margin:7px 0;
+    font:inherit;font-size:15.5px;color:var(--text);transition:border-color .12s,background .12s}
+  .opt:hover:not(:disabled){border-color:var(--line-strong);background:var(--panel3)}
+  .opt:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .opt:disabled{cursor:default}
+  .opt .ltr{flex:none;font-family:var(--mono);font-weight:700;font-size:13px;color:var(--accent-2);
+    width:18px;text-align:center;padding-top:1px}
+  .opt .otext{flex:1}
+  .opt.sel{border-color:var(--accent);background:var(--accent-tint)}
+  .opt.correct{border-color:var(--ok-line);background:var(--ok-bg)}
+  .opt.correct .ltr{color:var(--ok)}
+  .opt.wrong{border-color:var(--no-line);background:var(--no-bg)}
+  .opt.wrong .ltr{color:var(--no)}
+  .opt .mark{margin-left:auto;font-family:var(--mono);font-weight:700;font-size:13px;white-space:nowrap}
+  .opt.correct .mark{color:var(--ok)}.opt.wrong .mark{color:var(--no)}
+  .checkbtn{font-family:var(--mono);font-size:12.5px;font-weight:700;letter-spacing:.04em;
+    background:var(--accent);color:#1a1206;border:none;border-radius:8px;padding:9px 16px;cursor:pointer;
+    margin:6px 0 2px}
+  .checkbtn:hover{background:var(--accent-2)}.checkbtn:disabled{opacity:.35;cursor:default}
+  .reveal{max-height:0;overflow:hidden;transition:max-height .3s ease}
+  .reveal.show{max-height:1900px}
+  .rv-inner{border-top:1px solid var(--line);margin-top:12px;padding:13px 2px 12px;font-size:15px;
+    color:var(--soft);line-height:1.58}
+  .rv-inner .verdict{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;
+    font-weight:700;margin-bottom:6px}
+  .verdict.r-ok{color:var(--ok)}.verdict.r-no{color:var(--no)}
+  .rv-inner b{color:var(--text)}
+  .flip{display:block;margin-top:10px;padding:9px 12px;background:var(--panel3);border-radius:8px;
+    font-size:14.5px;border:1px solid var(--line)}
+  .flip .fl{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--accent-2);font-weight:700;margin-right:6px}
+
+  #help{position:fixed;inset:0;z-index:90;background:rgba(6,11,17,.72);display:none;
+    align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+  #help.show{display:flex}
+  .help-card{background:var(--panel2);border:1px solid var(--line-strong);border-radius:14px;
+    padding:24px 26px;max-width:380px;width:calc(100% - 44px)}
+  .help-card h4{margin:0 0 4px;font-family:var(--mono);font-size:12px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--accent)}
+  .help-card .hk{display:flex;justify-content:space-between;gap:14px;padding:6px 0;font-size:14.5px;
+    border-bottom:1px solid var(--line)}
+  .help-card .hk:last-of-type{border-bottom:none}
+  .help-card kbd{font-family:var(--mono);background:var(--panel3);border:1px solid var(--line-strong);
+    border-bottom-width:2px;border-radius:5px;padding:1px 8px;color:var(--accent-2);font-weight:600}
+  .help-card .close{margin-top:14px;font-family:var(--mono);font-size:12px;color:var(--muted);text-align:center}
+
+  .summary{padding:46px 0 70px}
+  .scorecard{background:linear-gradient(160deg,var(--panel3),var(--panel));color:var(--text);
+    border:1px solid var(--line-strong);border-radius:16px;padding:26px 26px 22px;text-align:center}
+  .scorecard .big{font-size:54px;font-weight:800;letter-spacing:-.02em;line-height:1}
+  .scorecard .lab2{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--accent);margin-bottom:8px}
+  .scorecard .note{color:var(--soft);font-size:14.5px;margin-top:10px}
+  .misslist{margin-top:18px;font-family:var(--mono);font-size:13px}
+  .misslist a{color:var(--accent-2);text-decoration:none;border-bottom:1px dotted var(--accent);
+    margin:0 4px;display:inline-block}
+  .foot{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:center;margin-top:30px}
+
+  @media (max-width:560px){
+    body{font-size:16px} h1{font-size:31px} h2{font-size:23px}
+    .hud-inner{font-size:11px;gap:10px} .stem{font-size:15.5px}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<div class="hud">
+  <div class="hud-inner">
+    <span class="dot">▰ SAA-C03</span>
+    <span class="stat"><b id="h-ans">0</b>/<span id="h-tot">0</span> answered</span>
+    <span class="stat"><b id="h-pct">—</b> correct</span>
+    <div class="bar"><i id="h-bar"></i></div>
+    <button id="h-help">? keys</button>
+    <button id="h-reset">reset</button>
+  </div>
+</div>
+
+<div id="help"><div class="help-card">
+  <h4>Vim scrolling</h4>
+  <div class="hk"><span>Scroll down / up (nudge)</span><span><kbd>j</kbd> <kbd>k</kbd></span></div>
+  <div class="hk"><span>Half page down / up</span><span><kbd>d</kbd> <kbd>u</kbd></span></div>
+  <div class="hk"><span>Full page down / up</span><span><kbd>f</kbd> <kbd>b</kbd></span></div>
+  <div class="hk"><span>Top of page</span><span><kbd>g</kbd><kbd>g</kbd></span></div>
+  <div class="hk"><span>Bottom of page</span><span><kbd>G</kbd></span></div>
+  <div class="hk"><span>Toggle this help</span><span><kbd>?</kbd></span></div>
+  <div class="close">Answer questions by clicking · esc closes help</div>
+</div></div>
+
+<div class="wrap">
+<header class="top">
+  <p class="eyebrow">Weakness-targeted drill · File 4 of 5 · dark</p>
+  <h1>Resilience, DR &amp; Global<br><span class="thin">HA &amp; ARC · Route 53 · DR strategies · CloudFront vs Global Accelerator</span></h1>
+  <p class="lede">Your weakest cluster after High-Performing. The exam tests two things relentlessly here: the four DR strategies mapped to RTO/RPO (the question you split wrong under time pressure), and which Route 53 policy to reach for — performance vs failover. We drill both hard.</p>
+  <div class="filechips">
+    <span class="fc done">1 · Compute</span>
+    <span class="fc done">2 · Decoupling</span>
+    <span class="fc done">3 · Databases</span>
+    <span class="fc here">4 · Resilience &amp; DR</span>
+    <span class="fc">5 · Cost</span>
+  </div>
+  <div class="legend">
+    <div class="row"><span class="tg chip drill">drill</span><span><b>Quick check.</b> Exam-real, one fact at a time.</span></div>
+    <div class="row"><span class="tg chip exam">exam</span><span><b>Scenario.</b> Full SAA-C03 difficulty — several designs fit, one wins.</span></div>
+    <div class="row"><span class="tg chip mixed">mixed</span><span><b>All-topics review</b> so Files 1–3 stay sharp.</span></div>
+    <div class="row"><span class="tg chip miss">↻ your miss</span><span>You got this exact concept wrong on a mock or the timed exam.</span></div>
+    <div class="row"><span class="tg chip win">✓ lock it in</span><span>You answered this right before — prove it sticks.</span></div>
+    <div class="keys">
+      <span><kbd>j</kbd><kbd>k</kbd>scroll</span>
+      <span><kbd>d</kbd><kbd>u</kbd>half page</span>
+      <span><kbd>f</kbd><kbd>b</kbd>full page</span>
+      <span><kbd>g</kbd><kbd>g</kbd>top &nbsp; <kbd>G</kbd>bottom</span>
+      <span><kbd>?</kbd>help</span>
+      <span><b>click</b> to answer</span>
+    </div>
+  </div>
+</header>
+</div>
+
+<div class="wrap">
+
+<!-- ===================== SECTION 1 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">01</span> High availability &amp; graceful failure</div>
+  <h2>Assume everything breaks, then design so it doesn't matter</h2>
+  <p class="sub">Resilient architecture is mostly the absence of single points of failure: spread across AZs, put a load balancer and an Auto Scaling group in front, decouple the tiers, and keep instances stateless so losing one is a non-event.</p>
+
+  <h3>The HA checklist the exam rewards</h3>
+  <ul class="tight">
+    <li><b>Multi-AZ everything</b> — ASG spanning AZs behind an ELB, Multi-AZ databases, multi-AZ subnets. One AZ dying should be invisible.</li>
+    <li><b>Stateless instances</b> — externalize session state (ElastiCache/DynamoDB) so any instance can serve any request and scale-in/deploys lose nothing.</li>
+    <li><b>Decouple</b> — a queue (SQS) between tiers means a slow or failed downstream backs up instead of dropping work.</li>
+    <li><b>ELB health checks on the ASG</b> — so a broken-but-running instance gets replaced, not left in rotation.</li>
+    <li><b>Automate recovery</b> — Auto Scaling self-heals; don't rely on a human noticing.</li>
+  </ul>
+
+  <div class="box key"><p class="lab">Key fact — gray failures &amp; ARC</p><p>A <b>gray failure</b> is a partial, ambiguous impairment: health checks pass, but latency or error rates quietly climb. Amazon Application Recovery Controller (ARC) gives you the tools the standard health check can't:</p>
+  <ul class="tight" style="margin-top:8px">
+    <li><b>Zonal shift / autoshift</b> — drain a suspect AZ with one auto-expiring action (manual), or let AWS do it on impairment signals you can't see (autoshift), validated by <b>practice runs</b>.</li>
+    <li><b>Routing controls</b> — highly-available on/off switches (data plane spread across multiple Regions) to trigger a <em>Region-level</em> failover reliably, even mid-outage when control-plane APIs are shaky.</li>
+    <li><b>Readiness checks</b> — continuously verify your recovery environment is actually scaled and configured to take over.</li>
+  </ul></div>
+
+  <div class="box field"><p class="lab">// field note — "everything fails, all the time"</p><p>That line, widely attributed to Amazon CTO Werner Vogels, is the whole philosophy in five words. The corollary lesson came on <b>February 28, 2017</b>: a typo during a routine debugging command removed far more S3 capacity than intended in <code>us-east-1</code>, cascading across dozens of services. The kicker — the AWS status dashboard itself depended on S3, so for a while it couldn't even show that S3 was down. The takeaway runs through this whole file: hard Regional dependencies are single points of failure, and resilience is a design choice you make <em>before</em> the incident.</p></div>
+
+  <div class="quizhead"><span class="ttl">Quick check</span><span class="rule"></span><span class="meta">8 questions · one fact each</span></div>
+  <div id="s1-drill"></div>
+  <div class="quizhead"><span class="ttl">Scenario pressure</span><span class="rule"></span><span class="meta">7 questions · exam difficulty</span></div>
+  <div id="s1-exam"></div>
+</section>
+
+<!-- ===================== MIXED 1 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">↻</span> Mixed review — all domains</div>
+  <h2>Keep Files 1–3 warm</h2>
+  <p class="sub">Four across decoupling and databases, including your Kinesis and Aurora-failover misses.</p>
+  <div id="mix-1"></div>
+</section>
+
+<!-- ===================== SECTION 2 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">02</span> Route 53 — routing policies &amp; DNS failover</div>
+  <h2>Seven policies; pick the one the requirement names</h2>
+  <p class="sub">Almost every Route 53 question is "performance vs failover vs compliance vs split." Match the intent and you're done.</p>
+
+  <div class="tw"><table>
+    <tr><th>Policy</th><th>Use it when the stem says…</th></tr>
+    <tr><td><b>Simple</b></td><td>one record, no health-based decision needed</td></tr>
+    <tr><td><b>Weighted</b></td><td>split traffic by percentage — canary, blue/green, gradual shift</td></tr>
+    <tr><td><b>Latency-based</b></td><td>send users to the lowest-latency Region (performance, active-active)</td></tr>
+    <tr><td><b>Failover</b></td><td>active-passive DR — primary + standby with health checks</td></tr>
+    <tr><td><b>Geolocation</b></td><td>route by user location — compliance, data residency, localization</td></tr>
+    <tr><td><b>Geoproximity</b></td><td>route by distance with a tunable <em>bias</em> (via Traffic Flow)</td></tr>
+    <tr><td><b>Multivalue answer</b></td><td>return several healthy records for simple client-side HA</td></tr>
+  </table></div>
+
+  <div class="box trap"><p class="lab">Failover ≠ latency</p><p>For automatic DR cutover to a standby, the answer is <b>failover routing</b> (active-passive, health-checked). <b>Latency-based</b> routing is a <em>performance</em> tool — it sends each user to the nearest healthy Region; it is not "promote the standby when the primary dies." Choosing two routing policies at once, or latency where failover belongs, is a recurring trap (and the one that cost you on Mock 2).</p></div>
+
+  <p><strong>Two more reflexes:</strong> an <b>alias record</b> is Route 53-specific — it can sit at the <em>zone apex</em> (<code>example.com</code>), points to AWS resources (ELB, CloudFront, S3, API GW), is free, and can evaluate target health; a plain <b>CNAME cannot be used at the apex</b>. And DNS failover speed is bounded by the record's <b>TTL</b> — resolvers cache the old answer until it expires, so DNS-based failover is "minutes," not "seconds" (which is exactly why Global Accelerator exists for sub-minute Regional failover — Section 03).</p>
+
+  <div class="box field"><p class="lab">// trivia</p><p>The "53" in Route 53 is the TCP/UDP <b>port number for DNS</b> — a quiet nod to what the service does. AWS also backs Route 53 with a <b>100% availability SLA</b>, one of the few services it commits to that level for, because DNS resolution failing is catastrophic in a way few other failures are.</p></div>
+
+  <div class="quizhead"><span class="ttl">Quick check</span><span class="rule"></span><span class="meta">8 questions · one fact each</span></div>
+  <div id="s2-drill"></div>
+  <div class="quizhead"><span class="ttl">Scenario pressure</span><span class="rule"></span><span class="meta">7 questions · exam difficulty + your routing miss</span></div>
+  <div id="s2-exam"></div>
+</section>
+
+<!-- ===================== MIXED 2 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">↻</span> Mixed review — all domains</div>
+  <h2>Keep the rest warm</h2>
+  <p class="sub">Four across cost, security and caching — two are previous misses that preview File 5.</p>
+  <div id="mix-2"></div>
+</section>
+
+<!-- ===================== SECTION 3 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">03</span> Disaster recovery strategies &amp; global delivery</div>
+  <h2>RTO and RPO choose the strategy — and the cost</h2>
+  <p class="sub">This is your headline miss. The four DR strategies sit on one axis: faster recovery costs more. Read the RTO/RPO in the stem and the answer is decided.</p>
+
+  <div class="box key"><p class="lab">Key fact — RPO vs RTO</p><p><b>RPO</b> = how much <em>data</em> you can afford to lose (the gap back to the last good copy) → it drives how often you replicate. <b>RTO</b> = how much <em>downtime</em> you can tolerate (time to be running again) → it drives how much standby infrastructure you keep warm. "Lose at most 5 minutes of data" is an RPO; "be back within 1 hour" is an RTO.</p></div>
+
+  <div class="tw"><table>
+    <tr><th>Strategy</th><th>What's running in DR</th><th>RTO / RPO</th><th>Cost</th></tr>
+    <tr><td><b>Backup &amp; Restore</b></td><td>nothing — just backups in another Region</td><td>hours</td><td>lowest</td></tr>
+    <tr><td><b>Pilot Light</b></td><td>core data replicated; minimal/off compute</td><td>tens of minutes</td><td>low</td></tr>
+    <tr><td><b>Warm Standby</b></td><td>a scaled-down but fully functional copy</td><td>minutes</td><td>medium</td></tr>
+    <tr><td><b>Multi-Site Active-Active</b></td><td>full production in multiple Regions</td><td>near zero</td><td>highest</td></tr>
+  </table></div>
+
+  <p>The deciding clue is what's already running. "Just keep the data safe, hours of downtime is fine" → <b>backup &amp; restore</b>. "Database is live-replicated but compute is off until disaster" → <b>pilot light</b>. "A smaller-but-complete environment is always up and we scale it on failover" → <b>warm standby</b>. "Both Regions serve live traffic, near-zero downtime" → <b>multi-site active-active</b>.</p>
+
+  <h3>Global delivery: CloudFront vs Global Accelerator</h3>
+  <div class="tw"><table>
+    <tr><th></th><th>CloudFront</th><th>Global Accelerator</th></tr>
+    <tr><td><b>Layer / job</b></td><td>L7 CDN — caches HTTP content at the edge, offloads origin</td><td>L4 — routes TCP/UDP over the AWS backbone to the best Region</td></tr>
+    <tr><td><b>Caches?</b></td><td>Yes</td><td>No</td></tr>
+    <tr><td><b>Static IPs</b></td><td>No</td><td>Yes — 2 static anycast IPs</td></tr>
+    <tr><td><b>Failover</b></td><td>origin groups (primary + secondary origin)</td><td>fast Regional failover, no DNS-TTL wait</td></tr>
+    <tr><td><b>Reach for it</b></td><td>websites, media, cacheable content</td><td>non-HTTP, gaming/IoT/VoIP, static IPs, sub-minute Regional failover</td></tr>
+  </table></div>
+
+  <div class="box field"><p class="lab">// field note — DR is a spectrum, not a switch</p><p>AWS's own disaster-recovery guidance lays these four strategies out on a single dial from cheapest/slowest to priciest/instant. The architect's job isn't to pick "the best" one — it's to read the business's tolerance for lost data and downtime and choose the cheapest strategy that still meets it. Spending warm-standby money on a workload that's fine with an overnight restore is as wrong on the exam as the reverse.</p></div>
+
+  <div class="quizhead"><span class="ttl">Quick check</span><span class="rule"></span><span class="meta">5 questions · one fact each</span></div>
+  <div id="s3-drill"></div>
+  <div class="quizhead"><span class="ttl">Scenario pressure</span><span class="rule"></span><span class="meta">7 questions · exam difficulty + your DR &amp; multi-Region misses</span></div>
+  <div id="s3-exam"></div>
+</section>
+
+<!-- ===================== SUMMARY ===================== -->
+<section class="summary">
+  <div class="scorecard">
+    <div class="lab2">Session readiness</div>
+    <div class="big"><span id="sc-pct">—</span></div>
+    <div class="note"><span id="sc-line">Answer some questions and your readiness score appears here.</span></div>
+    <div class="misslist" id="sc-miss"></div>
+  </div>
+  <p class="foot">File 4 / 5 · Resilience, DR &amp; Global Architecture · 50 questions · press <kbd style="font-family:var(--mono)">?</kbd> for scroll keys · last up: File 5 — Cost Optimization (Spot vs RI vs Savings Plans, scheduling, right-sizing, Graviton, cost tooling).</p>
+</section>
+
+</div><!-- /wrap -->
+
+<script>
+const BANK = [
+
+/* ====== S1 DRILL — HA & ARC ====== */
+{g:"s1-drill",id:"4.01",d:"drill",q:"Which design eliminates single points of failure for a web tier and survives an AZ outage?",
+o:["A single large EC2 instance with an Elastic IP","An Auto Scaling group spanning multiple AZs behind an Elastic Load Balancer","Two instances in one AZ behind an ALB","Route 53 round-robin to fixed instance IPs"],c:1,
+e:`<b>ASG across multiple AZs behind an ELB</b> has no single point of failure and tolerates an AZ loss. ✗ One instance is itself a SPOF; ✗ single-AZ dies with the AZ; ✗ round-robin DNS has no health-based failover or autoscaling.`},
+
+{g:"s1-drill",id:"4.02",d:"drill",q:"What is a 'gray failure'?",
+o:["A complete, obvious outage","A partial/ambiguous impairment where health checks still pass but latency or errors climb","A billing anomaly","A DNS misconfiguration"],c:1,
+e:`A <b>gray failure</b> is partial and ambiguous — standard health checks look fine while performance quietly degrades. That's why tools like ARC zonal shift exist beyond simple health checks.`},
+
+{g:"s1-drill",id:"4.03",d:"drill",q:"What does an ARC zonal shift do?",
+o:["Fails the whole Region over to another Region","Moves traffic away from a single impaired Availability Zone with an auto-expiring action","Resizes instances automatically","Rotates KMS keys"],c:1,
+e:`<b>Zonal shift</b> drains a suspect AZ quickly and reverts automatically when the shift expires. Region-level failover is routing controls; the others are unrelated.`},
+
+{g:"s1-drill",id:"4.04",d:"drill",q:"What are ARC routing controls?",
+o:["DNS records that cache forever","Highly-available on/off switches to trigger Region-level failover, reliable even during a large outage","CloudWatch dashboards","IAM permission boundaries"],c:1,
+e:`<b>Routing controls</b> are dependable failover switches backed by a multi-Region data plane, so you can flip Region-level failover even when control-plane APIs are degraded.`},
+
+{g:"s1-drill",id:"4.05",d:"drill",q:"What do ARC readiness checks provide?",
+o:["Continuous verification that your recovery environment is scaled and configured to take over","Automatic code deployment","Cost forecasts","Encryption of backups"],c:0,
+e:`<b>Readiness checks</b> continuously confirm the standby/recovery environment is actually ready (capacity, config, limits) — so failover doesn't reveal a half-built DR site. The others are unrelated services.`},
+
+{g:"s1-drill",id:"4.06",d:"drill",q:"To make a web tier resilient to instance loss and deployments, what should you do with session state?",
+o:["Keep it in instance memory with sticky sessions","Externalize it to a shared store (ElastiCache/DynamoDB) so instances are stateless","Store it on the instance's local disk","Disable Auto Scaling"],c:1,
+e:`<b>Externalizing session state</b> makes instances stateless, so losing or replacing one doesn't drop a user's session. Sticky sessions and local storage create the exact fragility you're removing.`},
+
+{g:"s1-drill",id:"4.07",d:"drill",q:"How does putting an SQS queue between two tiers improve resilience?",
+o:["It encrypts traffic","It buffers requests so a slow or failed downstream backs up instead of dropping work","It caches database queries","It provides a static IP"],c:1,
+e:`A <b>queue absorbs spikes and outages</b> — if the consumer slows or fails, work waits in the queue instead of being lost. The other options describe TLS, caching, and NLB respectively.`},
+
+{g:"s1-drill",id:"4.08",d:"drill",q:"With ELB health checks enabled on an Auto Scaling group, what happens to an instance the load balancer marks unhealthy?",
+o:["It stays in service until manually removed","The ASG terminates and replaces it","It's resized","It's moved to another AZ without replacement"],c:1,
+e:`With <b>ELB health checks enabled</b>, the ASG replaces instances the load balancer deems unhealthy — automated self-healing. Without it, the ASG only watches EC2 status checks.`},
+
+/* ====== S1 EXAM — HA & ARC ====== */
+{g:"s1-exam",id:"4.09",d:"exam",tag:"win",q:"A web tier must handle large, unpredictable traffic swings and remain available even if an entire Availability Zone fails. Best design?",
+o:["A vertically-scaled single instance with frequent backups","An Auto Scaling group across multiple AZs behind an Application Load Balancer","Instances in one AZ with a warm spare in the same AZ","Multivalue-answer DNS to instances in one AZ"],c:1,
+e:`<b>ASG across AZs behind an ALB</b> scales with demand and survives an AZ loss — the canonical resilient web tier. ✗ A single instance can't scale or tolerate failure; ✗ same-AZ designs die with the AZ; ✗ DNS to one AZ has the same flaw.`},
+
+{g:"s1-exam",id:"4.10",d:"exam",tag:"miss",q:"An Auto Scaling group spans three AZs behind an ALB. One AZ has a gray failure — latency triples but ELB health checks still pass — and the ASG keeps launching into it. You want one auto-reverting action to move traffic out now, AWS to do it automatically in future impairments, and regular proof the other AZs can absorb the load, with the LEAST effort.",
+o:["A CloudWatch+Lambda system to deregister and later re-register the AZ's targets","ARC zonal shift now, plus zonal autoshift enabled with practice runs","Enable ALB cross-zone load balancing","Add a fourth AZ"],c:1,
+e:`<b>ARC zonal shift</b> drains the AZ with one auto-expiring action; <b>zonal autoshift</b> lets AWS act on impairment signals health checks miss; <b>practice runs</b> prove the other AZs can carry the load. ✗ The Lambda build is all-DIY detection and rollback; ✗ cross-zone spreads load into the sick AZ; ✗ a fourth AZ doesn't address the gray failure.<span class="flip"><span class="fl">flip it</span>If you needed to fail the whole <i>Region</i> over, the answer becomes ARC <b>routing controls</b> (or Route 53 failover).</span>`},
+
+{g:"s1-exam",id:"4.11",d:"exam",q:"A company runs multi-Region active-passive and wants a reliable way to trigger Region failover that keeps working even during a massive Region impairment — not something that depends on calling control-plane APIs that might be degraded. What should they use?",
+o:["A Lambda function that calls failover APIs when an alarm fires","ARC routing controls (data plane spread across multiple Regions)","A cron job that edits Route 53 records","Manual console changes during the incident"],c:1,
+e:`<b>ARC routing controls</b> are designed to be dependable during large outages — their data plane spans multiple Regions so the failover switch works even when control-plane APIs are shaky. ✗ Lambda/cron/manual all depend on services that may be impaired during the very event you're failing over from.`},
+
+{g:"s1-exam",id:"4.12",d:"exam",tag:"miss",q:"A stateful web app stores user sessions in memory on each EC2 instance. During a recent deployment, instances were replaced and all sessions were lost. The team needs the design to survive instance replacement without losing sessions. Best change?",
+o:["Increase the health-check grace period","Externalize sessions to ElastiCache for Redis and disable sticky sessions","Pin users to instances with longer sticky-session duration","Take snapshots of instance memory"],c:1,
+e:`Sessions die because state lives on the instance. <b>Externalize to ElastiCache Redis and go stateless</b> — replacements no longer lose sessions and load spreads evenly. ✗ A grace period doesn't persist state; ✗ stickiness deepens the coupling; ✗ memory snapshots aren't a session-store pattern.`},
+
+{g:"s1-exam",id:"4.13",d:"exam",q:"A critical application's database must continue serving with automatic failover if its Availability Zone fails, with no manual steps. Which feature?",
+o:["A cross-Region read replica","RDS Multi-AZ (synchronous standby, automatic failover)","Daily snapshots","Multivalue-answer routing to two databases"],c:1,
+e:`<b>RDS Multi-AZ</b> fails over automatically to a synchronous standby in another AZ. ✗ A cross-Region replica is for DR/read scaling and needs manual promotion; ✗ snapshots are slow recovery; ✗ DNS multivalue isn't database failover.`},
+
+{g:"s1-exam",id:"4.14",d:"exam",q:"An image-processing pipeline silently drops work during traffic spikes when the processing tier can't keep up. Make it resilient so nothing is lost when the backend is slow.",
+o:["Put an SQS queue between the tiers and scale workers on queue depth","Add sticky sessions to the load balancer","Vertically scale the processing instances only","Increase the ALB idle timeout"],c:0,
+e:`Decouple with <b>SQS</b>: the queue buffers spikes and a slow backend just builds backlog — nothing is dropped — while workers scale on queue depth. ✗ Stickiness/idle-timeout/bigger boxes don't add a durable buffer.`},
+
+{g:"s1-exam",id:"4.15",d:"exam",q:"Which architecture has NO single point of failure for a stateless web application?",
+o:["One AZ: ALB → ASG → single RDS instance","Multiple AZs: ALB → ASG across AZs → RDS Multi-AZ, with sessions in ElastiCache (Multi-AZ)","One large instance with an Elastic IP and a standby instance stopped nearby","Route 53 simple routing to two instances in the same AZ"],c:1,
+e:`Only the <b>fully multi-AZ stack</b> — ALB, ASG across AZs, Multi-AZ database, Multi-AZ session store — removes every SPOF. ✗ A single-AZ or single-RDS design has SPOFs; ✗ a stopped standby isn't automatic HA; ✗ same-AZ DNS shares one failure domain.`},
+
+/* ====== MIX 1 ====== */
+{g:"mix-1",id:"M1.1",d:"mixed",tag:"miss",q:"Several independent consumers (billing, notifications, analytics) must each receive EVERY event, process at their own pace, and catch up on missed events after downtime, ordered per key at high throughput. Which service?",
+o:["A single SQS FIFO queue all three poll","Kinesis Data Streams with the key as the partition key; each consumer reads the whole stream independently","An SNS Standard topic","EventBridge to three SQS Standard queues"],c:1,
+e:`Many independent consumers + every record + replay/catch-up + per-key ordering + high throughput = <b>Kinesis Data Streams</b>. ✗ One SQS queue means they compete; ✗ SNS doesn't retain for catch-up; ✗ Standard queues lose ordering.`},
+
+{g:"mix-1",id:"M1.2",d:"mixed",tag:"win",q:"A read-heavy reporting workload slows a single RDS instance; writes are light and must not be impacted. How do you scale reads?",
+o:["Enable Multi-AZ","Add read replicas and route reporting reads to them","Increase IOPS only","Restore nightly snapshots to query"],c:1,
+e:`<b>Read replicas</b> offload reads without touching the writer. ✗ Multi-AZ is failover; ✗ more IOPS isn't read capacity; ✗ snapshot-querying is a batch workaround.`},
+
+{g:"mix-1",id:"M1.3",d:"mixed",tag:"miss",q:"During an actual outage of the primary Region, how do you bring an Aurora Global Database's secondary Region online as a writable cluster?",
+o:["Use managed planned failover","Detach the secondary from the Global Database and promote it to a standalone read/write cluster","Wait for the primary to recover","Enable Multi-AZ in the secondary Region"],c:1,
+e:`For an <em>unplanned</em> outage you <b>detach the secondary and promote it to standalone read/write</b>. ✗ Managed planned failover needs a healthy primary; ✗ waiting violates the RTO; ✗ Multi-AZ is within a Region, not cross-Region promotion.`},
+
+{g:"mix-1",id:"M1.4",d:"mixed",tag:"win",q:"During flash sales the order backend can't keep up and orders are dropped. Capture every order with minimal code change.",
+o:["Place an SQS queue between the web and processing tiers","Enable ALB connection draining","Move to a larger processing instance","Enable sticky sessions"],c:0,
+e:`A <b>queue</b> buffers the surge so nothing is lost — minimal change. ✗ Draining, bigger boxes, and stickiness add no durable buffer.`},
+
+/* ====== S2 DRILL — Route 53 ====== */
+{g:"s2-drill",id:"4.16",d:"drill",q:"Which Route 53 routing policy implements active-passive disaster recovery with a primary and a health-checked standby?",
+o:["Latency-based","Failover","Weighted","Geolocation"],c:1,
+e:`<b>Failover routing</b> is active-passive: traffic goes to the primary while healthy, then to the standby. Latency/weighted/geolocation serve other intents.`},
+
+{g:"s2-drill",id:"4.17",d:"drill",q:"Which policy sends each user to the AWS Region that gives them the lowest latency?",
+o:["Geolocation","Latency-based","Failover","Simple"],c:1,
+e:`<b>Latency-based</b> routing optimizes for performance per user. Geolocation routes by location (not measured latency); failover is DR; simple has no decision logic.`},
+
+{g:"s2-drill",id:"4.18",d:"drill",q:"Which policy splits traffic by percentage for canary or blue/green releases?",
+o:["Weighted","Multivalue answer","Geoproximity","Failover"],c:0,
+e:`<b>Weighted</b> routing assigns percentages to records — ideal for gradual/canary rollouts. The others don't do percentage splits.`},
+
+{g:"s2-drill",id:"4.19",d:"drill",q:"Which policy routes users based on their country or continent (e.g. for data-residency compliance)?",
+o:["Latency-based","Geolocation","Weighted","Simple"],c:1,
+e:`<b>Geolocation</b> routing decides by the user's geographic location — the compliance/localization tool. Latency is performance; weighted is percentage; simple is none.`},
+
+{g:"s2-drill",id:"4.20",d:"drill",q:"Which policy returns multiple healthy records (up to 8) for simple client-side load balancing / HA?",
+o:["Simple","Multivalue answer","Failover","Geoproximity"],c:1,
+e:`<b>Multivalue answer</b> returns several health-checked records so clients can spread requests — basic HA, not a replacement for an ELB.`},
+
+{g:"s2-drill",id:"4.21",d:"drill",q:"What can an alias record do that a CNAME cannot?",
+o:["Resolve faster always","Sit at the zone apex (example.com), point to AWS resources, free, and evaluate target health","Encrypt DNS queries","Replace a load balancer"],c:1,
+e:`<b>Alias</b> records work at the zone apex, target AWS resources, cost nothing, and can evaluate target health — none of which a plain <b>CNAME</b> can do at the apex.`},
+
+{g:"s2-drill",id:"4.22",d:"drill",q:"DNS-based failover speed is primarily bounded by what?",
+o:["The number of records","The record's TTL (resolvers cache the old answer until it expires)","The Region count","The instance type"],c:1,
+e:`Resolvers cache answers for the <b>TTL</b>, so DNS failover is only as fast as that cache expiring — which is why DNS failover is 'minutes' and Global Accelerator (no DNS-TTL dependency) is used for sub-minute Regional failover.`},
+
+{g:"s2-drill",id:"4.23",d:"drill",q:"What does geoproximity routing add beyond geolocation?",
+o:["Encryption of records","A tunable bias to expand or shrink the geographic area routed to a resource","A 100% SLA","Percentage-based splits"],c:1,
+e:`<b>Geoproximity</b> routes by distance and lets you set a <b>bias</b> to grow/shrink each resource's catchment (via Traffic Flow). The others describe unrelated features.`},
+
+/* ====== S2 EXAM — Route 53 ====== */
+{g:"s2-exam",id:"4.24",d:"exam",tag:"win",q:"A company runs its primary app in us-east-1 and a standby in us-west-2. DNS must automatically send users to the standby if the primary becomes unhealthy. What should they configure in Route 53?",
+o:["Weighted routing split 50/50","Simple routing listing both endpoints","Failover routing with a health check on the primary endpoint","Geolocation routing by user country"],c:2,
+e:`<b>Failover routing with a health check on the primary</b> is the active-passive DR pattern — traffic flips to the standby automatically when the primary fails. ✗ Weighted/simple don't fail over on health; ✗ geolocation routes by location, not health.`},
+
+{g:"s2-exam",id:"4.25",d:"exam",tag:"miss",q:"For automatic DNS cutover to a DR Region when the primary fails, a teammate suggests using latency-based routing because it 'sends users to the healthy Region.' Why is that wrong, and what should you use?",
+o:["Latency routing is correct; it handles failover","Latency routing optimizes performance, not active-passive failover; use failover routing with health checks","Use weighted routing at 100/0","Use geolocation routing"],c:1,
+e:`<b>Latency-based routing is a performance tool</b> — it directs users to the nearest healthy Region, not "promote the standby when the primary dies." For active-passive DR cutover, use <b>failover routing with health checks</b>. ✗ Weighted 100/0 and geolocation aren't health-driven failover mechanisms.`},
+
+{g:"s2-exam",id:"4.26",d:"exam",q:"A global app runs full production in three Regions, all healthy and serving traffic. Users should hit whichever Region is fastest for them. Which routing policy?",
+o:["Failover routing","Latency-based routing (active-active)","Geolocation routing by continent","Simple routing"],c:1,
+e:`All Regions live + route each user to the fastest = <b>latency-based routing</b> (active-active). ✗ Failover is active-passive; ✗ geolocation routes by location, not measured latency; ✗ simple has no logic.`},
+
+{g:"s2-exam",id:"4.27",d:"exam",q:"Regulations require that European users' requests are served only from the EU Region, regardless of latency. Which Route 53 policy?",
+o:["Latency-based routing","Geolocation routing","Geoproximity routing","Weighted routing"],c:1,
+e:`Hard location-based rules are <b>geolocation routing</b>'s job — route by where the user is for compliance/residency. ✗ Latency ignores jurisdiction; ✗ geoproximity is distance-with-bias, not a strict legal boundary; ✗ weighted is percentage splitting.`},
+
+{g:"s2-exam",id:"4.28",d:"exam",q:"A team wants to shift production traffic gradually — 10%, then 50%, then 100% — to a new application stack for a blue/green rollout, controlled at the DNS layer. Which policy?",
+o:["Weighted routing","Failover routing","Multivalue answer","Geolocation routing"],c:0,
+e:`<b>Weighted routing</b> assigns percentages you can ramp over time — the DNS-layer blue/green/canary tool. The others don't do percentage shifting.`},
+
+{g:"s2-exam",id:"4.29",d:"exam",q:"You need the zone apex (example.com, no subdomain) to point at an Application Load Balancer. What record type works?",
+o:["A CNAME at the apex","An alias A/AAAA record pointing to the ALB","An MX record","A TXT record"],c:1,
+e:`A plain <b>CNAME can't live at the zone apex</b>; Route 53's <b>alias A/AAAA record</b> can, and it points natively at AWS resources like an ALB. MX/TXT serve other purposes.`},
+
+{g:"s2-exam",id:"4.30",d:"exam",q:"A workload requires sub-minute failover to a DR Region, but DNS TTL caching makes Route 53 failover too slow to meet the RTO. What addresses this?",
+o:["Set the Route 53 TTL to a few hours","Use AWS Global Accelerator, which fails over at the network layer without waiting on DNS TTLs","Use multivalue-answer routing","Add more Route 53 health checks"],c:1,
+e:`<b>Global Accelerator</b> fails over over the AWS backbone on static anycast IPs — no DNS-TTL wait — meeting sub-minute Regional failover. ✗ A longer TTL makes failover slower; ✗ multivalue/more health checks still ride DNS caching.`},
+
+/* ====== MIX 2 ====== */
+{g:"mix-2",id:"M2.1",d:"mixed",tag:"miss",q:"A nightly ETL fleet runs restartable, interruption-tolerant jobs 365 days a year and wants the GREATEST cost savings. Best purchasing strategy?",
+o:["1-year All-Upfront Reserved Instances for the exact type","Spot Instances diversified across several instance types and AZs, relaunching on interruption","All On-Demand for reliability","Dedicated Hosts"],c:1,
+e:`Interruption-tolerant work is the ideal <b>Spot</b> case; diversifying across <b>instance types and AZs</b> avoids a single pool draining the fleet, for the deepest savings. ✗ RIs lock to one type at higher cost; ✗ all On-Demand is most expensive; ✗ Dedicated Hosts serve licensing/compliance. (Full tree: File 5.)`},
+
+{g:"mix-2",id:"M2.2",d:"mixed",tag:"win",q:"A DynamoDB-backed app needs microsecond read latency for a read-intensive, eventually-consistent workload, with no application rewrite. What do you add?",
+o:["DynamoDB Accelerator (DAX)","A DynamoDB global table","A separate ElastiCache the app queries directly","Provisioned capacity with auto scaling"],c:0,
+e:`<b>DAX</b> is the in-memory, microsecond cache built into the DynamoDB API — drop-in. ✗ Global tables are multi-Region, not latency; ✗ a separate cache means a rewrite; ✗ auto scaling is capacity, not microsecond latency.`},
+
+{g:"mix-2",id:"M2.3",d:"mixed",q:"A public-facing ALB is being hit with SQL injection and cross-site scripting attempts. What blocks these at Layer 7 while allowing legitimate traffic?",
+o:["AWS Shield Standard","AWS WAF on the ALB with managed/match rules","A Network ACL","Amazon GuardDuty"],c:1,
+e:`<b>WAF</b> inspects L7 requests and blocks SQLi/XSS — attach it to the ALB. ✗ Shield is DDoS (L3/4); ✗ NACLs filter IPs/ports, not payloads; ✗ GuardDuty detects but doesn't inline-block requests.`},
+
+{g:"mix-2",id:"M2.4",d:"mixed",tag:"miss",q:"A company uses Direct Connect to its VPC and a new rule requires all data in transit to be encrypted. Most operationally efficient solution?",
+o:["Enable an 'encryption' setting on the Direct Connect connection","Run a Site-to-Site VPN (IPsec) over the Direct Connect link","Replace Direct Connect with an internet VPN","Encrypt with CloudHSM before sending"],c:1,
+e:`<b>Direct Connect is private but unencrypted</b> — layer an IPsec <b>VPN over the DX link</b> for private + encrypted. ✗ There's no DX encryption toggle; ✗ dropping DX loses the dedicated line; ✗ app/CloudHSM encryption is heavier and incomplete.`},
+
+/* ====== S3 DRILL — DR strategies & global delivery ====== */
+{g:"s3-drill",id:"4.31",d:"drill",q:"Which DR strategy is cheapest and accepts the longest RTO (hours) — just keeping backups in another Region and rebuilding on disaster?",
+o:["Backup & Restore","Pilot Light","Warm Standby","Multi-Site Active-Active"],c:0,
+e:`<b>Backup & Restore</b> is the lowest-cost, longest-RTO option — restore infrastructure from backups when disaster strikes. The others keep progressively more running for faster recovery at higher cost.`},
+
+{g:"s3-drill",id:"4.32",d:"drill",q:"Which DR strategy keeps the database continuously replicated to the DR Region but minimal/off compute, scaling it up only on disaster?",
+o:["Backup & Restore","Pilot Light","Warm Standby","Multi-Site Active-Active"],c:1,
+e:`<b>Pilot Light</b> keeps the core (data) warm and the rest dark until needed — cheaper than warm standby, faster than backup & restore.`},
+
+{g:"s3-drill",id:"4.33",d:"drill",q:"Which DR strategy runs a scaled-down but fully functional copy in the DR Region, scaled to full capacity on failover (RTO in minutes)?",
+o:["Backup & Restore","Pilot Light","Warm Standby","Multi-Site Active-Active"],c:2,
+e:`<b>Warm Standby</b> keeps a smaller-but-complete environment always running, so failover just scales it up — minutes RTO at medium cost.`},
+
+{g:"s3-drill",id:"4.34",d:"drill",q:"Which DR strategy runs full production in multiple Regions simultaneously for near-zero RTO/RPO (at the highest cost)?",
+o:["Backup & Restore","Pilot Light","Warm Standby","Multi-Site Active-Active"],c:3,
+e:`<b>Multi-Site Active-Active</b> serves live traffic from multiple Regions at once — near-zero recovery time, highest cost and complexity.`},
+
+{g:"s3-drill",id:"4.35",d:"drill",q:"Between CloudFront and Global Accelerator, which caches content at the edge?",
+o:["Global Accelerator","CloudFront","Both cache equally","Neither caches"],c:1,
+e:`<b>CloudFront</b> is a CDN that caches at edge locations and offloads the origin. Global Accelerator improves the network path but <b>does not cache</b>.`},
+
+/* ====== S3 EXAM — DR strategies & global delivery ====== */
+{g:"s3-exam",id:"4.36",d:"exam",tag:"miss",q:"A critical application needs an RTO of a few minutes. The business requires that a fully functional environment already be running in the DR Region so failover only has to scale it up — but it doesn't justify the cost of running full production in two Regions. Which DR strategy?",
+o:["Backup & Restore","Pilot Light","Warm Standby","Multi-Site Active-Active"],c:2,
+e:`'Already fully functional, just scale up on failover, RTO of minutes, but not full dual-Region production' is <b>Warm Standby</b>. ✗ Backup & Restore is hours; ✗ Pilot Light keeps compute off/minimal (not 'fully functional running'); ✗ Multi-Site is the full-production-everywhere cost they're avoiding.<span class="flip"><span class="fl">flip it</span>If compute could be off until disaster (only data replicated), it'd be <b>Pilot Light</b>; if near-zero downtime were required, <b>Multi-Site Active-Active</b>.</span>`},
+
+{g:"s3-exam",id:"4.37",d:"exam",q:"An internal reporting tool can tolerate several hours of downtime and a day of data loss in a regional disaster, and the company wants the cheapest DR that simply keeps the data safe in another Region. Which strategy?",
+o:["Backup & Restore","Pilot Light","Warm Standby","Multi-Site Active-Active"],c:0,
+e:`Hours of RTO + cheapest + just keep data safe = <b>Backup & Restore</b> (back up to another Region, rebuild on disaster). ✗ Pilot Light/Warm Standby/Multi-Site all spend more for faster recovery the workload doesn't need.`},
+
+{g:"s3-exam",id:"4.38",d:"exam",q:"A company wants its DR Region to hold a live-replicated copy of the database to keep data current, but run almost no compute there to save money, launching and scaling the application tier only if disaster strikes. Which strategy?",
+o:["Backup & Restore","Pilot Light","Warm Standby","Multi-Site Active-Active"],c:1,
+e:`Live data replication + minimal/off compute until needed = <b>Pilot Light</b>. ✗ Backup & Restore wouldn't keep the DB live-replicated; ✗ Warm Standby runs a functional copy (more cost); ✗ Multi-Site runs full production everywhere.`},
+
+{g:"s3-exam",id:"4.39",d:"exam",tag:"miss",q:"A global application must be deployed across multiple Regions so users get low latency AND the app survives a full Region failure. How should the data and routing be architected?",
+o:["A single Region with CloudFront in front","Route 53 (latency or failover) directing users across Regions, with cross-Region data replication (Aurora Global Database or DynamoDB Global Tables) and CloudFront at the edge","Many EC2 instances in one Region with Multi-AZ","Cross-Region S3 replication only"],c:1,
+e:`A true multi-Region design combines <b>Route 53 routing across Regions</b>, <b>cross-Region data replication</b> (Aurora Global DB / DynamoDB Global Tables) for the database tier, and <b>CloudFront</b> for edge delivery. ✗ A single Region (even with CloudFront/Multi-AZ) can't survive a Region failure; ✗ replicating only S3 ignores compute and the database.`},
+
+{g:"s3-exam",id:"4.40",d:"exam",q:"A global website serves cacheable content and must offload its origin AND automatically fall back to a secondary origin if the primary returns errors. What should be configured?",
+o:["Global Accelerator with two endpoints","CloudFront with an origin group (primary + secondary) for origin failover","Route 53 failover routing only","An NLB with two targets"],c:1,
+e:`<b>CloudFront origin failover</b> (an origin group) caches at the edge, offloads the origin, and fails to the secondary origin on specified error codes. ✗ Global Accelerator doesn't cache; ✗ Route 53 failover is DNS-level, not origin-level within a CDN; ✗ an NLB doesn't cache or do CDN origin failover.`},
+
+{g:"s3-exam",id:"4.41",d:"exam",q:"A real-time multiplayer game uses a custom UDP protocol, needs static IPs clients can allow-list, and must fail over to another Region in well under a minute without waiting on DNS caches. What should front it?",
+o:["Amazon CloudFront","AWS Global Accelerator","Route 53 latency-based routing","A single NLB in one Region"],c:1,
+e:`UDP + static IPs + sub-minute Region failover with no DNS-TTL wait = <b>Global Accelerator</b>. ✗ CloudFront is an HTTP cache; ✗ Route 53 latency routing rides DNS TTLs; ✗ one Region can't fail over.`},
+
+{g:"s3-exam",id:"4.42",d:"exam",q:"A company can lose at most 5 minutes of data in a disaster (RPO 5 minutes). Its current protection is a once-daily backup. What change meets the RPO?",
+o:["Take the daily backup at a different time","Implement continuous/near-continuous replication (e.g. async cross-Region database replication or frequent log shipping)","Increase backup retention to 35 days","Compress the backups"],c:1,
+e:`RPO drives <b>how often you replicate</b>: a 5-minute RPO can't be met by daily backups (24h of potential loss) — you need <b>continuous or near-continuous replication</b>. ✗ Changing the backup time, retention, or compression doesn't shrink the replication gap.`}
+
+];
+
+/* ---------------- RENDER (click to answer) ---------------- */
+const L=["A","B","C","D","E"];
+const state={};
+let total=BANK.length;
+
+function tagChip(t){
+  if(t==="miss") return '<span class="chip miss">↻ your miss</span>';
+  if(t==="win")  return '<span class="chip win">✓ lock it in</span>';
+  return "";
+}
+function diffChip(d,multi){
+  let base = d==="exam"?'<span class="chip exam">exam</span>'
+           : d==="mixed"?'<span class="chip mixed">mixed</span>'
+           : '<span class="chip drill">drill</span>';
+  if(multi) base += ' <span class="chip two">select two</span>';
+  return base;
+}
+
+BANK.forEach(item=>{
+  const host=document.getElementById(item.g);
+  if(!host)return;
+  const card=document.createElement("div");
+  card.className="q";
+  card.dataset.id=item.id;
+  const correctArr = Array.isArray(item.c)?item.c:[item.c];
+  const multi = item.multi===true || correctArr.length>1;
+
+  card.innerHTML =
+    '<div class="qtop"><span class="qid">Q '+item.id+'</span>'+diffChip(item.d,multi)+tagChip(item.tag)+'</div>'+
+    '<div class="stem">'+item.q+'</div>'+
+    '<ul class="opts">'+item.o.map((t,i)=>
+      '<button class="opt" data-i="'+i+'"><span class="ltr">'+L[i]+'</span><span class="otext">'+t+'</span><span class="mark"></span></button>'
+    ).join('')+'</ul>'+
+    (multi?'<button class="checkbtn" disabled>Check answer</button>':'')+
+    '<div class="reveal"><div class="rv-inner"></div></div>';
+
+  host.appendChild(card);
+
+  const opts=[...card.querySelectorAll(".opt")];
+  const checkBtn=card.querySelector(".checkbtn");
+  const reveal=card.querySelector(".reveal");
+  const rvInner=card.querySelector(".rv-inner");
+  let locked=false;
+  let sel=new Set();
+
+  function settle(){
+    locked=true;
+    const ok = sel.size===correctArr.length && [...sel].every(i=>correctArr.includes(i));
+    opts.forEach((b,i)=>{
+      b.disabled=true; b.classList.remove("sel");
+      const mark=b.querySelector(".mark");
+      if(correctArr.includes(i)){b.classList.add("correct");mark.textContent="✓ correct";}
+      else if(sel.has(i)){b.classList.add("wrong");mark.textContent="✗ your pick";}
+    });
+    if(checkBtn)checkBtn.style.display="none";
+    rvInner.innerHTML='<div class="verdict '+(ok?'r-ok':'r-no')+'">'+(ok?'Correct':'Not quite')+'</div>'+item.e;
+    reveal.classList.add("show");
+    state[item.id]={answered:true,correct:ok};
+    updateHUD();
+  }
+
+  function select(i){
+    if(locked||i<0||i>=opts.length)return;
+    if(multi){
+      if(sel.has(i)){sel.delete(i);opts[i].classList.remove("sel");}
+      else{sel.add(i);opts[i].classList.add("sel");}
+      if(checkBtn)checkBtn.disabled = sel.size===0;
+    } else { sel=new Set([i]); settle(); }
+  }
+  opts.forEach(b=>b.addEventListener("click",()=>select(+b.dataset.i)));
+  if(checkBtn)checkBtn.addEventListener("click",()=>{ if(!locked&&sel.size)settle(); });
+});
+
+/* ---------------- VIM PAGE SCROLLING ---------------- */
+let lastG=0;
+const help=document.getElementById("help");
+function toggleHelp(){help.classList.toggle("show");}
+function by(dy){ window.scrollBy({top:dy, behavior:"smooth"}); }
+function to(y){ window.scrollTo({top:y, behavior:"smooth"}); }
+
+document.addEventListener("keydown",e=>{
+  const tag=(e.target.tagName||"").toLowerCase();
+  if(tag==="input"||tag==="textarea")return;
+  if(e.metaKey||e.ctrlKey||e.altKey)return;   // leave browser shortcuts alone
+
+  if(e.key==="Escape"){help.classList.remove("show");return;}
+  if(e.key==="?"){e.preventDefault();toggleHelp();return;}
+  if(help.classList.contains("show"))return;
+
+  const vh=window.innerHeight;
+  switch(e.key){
+    case"j":e.preventDefault();by(95);break;
+    case"k":e.preventDefault();by(-95);break;
+    case"d":e.preventDefault();by(vh*0.5);break;
+    case"u":e.preventDefault();by(-vh*0.5);break;
+    case"f":e.preventDefault();by(vh*0.9);break;
+    case"b":e.preventDefault();by(-vh*0.9);break;
+    case"G":e.preventDefault();to(document.body.scrollHeight);break;
+    case"g":{const now=Date.now();if(now-lastG<500){e.preventDefault();to(0);lastG=0;}else lastG=now;break;}
+  }
+});
+document.getElementById("h-help").addEventListener("click",toggleHelp);
+
+/* ---------------- HUD + SUMMARY ---------------- */
+document.getElementById("h-tot").textContent=total;
+function updateHUD(){
+  const answered=Object.keys(state).length;
+  const correct=Object.values(state).filter(s=>s.correct).length;
+  const pct=answered?Math.round(100*correct/answered):0;
+  document.getElementById("h-ans").textContent=answered;
+  document.getElementById("h-pct").textContent=answered?pct+"%":"—";
+  document.getElementById("h-bar").style.width=(100*answered/total)+"%";
+
+  const scP=document.getElementById("sc-pct");
+  const scL=document.getElementById("sc-line");
+  const scM=document.getElementById("sc-miss");
+  if(answered===0){scP.textContent="—";scL.textContent="Answer some questions and your readiness score appears here.";scM.innerHTML="";return;}
+  scP.textContent=pct+"%";
+  let v;
+  if(answered<total) v=correct+" / "+answered+" so far — "+(total-answered)+" left.";
+  else if(pct>=80) v="Strong. DR strategy + Route 53 reflexes are landing. One file to go.";
+  else if(pct>=70) v="On the pass line. Redo the misses — especially the DR-strategy ones — then File 5.";
+  else v="Below target. Re-read the DR strategy table and the failover-vs-latency box, redo the misses, run it again.";
+  scL.textContent=v;
+
+  const missed=Object.entries(state).filter(([k,val])=>!val.correct).map(([k])=>k);
+  scM.innerHTML = missed.length
+    ? "review: "+missed.map(id=>'<a href="#" onclick="jump(\''+id+'\');return false;">Q'+id+'</a>').join("")
+    : (answered===total?"clean sweep — nothing flagged.":"");
+}
+function jump(id){
+  const el=[...document.querySelectorAll(".q")].find(q=>q.dataset.id===id);
+  if(el)el.scrollIntoView({behavior:"smooth",block:"center"});
+}
+document.getElementById("h-reset").addEventListener("click",()=>location.reload());
+updateHUD();
+</script>
+</body>
+</html>

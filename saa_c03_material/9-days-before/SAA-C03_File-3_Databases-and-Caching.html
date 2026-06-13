@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SAA-C03 · File 3 · Databases &amp; Caching</title>
+<style>
+  :root{
+    --bg:#0e1620; --bg2:#0a1019; --panel:#15212e; --panel2:#1a2836; --panel3:#1f2f40;
+    --line:#26384a; --line-strong:#36506a;
+    --text:#e7eef6; --soft:#a3b5c7; --muted:#6f8298;
+    --accent:#f59e3c; --accent-2:#f7b260; --accent-tint:rgba(245,158,60,.12);
+    --ok:#3fcf8e; --ok-bg:rgba(63,207,142,.13); --ok-line:rgba(63,207,142,.45);
+    --no:#ff7062; --no-bg:rgba(255,112,98,.13); --no-line:rgba(255,112,98,.45);
+    --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);
+    line-height:1.62;font-size:17px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:860px;margin:0 auto;padding:0 22px}
+  ::selection{background:rgba(245,158,60,.3)}
+
+  .hud{position:sticky;top:0;z-index:50;background:rgba(10,16,25,.96);
+    border-bottom:1px solid #1d2c3c;backdrop-filter:saturate(1.2) blur(7px)}
+  .hud-inner{max-width:860px;margin:0 auto;padding:9px 22px;display:flex;gap:16px;
+    align-items:center;font-family:var(--mono);font-size:12.5px;flex-wrap:wrap}
+  .hud .dot{color:var(--accent);font-weight:700;letter-spacing:.04em}
+  .hud .stat b{color:var(--text);font-weight:700}
+  .hud .stat{color:var(--muted)}
+  .bar{flex:1;min-width:110px;height:7px;background:#10202f;border-radius:99px;overflow:hidden}
+  .bar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    transition:width .35s ease}
+  .hud button{font-family:var(--mono);font-size:11.5px;color:var(--soft);background:transparent;
+    border:1px solid #2c4055;border-radius:6px;padding:3px 9px;cursor:pointer}
+  .hud button:hover{color:var(--text);border-color:var(--accent)}
+
+  header.top{padding:54px 0 30px;border-bottom:1px solid var(--line)}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--accent);margin:0 0 14px}
+  h1{font-size:40px;line-height:1.05;margin:0 0 12px;font-weight:800;letter-spacing:-.018em}
+  h1 .thin{font-weight:400;color:var(--soft)}
+  .lede{font-size:18px;color:var(--soft);margin:0;max-width:60ch}
+  .filechips{display:flex;gap:7px;flex-wrap:wrap;margin-top:22px;font-family:var(--mono);font-size:11.5px}
+  .fc{padding:4px 10px;border:1px solid var(--line-strong);border-radius:99px;color:var(--muted)}
+  .fc.here{background:var(--accent);color:#1a1206;border-color:var(--accent);font-weight:700}
+  .fc.done{color:var(--soft);border-color:var(--line);text-decoration:line-through;text-decoration-color:var(--muted)}
+
+  .legend{margin:26px 0 0;padding:16px 18px;background:var(--panel);border:1px solid var(--line);
+    border-radius:12px;font-size:14px;color:var(--soft)}
+  .legend b{color:var(--text)}
+  .legend .row{display:flex;gap:10px;align-items:baseline;margin:7px 0}
+  .legend .tg{flex:none}
+  .keys{margin-top:13px;padding-top:12px;border-top:1px solid var(--line);
+    font-family:var(--mono);font-size:13px;color:var(--soft);display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:5px 18px}
+  .keys kbd{background:var(--panel3);border:1px solid var(--line-strong);border-bottom-width:2px;
+    border-radius:5px;padding:1px 7px;color:var(--accent-2);font-weight:600;margin-right:7px;
+    display:inline-block;min-width:20px;text-align:center}
+
+  section{padding:46px 0;border-bottom:1px solid var(--line)}
+  .sec-tag{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--accent);display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .sec-tag .n{background:var(--accent);color:#1a1206;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700}
+  h2{font-size:28px;line-height:1.12;margin:0 0 6px;font-weight:800;letter-spacing:-.015em}
+  h3{font-size:18.5px;margin:30px 0 8px;font-weight:700;letter-spacing:-.01em;color:var(--text)}
+  p{margin:13px 0}
+  .sub{color:var(--soft);font-size:16px;margin-top:2px}
+  code{font-family:var(--mono);font-size:.85em;background:#0c1a27;border:1px solid var(--line);
+    padding:1px 6px;border-radius:5px;color:var(--accent-2);white-space:nowrap}
+  strong{font-weight:700;color:var(--text)}
+  ul.tight{margin:12px 0;padding-left:20px}
+  ul.tight li{margin:7px 0}
+  em{color:var(--soft)}
+
+  .box{margin:22px 0;border-radius:12px;padding:16px 18px 16px 20px;border:1px solid var(--line);
+    background:var(--panel);position:relative;overflow:hidden}
+  .box .lab{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+    margin:0 0 6px;font-weight:700}
+  .box.key{border-color:rgba(245,158,60,.4);background:var(--accent-tint)}
+  .box.key:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent)}
+  .box.key .lab{color:var(--accent-2)}
+  .box.trap{border-color:var(--no-line);background:var(--no-bg)}
+  .box.trap:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--no)}
+  .box.trap .lab{color:var(--no)}
+  .box.field{background:var(--panel3);border-color:var(--line-strong)}
+  .box.field:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent)}
+  .box.field .lab{color:var(--accent)}
+  .box p:first-of-type{margin-top:0}.box p:last-child{margin-bottom:0}
+
+  .tw{overflow-x:auto;margin:22px 0}
+  table{border-collapse:collapse;width:100%;font-size:14.5px}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;
+    color:var(--muted);font-weight:600;border-bottom:2px solid var(--line-strong)}
+  td b{color:var(--text)}
+  tr:last-child td{border-bottom:none}
+
+  .quizhead{display:flex;align-items:center;gap:10px;margin:34px 0 4px;flex-wrap:wrap}
+  .quizhead .ttl{font-family:var(--mono);font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--text);font-weight:700}
+  .quizhead .meta{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  .quizhead .rule{flex:1;height:1px;background:var(--line)}
+
+  .q{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:18px 18px 6px;
+    margin:16px 0;transition:border-color .2s,box-shadow .2s;position:relative}
+  .q:focus{outline:none}
+  .q.current{border-color:var(--accent);box-shadow:-3px 0 0 0 var(--accent), 0 0 0 1px rgba(245,158,60,.25)}
+  .qtop{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:9px}
+  .qid{font-family:var(--mono);font-size:11.5px;color:var(--muted);font-weight:600}
+  .chip{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+    padding:2px 7px;border-radius:5px;font-weight:700}
+  .chip.drill{background:#1c2c3b;color:#8fb4d6}
+  .chip.exam{background:var(--accent);color:#1a1206}
+  .chip.mixed{background:var(--accent-tint);color:var(--accent-2);border:1px solid rgba(245,158,60,.4)}
+  .chip.two{background:rgba(150,110,210,.18);color:#bfa3e8;border:1px solid rgba(150,110,210,.4)}
+  .chip.miss{background:var(--no-bg);color:var(--no);border:1px solid var(--no-line)}
+  .chip.win{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-line)}
+  .stem{font-size:16.5px;margin:2px 0 13px;line-height:1.5;color:var(--text)}
+  .opts{list-style:none;margin:0;padding:0}
+  .opt{display:flex;gap:11px;align-items:flex-start;width:100%;text-align:left;cursor:pointer;
+    border:1px solid var(--line);background:var(--panel2);border-radius:9px;padding:11px 13px;margin:7px 0;
+    font:inherit;font-size:15.5px;color:var(--text);transition:border-color .12s,background .12s}
+  .opt:hover:not(:disabled){border-color:var(--line-strong);background:var(--panel3)}
+  .opt:disabled{cursor:default}
+  .opt .ltr{flex:none;font-family:var(--mono);font-weight:700;font-size:13px;color:var(--accent-2);
+    width:18px;text-align:center;padding-top:1px}
+  .opt .otext{flex:1}
+  .opt.sel{border-color:var(--accent);background:var(--accent-tint)}
+  .opt.correct{border-color:var(--ok-line);background:var(--ok-bg)}
+  .opt.correct .ltr{color:var(--ok)}
+  .opt.wrong{border-color:var(--no-line);background:var(--no-bg)}
+  .opt.wrong .ltr{color:var(--no)}
+  .opt .mark{margin-left:auto;font-family:var(--mono);font-weight:700;font-size:13px;white-space:nowrap}
+  .opt.correct .mark{color:var(--ok)}.opt.wrong .mark{color:var(--no)}
+  .checkbtn{font-family:var(--mono);font-size:12.5px;font-weight:700;letter-spacing:.04em;
+    background:var(--accent);color:#1a1206;border:none;border-radius:8px;padding:9px 16px;cursor:pointer;
+    margin:6px 0 2px}
+  .checkbtn:hover{background:var(--accent-2)}.checkbtn:disabled{opacity:.35;cursor:default}
+  .reveal{max-height:0;overflow:hidden;transition:max-height .3s ease}
+  .reveal.show{max-height:1900px}
+  .rv-inner{border-top:1px solid var(--line);margin-top:12px;padding:13px 2px 12px;font-size:15px;
+    color:var(--soft);line-height:1.58}
+  .rv-inner .verdict{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;
+    font-weight:700;margin-bottom:6px}
+  .verdict.r-ok{color:var(--ok)}.verdict.r-no{color:var(--no)}
+  .rv-inner b{color:var(--text)}
+  .flip{display:block;margin-top:10px;padding:9px 12px;background:var(--panel3);border-radius:8px;
+    font-size:14.5px;border:1px solid var(--line)}
+  .flip .fl{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--accent-2);font-weight:700;margin-right:6px}
+
+  #help{position:fixed;inset:0;z-index:90;background:rgba(6,11,17,.72);display:none;
+    align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+  #help.show{display:flex}
+  .help-card{background:var(--panel2);border:1px solid var(--line-strong);border-radius:14px;
+    padding:24px 26px;max-width:380px;width:calc(100% - 44px)}
+  .help-card h4{margin:0 0 4px;font-family:var(--mono);font-size:12px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--accent)}
+  .help-card .hk{display:flex;justify-content:space-between;gap:14px;padding:6px 0;font-size:14.5px;
+    border-bottom:1px solid var(--line)}
+  .help-card .hk:last-of-type{border-bottom:none}
+  .help-card kbd{font-family:var(--mono);background:var(--panel3);border:1px solid var(--line-strong);
+    border-bottom-width:2px;border-radius:5px;padding:1px 8px;color:var(--accent-2);font-weight:600}
+  .help-card .close{margin-top:14px;font-family:var(--mono);font-size:12px;color:var(--muted);text-align:center}
+
+  .summary{padding:46px 0 70px}
+  .scorecard{background:linear-gradient(160deg,var(--panel3),var(--panel));color:var(--text);
+    border:1px solid var(--line-strong);border-radius:16px;padding:26px 26px 22px;text-align:center}
+  .scorecard .big{font-size:54px;font-weight:800;letter-spacing:-.02em;line-height:1}
+  .scorecard .lab2{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--accent);margin-bottom:8px}
+  .scorecard .note{color:var(--soft);font-size:14.5px;margin-top:10px}
+  .misslist{margin-top:18px;font-family:var(--mono);font-size:13px}
+  .misslist a{color:var(--accent-2);text-decoration:none;border-bottom:1px dotted var(--accent);
+    margin:0 4px;display:inline-block}
+  .foot{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:center;margin-top:30px}
+
+  @media (max-width:560px){
+    body{font-size:16px} h1{font-size:31px} h2{font-size:23px}
+    .hud-inner{font-size:11px;gap:10px} .stem{font-size:15.5px}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<div class="hud">
+  <div class="hud-inner">
+    <span class="dot">▰ SAA-C03</span>
+    <span class="stat"><b id="h-ans">0</b>/<span id="h-tot">0</span> answered</span>
+    <span class="stat"><b id="h-pct">—</b> correct</span>
+    <div class="bar"><i id="h-bar"></i></div>
+    <button id="h-help">? keys</button>
+    <button id="h-reset">reset</button>
+  </div>
+</div>
+
+<div id="help"><div class="help-card">
+  <h4>Vim navigation</h4>
+  <div class="hk"><span>Next / previous question</span><span><kbd>j</kbd> <kbd>k</kbd></span></div>
+  <div class="hk"><span>Jump to top</span><span><kbd>g</kbd><kbd>g</kbd></span></div>
+  <div class="hk"><span>Jump to bottom</span><span><kbd>G</kbd></span></div>
+  <div class="hk"><span>Next unanswered</span><span><kbd>n</kbd></span></div>
+  <div class="hk"><span>Select option (commits single)</span><span><kbd>1</kbd>–<kbd>5</kbd></span></div>
+  <div class="hk"><span>Check a Select-TWO</span><span><kbd>Enter</kbd></span></div>
+  <div class="hk"><span>Toggle this help</span><span><kbd>?</kbd></span></div>
+  <div class="close">esc or ? to close</div>
+</div></div>
+
+<div class="wrap">
+<header class="top">
+  <p class="eyebrow">Weakness-targeted drill · File 3 of 5 · dark</p>
+  <h1>Databases &amp; Caching<br><span class="thin">RDS · Aurora · DynamoDB · ElastiCache · Redshift</span></h1>
+  <p class="lede">Two reflexes win this whole domain: <em>failover vs scaling</em> (Multi-AZ vs read replicas), and <em>planned vs unplanned</em> regional failover for Aurora Global Database — the exact scenario you split the wrong way on Mock 2. We drill both, then bank your strong caching instincts.</p>
+  <div class="filechips">
+    <span class="fc done">1 · Compute</span>
+    <span class="fc done">2 · Decoupling</span>
+    <span class="fc here">3 · Databases</span>
+    <span class="fc">4 · Resilience &amp; DR</span>
+    <span class="fc">5 · Cost</span>
+  </div>
+  <div class="legend">
+    <div class="row"><span class="tg chip drill">drill</span><span><b>Quick check.</b> Exam-real, one fact at a time.</span></div>
+    <div class="row"><span class="tg chip exam">exam</span><span><b>Scenario.</b> Full SAA-C03 difficulty — several engines fit, one wins.</span></div>
+    <div class="row"><span class="tg chip mixed">mixed</span><span><b>All-topics review</b> so Files 1–2 stay sharp.</span></div>
+    <div class="row"><span class="tg chip miss">↻ your miss</span><span>You got this exact concept wrong on a mock or the timed exam.</span></div>
+    <div class="row"><span class="tg chip win">✓ lock it in</span><span>You answered this right before — prove it sticks.</span></div>
+    <div class="keys">
+      <span><kbd>j</kbd><kbd>k</kbd>next / prev</span>
+      <span><kbd>g</kbd><kbd>g</kbd>top &nbsp; <kbd>G</kbd>bottom</span>
+      <span><kbd>n</kbd>next unanswered</span>
+      <span><kbd>1</kbd>–<kbd>5</kbd>pick option</span>
+      <span><kbd>↵</kbd>check select-two</span>
+      <span><kbd>?</kbd>help overlay</span>
+    </div>
+  </div>
+</header>
+</div>
+
+<div class="wrap">
+
+<!-- ===================== SECTION 1 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">01</span> RDS — Multi-AZ, read replicas &amp; the relational toolbox</div>
+  <h2>Two features that look alike and solve opposite problems</h2>
+  <p class="sub">Half the relational questions on this exam hinge on one distinction: do you need to survive a failure, or do you need to serve more reads? Those are different tools.</p>
+
+  <div class="tw"><table>
+    <tr><th></th><th>Multi-AZ</th><th>Read replicas</th></tr>
+    <tr><td><b>Job</b></td><td>high availability / failover</td><td>scale read throughput</td></tr>
+    <tr><td><b>Replication</b></td><td>synchronous to a standby</td><td>asynchronous (lag possible)</td></tr>
+    <tr><td><b>Serves reads?</b></td><td>No (classic Multi-AZ standby is idle)</td><td>Yes — that's the point</td></tr>
+    <tr><td><b>Failover</b></td><td>automatic, endpoint swaps (~60–120s)</td><td>manual promote to standalone</td></tr>
+    <tr><td><b>Span</b></td><td>another AZ, same Region</td><td>same Region, cross-Region, or cross-account</td></tr>
+  </table></div>
+
+  <div class="box key"><p class="lab">Key fact — they combine, and there's a newer option</p><p>Multi-AZ and read replicas are orthogonal — production systems often run both. And the <b>Multi-AZ DB cluster</b> deployment (1 writer + <b>2 readable standbys</b> across 3 AZs) gives you HA <em>and</em> readable secondaries with faster failover — the answer when a stem wants "automatic failover but the standbys shouldn't sit idle."</p></div>
+
+  <p><strong>The rest of the RDS kit:</strong></p>
+  <ul class="tight">
+    <li><b>RDS Proxy</b> — pools connections (saves you from Lambda connection storms and "too many connections"), enforces IAM auth, and cuts failover time significantly.</li>
+    <li><b>Encrypt an existing unencrypted DB</b> — you can't do it in place: <b>snapshot → copy the snapshot with encryption (KMS) → restore</b> a new encrypted instance.</li>
+    <li><b>Point-in-time recovery</b> — automated backups let you restore to any second within the retention window (up to 35 days). Manual snapshots live until you delete them and can be copied cross-Region.</li>
+    <li><b>Cross-Region read replica</b> — local low-latency reads <em>and</em> a promote-able DR copy in another Region.</li>
+  </ul>
+
+  <div class="box field"><p class="lab">// field note — the most common RDS mistake</p><p>The AWS forums are full of people who switched on Multi-AZ expecting more read capacity and got a standby that refuses to answer a single <code>SELECT</code>. Multi-AZ buys a standby that <em>takes over when things break</em>; read replicas buy copies that <em>answer reads</em>. If you can keep "failover vs scaling" straight, you'll out-answer most candidates on the relational questions alone.</p></div>
+
+  <div class="quizhead"><span class="ttl">Quick check</span><span class="rule"></span><span class="meta">8 questions · one fact each</span></div>
+  <div id="s1-drill"></div>
+  <div class="quizhead"><span class="ttl">Scenario pressure</span><span class="rule"></span><span class="meta">7 questions · exam difficulty</span></div>
+  <div id="s1-exam"></div>
+</section>
+
+<!-- ===================== MIXED 1 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">↻</span> Mixed review — all domains</div>
+  <h2>Keep Files 1–2 warm</h2>
+  <p class="sub">Four across compute, resilience and decoupling — including the ARC zonal-shift concept you missed in File 1's source material.</p>
+  <div id="mix-1"></div>
+</section>
+
+<!-- ===================== SECTION 2 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">02</span> Aurora &amp; Aurora Global Database</div>
+  <h2>Where your headline miss lives</h2>
+  <p class="sub">Aurora rebuilt the relational engine on a distributed storage fabric. The exam-critical part is its global story — and the difference between a <em>planned</em> and an <em>unplanned</em> regional failover.</p>
+
+  <h3>Aurora in one paragraph</h3>
+  <p>Aurora (MySQL/PostgreSQL-compatible) keeps <b>six copies of your data across three AZs</b> in a self-healing storage layer that the database instances share. Because a failover doesn't copy any data, promoting one of the up-to-<b>15 Aurora Replicas</b> takes well under a minute — and those replicas <b>serve reads</b> (via the reader endpoint) at the same time. <b>Aurora Serverless</b> autoscales capacity for variable or intermittent workloads with little to manage. <b>Backtrack</b> (Aurora MySQL) rewinds a cluster to a past moment in seconds without a restore.</p>
+
+  <div class="box key"><p class="lab">Key fact — Aurora Global Database failover</p><p>A Global Database has one read/write <b>primary Region</b> and one or more <b>read-only secondary Regions</b>, with storage-level replication (typical lag &lt; 1s → <b>RPO ~1s, RTO &lt; 1min</b>). How you fail over depends on <em>why</em>:</p>
+  <ul class="tight" style="margin-top:8px">
+    <li><b>Managed planned failover</b> — for planned events (DR drills, Region rotation) <em>while the primary is healthy</em>. It promotes a secondary and <b>keeps the global topology</b> (the old primary becomes a secondary).</li>
+    <li><b>Detach &amp; promote (unplanned)</b> — during an actual primary-Region outage, you <b>remove a secondary from the Global Database and promote it to a standalone read/write cluster</b>. This breaks the topology, but it's the path when the primary is gone.</li>
+  </ul></div>
+
+  <div class="box trap"><p class="lab">The Mock 2 trap, named</p><p>For automatic <b>DNS failover to the DR Region</b>, the answer is Route 53 <b>active-passive failover routing</b> with health checks — <em>not</em> latency-based routing. Latency routing sends each user to the nearest healthy endpoint; it's a performance tool, not a "promote the standby when the primary dies" tool. Pairing two routing policies (as the tempting wrong answer did) is double-bait.</p></div>
+
+  <div class="box field"><p class="lab">// field note — Aurora's quiet rebuild</p><p>When AWS shipped Aurora (GA 2015) it didn't just wrap MySQL — it tore out the storage engine and replaced it with a distributed, self-healing fabric spread across three AZs. Decoupling compute from that shared storage is why a replica can be promoted in seconds and why you can attach 15 readers without copying the database 15 times. AWS has called Aurora one of the fastest-growing services in its history.</p></div>
+
+  <div class="quizhead"><span class="ttl">Quick check</span><span class="rule"></span><span class="meta">8 questions · one fact each</span></div>
+  <div id="s2-drill"></div>
+  <div class="quizhead"><span class="ttl">Scenario pressure</span><span class="rule"></span><span class="meta">7 questions · exam difficulty + your headline miss</span></div>
+  <div id="s2-exam"></div>
+</section>
+
+<!-- ===================== MIXED 2 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">↻</span> Mixed review — all domains</div>
+  <h2>Keep the rest warm</h2>
+  <p class="sub">Four more across cost, networking and security — two of them previous misses.</p>
+  <div id="mix-2"></div>
+</section>
+
+<!-- ===================== SECTION 3 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">03</span> DynamoDB, caching &amp; purpose-built data</div>
+  <h2>Match the access pattern to the engine</h2>
+  <p class="sub">When the question describes the shape of the data and the latency target, it's telling you the answer. This is also where your caching wins live — let's lock them in.</p>
+
+  <h3>DynamoDB</h3>
+  <p>Serverless NoSQL key-value/document store with <b>single-digit-millisecond</b> latency at any scale (microseconds with <b>DAX</b>). Choose <b>on-demand</b> capacity for spiky/unpredictable traffic, <b>provisioned + auto scaling</b> for steady/predictable load. <b>Global Tables</b> give multi-Region <b>active-active</b> read/write; <b>Streams</b> emit change events (→ Lambda) for CDC; <b>TTL</b> auto-expires items. Reach for DynamoDB when key-based access and predictable latency matter more than relational joins.</p>
+
+  <h3>Caching: ElastiCache &amp; DAX</h3>
+  <div class="tw"><table>
+    <tr><th>Choice</th><th>Use it for</th></tr>
+    <tr><td><b>ElastiCache Redis</b></td><td>HA caching with replication, Multi-AZ failover, persistence; rich structures — <b>sorted sets for leaderboards</b>, pub/sub, geospatial</td></tr>
+    <tr><td><b>ElastiCache Memcached</b></td><td>simplest multi-threaded cache; no persistence, replication, or Multi-AZ</td></tr>
+    <tr><td><b>DAX</b></td><td>microsecond cache <em>specifically</em> in front of DynamoDB, via the DynamoDB API (not a general cache)</td></tr>
+    <tr><td><b>MemoryDB for Redis</b></td><td>when you need durable Redis as a <em>primary</em> database, not just a cache</td></tr>
+  </table></div>
+  <p><strong>Caching strategies:</strong> <b>lazy loading / cache-aside</b> populates the cache on a miss (only cache what's asked for; bound staleness with a <b>TTL</b>); <b>write-through</b> updates the cache on every write (always fresh, more writes). Pair lazy loading with a TTL when source data changes on a known cadence.</p>
+
+  <h3>Redshift &amp; the purpose-built tour</h3>
+  <p><b>Redshift</b> is a columnar, massively-parallel <b>data warehouse</b> for analytics/OLAP over huge datasets — not an OLTP database for high-concurrency single-row transactions. The purpose-built one-liners: <b>Neptune</b> = graph (relationships), <b>DocumentDB</b> = MongoDB-compatible, <b>Keyspaces</b> = managed Cassandra, <b>Timestream</b> = time-series/IoT, <b>QLDB</b> = immutable ledger.</p>
+
+  <div class="box field"><p class="lab">// field note — where DynamoDB came from</p><p>DynamoDB's ancestor, "Dynamo," was built inside Amazon after relational databases buckled under holiday-peak shopping-cart load. The famous 2007 Dynamo paper made a deliberate trade: give up a little consistency to keep the cart <em>always writeable</em>, because a customer who can't add to their cart is lost revenue. That paper influenced Cassandra and Riak; the managed service launched in 2012. The exam lesson: DynamoDB is for predictable single-digit-ms latency at scale — not for joins. And the old engineering line still bites here: one of the two hard problems in computing is cache invalidation, which is exactly why every cache answer comes with a TTL.</p></div>
+
+  <div class="quizhead"><span class="ttl">Quick check</span><span class="rule"></span><span class="meta">5 questions · one fact each</span></div>
+  <div id="s3-drill"></div>
+  <div class="quizhead"><span class="ttl">Scenario pressure</span><span class="rule"></span><span class="meta">7 questions · exam difficulty + your caching wins</span></div>
+  <div id="s3-exam"></div>
+</section>
+
+<!-- ===================== SUMMARY ===================== -->
+<section class="summary">
+  <div class="scorecard">
+    <div class="lab2">Session readiness</div>
+    <div class="big"><span id="sc-pct">—</span></div>
+    <div class="note"><span id="sc-line">Answer some questions and your readiness score appears here.</span></div>
+    <div class="misslist" id="sc-miss"></div>
+  </div>
+  <p class="foot">File 3 / 5 · Databases &amp; Caching · 50 questions · press <kbd style="font-family:var(--mono)">?</kbd> for keys · next: File 4 — Resilience, DR &amp; Global Architecture (Route 53's 7 policies, the 4 DR strategies, ARC, CloudFront vs Global Accelerator).</p>
+</section>
+
+</div><!-- /wrap -->
+
+<script>
+const BANK = [
+
+/* ====== S1 DRILL — RDS ====== */
+{g:"s1-drill",id:"3.01",d:"drill",q:"What is the primary purpose of an RDS Multi-AZ deployment?",
+o:["Scale read traffic across replicas","Automatic failover to a synchronous standby in another AZ (high availability)","Reduce storage cost","Cache frequent queries"],c:1,
+e:`<b>Multi-AZ</b> maintains a synchronous standby in another AZ and fails over automatically — it's a high-availability feature. ✗ Read scaling is read replicas; ✗ it doesn't lower cost (it roughly doubles instance cost); ✗ caching is ElastiCache.`},
+
+{g:"s1-drill",id:"3.02",d:"drill",q:"A single RDS instance is overwhelmed by read traffic while writes stay light. How do you scale the reads without affecting writes?",
+o:["Enable Multi-AZ","Add one or more read replicas and route reads to them","Increase the backup retention period","Add a NAT gateway"],c:1,
+e:`<b>Read replicas</b> offload read traffic and leave the writer untouched. ✗ Multi-AZ is failover, not read scaling; ✗ backups and NAT are unrelated.`},
+
+{g:"s1-drill",id:"3.03",d:"drill",q:"In a classic RDS Multi-AZ (instance) deployment, can the standby serve read queries?",
+o:["Yes, it load-balances reads automatically","No — the standby is idle until failover","Only for reporting queries","Only if you enable a reader endpoint"],c:1,
+e:`The classic Multi-AZ <b>standby is passive</b> — it exists for failover and doesn't serve reads. (If you want readable standbys, that's the Multi-AZ DB <i>cluster</i> deployment.)`},
+
+{g:"s1-drill",id:"3.04",d:"drill",q:"How do you encrypt an existing unencrypted RDS instance?",
+o:["Toggle encryption on the running instance via the CLI","Take a snapshot, copy it with encryption (KMS) enabled, and restore a new instance from the encrypted copy","Enable default encryption and reboot","Move the data to an encrypted EFS volume"],c:1,
+e:`You can't flip encryption on in place. The path is <b>snapshot → copy with encryption → restore</b>. There's no in-place CLI toggle; rebooting doesn't encrypt; RDS doesn't store data on EFS.`},
+
+{g:"s1-drill",id:"3.05",d:"drill",q:"You need to restore an RDS database to a specific second, just before a bad deploy 90 minutes ago. Which feature?",
+o:["Point-in-time recovery from automated backups","Restore the latest automated backup","Create a read replica","Multi-AZ failover"],c:0,
+e:`<b>Point-in-time recovery</b> restores to any second within the retention window. ✗ The "latest backup" loses up to a day; ✗ replicas/Multi-AZ don't roll back in time.`},
+
+{g:"s1-drill",id:"3.06",d:"drill",q:"What does a cross-Region read replica give you?",
+o:["Synchronous HA within one AZ","Local low-latency reads in another Region plus a promote-able DR copy","Automatic global write replication","Lower backup cost"],c:1,
+e:`A <b>cross-Region read replica</b> serves local reads in the other Region and can be promoted if the primary Region fails — read scaling + DR. ✗ That's not synchronous HA, not multi-write, not a backup-cost feature.`},
+
+{g:"s1-drill",id:"3.07",d:"drill",q:"Lambda functions are exhausting an RDS instance's connections during spikes, and failovers feel slow. What service helps most?",
+o:["RDS Proxy (connection pooling + faster failover)","A bigger instance class","More read replicas","Aurora Backtrack"],c:0,
+e:`<b>RDS Proxy</b> pools and reuses connections (taming Lambda connection storms) and shortens failover time. ✗ A bigger box doesn't fix connection churn; ✗ replicas scale reads, not connections; ✗ Backtrack rewinds data.`},
+
+{g:"s1-drill",id:"3.08",d:"drill",q:"Which RDS deployment provides automatic failover AND readable standby instances?",
+o:["Single-AZ with a read replica","Multi-AZ DB cluster (1 writer + 2 readable standbys)","Classic Multi-AZ instance","Aurora Serverless v1"],c:1,
+e:`The <b>Multi-AZ DB cluster</b> gives HA via two standbys that also serve reads. ✗ Classic Multi-AZ standby is idle; ✗ a single-AZ + replica isn't HA on the writer; ✗ Serverless v1 is an Aurora scaling mode, not this.`},
+
+/* ====== S1 EXAM — RDS ====== */
+{g:"s1-exam",id:"3.09",d:"exam",tag:"miss",q:"A critical application's RDS database must automatically fail over to another Availability Zone if its AZ becomes impaired, with minimal downtime and no manual steps. What should you configure?",
+o:["Add a read replica and promote it manually during an outage","Enable Multi-AZ on the RDS instance","Increase the instance size and provisioned IOPS","Schedule frequent snapshots and restore on failure"],c:1,
+e:`<b>Multi-AZ</b> provides automatic failover to the standby with no manual intervention — exactly the requirement. ✗ Promoting a read replica is manual; ✗ a bigger instance doesn't add failover; ✗ snapshot-restore is slow and manual.<span class="flip"><span class="fl">flip it</span>If the goal were "serve more read traffic," not "survive an AZ failure," the answer flips to <b>read replicas</b>.</span>`},
+
+{g:"s1-exam",id:"3.10",d:"exam",tag:"win",q:"A reporting workload puts heavy read load on an RDS MySQL instance and slows the app. Writes are light and must not be impacted. How do you scale reads?",
+o:["Convert to Multi-AZ","Add read replicas and direct read/reporting traffic to them","Enlarge storage and IOPS only","Take nightly snapshots and query restores"],c:1,
+e:`<b>Read replicas</b> absorb the reporting reads without touching the writer. ✗ Multi-AZ is failover; ✗ more IOPS doesn't add read capacity like replicas; ✗ snapshot-querying is a batch hack.`},
+
+{g:"s1-exam",id:"3.11",d:"exam",q:"A serverless app's many concurrent Lambda invocations cause 'too many connections' errors on RDS, and the team also wants quicker recovery during failovers. Best solution?",
+o:["Provision a much larger DB instance","Put RDS Proxy in front of the database","Switch the app to DynamoDB immediately","Add five read replicas"],c:1,
+e:`<b>RDS Proxy</b> pools connections so bursts of Lambdas reuse a managed pool (no connection storms) and it reduces failover time. ✗ A bigger instance has more connections but still gets stormed; ✗ a full DB migration is overkill; ✗ replicas don't solve writer connection limits.`},
+
+{g:"s1-exam",id:"3.12",d:"exam",tag:"miss",q:"A non-critical internal analytics database runs on a Multi-AZ RDS db.r5.2xlarge but is used lightly and has no high-availability requirement. The team wants to cut cost. What's the most effective change?",
+o:["Buy a Reserved Instance for the db.r5.2xlarge as-is","Convert to Single-AZ and right-size the instance to actual usage","Add a read replica to spread load","Migrate to Aurora Global Database"],c:1,
+e:`No HA requirement means <b>Multi-AZ is paying for failover you don't need — drop to Single-AZ and right-size</b> the over-provisioned instance. ✗ An RI just locks in the oversized, doubled cost; ✗ a replica adds cost; ✗ Global Database is the opposite direction.`},
+
+{g:"s1-exam",id:"3.13",d:"exam",q:"A bad migration corrupted data two hours ago. You must restore to the moment just before it ran, and also keep an indefinitely-retained copy of that pre-migration state for audit. What's the right combination?",
+o:["Restore from the most recent automated daily backup","Use point-in-time recovery to just before the migration, and take a manual snapshot to retain indefinitely","Promote a read replica","Enable Multi-AZ to roll back"],c:1,
+e:`<b>PITR</b> restores to any second in the retention window (so you hit just-before-migration), and a <b>manual snapshot</b> persists until you delete it for the audit copy. ✗ Daily backup loses two hours; ✗ replica promotion doesn't roll back; ✗ Multi-AZ has nothing to do with time travel.`},
+
+{g:"s1-exam",id:"3.14",d:"exam",q:"A team occasionally needs a full read/write copy of production data for load testing, isolated from the live database. For standard RDS, what's a clean way to get one?",
+o:["Point the test app at a read replica","Restore the latest snapshot into a new standalone instance (or promote a replica) and test against that","Enable Multi-AZ and use the standby for testing","Query production during off-hours"],c:1,
+e:`<b>Restore a snapshot to a new instance</b> (or promote a replica to standalone) gives an isolated read/write copy that won't touch production. ✗ A read replica is read-only and still tied to prod; ✗ the Multi-AZ standby isn't accessible for testing; ✗ testing on prod is the risk you're avoiding.`},
+
+{g:"s1-exam",id:"3.15",d:"exam",q:"A company wants a warm copy of its RDS PostgreSQL database in a second Region that can be promoted to read/write if the primary Region fails. What should they set up?",
+o:["Multi-AZ in the primary Region","A cross-Region read replica that can be promoted during a Region failure","Daily snapshots copied to S3 only","An ElastiCache replica in the second Region"],c:1,
+e:`A <b>cross-Region read replica</b> stays warm with async replication and can be promoted for DR. ✗ Multi-AZ is single-Region; ✗ snapshot copies are colder (higher RPO/RTO); ✗ ElastiCache isn't a database copy.`},
+
+/* ====== MIX 1 ====== */
+{g:"mix-1",id:"M1.1",d:"mixed",tag:"win",q:"A web tier must absorb large traffic swings and survive a full AZ failure. Best design?",
+o:["One large EC2 instance with an Elastic IP","An Auto Scaling group across multiple AZs behind an ALB","Instances in one AZ behind an ALB","Route 53 round-robin across instance IPs"],c:1,
+e:`<b>ASG across AZs behind an ALB</b> scales with demand and tolerates an AZ loss. ✗ A single instance is a SPOF; ✗ single-AZ dies with the AZ; ✗ round-robin DNS has no health-based failover or autoscaling.`},
+
+{g:"mix-1",id:"M1.2",d:"mixed",tag:"miss",q:"An Auto Scaling group keeps launching instances into an AZ with a gray failure (latency tripled, but ELB health checks still pass). You want one action to immediately move traffic out of that AZ — auto-reverting — and have AWS do it automatically next time, with the least effort.",
+o:["A CloudWatch+Lambda script to deregister and re-register the AZ's targets","ARC zonal shift now, plus zonal autoshift enabled with practice runs","Enable ALB cross-zone load balancing","Larger instances in the healthy AZs"],c:1,
+e:`<b>ARC zonal shift</b> drains a suspect AZ with one auto-expiring action; <b>zonal autoshift</b> lets AWS act on impairment signals you can't see, and practice runs verify the other AZs can carry the load. ✗ The Lambda build is all-DIY; ✗ cross-zone spreads load into the sick AZ too; ✗ bigger instances don't address the gray failure.`},
+
+{g:"mix-1",id:"M1.3",d:"mixed",tag:"win",q:"A static website in S3 loads slowly for a global audience, and the team wants to offload the origin. What should they implement?",
+o:["S3 Transfer Acceleration","A CloudFront distribution with the S3 bucket as origin","Cross-Region replication to every Region","EC2 fleets behind Route 53 latency routing"],c:1,
+e:`<b>CloudFront</b> caches static content at the edge worldwide and offloads the origin. ✗ Transfer Acceleration speeds uploads; ✗ replicating everywhere is costly and uncached; ✗ EC2 fleets are heavy overkill for static files.`},
+
+{g:"mix-1",id:"M1.4",d:"mixed",q:"Events for a given customer must be processed strictly in order, and the same event must never be processed twice. Which messaging choice fits?",
+o:["SQS Standard with idempotent consumers","SQS FIFO with the customer ID as the message group ID","SNS Standard topic","A Kinesis stream with random partition keys"],c:1,
+e:`<b>SQS FIFO</b> preserves order within a message group and processes exactly once — set the group ID to the customer ID for per-customer ordering with cross-customer parallelism. ✗ Standard can't guarantee order/no-dupes; ✗ SNS isn't a queue; ✗ random partition keys would scatter a customer's events across shards.`},
+
+/* ====== S2 DRILL — Aurora ====== */
+{g:"s2-drill",id:"3.16",d:"drill",q:"How does Aurora store your data for durability?",
+o:["One copy with nightly backups","Six copies across three Availability Zones, self-healing","Two synchronous copies in one AZ","On the instance's local NVMe"],c:1,
+e:`Aurora keeps <b>six copies across three AZs</b> in a self-healing storage layer. The other options describe lesser durability models Aurora deliberately replaced.`},
+
+{g:"s2-drill",id:"3.17",d:"drill",q:"What do Aurora Replicas provide?",
+o:["Only failover targets, no read traffic","Read scaling (reader endpoint) AND fast failover targets, up to 15","Write scaling across replicas","Cross-Region writes"],c:1,
+e:`Up to <b>15 Aurora Replicas</b> serve reads via the reader endpoint and act as quick failover targets. They don't take writes; cross-Region read/write is Global Tables (DynamoDB), not Aurora replicas.`},
+
+{g:"s2-drill",id:"3.18",d:"drill",q:"Aurora Serverless is the natural fit for which workload?",
+o:["Steady 24/7 load at known size","Variable or intermittent workloads where capacity needs change and management should be minimal","Petabyte-scale analytics","Graph traversals"],c:1,
+e:`<b>Aurora Serverless</b> autoscales for variable/intermittent demand with minimal admin. Steady load suits provisioned (and Reserved); analytics is Redshift; graphs are Neptune.`},
+
+{g:"s2-drill",id:"3.19",d:"drill",q:"What are the approximate RPO and RTO of an Aurora Global Database?",
+o:["RPO 0, RTO 0","RPO ~1 second, RTO under 1 minute","RPO 1 hour, RTO 4 hours","RPO 1 day, RTO 1 day"],c:1,
+e:`Storage-level cross-Region replication gives <b>RPO ~1s and RTO &lt; 1min</b>. The others describe far weaker objectives (or the impossible RPO/RTO 0).`},
+
+{g:"s2-drill",id:"3.20",d:"drill",q:"In an Aurora Global Database, the secondary Regions are…",
+o:["Full read/write replicas","Read-only (until promoted), providing local low-latency reads and DR","Write-only standby","Backup snapshots in S3"],c:1,
+e:`Secondary Regions are <b>read-only</b> — great for local reads and DR — until you promote one. They aren't writable, write-only, or mere snapshots.`},
+
+{g:"s2-drill",id:"3.21",d:"drill",q:"You need to fail an Aurora Global Database over to another Region for a PLANNED DR drill while the primary is healthy, keeping the global topology intact. Which mechanism?",
+o:["Managed planned failover","Detach and promote the secondary","Delete and recreate the cluster","Multi-AZ failover"],c:0,
+e:`<b>Managed planned failover</b> is for planned events with a healthy primary and preserves the global topology (old primary becomes secondary). Detach-and-promote is for unplanned outages; Multi-AZ is within a Region.`},
+
+{g:"s2-drill",id:"3.22",d:"drill",q:"Which Aurora MySQL feature rewinds the cluster to a previous point in time in seconds, without restoring from a backup?",
+o:["Point-in-time recovery","Backtrack","Snapshot restore","Read replica promotion"],c:1,
+e:`<b>Backtrack</b> rewinds an Aurora MySQL cluster in place, fast. PITR and snapshot restore create a <i>new</i> instance and take longer; replica promotion doesn't roll back.`},
+
+{g:"s2-drill",id:"3.23",d:"drill",q:"To distribute read queries across an Aurora cluster's replicas, your application should connect to…",
+o:["The writer (cluster) endpoint","The reader endpoint","Each replica's instance endpoint manually","A NAT gateway"],c:1,
+e:`The <b>reader endpoint</b> load-balances reads across the Aurora Replicas. The writer endpoint is for writes; hardcoding instance endpoints is brittle; NAT is networking.`},
+
+/* ====== S2 EXAM — Aurora ====== */
+{g:"s2-exam",id:"3.24",d:"exam",tag:"miss",multi:true,q:"A retail app uses Aurora Global Database (primary us-east-1, secondary eu-west-1) and requires RPO 1s / RTO 1min for the database. During a regional failure, DNS must automatically route users to eu-west-1 with no manual DNS changes. Which TWO actions meet the requirement?",
+o:["Configure Route 53 active-passive failover routing with health checks on each Region's endpoint","Configure Route 53 latency-based routing so users hit the closest healthy Region","During an unplanned Region outage, detach the secondary from the Global Database and promote it to a standalone read/write cluster","Use managed planned failover to promote the secondary while keeping the global topology","Replace Aurora Global Database with cross-Region read replicas"],c:[0,2],
+e:`Two correct moves: <b>Route 53 active-passive failover routing with health checks</b> handles the automatic DNS cutover, and during an <em>unplanned</em> Region outage you <b>detach the secondary and promote it to standalone read/write</b>.<br>✗ Latency-based routing is a performance tool, not DR failover (this was the tempting second pick that conflicts with failover routing). ✗ Managed planned failover requires a <em>healthy</em> primary — wrong for an outage. ✗ Replacing Global Database loses the 1s/1min objective.<span class="flip"><span class="fl">flip it</span>If this were a planned DR drill with a healthy primary, the promotion answer flips to <b>managed planned failover</b> (which preserves the topology).</span>`},
+
+{g:"s2-exam",id:"3.25",d:"exam",q:"A company wants to run quarterly DR drills, rotating its Aurora Global Database's primary to another Region and back, with the primary healthy the whole time and the global topology preserved. Which failover approach?",
+o:["Detach and promote a secondary each quarter","Managed planned failover","Delete the global database and rebuild in the other Region","Promote a cross-Region read replica"],c:1,
+e:`<b>Managed planned failover</b> is purpose-built for planned events with a healthy primary and keeps the global topology intact (old primary becomes a secondary). ✗ Detach-and-promote is for unplanned outages and breaks the topology; ✗ rebuild is destructive; ✗ replica promotion is a different (non-Global-DB) pattern.`},
+
+{g:"s2-exam",id:"3.26",d:"exam",q:"An Aurora cluster's read traffic grows and shrinks through the day. The team wants read capacity to add and remove Aurora Replicas automatically based on load. What should they enable?",
+o:["Aurora Auto Scaling for Aurora Replicas (with the reader endpoint)","Multi-AZ on the writer","A larger fixed number of replicas at all times","DynamoDB auto scaling"],c:0,
+e:`<b>Aurora Auto Scaling</b> adds/removes replicas to track read load, and the reader endpoint spreads traffic across them. ✗ Multi-AZ is failover; ✗ a fixed large replica count wastes money off-peak; ✗ DynamoDB scaling is a different engine.`},
+
+{g:"s2-exam",id:"3.27",d:"exam",q:"A new application has spiky, unpredictable database load with quiet stretches, and the team can't forecast capacity and doesn't want to manage instance sizing. Which Aurora option fits best?",
+o:["A large provisioned Aurora instance sized for peak","Aurora Serverless v2 (fine-grained autoscaling)","A fleet of fixed Aurora Replicas","Provisioned with manual scaling scripts"],c:1,
+e:`<b>Aurora Serverless v2</b> autoscales capacity finely to demand with minimal management — ideal for unpredictable load. ✗ Sizing for peak wastes money in the quiet; ✗ fixed replicas/manual scripts are exactly the management you want to avoid.`},
+
+{g:"s2-exam",id:"3.28",d:"exam",q:"A team self-manages MySQL and wants a managed engine with near-zero-data-loss failover under a minute, up to 15 low-lag read replicas, and storage that self-heals across three AZs — staying MySQL-compatible. What should they choose?",
+o:["RDS for MySQL, Single-AZ","Amazon Aurora MySQL","Amazon DynamoDB","Amazon Redshift"],c:1,
+e:`Those exact properties — sub-minute failover with no data copy, 15 readers, self-healing 3-AZ storage — are <b>Aurora MySQL</b>'s signature. ✗ Single-AZ RDS lacks the HA and storage fabric; ✗ DynamoDB isn't relational/MySQL; ✗ Redshift is an analytics warehouse.`},
+
+{g:"s2-exam",id:"3.29",d:"exam",q:"A relational application has a single global writer but needs low-latency reads for users in North America, Europe, and Asia, with sub-second replication. What's the cleanest fit?",
+o:["DynamoDB Global Tables","Aurora Global Database with secondary Regions serving local reads","Multiple independent RDS instances kept in sync by the app","A single RDS instance with CloudFront in front"],c:1,
+e:`<b>Aurora Global Database</b> gives a single writer Region plus read-only secondaries worldwide with &lt;1s replication. ✗ DynamoDB Global Tables is NoSQL and multi-writer (not "single global writer relational"); ✗ app-managed sync is fragile; ✗ CloudFront can't cache dynamic per-user DB reads safely.`},
+
+{g:"s2-exam",id:"3.30",d:"exam",q:"A bad bulk UPDATE ran against an Aurora MySQL cluster ten minutes ago. The team wants the fastest possible undo without provisioning a new restored cluster. Best option?",
+o:["Point-in-time recovery to a new cluster","Aurora Backtrack to just before the bad update","Restore last night's snapshot","Fail over to a read replica"],c:1,
+e:`<b>Backtrack</b> rewinds the existing Aurora MySQL cluster in seconds — fastest, no new cluster. ✗ PITR and snapshot restore both create a new cluster and take longer; ✗ failing over to a replica doesn't undo the committed write.`},
+
+/* ====== MIX 2 ====== */
+{g:"mix-2",id:"M2.1",d:"mixed",tag:"miss",q:"A nightly ETL fleet runs restartable jobs that process independent shards, runs 365 days a year, and tolerates interruption. The team wants the GREATEST cost savings. Best purchasing strategy?",
+o:["1-year All-Upfront Reserved Instances for the exact type","Spot Instances diversified across several instance types and AZs, handling interruptions by relaunching","All On-Demand for reliability","Dedicated Hosts"],c:1,
+e:`Interruption-tolerant, restartable work is the ideal <b>Spot</b> case; <b>diversifying across instance types and AZs</b> avoids a single pool drying up the fleet and yields the deepest savings. ✗ RIs lock to one type and cost more than Spot; ✗ all On-Demand is most expensive; ✗ Dedicated Hosts are for licensing/compliance. (Full tree: File 5.)`},
+
+{g:"mix-2",id:"M2.2",d:"mixed",tag:"win",q:"An app on EC2 must read/write an S3 bucket with no long-lived credentials stored on the instances. What should you configure?",
+o:["Access keys in a config file, rotated monthly","An IAM role (instance profile) with the needed S3 permissions attached to the instances","Hardcoded environment-variable credentials","Keys in Parameter Store fetched at boot"],c:1,
+e:`An <b>IAM role via instance profile</b> delivers temporary, auto-rotated credentials — no secrets on disk. Every other option stores or fetches long-lived keys.`},
+
+{g:"mix-2",id:"M2.3",d:"mixed",q:"You need to route AWS service events and dozens of SaaS event sources to many targets based on the content of each event, adding consumers without changing producers. Which service?",
+o:["Amazon SNS","Amazon EventBridge","Amazon SQS","AWS Step Functions"],c:1,
+e:`<b>EventBridge</b> is the content-routing event bus with broad AWS/SaaS sources and producer-independent consumers. ✗ SNS filtering is coarser; ✗ SQS is point-to-point; ✗ Step Functions orchestrates workflows.`},
+
+{g:"mix-2",id:"M2.4",d:"mixed",tag:"miss",q:"An app in a private subnet must write to S3 with no traffic leaving the AWS network and no additional hourly cost. What do you configure?",
+o:["A Gateway VPC endpoint for S3, added to the route table","An Interface VPC endpoint for S3","A NAT gateway in a public subnet","S3 Transfer Acceleration"],c:0,
+e:`<b>Gateway endpoints (S3, DynamoDB) are free</b> and route privately via the route table — meeting the no-hourly-cost, stays-on-AWS requirement. ✗ Interface endpoints bill hourly + per-GB; ✗ NAT gateways send traffic out and bill hourly; ✗ Transfer Acceleration is about upload speed, not private routing.`},
+
+/* ====== S3 DRILL — DynamoDB / caching / purpose-built ====== */
+{g:"s3-drill",id:"3.31",d:"drill",q:"Which best describes DynamoDB?",
+o:["A relational engine with complex joins","A serverless NoSQL key-value/document store with single-digit-ms latency at any scale","A columnar data warehouse","An in-memory cache"],c:1,
+e:`<b>DynamoDB</b> is serverless NoSQL with single-digit-ms latency at scale. Joins are relational (RDS/Aurora); columnar warehouse is Redshift; in-memory cache is ElastiCache.`},
+
+{g:"s3-drill",id:"3.32",d:"drill",q:"You need microsecond read latency for a DynamoDB table without changing the application's data path. What do you add?",
+o:["ElastiCache the app queries separately","DynamoDB Accelerator (DAX)","A read replica","Global Tables"],c:1,
+e:`<b>DAX</b> is the in-memory cache built into the DynamoDB API for microsecond reads — drop-in. ✗ A separate ElastiCache means rewriting the data path; ✗ DynamoDB has no "read replica"; ✗ Global Tables is multi-Region, not latency.`},
+
+{g:"s3-drill",id:"3.33",d:"drill",q:"You need DynamoDB data readable and writable locally in multiple Regions worldwide (active-active). Which feature?",
+o:["DAX","Global Tables","Streams","TTL"],c:1,
+e:`<b>Global Tables</b> provide multi-Region active-active replication. DAX caches; Streams emit change events; TTL expires items.`},
+
+{g:"s3-drill",id:"3.34",d:"drill",q:"Which ElastiCache engine supports replication, Multi-AZ failover, persistence, and sorted sets?",
+o:["Memcached","Redis","DAX","Both equally"],c:1,
+e:`<b>Redis</b> offers replication, Multi-AZ failover, persistence and rich structures (sorted sets). Memcached has none of those; DAX is DynamoDB-specific.`},
+
+{g:"s3-drill",id:"3.35",d:"drill",q:"Which service is purpose-built for petabyte-scale analytics and complex aggregations (a data warehouse), not single-row OLTP?",
+o:["Amazon DynamoDB","Amazon Redshift","Amazon RDS","Amazon ElastiCache"],c:1,
+e:`<b>Redshift</b> is the columnar MPP data warehouse for OLAP/analytics. DynamoDB/RDS are operational databases; ElastiCache is a cache.`},
+
+/* ====== S3 EXAM — DynamoDB / caching / purpose-built ====== */
+{g:"s3-exam",id:"3.36",d:"exam",tag:"win",q:"A product-catalog page on RDS MySQL gets ~50,000 identical read queries/sec during flash sales. The catalog changes only about twice a day. Adding read replicas introduced 30s lag and still couldn't handle peak. The team needs sub-millisecond responses at peak. Best solution?",
+o:["Add more Aurora Replicas with auto scaling","Put ElastiCache for Redis in front of the database using a lazy-loading (cache-aside) strategy with a TTL aligned to the catalog update frequency","Add DynamoDB Accelerator (DAX) in front of RDS","Use CloudFront with an ALB origin to cache API responses"],c:1,
+e:`Repeated, rarely-changing reads at huge volume are a textbook cache case: <b>ElastiCache Redis, cache-aside, TTL matched to the twice-daily updates</b> serves sub-ms from memory and slashes DB load. ✗ More replicas hit the same lag/limits; ✗ DAX only caches DynamoDB, not RDS; ✗ CloudFront API caching is coarser and less precise than a query cache here.`},
+
+{g:"s3-exam",id:"3.37",d:"exam",tag:"win",q:"A gaming leaderboard must return the top 100 and any individual player's rank with single-digit-ms latency at scale. A DynamoDB GSI on score forces scanning all higher scores to compute a rank, which is too slow. Which purpose-built approach fixes ranking?",
+o:["Aurora MySQL with a RANK() window function computed per request","ElastiCache for Redis using Sorted Sets (ZADD / ZRANK / ZREVRANGE)","DynamoDB Accelerator (DAX) to cache the GSI","Amazon Neptune graph traversals"],c:1,
+e:`<b>Redis Sorted Sets</b> maintain rankings in O(log n): ZADD to score, ZRANK for a player's rank, ZREVRANGE for the top N — built for exactly this. ✗ A per-request SQL RANK() doesn't scale to this latency; ✗ caching a scan-heavy GSI doesn't fix the algorithm; ✗ Neptune is for relationships, not sorted ranking.`},
+
+{g:"s3-exam",id:"3.38",d:"exam",tag:"miss",q:"An application needs a fully managed, serverless NoSQL database delivering single-digit-millisecond latency that scales seamlessly to any request volume. Which service?",
+o:["Amazon RDS for MySQL","Amazon DynamoDB","Amazon ElastiCache for Redis","Amazon Redshift"],c:1,
+e:`Serverless NoSQL + single-digit-ms + scale-to-any-volume = <b>DynamoDB</b>. ✗ RDS is relational and not serverless in this sense; ✗ ElastiCache is a cache, not a primary database; ✗ Redshift is analytics.`},
+
+{g:"s3-exam",id:"3.39",d:"exam",q:"A new DynamoDB table will see highly variable, spiky, unpredictable traffic with long idle periods, and the team doesn't want to manage or forecast capacity. Which capacity mode?",
+o:["Provisioned with a high fixed capacity","On-demand capacity mode","Provisioned with auto scaling tuned for steady load","Reserved capacity for three years"],c:1,
+e:`<b>On-demand</b> charges per request and needs no capacity planning — ideal for spiky/unpredictable load with idle gaps. ✗ High fixed provisioned wastes money when idle; ✗ provisioned+autoscaling suits predictable patterns; ✗ reserved capacity assumes steady, forecastable usage.`},
+
+{g:"s3-exam",id:"3.40",d:"exam",q:"Whenever items change in a DynamoDB table, downstream systems must react (e.g. update a search index). What's the native, low-effort mechanism?",
+o:["Poll the table on a schedule for changes","Enable DynamoDB Streams and trigger a Lambda function on changes","Run a nightly full export to S3","Switch the table to Redshift"],c:1,
+e:`<b>DynamoDB Streams → Lambda</b> is native change data capture with minimal effort. ✗ Polling is laggy and wasteful; ✗ nightly exports aren't near-real-time; ✗ Redshift is the wrong engine entirely.`},
+
+{g:"s3-exam",id:"3.41",d:"exam",q:"A team deployed a high-concurrency transactional application directly on Amazon Redshift and it performs poorly. What's the correct understanding and fix?",
+o:["Add Redshift nodes until transactions speed up","Redshift is an OLAP data warehouse, not an OLTP store — run the transactional workload on RDS/Aurora or DynamoDB and keep Redshift for analytics","Enable Redshift Multi-AZ for transactions","Put DAX in front of Redshift"],c:1,
+e:`<b>Redshift is built for analytical queries over large datasets, not high-concurrency single-row transactions.</b> Move OLTP to RDS/Aurora/DynamoDB and use Redshift for the analytics it's good at. ✗ More nodes won't fix the workload mismatch; ✗ Multi-AZ/DAX don't make Redshift an OLTP engine.`},
+
+{g:"s3-exam",id:"3.42",d:"exam",q:"An application's core need is to model and traverse highly connected data — friend-of-friend relationships and fraud-ring detection across many hops. Which purpose-built database?",
+o:["Amazon DynamoDB","Amazon Neptune (graph database)","Amazon Redshift","Amazon RDS for PostgreSQL"],c:1,
+e:`Relationship-heavy, multi-hop traversal is the <b>graph</b> use case — <b>Amazon Neptune</b>. ✗ DynamoDB/RDS can store relationships but multi-hop traversal is awkward and slow; ✗ Redshift is analytics, not graph traversal.`}
+
+];
+
+/* ---------------- RENDER ---------------- */
+const L=["A","B","C","D","E"];
+const state={};
+let total=BANK.length;
+
+function tagChip(t){
+  if(t==="miss") return '<span class="chip miss">↻ your miss</span>';
+  if(t==="win")  return '<span class="chip win">✓ lock it in</span>';
+  return "";
+}
+function diffChip(d,multi){
+  let base = d==="exam"?'<span class="chip exam">exam</span>'
+           : d==="mixed"?'<span class="chip mixed">mixed</span>'
+           : '<span class="chip drill">drill</span>';
+  if(multi) base += ' <span class="chip two">select two</span>';
+  return base;
+}
+
+BANK.forEach(item=>{
+  const host=document.getElementById(item.g);
+  if(!host)return;
+  const card=document.createElement("div");
+  card.className="q";
+  card.tabIndex=0;
+  card.dataset.id=item.id;
+  const correctArr = Array.isArray(item.c)?item.c:[item.c];
+  const multi = item.multi===true || correctArr.length>1;
+
+  card.innerHTML =
+    '<div class="qtop"><span class="qid">Q '+item.id+'</span>'+diffChip(item.d,multi)+tagChip(item.tag)+'</div>'+
+    '<div class="stem">'+item.q+'</div>'+
+    '<ul class="opts">'+item.o.map((t,i)=>
+      '<button class="opt" data-i="'+i+'"><span class="ltr">'+L[i]+'</span><span class="otext">'+t+'</span><span class="mark"></span></button>'
+    ).join('')+'</ul>'+
+    (multi?'<button class="checkbtn" disabled>Check answer</button>':'')+
+    '<div class="reveal"><div class="rv-inner"></div></div>';
+
+  host.appendChild(card);
+
+  const opts=[...card.querySelectorAll(".opt")];
+  const checkBtn=card.querySelector(".checkbtn");
+  const reveal=card.querySelector(".reveal");
+  const rvInner=card.querySelector(".rv-inner");
+  let locked=false;
+  let sel=new Set();
+
+  function settle(){
+    locked=true;
+    const ok = sel.size===correctArr.length && [...sel].every(i=>correctArr.includes(i));
+    opts.forEach((b,i)=>{
+      b.disabled=true; b.classList.remove("sel");
+      const mark=b.querySelector(".mark");
+      if(correctArr.includes(i)){b.classList.add("correct");mark.textContent="✓ correct";}
+      else if(sel.has(i)){b.classList.add("wrong");mark.textContent="✗ your pick";}
+    });
+    if(checkBtn)checkBtn.style.display="none";
+    rvInner.innerHTML='<div class="verdict '+(ok?'r-ok':'r-no')+'">'+(ok?'Correct':'Not quite')+'</div>'+item.e;
+    reveal.classList.add("show");
+    state[item.id]={answered:true,correct:ok};
+    updateHUD();
+  }
+
+  card._select=function(i){
+    if(locked||i<0||i>=opts.length)return;
+    if(multi){
+      if(sel.has(i)){sel.delete(i);opts[i].classList.remove("sel");}
+      else{sel.add(i);opts[i].classList.add("sel");}
+      if(checkBtn)checkBtn.disabled = sel.size===0;
+    } else { sel=new Set([i]); settle(); }
+  };
+  card._check=function(){ if(!locked&&multi&&sel.size)settle(); };
+  card._locked=()=>locked;
+  card._multi=multi;
+
+  opts.forEach(b=>b.addEventListener("click",()=>card._select(+b.dataset.i)));
+  if(checkBtn)checkBtn.addEventListener("click",()=>card._check());
+});
+
+/* ---------------- VIM NAVIGATION ---------------- */
+const cards=[...document.querySelectorAll(".q")];
+let cur=-1, lastG=0;
+
+function setCurrent(i){
+  if(cur>=0&&cards[cur])cards[cur].classList.remove("current");
+  cur=i;
+  if(cur>=0&&cards[cur])cards[cur].classList.add("current");
+}
+function focusCard(i){
+  if(!cards.length)return;
+  i=Math.max(0,Math.min(cards.length-1,i));
+  setCurrent(i);
+  cards[i].focus({preventScroll:true});
+  cards[i].scrollIntoView({behavior:"smooth",block:"center"});
+}
+function nextUnanswered(){
+  for(let off=1;off<=cards.length;off++){
+    const i=((cur<0?0:cur)+off)%cards.length;
+    if(!state[cards[i].dataset.id]){focusCard(i);return;}
+  }
+}
+cards.forEach((c,i)=>c.addEventListener("focusin",()=>setCurrent(i)));
+
+const help=document.getElementById("help");
+function toggleHelp(){help.classList.toggle("show");}
+
+document.addEventListener("keydown",e=>{
+  const tag=(e.target.tagName||"").toLowerCase();
+  if(tag==="input"||tag==="textarea")return;
+  if(e.key==="Escape"){help.classList.remove("show");return;}
+  if(e.key==="?"){e.preventDefault();toggleHelp();return;}
+  if(help.classList.contains("show"))return;
+
+  let idx=-1;
+  if(e.key>="1"&&e.key<="5")idx=+e.key-1;
+  const lk=(e.key||"").toLowerCase();
+  if(lk>="a"&&lk<="e"&&e.key.length===1)idx=lk.charCodeAt(0)-97;
+  if(idx>=0){
+    if(cur<0)focusCard(0);
+    if(cur>=0){e.preventDefault();cards[cur]._select(idx);}
+    return;
+  }
+  switch(e.key){
+    case"j":e.preventDefault();focusCard(cur<0?0:cur+1);break;
+    case"k":e.preventDefault();focusCard(cur<0?0:cur-1);break;
+    case"G":e.preventDefault();focusCard(cards.length-1);break;
+    case"g":{const now=Date.now();if(now-lastG<500){e.preventDefault();focusCard(0);lastG=0;}else lastG=now;break;}
+    case"n":e.preventDefault();nextUnanswered();break;
+    case"Enter":if(cur>=0&&cards[cur]._multi&&!cards[cur]._locked()){e.preventDefault();cards[cur]._check();}break;
+  }
+});
+document.getElementById("h-help").addEventListener("click",toggleHelp);
+
+/* ---------------- HUD + SUMMARY ---------------- */
+document.getElementById("h-tot").textContent=total;
+function updateHUD(){
+  const answered=Object.keys(state).length;
+  const correct=Object.values(state).filter(s=>s.correct).length;
+  const pct=answered?Math.round(100*correct/answered):0;
+  document.getElementById("h-ans").textContent=answered;
+  document.getElementById("h-pct").textContent=answered?pct+"%":"—";
+  document.getElementById("h-bar").style.width=(100*answered/total)+"%";
+
+  const scP=document.getElementById("sc-pct");
+  const scL=document.getElementById("sc-line");
+  const scM=document.getElementById("sc-miss");
+  if(answered===0){scP.textContent="—";scL.textContent="Answer some questions and your readiness score appears here.";scM.innerHTML="";return;}
+  scP.textContent=pct+"%";
+  let v;
+  if(answered<total) v=correct+" / "+answered+" so far — "+(total-answered)+" left. Press n for the next unanswered.";
+  else if(pct>=80) v="Strong. Failover-vs-scaling and planned-vs-unplanned are sticking. On to File 4.";
+  else if(pct>=70) v="On the pass line. Redo the misses below — especially the Aurora Global DB one — then File 4.";
+  else v="Below target. Re-read the Multi-AZ and Aurora Global Database boxes, redo the misses, run it again.";
+  scL.textContent=v;
+
+  const missed=Object.entries(state).filter(([k,val])=>!val.correct).map(([k])=>k);
+  scM.innerHTML = missed.length
+    ? "review: "+missed.map(id=>'<a href="#" onclick="jump(\''+id+'\');return false;">Q'+id+'</a>').join("")
+    : (answered===total?"clean sweep — nothing flagged.":"");
+}
+function jump(id){
+  const i=cards.findIndex(q=>q.dataset.id===id);
+  if(i>=0)focusCard(i);
+}
+document.getElementById("h-reset").addEventListener("click",()=>location.reload());
+updateHUD();
+</script>
+</body>
+</html>

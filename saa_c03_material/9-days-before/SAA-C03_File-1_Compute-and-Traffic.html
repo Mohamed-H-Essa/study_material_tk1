@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SAA-C03 · File 1 · Compute &amp; Traffic</title>
+<style>
+  :root{
+    --ink:#16202e; --ink-soft:#46566a; --muted:#7b8a9c;
+    --paper:#fafbfc; --panel:#ffffff; --line:#e4e8ed; --line-strong:#cfd6de;
+    --accent:#e8821e; --accent-deep:#b25e10; --accent-tint:#fdf3e7;
+    --navy:#1c2b3e; --navy-tint:#eef2f7;
+    --ok:#157a55; --ok-bg:#e6f3ec; --ok-line:#aedcc4;
+    --no:#bb392c; --no-bg:#fbeae7; --no-line:#f0c2ba;
+    --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+    line-height:1.62;font-size:17px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:860px;margin:0 auto;padding:0 22px}
+
+  /* ---------- HUD ---------- */
+  .hud{position:sticky;top:0;z-index:50;background:rgba(28,43,62,.97);color:#fff;
+    border-bottom:1px solid #0e1622;backdrop-filter:saturate(1.2) blur(6px)}
+  .hud-inner{max-width:860px;margin:0 auto;padding:9px 22px;display:flex;gap:16px;
+    align-items:center;font-family:var(--mono);font-size:12.5px;flex-wrap:wrap}
+  .hud .dot{color:var(--accent);font-weight:700;letter-spacing:.04em}
+  .hud .stat b{color:#fff;font-weight:700}
+  .hud .stat{color:#9fb0c4}
+  .bar{flex:1;min-width:120px;height:7px;background:#0f1b2a;border-radius:99px;overflow:hidden}
+  .bar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),#f0a850);
+    transition:width .35s ease}
+  .hud button{font-family:var(--mono);font-size:11.5px;color:#9fb0c4;background:transparent;
+    border:1px solid #33445a;border-radius:6px;padding:3px 9px;cursor:pointer}
+  .hud button:hover{color:#fff;border-color:var(--accent)}
+
+  /* ---------- header ---------- */
+  header.top{padding:54px 0 30px;border-bottom:1px solid var(--line)}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--accent-deep);margin:0 0 14px}
+  h1{font-size:40px;line-height:1.05;margin:0 0 12px;font-weight:800;letter-spacing:-.018em}
+  h1 .thin{font-weight:400;color:var(--ink-soft)}
+  .lede{font-size:18px;color:var(--ink-soft);margin:0;max-width:60ch}
+  .filechips{display:flex;gap:7px;flex-wrap:wrap;margin-top:22px;font-family:var(--mono);font-size:11.5px}
+  .fc{padding:4px 10px;border:1px solid var(--line-strong);border-radius:99px;color:var(--muted)}
+  .fc.here{background:var(--navy);color:#fff;border-color:var(--navy)}
+
+  .legend{margin:26px 0 0;padding:16px 18px;background:var(--panel);border:1px solid var(--line);
+    border-radius:12px;font-size:14px;color:var(--ink-soft)}
+  .legend b{color:var(--ink)}
+  .legend .row{display:flex;gap:10px;align-items:baseline;margin:7px 0}
+  .legend .tg{flex:none}
+
+  /* ---------- sections ---------- */
+  section{padding:46px 0;border-bottom:1px solid var(--line)}
+  .sec-tag{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--accent-deep);display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .sec-tag .n{background:var(--navy);color:#fff;border-radius:6px;padding:2px 8px;font-size:11px}
+  h2{font-size:28px;line-height:1.12;margin:0 0 6px;font-weight:800;letter-spacing:-.015em}
+  h3{font-size:18.5px;margin:30px 0 8px;font-weight:700;letter-spacing:-.01em}
+  p{margin:13px 0}
+  .sub{color:var(--ink-soft);font-size:16px;margin-top:2px}
+  code{font-family:var(--mono);font-size:.86em;background:#eef1f4;padding:1.5px 6px;border-radius:5px;
+    color:#243; white-space:nowrap}
+  strong{font-weight:700}
+  ul.tight{margin:12px 0;padding-left:20px}
+  ul.tight li{margin:7px 0}
+
+  /* ---------- callouts ---------- */
+  .box{margin:22px 0;border-radius:12px;padding:16px 18px 16px 20px;border:1px solid var(--line);
+    background:var(--panel);position:relative;overflow:hidden}
+  .box .lab{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+    margin:0 0 6px;font-weight:600}
+  .box.key{border-color:#f3d9b6;background:var(--accent-tint)}
+  .box.key:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent)}
+  .box.key .lab{color:var(--accent-deep)}
+  .box.trap{border-color:var(--no-line);background:var(--no-bg)}
+  .box.trap:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--no)}
+  .box.trap .lab{color:var(--no)}
+  .box.field{background:var(--navy);color:#dfe7f0;border-color:var(--navy)}
+  .box.field .lab{color:var(--accent)}
+  .box.field b{color:#fff}
+  .box p:first-of-type{margin-top:0}.box p:last-child{margin-bottom:0}
+
+  /* ---------- table ---------- */
+  .tw{overflow-x:auto;margin:22px 0}
+  table{border-collapse:collapse;width:100%;font-size:14.5px}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;
+    color:var(--muted);font-weight:600;border-bottom:2px solid var(--line-strong)}
+  td b{color:var(--ink)}
+  tr:last-child td{border-bottom:none}
+
+  /* ---------- quiz ---------- */
+  .quizhead{display:flex;align-items:center;gap:10px;margin:34px 0 4px;flex-wrap:wrap}
+  .quizhead .ttl{font-family:var(--mono);font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--ink);font-weight:700}
+  .quizhead .meta{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  .quizhead .rule{flex:1;height:1px;background:var(--line)}
+
+  .q{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:18px 18px 6px;
+    margin:16px 0;transition:border-color .2s}
+  .q:focus-within{border-color:var(--line-strong)}
+  .q:focus{outline:2px solid var(--accent);outline-offset:2px}
+  .qtop{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:9px}
+  .qid{font-family:var(--mono);font-size:11.5px;color:var(--muted);font-weight:600}
+  .chip{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+    padding:2px 7px;border-radius:5px;font-weight:700}
+  .chip.drill{background:#eaf0f6;color:#3a566f}
+  .chip.exam{background:#1c2b3e;color:#fff}
+  .chip.mixed{background:var(--accent-tint);color:var(--accent-deep)}
+  .chip.two{background:#efe7f6;color:#6a3fa0}
+  .chip.miss{background:var(--no-bg);color:var(--no);border:1px solid var(--no-line)}
+  .chip.win{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-line)}
+  .stem{font-size:16.5px;margin:2px 0 13px;line-height:1.5}
+  .opts{list-style:none;margin:0;padding:0}
+  .opt{display:flex;gap:11px;align-items:flex-start;width:100%;text-align:left;cursor:pointer;
+    border:1px solid var(--line);background:#fff;border-radius:9px;padding:11px 13px;margin:7px 0;
+    font:inherit;font-size:15.5px;color:var(--ink);transition:border-color .12s,background .12s}
+  .opt:hover:not(:disabled){border-color:var(--line-strong);background:#fafcff}
+  .opt:disabled{cursor:default}
+  .opt .ltr{flex:none;font-family:var(--mono);font-weight:700;font-size:13px;color:var(--accent-deep);
+    width:18px;text-align:center;padding-top:1px}
+  .opt.sel{border-color:var(--accent);background:var(--accent-tint)}
+  .opt.sel .ltr{color:var(--accent-deep)}
+  .opt.correct{border-color:var(--ok-line);background:var(--ok-bg)}
+  .opt.correct .ltr{color:var(--ok)}
+  .opt.wrong{border-color:var(--no-line);background:var(--no-bg)}
+  .opt.wrong .ltr{color:var(--no)}
+  .opt .mark{margin-left:auto;font-family:var(--mono);font-weight:700;font-size:13px}
+  .opt.correct .mark{color:var(--ok)}.opt.wrong .mark{color:var(--no)}
+  .checkbtn{font-family:var(--mono);font-size:12.5px;font-weight:700;letter-spacing:.04em;
+    background:var(--navy);color:#fff;border:none;border-radius:8px;padding:9px 16px;cursor:pointer;
+    margin:6px 0 2px}
+  .checkbtn:hover{background:#0f1d2c}.checkbtn:disabled{opacity:.4;cursor:default}
+  .reveal{max-height:0;overflow:hidden;transition:max-height .3s ease}
+  .reveal.show{max-height:1600px}
+  .rv-inner{border-top:1px solid var(--line);margin-top:12px;padding:13px 2px 12px;font-size:15px;
+    color:var(--ink-soft);line-height:1.58}
+  .rv-inner .verdict{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;
+    font-weight:700;margin-bottom:6px}
+  .verdict.r-ok{color:var(--ok)}.verdict.r-no{color:var(--no)}
+  .rv-inner b{color:var(--ink)}
+  .flip{display:block;margin-top:10px;padding:9px 12px;background:var(--navy-tint);border-radius:8px;
+    font-size:14.5px}
+  .flip .fl{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--accent-deep);font-weight:700;margin-right:6px}
+
+  /* ---------- summary ---------- */
+  .summary{padding:46px 0 70px}
+  .scorecard{background:var(--navy);color:#fff;border-radius:16px;padding:26px 26px 22px;text-align:center}
+  .scorecard .big{font-size:54px;font-weight:800;letter-spacing:-.02em;line-height:1}
+  .scorecard .lab2{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--accent);margin-bottom:8px}
+  .scorecard .note{color:#b9c6d6;font-size:14.5px;margin-top:10px}
+  .misslist{margin-top:18px;font-family:var(--mono);font-size:13px}
+  .misslist a{color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent);
+    margin:0 4px;display:inline-block}
+  .foot{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:center;margin-top:30px}
+
+  @media (max-width:560px){
+    body{font-size:16px} h1{font-size:31px} h2{font-size:23px}
+    .hud-inner{font-size:11px;gap:10px} .stem{font-size:15.5px}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<div class="hud">
+  <div class="hud-inner">
+    <span class="dot">▰ SAA-C03</span>
+    <span class="stat"><b id="h-ans">0</b>/<span id="h-tot">0</span> answered</span>
+    <span class="stat"><b id="h-pct">—</b> correct</span>
+    <div class="bar"><i id="h-bar"></i></div>
+    <button id="h-reset">reset</button>
+  </div>
+</div>
+
+<div class="wrap">
+<header class="top">
+  <p class="eyebrow">Weakness-targeted drill · File 1 of 5</p>
+  <h1>Compute &amp; Traffic<br><span class="thin">EC2, Auto Scaling, load balancing &amp; session state</span></h1>
+  <p class="lede">Built from your two mocks and your 65-question timed exam. Opens with the things you already nail, then walks straight into the misses — including the ones you got wrong while feeling <em>confident</em>, which are the ones the exam punishes hardest.</p>
+  <div class="filechips">
+    <span class="fc here">1 · Compute &amp; Traffic</span>
+    <span class="fc">2 · Decoupling</span>
+    <span class="fc">3 · Databases</span>
+    <span class="fc">4 · Resilience &amp; DR</span>
+    <span class="fc">5 · Cost</span>
+  </div>
+  <div class="legend">
+    <div class="row"><span class="tg chip drill">drill</span><span><b>Quick check.</b> Exam-real, but tests one fact at a time. Confidence fuel.</span></div>
+    <div class="row"><span class="tg chip exam">exam</span><span><b>Scenario.</b> Full SAA-C03 difficulty — multiple plausible services, one fatal flaw.</span></div>
+    <div class="row"><span class="tg chip mixed">mixed</span><span><b>All-topics review</b> dropped between sections so nothing goes stale.</span></div>
+    <div class="row"><span class="tg chip miss">↻ your miss</span><span>You got this exact concept wrong on a mock or the timed exam.</span></div>
+    <div class="row"><span class="tg chip win">✓ lock it in</span><span>You got this right before — proving it sticks.</span></div>
+    <p style="margin:12px 0 0;font-size:13.5px;color:var(--muted)">Click an option to answer (or focus a card and press <code>1–5</code>; <code>Enter</code> checks Select-TWO). Every answer reveals why the right one wins, why each distractor dies, and the <b>Flip it</b> — the small stem change that would make a wrong answer correct.</p>
+  </div>
+</header>
+</div>
+
+<div class="wrap">
+
+<!-- ===================== SECTION 1 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">01</span> Elastic compute &amp; Auto Scaling</div>
+  <h2>Pick the instance, then let the group babysit it</h2>
+  <p class="sub">The exam rarely asks "what is EC2." It asks which scaling behavior, which health check, which placement, which automation — with a "least operational effort" clause that quietly rules out anything you'd hand-build.</p>
+
+  <h3>Instance families, in one breath</h3>
+  <p>The letter is the workload. <code>T</code>/<code>M</code> = general purpose (T is <em>burstable</em>: cheap baseline, CPU credits for spikes). <code>C</code> = compute-optimized (batch, HPC, gaming servers). <code>R</code>/<code>X</code>/<code>z</code> = memory-optimized (in-memory DBs, big caches). <code>I</code>/<code>D</code> = storage-optimized (local NVMe, big sequential I/O). <code>P</code>/<code>G</code>/<code>Inf</code>/<code>Trn</code> = accelerated (GPU/ML). A trailing <code>g</code> means <strong>Graviton</strong> (AWS ARM silicon) — usually ~20% cheaper and better performance-per-watt when your software runs on ARM. "Lowest cost, x86 not required" is a Graviton tell.</p>
+
+  <h3>Auto Scaling groups: the four scaling policies</h3>
+  <div class="tw"><table>
+    <tr><th>Policy</th><th>What it does</th><th>Stem tell</th></tr>
+    <tr><td><b>Target tracking</b></td><td>Keep a metric at a number (e.g. avg CPU 50%). AWS does the math.</td><td>"maintain", "keep utilization around" → the default right answer</td></tr>
+    <tr><td><b>Step scaling</b></td><td>Add/remove N based on <em>how badly</em> an alarm is breached.</td><td>"add more aggressively as load grows"</td></tr>
+    <tr><td><b>Scheduled</b></td><td>Change capacity at known clock times.</td><td>"every weekday 12–2pm", "business hours only", "predictable calendar"</td></tr>
+    <tr><td><b>Predictive</b></td><td>ML forecasts recurring patterns and provisions capacity <em>ahead</em> of demand.</td><td>"cyclical", "recurring daily/weekly", "scale before the spike, not after"</td></tr>
+  </table></div>
+
+  <div class="box key"><p class="lab">Key fact</p><p><b>Health checks decide replacement.</b> By default an ASG only watches EC2 status checks (is the hypervisor happy). If your app crashes but the instance is "running," the ASG leaves it. Turn on <b>ELB health checks</b> so the ASG replaces any instance the load balancer marks unhealthy. The <b>health-check grace period</b> stops it from killing instances mid-bootstrap.</p></div>
+
+  <p><strong>Other ASG levers the exam loves:</strong></p>
+  <ul class="tight">
+    <li><b>Launch templates</b> over launch configurations — templates get all new features and versioning; launch configs are legacy.</li>
+    <li><b>Lifecycle hooks</b> pause an instance in <code>Pending:Wait</code> (run bootstrap/config before it serves) or <code>Terminating:Wait</code> (drain gracefully).</li>
+    <li><b>Instance refresh</b> rolls a new AMI/launch-template version across the whole group with a rolling replacement — no rebuild.</li>
+    <li><b>Warm pools</b> keep pre-initialized instances ready, so a slow 8-minute bootstrap doesn't make scale-out useless.</li>
+    <li><b>Cooldown</b> prevents the group from thrashing before the last action's effect lands.</li>
+  </ul>
+
+  <div class="box field"><p class="lab">// field note — design for failure</p><p>After a 2008 data-center incident corrupted its database and stopped DVD shipments for three days, <b>Netflix</b> swore off running its own racks and moved onto AWS. To prove the new design could survive failure, it built <b>Chaos Monkey</b> — a tool that randomly kills production instances <em>during business hours</em>. If a dying instance can take you down, you find out at 2 p.m. on a Tuesday, not 2 a.m. during an outage. An Auto Scaling group of stateless instances across multiple AZs is precisely the architecture that makes Chaos Monkey boring.</p></div>
+
+  <!-- DRILL -->
+  <div class="quizhead"><span class="ttl">Quick check</span><span class="rule"></span><span class="meta">8 questions · one fact each</span></div>
+  <div id="s1-drill"></div>
+
+  <!-- SCENARIO -->
+  <div class="quizhead"><span class="ttl">Scenario pressure</span><span class="rule"></span><span class="meta">7 questions · exam difficulty</span></div>
+  <div id="s1-exam"></div>
+</section>
+
+<!-- ===================== MIXED 1 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">↻</span> Mixed review — all domains</div>
+  <h2>Keep the rest warm</h2>
+  <p class="sub">Four pulled from across the blueprint, including a couple from areas you've "finished" — because one of them is a concept you got wrong while feeling sure.</p>
+  <div id="mix-1"></div>
+</section>
+
+<!-- ===================== SECTION 2 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">02</span> Elastic Load Balancing &amp; traffic entry</div>
+  <h2>Three load balancers, one global front door</h2>
+  <p class="sub">The whole game is matching the layer and the requirement: HTTP routing vs raw speed vs inline appliances vs static-IP-across-Regions.</p>
+
+  <div class="tw"><table>
+    <tr><th>Service</th><th>Layer</th><th>Reach for it when…</th><th>Can't do</th></tr>
+    <tr><td><b>ALB</b></td><td>7 (HTTP/S)</td><td>path/host routing, redirects, WebSockets, OIDC/Cognito auth, target = EC2 / IP / <b>Lambda</b> / containers, WAF</td><td>static IP; non-HTTP protocols</td></tr>
+    <tr><td><b>NLB</b></td><td>4 (TCP/UDP/TLS)</td><td>millions of req/s, ultra-low latency, <b>static / Elastic IP</b>, UDP, preserve source IP</td><td>path-based HTTP routing; L7 auth</td></tr>
+    <tr><td><b>GWLB</b></td><td>3+4</td><td>insert third-party <b>virtual appliances</b> (firewalls, IDS/IPS) transparently; GENEVE :6081</td><td>be your app's load balancer</td></tr>
+    <tr><td><b>Global Accelerator</b></td><td>4 (edge)</td><td>2 <b>static anycast IPs</b>, route over AWS backbone to the best healthy Region, fast cross-Region failover, TCP/UDP</td><td><b>cache content</b> (that's CloudFront)</td></tr>
+  </table></div>
+
+  <div class="box trap"><p class="lab">Classic trap</p><p><b>"Static IP" splits two ways.</b> Static IP <em>within</em> a Region for an L4 service → <b>NLB with Elastic IPs</b>. Static IP that survives a whole-Region failure, or non-HTTP traffic that needs the fastest global path → <b>Global Accelerator</b>. And <b>ALB has no static IP at all</b> — its addresses rotate, so any answer pairing "ALB" with "Elastic IP" is bait.</p></div>
+
+  <div class="box key"><p class="lab">Key fact — cross-zone load balancing</p><p>On an <b>ALB it's always on and free</b>. On an <b>NLB (and GWLB) it's off by default</b>, and turning it on bills inter-AZ data transfer. The exam symptom: an NLB where one AZ's targets are slammed while another sits idle because client DNS pinned them to a single AZ node → <b>enable cross-zone load balancing</b>.</p></div>
+
+  <p><strong>Two more entry-tier reflexes:</strong> <b>connection draining</b> / deregistration delay lets in-flight requests finish before a target is pulled (so scale-in and deploys don't drop live requests); <b>WAF</b> attaches only to <b>CloudFront, ALB, API Gateway, AppSync</b> — never an NLB.</p>
+
+  <div class="box field"><p class="lab">// field note — trivia + a cautionary tale</p><p>The three load balancers arrived years apart: <b>ALB in 2016, NLB in 2017, GWLB in 2020</b> — each filling a gap the previous one left open. And on <b>Christmas Eve 2012</b>, an AWS operator accidentally deleted Elastic Load Balancing state data in <code>us-east-1</code>; ELB degraded and knocked Netflix streaming offline for hours on one of the year's busiest nights. The lesson lands in File 4: ELB spreads you across AZs for free, but it's still a <em>Regional</em> service — real DR needs a second Region.</p></div>
+
+  <div class="quizhead"><span class="ttl">Quick check</span><span class="rule"></span><span class="meta">8 questions · one fact each</span></div>
+  <div id="s2-drill"></div>
+
+  <div class="quizhead"><span class="ttl">Scenario pressure</span><span class="rule"></span><span class="meta">7 questions · exam difficulty</span></div>
+  <div id="s2-exam"></div>
+</section>
+
+<!-- ===================== MIXED 2 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">↻</span> Mixed review — all domains</div>
+  <h2>Keep the rest warm</h2>
+  <p class="sub">Four more across databases, security and networking — the kind of cross-topic jumps the real exam makes every other question.</p>
+  <div id="mix-2"></div>
+</section>
+
+<!-- ===================== SECTION 3 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">03</span> Session state, placement &amp; the resilient web tier</div>
+  <h2>Stateless instances are the whole point</h2>
+  <p class="sub">Every "users lost their sessions during a deploy / scale-in" question has the same answer family: get the state <em>off</em> the instance. This is also where two of your confident-but-wrong storage misses live, so they're back.</p>
+
+  <h3>Where session state should live</h3>
+  <div class="tw"><table>
+    <tr><th>Store</th><th>Pick it when</th><th>Why not the other</th></tr>
+    <tr><td><b>ElastiCache for Redis</b></td><td>sub-ms latency, needs <b>Multi-AZ failover, replication, persistence</b>, cluster mode, sorted sets</td><td>Memcached has none of that — no replication, no persistence, no Multi-AZ</td></tr>
+    <tr><td><b>DynamoDB (TTL)</b></td><td>serverless app (API Gateway + Lambda), single-digit ms, auto-expire sessions, zero servers to run</td><td>Redis means you run a cache cluster; overkill for pure serverless</td></tr>
+  </table></div>
+  <div class="box trap"><p class="lab">Sticky sessions are a smell, not a solution</p><p>Session affinity pins a user to one instance, so that instance becomes a single point of failure, load goes lopsided, and scale-in / rolling deploys drop sessions. When a stem describes those exact pains, the fix is <b>externalize state + disable stickiness</b>, not "tune the stickiness."</p></div>
+
+  <h3>Placement groups — the 30-second version</h3>
+  <ul class="tight">
+    <li><b>Cluster</b> — pack instances tight in <em>one</em> AZ for lowest latency / highest throughput (HPC, tightly-coupled). Trade-off: a rack/AZ fault can take the whole group. Single-AZ by nature.</li>
+    <li><b>Spread</b> — scatter across distinct hardware (max 7 per AZ per group) for a handful of <em>critical</em> instances that must not share a failure domain.</li>
+    <li><b>Partition</b> — up to 7 partitions per AZ on separate racks, hundreds of instances; for big distributed/replicated systems (HDFS, Cassandra, Kafka).</li>
+  </ul>
+
+  <div class="box field"><p class="lab">// field note — small team, huge scale</p><p>When Facebook acquired <b>Instagram in April 2012</b> for about $1&nbsp;billion, the company had <b>13 employees</b> and ran entirely on AWS. Tens of millions of users, served by a tiny team — because they leaned on managed, auto-scaling, stateless infrastructure instead of operating servers. That's the entire thesis of this section in one acquisition.</p></div>
+
+  <div class="quizhead"><span class="ttl">Quick check</span><span class="rule"></span><span class="meta">5 questions · one fact each</span></div>
+  <div id="s3-drill"></div>
+
+  <div class="quizhead"><span class="ttl">Scenario pressure</span><span class="rule"></span><span class="meta">7 questions · exam difficulty + two of your confident misses</span></div>
+  <div id="s3-exam"></div>
+</section>
+
+<!-- ===================== SUMMARY ===================== -->
+<section class="summary">
+  <div class="scorecard">
+    <div class="lab2">Session readiness</div>
+    <div class="big"><span id="sc-pct">—</span></div>
+    <div class="note"><span id="sc-line">Answer some questions and your readiness score appears here.</span></div>
+    <div class="misslist" id="sc-miss"></div>
+  </div>
+  <p class="foot">File 1 / 5 · Compute &amp; Traffic · 50 questions · say the word and I'll build File 2 (Decoupling) next, or bolt 10 more scenarios onto any section here.</p>
+</section>
+
+</div><!-- /wrap -->
+
+<script>
+/* ---------------- QUESTION BANK ----------------
+   c = index (or array) of correct option(s), 0-based
+   multi:true => Select TWO; tag => "miss" | "win"          */
+const BANK = [
+
+/* ====== S1 DRILL ====== */
+{g:"s1-drill",id:"1.01",d:"drill",q:"An Auto Scaling group should keep average CPU utilization around 50%, adjusting capacity automatically. Which scaling policy fits best?",
+o:["Target tracking scaling","Step scaling","Simple scaling","Manual scaling with scheduled reviews"],c:0,
+e:`<b>Target tracking</b> is built for exactly this: name a metric and a target, AWS manages the rest. <b>Step</b> reacts to alarm breach <i>size</i>; <b>simple</b> is the older single-adjustment style; manual review isn't a scaling policy.<span class="flip"><span class="fl">flip it</span>If the stem said "add more instances the further CPU climbs above 70%", that's <b>step scaling</b>.</span>`},
+
+{g:"s1-drill",id:"1.02",d:"drill",q:"What should you use to define how new instances launch in an Auto Scaling group, with versioning and access to the newest EC2 features?",
+o:["A launch configuration","A launch template","An AMI tag policy","A CloudFormation change set"],c:1,
+e:`<b>Launch templates</b> are versioned and receive all new EC2 features. Launch configurations are legacy and frozen. AMI tags and change sets are unrelated to ASG launch definitions.`},
+
+{g:"s1-drill",id:"1.03",d:"drill",q:"An app crashes but the EC2 status checks still pass, so the Auto Scaling group never replaces the broken instance. What enables automatic replacement?",
+o:["Enable detailed CloudWatch monitoring","Enable ELB (target group) health checks on the Auto Scaling group","Shorten the cooldown period","Add a second Availability Zone"],c:1,
+e:`By default the ASG only honors EC2 status checks. Turning on <b>ELB health checks</b> lets the load balancer's view of "unhealthy" trigger replacement. Monitoring granularity, cooldown, and extra AZs don't change <i>which</i> health signal the ASG acts on.`},
+
+{g:"s1-drill",id:"1.04",d:"drill",q:"A workload sits near-idle most of the day with short, infrequent CPU spikes, and cost matters. Which instance family is the natural fit?",
+o:["Compute-optimized (C family)","Memory-optimized (R family)","Burstable general-purpose (T family)","Storage-optimized (I family)"],c:2,
+e:`<b>T-family</b> burstable instances bank CPU credits while idle and spend them on spikes — cheapest for low-baseline, bursty work. C/R/I are for sustained compute, memory, or local-storage demands respectively.`},
+
+{g:"s1-drill",id:"1.05",d:"drill",q:"Traffic reliably jumps every weekday from 12:00–14:00 and is quiet otherwise. What's the simplest way to have capacity ready exactly for that window?",
+o:["Scheduled scaling","A larger fixed instance count all day","Spot Instances only","Predictive scaling with no other policy"],c:0,
+e:`A known clock-time pattern is the definition of <b>scheduled scaling</b>. A fixed large count wastes money off-peak; Spot-only risks interruption with no baseline; predictive shines for <i>forecast</i> patterns but scheduled is the precise, simple fit for "exactly this time."<span class="flip"><span class="fl">flip it</span>If the pattern were "recurring but shifting, let AWS forecast it," that's <b>predictive scaling</b>.</span>`},
+
+{g:"s1-drill",id:"1.06",d:"drill",q:"What is the purpose of an Auto Scaling cooldown period?",
+o:["To delay health checks after launch","To prevent the group from launching or terminating again before the previous activity takes effect","To cap the maximum number of instances","To pause billing between scaling events"],c:1,
+e:`<b>Cooldown</b> stops the group from over-reacting — it waits for the last scaling action to show its effect before scaling again. It's not a health-check delay (that's the grace period), a size cap (that's max), or anything to do with billing.`},
+
+{g:"s1-drill",id:"1.07",d:"drill",q:"You need each new instance to finish installing software and registering with a config system BEFORE it starts serving traffic. What feature handles this?",
+o:["A lifecycle hook on Pending:Wait","A longer cooldown","Termination protection","A warm pool"],c:0,
+e:`A <b>lifecycle hook</b> on <code>Pending:Wait</code> pauses the instance so bootstrap actions complete before it goes InService. Cooldown governs scaling cadence; termination protection prevents deletion; warm pools pre-init instances but don't gate the bootstrap step the way a hook does.`},
+
+{g:"s1-drill",id:"1.08",d:"drill",q:"An application's code runs fine on ARM. The team wants the lowest compute cost for the same performance. What's the easy win?",
+o:["Move to Graviton (g-series) instances","Buy more On-Demand x86 instances","Switch to Dedicated Hosts","Enable detailed monitoring"],c:0,
+e:`<b>Graviton</b> (AWS ARM) instances typically deliver better price-performance — a clean cost cut when your stack is ARM-compatible. Dedicated Hosts cost more (and serve licensing/compliance needs); monitoring doesn't reduce compute cost.`},
+
+/* ====== S1 EXAM ====== */
+{g:"s1-exam",id:"1.09",d:"exam",tag:"miss",q:"A payment app's Auto Scaling group spans three AZs behind an ALB. One AZ has intermittent packet loss that does NOT fail ELB health checks, but customer latency triples — and the ASG keeps launching new instances into that sick AZ. The team wants to immediately move traffic out of the suspect AZ with one action that auto-reverts, have AWS do this automatically in future AZ impairments, and get regular proof the other AZs can absorb the load. With the LEAST operational effort?",
+o:["A CloudWatch composite alarm on per-AZ latency that triggers Lambda to deregister the AZ's targets, and a second Lambda to re-register after an hour","Use Amazon Application Recovery Controller (ARC) zonal shift for immediate manual shifts, and enable zonal autoshift with practice runs","Enable ALB cross-zone load balancing so healthy AZs absorb the impaired AZ's traffic, and tune target-group thresholds","Create ARC routing controls with readiness checks per AZ and toggle them during impairments"],c:1,
+e:`This is the textbook <b>gray failure</b>: healthy-looking checks, terrible reality. <b>ARC zonal shift</b> drains an AZ with one API call that auto-expires; <b>zonal autoshift</b> lets AWS act on impairment telemetry you can't see in CloudWatch, and <b>practice runs</b> verify your other AZs can carry the load.<br>✗ The Lambda build is real but you own all detection, rollback and testing — the opposite of "least effort," and there's no reliable public metric for AZ impairment. ✗ Cross-zone spreads traffic into <i>all</i> AZs including the sick one. ✗ Routing controls are the Region-level failover tool, not per-AZ.<span class="flip"><span class="fl">flip it</span>Change "one AZ" to "fail over the whole Region" and the answer becomes <b>ARC routing controls</b> (or Route 53 failover).</span>`},
+
+{g:"s1-exam",id:"1.10",d:"exam",q:"A retail site has a strong, recurring weekly traffic shape: ramps every morning, peaks at lunch, quiet overnight, bigger on weekends. Scale-out currently lags the ramp and users see errors at the start of each surge. The team wants capacity provisioned ahead of demand, automatically, without hand-writing a schedule for every pattern.",
+o:["Target tracking on CPU","Predictive scaling (optionally combined with target tracking)","Simple scaling with a long cooldown","Scheduled scaling with one fixed schedule"],c:1,
+e:`<b>Predictive scaling</b> uses ML to forecast recurring patterns and provisions capacity <i>before</i> the surge — fixing the lag. Pairing it with target tracking handles the unexpected on top.<br>✗ Target tracking alone only reacts <i>after</i> CPU rises (the lag). ✗ Simple scaling is slow and dated. ✗ A single fixed schedule can't follow shifting daily/weekend shapes without constant tuning.`},
+
+{g:"s1-exam",id:"1.11",d:"exam",q:"A new hardened AMI must roll out to every instance in a production Auto Scaling group with minimal disruption and no manual instance juggling. What's the cleanest mechanism?",
+o:["Terminate all instances so the ASG relaunches them from the new template","Start an instance refresh after updating the launch template to the new AMI","Create a brand-new ASG and a new ALB, then cut DNS over","Manually detach, re-image, and reattach each instance"],c:1,
+e:`<b>Instance refresh</b> does a controlled rolling replacement against the new launch-template version — minimal disruption, fully managed.<br>✗ Mass termination causes an availability dip and a thundering relaunch. ✗ A parallel ASG + DNS cutover is heavier and riskier than needed. ✗ Manual per-instance work is the operational-effort distractor.`},
+
+{g:"s1-exam",id:"1.12",d:"exam",q:"Scale-out events don't help fast enough: each instance needs ~8 minutes to load a large model and warm caches before it's useful, so by the time it's ready the spike has caused errors. What reduces this scale-out latency with the least redesign?",
+o:["Use a warm pool of pre-initialized instances","Switch to a much larger instance type","Lower the cooldown period to zero","Move the workload to a single always-on instance"],c:0,
+e:`A <b>warm pool</b> keeps instances pre-initialized (stopped or running) so scale-out promotes a ready instance instead of cold-booting one — directly attacking the 8-minute warmup.<br>✗ Bigger instances still pay the same warmup. ✗ Cooldown governs cadence, not boot time. ✗ One always-on instance kills elasticity and HA.`},
+
+{g:"s1-exam",id:"1.13",d:"exam",q:"A tightly-coupled HPC simulation runs across many Linux EC2 nodes that exchange data constantly; the bottleneck is inter-node network latency and throughput. Which placement strategy helps most?",
+o:["Spread placement group","Partition placement group","Cluster placement group","Spread instances across three AZs"],c:2,
+e:`<b>Cluster placement groups</b> pack instances onto close hardware in one AZ for the lowest latency and highest throughput — exactly what tightly-coupled HPC needs.<br>✗ Spread maximizes isolation (the opposite goal). ✗ Partition is for big distributed/replicated stores. ✗ Spreading across AZs <i>adds</i> the very latency you're fighting.<span class="flip"><span class="fl">flip it</span>If the requirement were "these critical nodes must never share a failure domain," that's a <b>spread</b> group.</span>`},
+
+{g:"s1-exam",id:"1.14",d:"exam",q:"A fault-tolerant batch fleet in an Auto Scaling group should run as cheaply as possible on Spot, but the team is burned by a single Spot pool drying up and killing the whole fleet. What configuration best protects capacity while keeping costs low?",
+o:["A mixed instances policy spanning several instance types across multiple AZs with the price-capacity-optimized allocation strategy","All Spot, single instance type, lowest-price allocation","Reserved Instances for the entire fleet","100% On-Demand to guarantee capacity"],c:0,
+e:`Diversifying across <b>many instance types and AZs</b> gives many Spot pools, and <b>price-capacity-optimized</b> picks pools least likely to be reclaimed — resilient <i>and</i> cheap.<br>✗ Single type + lowest-price concentrates risk in the pool most likely to be taken back. ✗ RIs/On-Demand defeat the "as cheaply as possible on Spot" requirement. (Spot purchasing gets its own deep dive in File 5.)`},
+
+{g:"s1-exam",id:"1.15",d:"exam",tag:"miss",q:"A web app behind an ALB uses sticky sessions. During peak, new instances launch but users keep hitting the same overloaded instances, and some users lose their session entirely when instances are terminated on scale-in. Redesign to fix BOTH the uneven load and the lost sessions.",
+o:["Replace the ALB with an NLB and increase stickiness duration","Store session data in ElastiCache for Redis and disable sticky sessions on the ALB","Store sessions on an EBS volume shared via Multi-Attach across instances","Use a longer scale-in cooldown so instances aren't terminated as often"],c:1,
+e:`Both symptoms trace to the same root: state lives on the instance. <b>Externalize sessions to ElastiCache Redis and turn off stickiness</b> — now any instance serves any user, load balances evenly, and terminations don't lose state.<br>✗ NLB + longer stickiness deepens the affinity problem. ✗ EBS Multi-Attach is single-AZ block storage for clustered apps, not a session store. ✗ Cooldown only delays the inevitable session loss.`},
+
+/* ====== MIX 1 ====== */
+{g:"mix-1",id:"M1.1",d:"mixed",tag:"win",q:"A static website (HTML/CSS/JS/images) in an S3 bucket loads slowly for a globally spread audience, and the team wants to offload requests from the origin. What should they implement?",
+o:["Enable S3 Transfer Acceleration","Create a CloudFront distribution with the S3 bucket as the origin","Cross-Region replicate the bucket to every Region","Host the site on EC2 in multiple Regions behind Route 53 latency routing"],c:1,
+e:`<b>CloudFront</b> caches static content at edge locations worldwide and offloads the origin — purpose-built for this.<br>✗ Transfer Acceleration speeds <i>uploads</i> to S3, not global reads. ✗ Replicating everywhere is costly and still not edge-cached. ✗ EC2 fleets are heavy overkill for static files.`},
+
+{g:"mix-1",id:"M1.2",d:"mixed",tag:"win",q:"An application on EC2 must read and write an S3 bucket, and security policy forbids any long-lived credentials on the instances. What should be configured?",
+o:["Store IAM access keys in a file and rotate monthly","Attach an IAM role (instance profile) with the needed S3 permissions to the instances","Hardcode credentials as environment variables","Put access keys in Parameter Store and fetch at boot"],c:1,
+e:`An <b>IAM role via an instance profile</b> delivers temporary, auto-rotated credentials — no secrets on disk. Every other option stores or fetches long-lived keys, which the policy forbids.`},
+
+{g:"mix-1",id:"M1.3",d:"mixed",tag:"miss",q:"A company has an AWS Direct Connect link to its VPC and a new compliance rule requires all data in transit to be encrypted. What is the MOST operationally efficient way to meet it?",
+o:["Tick an 'encryption' setting on the Direct Connect connection","Run a Site-to-Site VPN (IPsec) over the Direct Connect link","Replace Direct Connect with a Site-to-Site VPN over the public internet","Encrypt data with CloudHSM before sending it over Direct Connect"],c:1,
+e:`<b>Direct Connect is private but NOT encrypted.</b> Layer an IPsec <b>Site-to-Site VPN over the DX link</b> to get private <i>and</i> encrypted. ✗ There's no DX "encryption" toggle. ✗ Dropping DX for internet VPN loses the dedicated low-latency line. ✗ App/CloudHSM encryption is far more work and doesn't cover all in-transit traffic.<span class="flip"><span class="fl">flip it</span>If the stem only said "dedicated, consistent, low-latency" with no encryption requirement, <b>Direct Connect alone</b> is enough.</span>`},
+
+{g:"mix-1",id:"M1.4",d:"mixed",q:"A single malicious IP address is hammering your web servers, and you need to block all traffic from it at the subnet level. What do you use?",
+o:["A deny rule in the security group on the instances","A deny rule in the Network ACL for the subnet","A larger instance type to absorb the traffic","Sticky sessions to isolate the attacker"],c:1,
+e:`<b>Security groups have no deny rules</b> — they're allow-only and stateful. To explicitly block an IP you need a <b>NACL deny</b> at the subnet boundary (stateless, evaluated in order).`},
+
+/* ====== S2 DRILL ====== */
+{g:"s2-drill",id:"2.01",d:"drill",q:"You need to route requests to different target groups based on URL path (e.g. /api → service A, /images → service B). Which load balancer?",
+o:["Network Load Balancer","Application Load Balancer","Gateway Load Balancer","Classic Load Balancer"],c:1,
+e:`Path/host-based routing is a Layer-7 feature, so it's the <b>ALB</b>. NLB is L4 (no URL awareness); GWLB is for appliances; CLB is legacy.`},
+
+{g:"s2-drill",id:"2.02",d:"drill",q:"A workload needs ultra-low latency at Layer 4, must handle UDP, and requires a static IP per AZ. Which load balancer?",
+o:["Application Load Balancer","Gateway Load Balancer","Network Load Balancer","Global Accelerator (it's a load balancer)"],c:2,
+e:`That's the <b>NLB</b>: L4, TCP/UDP/TLS, millions of req/s, and Elastic/static IP support. ALB is L7 and has no static IP; GWLB fronts appliances; Global Accelerator is an edge router, not a load balancer.`},
+
+{g:"s2-drill",id:"2.03",d:"drill",q:"You must insert a fleet of third-party firewall virtual appliances transparently into the traffic path. Which service is designed for this?",
+o:["Gateway Load Balancer","Application Load Balancer","AWS WAF","Network Firewall only"],c:0,
+e:`<b>GWLB</b> exists to deploy and scale third-party virtual appliances as a transparent bump-in-the-wire (GENEVE, port 6081). ALB/WAF don't insert arbitrary inline appliances.`},
+
+{g:"s2-drill",id:"2.04",d:"drill",q:"Which statement about cross-zone load balancing is correct?",
+o:["It's off by default on the ALB","It's on by default and free on the ALB; off by default on the NLB","It's never available on the NLB","Enabling it on the ALB incurs inter-AZ charges"],c:1,
+e:`<b>ALB: cross-zone is always on and free. NLB/GWLB: off by default</b>, and enabling it bills inter-AZ data transfer. That asymmetry is a frequent exam detail.`},
+
+{g:"s2-drill",id:"2.05",d:"drill",q:"What does connection draining (deregistration delay) do?",
+o:["Caches responses at the edge","Lets in-flight requests to a target finish before the target is removed","Encrypts traffic between client and ALB","Balances load across AZs"],c:1,
+e:`<b>Deregistration delay</b> keeps a target around long enough to complete active requests during deploys or scale-in, so live requests aren't dropped. The others describe CloudFront, TLS, and cross-zone respectively.`},
+
+{g:"s2-drill",id:"2.06",d:"drill",q:"Which target type can an Application Load Balancer route to?",
+o:["EC2 instances only","EC2 instances and IP addresses only","EC2 instances, IP addresses, containers, and Lambda functions","Only Auto Scaling groups"],c:2,
+e:`The ALB can target instances, IPs, containers, and — the one people forget — <b>Lambda functions</b>. That breadth is why it shows up as the answer in serverless-fronting scenarios.`},
+
+{g:"s2-drill",id:"2.07",d:"drill",q:"What does AWS Global Accelerator provide?",
+o:["Edge caching of static content","Two static anycast IPs that route over the AWS backbone to the optimal healthy endpoint, with fast failover","A managed CDN with TLS certificates","A NoSQL database accelerator"],c:1,
+e:`Global Accelerator gives <b>two static anycast IPs</b> and steers TCP/UDP traffic over AWS's backbone to the best healthy Region/endpoint with quick failover. It does <b>not cache</b> (that's CloudFront) and isn't a database accelerator (that's DAX).`},
+
+{g:"s2-drill",id:"2.08",d:"drill",q:"AWS WAF can be attached to which of these?",
+o:["NLB and CLB","CloudFront, ALB, API Gateway, and AppSync","Any load balancer including the NLB","EC2 instances directly"],c:1,
+e:`<b>WAF integrates with CloudFront, ALB, API Gateway, and AppSync</b> — all L7. It does <b>not</b> attach to an NLB or CLB, and not directly to EC2.`},
+
+/* ====== S2 EXAM ====== */
+{g:"s2-exam",id:"2.09",d:"exam",tag:"win",q:"A stateful service uses UDP and static IPs that clients have hardcoded into firewall allow-lists. It runs on EC2 across multiple AZs; if an AZ fails it must keep serving on the SAME static IPs without clients changing firewall rules. The app does its own health checking. Which load balancing solution fits?",
+o:["An ALB with Elastic IPs assigned to each node","An NLB with an Elastic IP in each AZ, cross-zone load balancing enabled","Global Accelerator with static anycast IPs pointing to an ALB in each AZ","Round-robin DNS across instance public IPs"],c:1,
+e:`UDP + static IPs + survive-AZ-failure on the same IPs = <b>NLB with Elastic IPs per AZ</b>, the L4 balancer that owns fixed addresses. Cross-zone keeps healthy AZs sharing load.<br>✗ ALB can't hold Elastic IPs and can't do UDP. ✗ ALB can't carry UDP, so fronting one with Global Accelerator still fails the protocol requirement. ✗ DNS round-robin gives no health-based failover and slow TTL behavior.<span class="flip"><span class="fl">flip it</span>Make it multi-<i>Region</i> with the fastest global path and you add <b>Global Accelerator in front of the NLBs</b>.</span>`},
+
+{g:"s2-exam",id:"2.10",d:"exam",q:"A multiplayer game uses a custom TCP/UDP protocol. Players worldwide complain about lag and slow recovery when a Region has issues. The company wants the fastest network path to the nearest healthy Region and near-instant failover on fixed IPs. What should they put in front?",
+o:["Amazon CloudFront with the game servers as origin","AWS Global Accelerator with endpoints in multiple Regions","Route 53 latency-based routing to per-Region NLBs","A single large NLB in one Region"],c:1,
+e:`<b>Global Accelerator</b> routes TCP/UDP over the AWS backbone to the closest healthy Region and fails over fast on static anycast IPs — ideal for real-time gaming.<br>✗ CloudFront is an HTTP cache, wrong for a custom game protocol. ✗ Route 53 latency routing works at DNS layer, so failover waits on TTLs. ✗ One Region can't be "nearest healthy Region" globally.`},
+
+{g:"s2-exam",id:"2.11",d:"exam",q:"A global audience pulls large amounts of static and cacheable HTTP content. The team wants lower latency AND fewer requests reaching the origin. CloudFront or Global Accelerator?",
+o:["Global Accelerator, because it routes over the AWS backbone","CloudFront, because it caches content at edge locations and offloads the origin","Either one — they're interchangeable for HTTP","Global Accelerator with caching enabled"],c:1,
+e:`Cacheable HTTP that should offload the origin = <b>CloudFront</b>. Edge caching is the differentiator.<br>✗ Global Accelerator improves the network path but <b>does not cache</b>, so the origin still serves every request. ✗ They're not interchangeable; ✗ Global Accelerator has no caching mode.<span class="flip"><span class="fl">flip it</span>Make the traffic non-HTTP (TCP/UDP) or about static-IP regional failover and the answer flips to <b>Global Accelerator</b>.</span>`},
+
+{g:"s2-exam",id:"2.12",d:"exam",q:"Before requests reach the application, users must authenticate via a corporate OIDC provider / Amazon Cognito, with the load balancer handling the auth handshake so the app doesn't have to. Which entry point supports this natively?",
+o:["Network Load Balancer","Application Load Balancer with built-in authentication","Gateway Load Balancer","Classic Load Balancer"],c:1,
+e:`<b>ALB</b> can offload authentication to OIDC IdPs and Cognito before forwarding to targets — a Layer-7 feature.<br>✗ NLB/GWLB/CLB operate too low (or are legacy) to perform an OIDC handshake.`},
+
+{g:"s2-exam",id:"2.13",d:"exam",q:"An NLB fronts targets in three AZs, but operators notice one AZ's targets are overloaded while the others sit nearly idle. Investigation shows clients are resolving to a single AZ's NLB node and that node only forwards within its own AZ. What's the fix?",
+o:["Enable cross-zone load balancing on the NLB (accepting inter-AZ data charges)","Switch to sticky sessions","Add more AZs","Replace the NLB with a CLB"],c:0,
+e:`By default an NLB node only serves its own AZ's targets, so skewed DNS resolution skews load. <b>Enabling cross-zone load balancing</b> lets every node spread across all AZs (note the inter-AZ transfer cost).<br>✗ Stickiness worsens skew. ✗ More AZs doesn't change per-node behavior. ✗ A CLB is a regression.`},
+
+{g:"s2-exam",id:"2.14",d:"exam",q:"A team wants to shift a small percentage of production traffic to a new application version for a canary test, then ramp it up, all within the load balancer. What's the cleanest approach?",
+o:["Weighted target groups on the ALB (forward action split by weight)","Sticky sessions pinned to the new version","An NLB with two listeners","Manually editing client DNS for 5% of users"],c:0,
+e:`The ALB's <b>weighted target groups</b> split a listener's traffic by percentage between target groups — built for canary/blue-green ramps. ✗ Stickiness can't do percentage splits; ✗ NLB lacks L7 weighting; ✗ hand-editing client DNS isn't controllable or safe.`},
+
+{g:"s2-exam",id:"2.15",d:"exam",q:"During scale-in and deploys, in-flight requests are being cut off and users see errors, even though instances pass health checks before removal. What single setting most directly addresses dropped live requests?",
+o:["Increase the ALB idle timeout to 4000 seconds","Enable/raise the deregistration delay (connection draining) on the target group","Disable health checks during deploys","Switch to an NLB"],c:1,
+e:`<b>Deregistration delay (connection draining)</b> keeps a target in service long enough to finish active requests before it's removed — directly stopping the cut-offs.<br>✗ Idle timeout governs idle connections, not draining. ✗ Disabling health checks risks routing to dead targets. ✗ Changing LB type doesn't address graceful removal.`},
+
+/* ====== MIX 2 ====== */
+{g:"mix-2",id:"M2.1",d:"mixed",tag:"win",q:"A read-heavy reporting workload overwhelms a single RDS MySQL instance and slows the whole app. Writes are light and must not be affected. How do you scale the reads?",
+o:["Convert to a Multi-AZ deployment","Add one or more RDS read replicas and send read traffic to them","Increase storage and IOPS only","Take nightly snapshots and query restored copies"],c:1,
+e:`<b>Read replicas</b> scale read throughput and absorb reporting load without touching writes. ✗ Multi-AZ is for failover/HA, not read scaling (the standby doesn't serve reads). ✗ More IOPS doesn't add read capacity the way replicas do. ✗ Snapshot-restore is a batch hack, not live scaling.<span class="flip"><span class="fl">flip it</span>If the goal were "survive an AZ failure with automatic failover," the answer becomes <b>Multi-AZ</b>.</span>`},
+
+{g:"mix-2",id:"M2.2",d:"mixed",tag:"win",q:"A DynamoDB-backed app needs microsecond read latency for a read-intensive, eventually-consistent workload, with no application rewrite. What do you add?",
+o:["DynamoDB Accelerator (DAX)","A DynamoDB global table","ElastiCache the app must query directly","Provisioned capacity with Auto Scaling"],c:0,
+e:`<b>DAX</b> is the in-memory, microsecond-latency cache built into the DynamoDB API path — drop-in, no rewrite. ✗ Global tables are for multi-Region active-active, not latency. ✗ A separate ElastiCache means rewriting the data path. ✗ Auto Scaling adjusts capacity, not single-digit-microsecond latency.`},
+
+{g:"mix-2",id:"M2.3",d:"mixed",q:"An S3 bucket in Account A must be readable by a principal in partner Account B, with the least overhead and following best practice. What's the right setup?",
+o:["Email pre-signed URLs for every object weekly","Make the bucket public","Create an IAM user in Account A and share its access keys","Add a bucket policy in Account A granting the required S3 read actions to Account B's role/principal (and allow it in B's IAM policy)"],c:3,
+e:`Cross-account S3 is a two-lock door: the <b>bucket policy in A grants B's principal</b>, and B's IAM policy allows the action. That's the maintainable, least-overhead, best-practice path. ✗ Pre-signed URLs by email don't scale; ✗ public buckets leak; ✗ sharing long-lived keys is forbidden practice.`},
+
+{g:"mix-2",id:"M2.4",d:"mixed",q:"A company has one Direct Connect connection in us-east-1 and needs it to reach VPCs in us-west-2 and eu-west-1 as well. What enables this on the single connection?",
+o:["VPC peering across all three Regions","A Direct Connect Gateway associated with the Virtual Private Gateways in each Region","A separate Direct Connect connection per Region","A Transit Gateway with inter-Region peering only"],c:1,
+e:`A <b>Direct Connect Gateway</b> lets one DX connection fan out to VPCs in multiple Regions. ✗ Peering doesn't extend the DX link itself. ✗ Per-Region DX connections is the costly opposite of the requirement. ✗ TGW alone doesn't make a single DX reach other Regions without a DX Gateway.`},
+
+/* ====== S3 DRILL ====== */
+{g:"s3-drill",id:"3.01",d:"drill",q:"You need a session store with sub-ms latency that also offers Multi-AZ automatic failover, replication, and persistence. Which do you choose?",
+o:["ElastiCache for Memcached","ElastiCache for Redis","An EBS volume","S3"],c:1,
+e:`<b>Redis</b> supports replication, Multi-AZ failover, persistence and cluster mode — the HA session store. ✗ Memcached has none of those. ✗ EBS/S3 aren't session stores (S3 latency alone disqualifies it).`},
+
+{g:"s3-drill",id:"3.02",d:"drill",q:"A serverless app (API Gateway + Lambda) needs to keep session data with single-digit ms latency, auto-expiring after 24 hours, with the least operations. What fits best?",
+o:["DynamoDB with TTL set to 24 hours","A self-managed Redis cluster","An RDS table with a cron cleanup job","Encrypted client-side cookies only"],c:0,
+e:`<b>DynamoDB with TTL</b> is serverless, fast, and auto-expires items — a natural pairing with Lambda. ✗ Redis adds a cluster to operate. ✗ RDS + cron is heavier. ✗ Cookies hit size/security limits for real session data.`},
+
+{g:"s3-drill",id:"3.03",d:"drill",q:"Why does the exam treat sticky sessions as something to avoid for scalable web tiers?",
+o:["They encrypt traffic, slowing it down","They pin users to one instance, creating a single point of failure, uneven load, and broken scaling/deploys","They cost extra per request","They only work with NLBs"],c:1,
+e:`Affinity ties a user's state to one instance, so that instance is a SPOF, load skews, and scale-in/rolling deploys drop sessions. The cure is externalizing state. The other options are simply false.`},
+
+{g:"s3-drill",id:"3.04",d:"drill",q:"A few critical instances must each sit on distinct underlying hardware so no single hardware failure can take more than one down. Which placement group?",
+o:["Cluster","Spread","Partition","None — use one AZ"],c:1,
+e:`<b>Spread</b> placement groups put each instance on separate hardware (max 7 per AZ per group) for maximum isolation of critical nodes. Cluster does the opposite; partition is for large distributed systems.`},
+
+{g:"s3-drill",id:"3.05",d:"drill",q:"You're running a large distributed, replicated data store (e.g. Cassandra/HDFS/Kafka) across many instances and want to limit the blast radius of a rack failure. Which placement group?",
+o:["Cluster","Spread","Partition","Single-instance only"],c:2,
+e:`<b>Partition</b> placement groups isolate groups of instances onto separate racks (up to 7 partitions per AZ, hundreds of instances) — designed for big distributed/replicated systems. Cluster maximizes proximity; spread is capped at 7 instances per AZ.`},
+
+/* ====== S3 EXAM ====== */
+{g:"s3-exam",id:"3.06",d:"exam",tag:"miss",q:"An app stores user sessions in memory on each instance. After a recent deploy replaced all instances, every session was lost. The team wants sub-ms latency, automatic failover, and sessions that survive even if all app instances are replaced. Which solution meets ALL of these?",
+o:["ElastiCache for Memcached with Auto Discovery","ElastiCache for Redis with Multi-AZ and automatic failover","Keep sessions in memory but add a longer health-check grace period","DynamoDB Accelerator (DAX)"],c:1,
+e:`<b>Redis with Multi-AZ + automatic failover</b> gives sub-ms reads, survives node loss, and persists independently of the app fleet. ✗ Memcached lacks failover/persistence. ✗ Longer grace period doesn't externalize state. ✗ DAX caches DynamoDB; it isn't a general session store.`},
+
+{g:"s3-exam",id:"3.07",d:"exam",q:"A web tier must absorb large, unpredictable traffic swings and stay available even if an entire Availability Zone fails. Which design best meets both?",
+o:["One large EC2 instance with an Elastic IP","EC2 instances in a single AZ behind an ALB","An Auto Scaling group spanning multiple AZs behind an ALB","Several instances in one AZ with Route 53 round-robin"],c:2,
+e:`<b>ASG across multiple AZs behind an ALB</b> scales with demand and survives an AZ loss — the canonical resilient web tier. ✗ A single instance is a SPOF with no elasticity. ✗ Single-AZ designs die with the AZ. ✗ Round-robin DNS gives no health-based failover or autoscaling.`},
+
+{g:"s3-exam",id:"3.08",d:"exam",q:"An HPC team puts all nodes in a cluster placement group for lowest latency, but architecture review flags a resilience concern. What is the correct understanding of the trade-off?",
+o:["Cluster placement groups replicate across AZs automatically, so there's no concern","A cluster placement group lives in a single AZ, so an AZ/rack fault can affect the whole group — accept it for performance or use partition/multi-AZ where resilience matters more","Cluster groups can't be used with Auto Scaling, which is the real concern","The concern is cost — cluster groups carry a surcharge"],c:1,
+e:`Cluster groups are <b>single-AZ by design</b>; they trade resilience for proximity. The right call is to accept that for tightly-coupled performance, or choose <b>partition</b> / multi-AZ where the workload's resilience matters more. The other statements are factually wrong (no auto cross-AZ replication, no ASG ban, no surcharge).`},
+
+{g:"s3-exam",id:"3.09",d:"exam",q:"After externalizing all session state, what does making the web tier stateless most directly unlock?",
+o:["Lower S3 storage costs","Any instance can serve any request — enabling aggressive scale-in, rolling deploys, and Spot usage without losing user state","Automatic database failover","Encryption of data in transit"],c:1,
+e:`Statelessness means <b>any instance handles any request</b>, so you can scale in hard, roll deploys, and lean on interruptible Spot capacity without dropping sessions — the architectural payoff. The others are unrelated benefits.`},
+
+{g:"s3-exam",id:"3.10",d:"exam",tag:"miss",q:"Users upload images; each takes 5–10 minutes to process. At peak, uploads spike and work is silently dropped because the processing tier can't keep up. The team wants every upload eventually processed, decoupled from the web tier, with workers that scale to the backlog. What's the core design?",
+o:["Put an SQS queue between the tiers; workers in an ASG scale on queue depth; set the visibility timeout longer than the processing time","Increase the web instance size so it can process inline","Enable ALB sticky sessions so uploads stay on one instance","Process synchronously but add a longer ALB idle timeout"],c:0,
+e:`Decouple with <b>SQS</b>: the queue buffers spikes, workers pull when ready and scale on queue depth, and a <b>visibility timeout longer than the 5–10 min job</b> prevents another worker grabbing an in-flight message. ✗ Bigger web instances still couple upload to processing. ✗ Stickiness/idle-timeout don't add durability or buffering. (Full decoupling patterns: File 2.)<span class="flip"><span class="fl">flip it</span>If every consumer needed <i>every</i> event and the ability to replay history, you'd move to <b>Kinesis</b> — that's the File 2 trap.</span>`},
+
+{g:"s3-exam",id:"3.11",d:"exam",tag:"miss",q:"A self-managed database on EC2 needs a block storage volume delivering consistent sub-millisecond latency, very high sustained IOPS (above what gp3 provides), and 99.999% durability. Which EBS type?",
+o:["gp3 with throughput maxed out","st1 (Throughput Optimized HDD)","io2 / io2 Block Express","Instance store"],c:2,
+e:`Sustained high IOPS + sub-ms latency + 99.999% durability is the <b>io2 / io2 Block Express</b> signature (Block Express reaches up to 256,000 IOPS on Nitro). ✗ gp3 tops out at 16,000 IOPS. ✗ st1 is sequential HDD, not low-latency random I/O. ✗ Instance store is ephemeral — no durability.<span class="flip"><span class="fl">flip it</span>If durability didn't matter and you just wanted the absolute highest raw IOPS for scratch data, <b>instance store</b> wins.</span>`},
+
+{g:"s3-exam",id:"3.12",d:"exam",tag:"miss",q:"A nightly analytics job streams large, sequential reads/writes (log and warehouse data) and needs maximum throughput at the lowest cost. The volume is never a boot disk. Which EBS type fits best?",
+o:["gp3","io2","st1 (Throughput Optimized HDD)","sc1 (Cold HDD)"],c:2,
+e:`Large <b>sequential</b> throughput at low cost = <b>st1</b>, the throughput-optimized HDD (up to 500 MiB/s; can't boot). ✗ gp3/io2 are SSDs optimized for IOPS, costlier here. ✗ sc1 is cheaper still but lower throughput — it fits "infrequent, coldest, lowest cost," not "maximum throughput."<span class="flip"><span class="fl">flip it</span>Change the requirement to "rarely accessed, absolute lowest cost, throughput barely matters" and the answer becomes <b>sc1</b>.</span>`}
+
+];
+
+/* ---------------- RENDER ---------------- */
+const L=["A","B","C","D","E"];
+const state={}; // id -> {answered, correct}
+let total=BANK.length;
+
+function tagChip(t){
+  if(t==="miss") return '<span class="chip miss">↻ your miss</span>';
+  if(t==="win")  return '<span class="chip win">✓ lock it in</span>';
+  return "";
+}
+function diffChip(d,multi){
+  let base = d==="exam"?'<span class="chip exam">exam</span>'
+           : d==="mixed"?'<span class="chip mixed">mixed</span>'
+           : '<span class="chip drill">drill</span>';
+  if(multi) base += ' <span class="chip two">select two</span>';
+  return base;
+}
+
+BANK.forEach(item=>{
+  const host=document.getElementById(item.g);
+  if(!host)return;
+  const card=document.createElement("div");
+  card.className="q";
+  card.tabIndex=0;
+  card.dataset.id=item.id;
+  const correctArr = Array.isArray(item.c)?item.c:[item.c];
+  const multi = item.multi===true || correctArr.length>1;
+
+  card.innerHTML =
+    '<div class="qtop"><span class="qid">Q '+item.id+'</span>'+diffChip(item.d,multi)+tagChip(item.tag)+'</div>'+
+    '<div class="stem">'+item.q+'</div>'+
+    '<ul class="opts">'+item.o.map((t,i)=>
+      '<button class="opt" data-i="'+i+'"><span class="ltr">'+L[i]+'</span><span class="otext">'+t+'</span><span class="mark"></span></button>'
+    ).join('')+'</ul>'+
+    (multi?'<button class="checkbtn" disabled>Check answer</button>':'')+
+    '<div class="reveal"><div class="rv-inner"></div></div>';
+
+  host.appendChild(card);
+
+  const opts=[...card.querySelectorAll(".opt")];
+  const checkBtn=card.querySelector(".checkbtn");
+  const reveal=card.querySelector(".reveal");
+  const rvInner=card.querySelector(".rv-inner");
+  let locked=false;
+  let sel=new Set();
+
+  function settle(){
+    locked=true;
+    const userArr=[...sel];
+    const ok = userArr.length===correctArr.length && userArr.every(i=>correctArr.includes(i));
+    opts.forEach((b,i)=>{
+      b.disabled=true; b.classList.remove("sel");
+      const mark=b.querySelector(".mark");
+      if(correctArr.includes(i)){b.classList.add("correct");mark.textContent="✓ correct";}
+      else if(sel.has(i)){b.classList.add("wrong");mark.textContent="✗ your pick";}
+    });
+    if(checkBtn)checkBtn.style.display="none";
+    rvInner.innerHTML='<div class="verdict '+(ok?'r-ok':'r-no')+'">'+(ok?'Correct':'Not quite')+'</div>'+item.e;
+    reveal.classList.add("show");
+    state[item.id]={answered:true,correct:ok};
+    updateHUD();
+  }
+
+  opts.forEach(b=>{
+    b.addEventListener("click",()=>{
+      if(locked)return;
+      const i=+b.dataset.i;
+      if(multi){
+        if(sel.has(i)){sel.delete(i);b.classList.remove("sel");}
+        else{sel.add(i);b.classList.add("sel");}
+        if(checkBtn)checkBtn.disabled = sel.size===0;
+      } else {
+        sel=new Set([i]); settle();
+      }
+    });
+  });
+  if(checkBtn)checkBtn.addEventListener("click",()=>{if(!locked&&sel.size)settle();});
+
+  // keyboard: 1-5 / a-e select; Enter checks (multi)
+  card.addEventListener("keydown",e=>{
+    if(locked)return;
+    let idx=-1;
+    if(e.key>="1"&&e.key<="5")idx=+e.key-1;
+    const lk=e.key.toLowerCase();
+    if(lk>="a"&&lk<="e")idx=lk.charCodeAt(0)-97;
+    if(idx>=0&&idx<opts.length){e.preventDefault();opts[idx].click();}
+    else if(e.key==="Enter"&&multi&&sel.size){e.preventDefault();settle();}
+  });
+});
+
+/* ---------------- HUD + SUMMARY ---------------- */
+document.getElementById("h-tot").textContent=total;
+function updateHUD(){
+  const answered=Object.keys(state).length;
+  const correct=Object.values(state).filter(s=>s.correct).length;
+  const pct = answered? Math.round(100*correct/answered):0;
+  document.getElementById("h-ans").textContent=answered;
+  document.getElementById("h-pct").textContent= answered? pct+"%":"—";
+  document.getElementById("h-bar").style.width=(100*answered/total)+"%";
+
+  const scP=document.getElementById("sc-pct");
+  const scL=document.getElementById("sc-line");
+  const scM=document.getElementById("sc-miss");
+  if(answered===0){scP.textContent="—";scL.textContent="Answer some questions and your readiness score appears here.";scM.innerHTML="";return;}
+  scP.textContent=pct+"%";
+  let verdict;
+  if(answered<total) verdict=correct+" / "+answered+" so far — "+(total-answered)+" left. The bar at the very top tracks your run.";
+  else if(pct>=80) verdict="Strong. 80%+ on a weakness-targeted set means these concepts are sticking. Move to File 2.";
+  else if(pct>=70) verdict="On the pass line for this set. Re-take the ones below, then File 2.";
+  else verdict="Below your target. Re-read the section boxes, redo the misses below, and run it again before moving on.";
+  scL.textContent=verdict;
+
+  const missed=Object.entries(state).filter(([k,v])=>!v.correct).map(([k])=>k);
+  scM.innerHTML = missed.length
+    ? "review: "+missed.map(id=>'<a href="#" onclick="jump(\''+id+'\');return false;">Q'+id+'</a>').join("")
+    : (answered===total?"clean sweep — nothing flagged.":"");
+}
+function jump(id){
+  const el=[...document.querySelectorAll(".q")].find(q=>q.dataset.id===id);
+  if(el){el.scrollIntoView({behavior:"smooth",block:"center"});el.focus({preventScroll:true});}
+}
+document.getElementById("h-reset").addEventListener("click",()=>{location.reload()});
+updateHUD();
+</script>
+</body>
+</html>

@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SAA-C03 · File 2 · Decoupling &amp; Integration</title>
+<style>
+  :root{
+    --bg:#0e1620; --bg2:#0a1019; --panel:#15212e; --panel2:#1a2836; --panel3:#1f2f40;
+    --line:#26384a; --line-strong:#36506a;
+    --text:#e7eef6; --soft:#a3b5c7; --muted:#6f8298;
+    --accent:#f59e3c; --accent-2:#f7b260; --accent-tint:rgba(245,158,60,.12);
+    --ok:#3fcf8e; --ok-bg:rgba(63,207,142,.13); --ok-line:rgba(63,207,142,.45);
+    --no:#ff7062; --no-bg:rgba(255,112,98,.13); --no-line:rgba(255,112,98,.45);
+    --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);
+    line-height:1.62;font-size:17px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:860px;margin:0 auto;padding:0 22px}
+  ::selection{background:rgba(245,158,60,.3)}
+
+  /* ---------- HUD ---------- */
+  .hud{position:sticky;top:0;z-index:50;background:rgba(10,16,25,.96);
+    border-bottom:1px solid #1d2c3c;backdrop-filter:saturate(1.2) blur(7px)}
+  .hud-inner{max-width:860px;margin:0 auto;padding:9px 22px;display:flex;gap:16px;
+    align-items:center;font-family:var(--mono);font-size:12.5px;flex-wrap:wrap}
+  .hud .dot{color:var(--accent);font-weight:700;letter-spacing:.04em}
+  .hud .stat b{color:var(--text);font-weight:700}
+  .hud .stat{color:var(--muted)}
+  .bar{flex:1;min-width:110px;height:7px;background:#10202f;border-radius:99px;overflow:hidden}
+  .bar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    transition:width .35s ease}
+  .hud button{font-family:var(--mono);font-size:11.5px;color:var(--soft);background:transparent;
+    border:1px solid #2c4055;border-radius:6px;padding:3px 9px;cursor:pointer}
+  .hud button:hover{color:var(--text);border-color:var(--accent)}
+
+  /* ---------- header ---------- */
+  header.top{padding:54px 0 30px;border-bottom:1px solid var(--line)}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--accent);margin:0 0 14px}
+  h1{font-size:40px;line-height:1.05;margin:0 0 12px;font-weight:800;letter-spacing:-.018em}
+  h1 .thin{font-weight:400;color:var(--soft)}
+  .lede{font-size:18px;color:var(--soft);margin:0;max-width:60ch}
+  .filechips{display:flex;gap:7px;flex-wrap:wrap;margin-top:22px;font-family:var(--mono);font-size:11.5px}
+  .fc{padding:4px 10px;border:1px solid var(--line-strong);border-radius:99px;color:var(--muted)}
+  .fc.here{background:var(--accent);color:#1a1206;border-color:var(--accent);font-weight:700}
+  .fc.done{color:var(--soft);border-color:var(--line);text-decoration:line-through;text-decoration-color:var(--muted)}
+
+  .legend{margin:26px 0 0;padding:16px 18px;background:var(--panel);border:1px solid var(--line);
+    border-radius:12px;font-size:14px;color:var(--soft)}
+  .legend b{color:var(--text)}
+  .legend .row{display:flex;gap:10px;align-items:baseline;margin:7px 0}
+  .legend .tg{flex:none}
+  .keys{margin-top:13px;padding-top:12px;border-top:1px solid var(--line);
+    font-family:var(--mono);font-size:13px;color:var(--soft);display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:5px 18px}
+  .keys kbd{background:var(--panel3);border:1px solid var(--line-strong);border-bottom-width:2px;
+    border-radius:5px;padding:1px 7px;color:var(--accent-2);font-weight:600;margin-right:7px;
+    display:inline-block;min-width:20px;text-align:center}
+
+  /* ---------- sections ---------- */
+  section{padding:46px 0;border-bottom:1px solid var(--line)}
+  .sec-tag{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--accent);display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .sec-tag .n{background:var(--accent);color:#1a1206;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700}
+  h2{font-size:28px;line-height:1.12;margin:0 0 6px;font-weight:800;letter-spacing:-.015em}
+  h3{font-size:18.5px;margin:30px 0 8px;font-weight:700;letter-spacing:-.01em;color:var(--text)}
+  p{margin:13px 0}
+  .sub{color:var(--soft);font-size:16px;margin-top:2px}
+  code{font-family:var(--mono);font-size:.85em;background:#0c1a27;border:1px solid var(--line);
+    padding:1px 6px;border-radius:5px;color:var(--accent-2);white-space:nowrap}
+  strong{font-weight:700;color:var(--text)}
+  ul.tight{margin:12px 0;padding-left:20px}
+  ul.tight li{margin:7px 0}
+  em{color:var(--soft)}
+
+  /* ---------- callouts ---------- */
+  .box{margin:22px 0;border-radius:12px;padding:16px 18px 16px 20px;border:1px solid var(--line);
+    background:var(--panel);position:relative;overflow:hidden}
+  .box .lab{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+    margin:0 0 6px;font-weight:700}
+  .box.key{border-color:rgba(245,158,60,.4);background:var(--accent-tint)}
+  .box.key:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent)}
+  .box.key .lab{color:var(--accent-2)}
+  .box.trap{border-color:var(--no-line);background:var(--no-bg)}
+  .box.trap:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--no)}
+  .box.trap .lab{color:var(--no)}
+  .box.field{background:var(--panel3);border-color:var(--line-strong)}
+  .box.field:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent)}
+  .box.field .lab{color:var(--accent)}
+  .box p:first-of-type{margin-top:0}.box p:last-child{margin-bottom:0}
+
+  /* ---------- table ---------- */
+  .tw{overflow-x:auto;margin:22px 0}
+  table{border-collapse:collapse;width:100%;font-size:14.5px}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;
+    color:var(--muted);font-weight:600;border-bottom:2px solid var(--line-strong)}
+  td b{color:var(--text)}
+  tr:last-child td{border-bottom:none}
+
+  /* ---------- quiz ---------- */
+  .quizhead{display:flex;align-items:center;gap:10px;margin:34px 0 4px;flex-wrap:wrap}
+  .quizhead .ttl{font-family:var(--mono);font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--text);font-weight:700}
+  .quizhead .meta{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  .quizhead .rule{flex:1;height:1px;background:var(--line)}
+
+  .q{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:18px 18px 6px;
+    margin:16px 0;transition:border-color .2s,box-shadow .2s;position:relative}
+  .q:focus{outline:none}
+  .q.current{border-color:var(--accent);box-shadow:-3px 0 0 0 var(--accent), 0 0 0 1px rgba(245,158,60,.25)}
+  .qtop{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:9px}
+  .qid{font-family:var(--mono);font-size:11.5px;color:var(--muted);font-weight:600}
+  .chip{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+    padding:2px 7px;border-radius:5px;font-weight:700}
+  .chip.drill{background:#1c2c3b;color:#8fb4d6}
+  .chip.exam{background:var(--accent);color:#1a1206}
+  .chip.mixed{background:var(--accent-tint);color:var(--accent-2);border:1px solid rgba(245,158,60,.4)}
+  .chip.two{background:rgba(150,110,210,.18);color:#bfa3e8;border:1px solid rgba(150,110,210,.4)}
+  .chip.miss{background:var(--no-bg);color:var(--no);border:1px solid var(--no-line)}
+  .chip.win{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-line)}
+  .stem{font-size:16.5px;margin:2px 0 13px;line-height:1.5;color:var(--text)}
+  .opts{list-style:none;margin:0;padding:0}
+  .opt{display:flex;gap:11px;align-items:flex-start;width:100%;text-align:left;cursor:pointer;
+    border:1px solid var(--line);background:var(--panel2);border-radius:9px;padding:11px 13px;margin:7px 0;
+    font:inherit;font-size:15.5px;color:var(--text);transition:border-color .12s,background .12s}
+  .opt:hover:not(:disabled){border-color:var(--line-strong);background:var(--panel3)}
+  .opt:disabled{cursor:default}
+  .opt .ltr{flex:none;font-family:var(--mono);font-weight:700;font-size:13px;color:var(--accent-2);
+    width:18px;text-align:center;padding-top:1px}
+  .opt .otext{flex:1}
+  .opt.sel{border-color:var(--accent);background:var(--accent-tint)}
+  .opt.correct{border-color:var(--ok-line);background:var(--ok-bg)}
+  .opt.correct .ltr{color:var(--ok)}
+  .opt.wrong{border-color:var(--no-line);background:var(--no-bg)}
+  .opt.wrong .ltr{color:var(--no)}
+  .opt .mark{margin-left:auto;font-family:var(--mono);font-weight:700;font-size:13px;white-space:nowrap}
+  .opt.correct .mark{color:var(--ok)}.opt.wrong .mark{color:var(--no)}
+  .checkbtn{font-family:var(--mono);font-size:12.5px;font-weight:700;letter-spacing:.04em;
+    background:var(--accent);color:#1a1206;border:none;border-radius:8px;padding:9px 16px;cursor:pointer;
+    margin:6px 0 2px}
+  .checkbtn:hover{background:var(--accent-2)}.checkbtn:disabled{opacity:.35;cursor:default}
+  .reveal{max-height:0;overflow:hidden;transition:max-height .3s ease}
+  .reveal.show{max-height:1800px}
+  .rv-inner{border-top:1px solid var(--line);margin-top:12px;padding:13px 2px 12px;font-size:15px;
+    color:var(--soft);line-height:1.58}
+  .rv-inner .verdict{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;
+    font-weight:700;margin-bottom:6px}
+  .verdict.r-ok{color:var(--ok)}.verdict.r-no{color:var(--no)}
+  .rv-inner b{color:var(--text)}
+  .flip{display:block;margin-top:10px;padding:9px 12px;background:var(--panel3);border-radius:8px;
+    font-size:14.5px;border:1px solid var(--line)}
+  .flip .fl{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--accent-2);font-weight:700;margin-right:6px}
+
+  /* ---------- help overlay ---------- */
+  #help{position:fixed;inset:0;z-index:90;background:rgba(6,11,17,.72);display:none;
+    align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+  #help.show{display:flex}
+  .help-card{background:var(--panel2);border:1px solid var(--line-strong);border-radius:14px;
+    padding:24px 26px;max-width:380px;width:calc(100% - 44px)}
+  .help-card h4{margin:0 0 4px;font-family:var(--mono);font-size:12px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--accent)}
+  .help-card .hk{display:flex;justify-content:space-between;gap:14px;padding:6px 0;font-size:14.5px;
+    border-bottom:1px solid var(--line)}
+  .help-card .hk:last-of-type{border-bottom:none}
+  .help-card kbd{font-family:var(--mono);background:var(--panel3);border:1px solid var(--line-strong);
+    border-bottom-width:2px;border-radius:5px;padding:1px 8px;color:var(--accent-2);font-weight:600}
+  .help-card .close{margin-top:14px;font-family:var(--mono);font-size:12px;color:var(--muted);text-align:center}
+
+  /* ---------- summary ---------- */
+  .summary{padding:46px 0 70px}
+  .scorecard{background:linear-gradient(160deg,var(--panel3),var(--panel));color:var(--text);
+    border:1px solid var(--line-strong);border-radius:16px;padding:26px 26px 22px;text-align:center}
+  .scorecard .big{font-size:54px;font-weight:800;letter-spacing:-.02em;line-height:1}
+  .scorecard .lab2{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--accent);margin-bottom:8px}
+  .scorecard .note{color:var(--soft);font-size:14.5px;margin-top:10px}
+  .misslist{margin-top:18px;font-family:var(--mono);font-size:13px}
+  .misslist a{color:var(--accent-2);text-decoration:none;border-bottom:1px dotted var(--accent);
+    margin:0 4px;display:inline-block}
+  .foot{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:center;margin-top:30px}
+
+  @media (max-width:560px){
+    body{font-size:16px} h1{font-size:31px} h2{font-size:23px}
+    .hud-inner{font-size:11px;gap:10px} .stem{font-size:15.5px}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<div class="hud">
+  <div class="hud-inner">
+    <span class="dot">▰ SAA-C03</span>
+    <span class="stat"><b id="h-ans">0</b>/<span id="h-tot">0</span> answered</span>
+    <span class="stat"><b id="h-pct">—</b> correct</span>
+    <div class="bar"><i id="h-bar"></i></div>
+    <button id="h-help">? keys</button>
+    <button id="h-reset">reset</button>
+  </div>
+</div>
+
+<div id="help"><div class="help-card">
+  <h4>Vim navigation</h4>
+  <div class="hk"><span>Next / previous question</span><span><kbd>j</kbd> <kbd>k</kbd></span></div>
+  <div class="hk"><span>Jump to top</span><span><kbd>g</kbd><kbd>g</kbd></span></div>
+  <div class="hk"><span>Jump to bottom</span><span><kbd>G</kbd></span></div>
+  <div class="hk"><span>Next unanswered</span><span><kbd>n</kbd></span></div>
+  <div class="hk"><span>Select option (commits single)</span><span><kbd>1</kbd>–<kbd>5</kbd></span></div>
+  <div class="hk"><span>Check a Select-TWO</span><span><kbd>Enter</kbd></span></div>
+  <div class="hk"><span>Toggle this help</span><span><kbd>?</kbd></span></div>
+  <div class="close">esc or ? to close</div>
+</div></div>
+
+<div class="wrap">
+<header class="top">
+  <p class="eyebrow">Weakness-targeted drill · File 2 of 5 · dark</p>
+  <h1>Decoupling &amp; Integration<br><span class="thin">SQS · SNS · Kinesis · EventBridge · Step Functions</span></h1>
+  <p class="lede">This is your highest-value file. Your single most-repeated miss — picking SNS where the answer was Kinesis — lives here, alongside the visibility-timeout duplicate trap and the image-processing decouple you got wrong under time pressure. We fix the whole messaging decision tree.</p>
+  <div class="filechips">
+    <span class="fc done">1 · Compute</span>
+    <span class="fc here">2 · Decoupling</span>
+    <span class="fc">3 · Databases</span>
+    <span class="fc">4 · Resilience &amp; DR</span>
+    <span class="fc">5 · Cost</span>
+  </div>
+  <div class="legend">
+    <div class="row"><span class="tg chip drill">drill</span><span><b>Quick check.</b> Exam-real, one fact at a time.</span></div>
+    <div class="row"><span class="tg chip exam">exam</span><span><b>Scenario.</b> Full SAA-C03 difficulty — several services fit, one wins.</span></div>
+    <div class="row"><span class="tg chip mixed">mixed</span><span><b>All-topics review</b> so nothing you've studied goes cold.</span></div>
+    <div class="row"><span class="tg chip miss">↻ your miss</span><span>You got this exact concept wrong on a mock or the timed exam.</span></div>
+    <div class="row"><span class="tg chip win">✓ lock it in</span><span>You answered this right before — prove it sticks.</span></div>
+    <div class="keys">
+      <span><kbd>j</kbd><kbd>k</kbd>next / prev</span>
+      <span><kbd>g</kbd><kbd>g</kbd>top &nbsp; <kbd>G</kbd>bottom</span>
+      <span><kbd>n</kbd>next unanswered</span>
+      <span><kbd>1</kbd>–<kbd>5</kbd>pick option</span>
+      <span><kbd>↵</kbd>check select-two</span>
+      <span><kbd>?</kbd>help overlay</span>
+    </div>
+  </div>
+</header>
+</div>
+
+<div class="wrap">
+
+<!-- ===================== SECTION 1 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">01</span> SQS — the buffer that never drops work</div>
+  <h2>Put a queue between the tiers and stop losing requests</h2>
+  <p class="sub">SQS is a buffer: a producer drops a message, a consumer pulls it when ready, and the queue absorbs every spike in between. Each message is processed by exactly one consumer — SQS does not fan out.</p>
+
+  <h3>Standard vs FIFO</h3>
+  <div class="tw"><table>
+    <tr><th>Queue</th><th>Ordering</th><th>Delivery</th><th>Throughput</th><th>Reach for it</th></tr>
+    <tr><td><b>Standard</b></td><td>best-effort</td><td>at-least-once (duplicates possible)</td><td>nearly unlimited</td><td>default — make consumers idempotent</td></tr>
+    <tr><td><b>FIFO</b></td><td>strict, per message group</td><td>exactly-once processing + dedup</td><td>lower (per-group)</td><td>"must be in order" / "no duplicates"</td></tr>
+  </table></div>
+
+  <div class="box key"><p class="lab">Key fact — visibility timeout</p><p>When a consumer receives a message it's hidden for the <b>visibility timeout</b> (default 30s, max 12h). If the consumer doesn't <code>DeleteMessage</code> before that timer expires, the message becomes visible again and <b>another worker can pick it up — that's your duplicate</b>. Fix: set the timeout longer than your worst-case processing time, or extend it with <code>ChangeMessageVisibility</code> as a heartbeat. On Standard queues, duplicates are possible by design, so idempotent consumers are the real insurance.</p></div>
+
+  <p><strong>The rest of the SQS toolbox:</strong></p>
+  <ul class="tight">
+    <li><b>Dead-letter queue (DLQ)</b> — after <code>maxReceiveCount</code> failed attempts, a poison message is moved aside so it stops blocking the queue and you can inspect it.</li>
+    <li><b>Long polling</b> (<code>WaitTimeSeconds</code> up to 20s) — fewer empty responses, lower cost than short polling.</li>
+    <li><b>Retention</b> — default 4 days, max 14 days. The buffer survives even if every consumer is down.</li>
+    <li><b>Delay queues / message timers</b> — postpone delivery up to 15 minutes.</li>
+    <li><b>Scale consumers on backlog</b> — drive an Auto Scaling group off queue depth (<code>ApproximateNumberOfMessagesVisible</code>) or backlog-per-instance.</li>
+    <li><b>256 KB max</b> message — for bigger payloads, store in S3 and send a pointer (SQS Extended Client).</li>
+  </ul>
+
+  <div class="box field"><p class="lab">// field note — the oldest trick in the book</p><p><b>SQS is one of AWS's very first services</b>, generally available in 2006 — older than the iPhone. The reason it predates almost everything is cultural: Amazon famously reorganized around the idea (recounted as the early-2000s "API mandate") that every team must expose its data and functionality only through hardened service interfaces. Decoupling wasn't a feature they added later — it was the constraint that made AWS possible at all. A queue between two tiers is that same idea in miniature.</p></div>
+
+  <div class="quizhead"><span class="ttl">Quick check</span><span class="rule"></span><span class="meta">8 questions · one fact each</span></div>
+  <div id="s1-drill"></div>
+  <div class="quizhead"><span class="ttl">Scenario pressure</span><span class="rule"></span><span class="meta">7 questions · exam difficulty</span></div>
+  <div id="s1-exam"></div>
+</section>
+
+<!-- ===================== MIXED 1 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">↻</span> Mixed review — all domains</div>
+  <h2>Keep the rest warm</h2>
+  <p class="sub">Four across storage, databases and security — including one cross-account miss that's bitten you before.</p>
+  <div id="mix-1"></div>
+</section>
+
+<!-- ===================== SECTION 2 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">02</span> SNS &amp; EventBridge — fan-out and event routing</div>
+  <h2>One message, many destinations</h2>
+  <p class="sub">Where SQS hands a message to one worker, SNS and EventBridge deliver to many — push-style. The difference between them is filtering richness, target variety, and throughput.</p>
+
+  <h3>SNS — pub/sub fan-out</h3>
+  <p>Publish once to a <b>topic</b>; every subscription gets its own copy. Subscribers can be SQS, Lambda, HTTP/S, email, SMS, or mobile push. The durable pattern is <b>SNS → multiple SQS queues</b>: each consumer gets its own buffered copy and processes at its own pace, surviving downtime. <b>SNS FIFO</b> adds ordering + dedup (delivering to SQS FIFO queues). <b>Message filtering</b> lets a subscription receive only the subset it cares about.</p>
+
+  <div class="box trap"><p class="lab">SNS doesn't remember</p><p>Plain SNS is fire-and-forward: if a subscriber is offline when a message is published, it misses it — there's no log to replay from. When a stem says consumers must <b>catch up on missed events without data loss</b>, raw SNS is wrong. Buffer it (SNS → SQS) or, for true replay across many independent consumers, use Kinesis (Section 03).</p></div>
+
+  <h3>EventBridge — the serverless event bus</h3>
+  <p>EventBridge routes events by <b>content</b>. Rules match an event pattern against the JSON and send to up to five targets each, across a huge range of AWS services, plus SaaS partner sources and AWS service events on the default bus. It adds a <b>schema registry</b>, <b>archive &amp; replay</b>, a cron-style <b>Scheduler</b>, and <b>Pipes</b> for point-to-point filter-and-enrich without glue code.</p>
+
+  <div class="box key"><p class="lab">Key fact — SNS vs EventBridge</p><p>Both fan out. Pick <b>SNS</b> for the highest-throughput, lowest-latency pub/sub and for app-to-person messaging (SMS/email/push). Pick <b>EventBridge</b> when you need <b>rich content filtering</b>, many <b>AWS/SaaS targets</b>, schema, or replay — at the cost of higher latency and lower raw throughput. "Add new consumers without touching the producer" and "route based on what's inside the event" both point to EventBridge.</p></div>
+
+  <div class="box field"><p class="lab">// field note — the timeline</p><p>The integration toolkit grew in layers: SQS (2006) for buffering, SNS (2010) for fan-out, Step Functions (2016) for orchestration, Amazon MQ (2017) for migrating legacy brokers, and EventBridge (2019), which started life as CloudWatch Events before graduating into a full event bus. Each one exists because the previous tool was the wrong shape for a new job — which is exactly the judgment the exam tests.</p></div>
+
+  <div class="quizhead"><span class="ttl">Quick check</span><span class="rule"></span><span class="meta">8 questions · one fact each</span></div>
+  <div id="s2-drill"></div>
+  <div class="quizhead"><span class="ttl">Scenario pressure</span><span class="rule"></span><span class="meta">7 questions · exam difficulty</span></div>
+  <div id="s2-exam"></div>
+</section>
+
+<!-- ===================== MIXED 2 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">↻</span> Mixed review — all domains</div>
+  <h2>Keep the rest warm</h2>
+  <p class="sub">Four more, including a VPC-endpoint miss and a Spot question that previews File 5.</p>
+  <div id="mix-2"></div>
+</section>
+
+<!-- ===================== SECTION 3 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">03</span> Kinesis, orchestration &amp; the decoupling decision</div>
+  <h2>When the answer is a stream, not a queue</h2>
+  <p class="sub">This is the section that fixes your most expensive habit. A queue and a stream look similar and feel interchangeable — they are not. Get the deciding factors right and a whole class of questions opens up.</p>
+
+  <h3>Kinesis: four services, one family</h3>
+  <div class="tw"><table>
+    <tr><th>Service</th><th>It's for</th></tr>
+    <tr><td><b>Data Streams</b></td><td>real-time, replayable log; many consumers each read every record at their own position; ordering per partition key; high throughput</td></tr>
+    <tr><td><b>Data Firehose</b></td><td>zero-management delivery of streaming data into S3 / Redshift / OpenSearch / Splunk; near-real-time; no shards, no consumers</td></tr>
+    <tr><td><b>Managed Service for Apache Flink</b></td><td>real-time SQL / Flink analytics computed on a stream</td></tr>
+    <tr><td><b>Video Streams</b></td><td>ingesting and processing media streams</td></tr>
+  </table></div>
+
+  <div class="box key"><p class="lab">Key fact — SQS vs SNS vs Kinesis</p><p><b>SQS</b>: a message is consumed once by one worker, then deleted — no replay. <b>SNS</b>: pushed to every subscriber once, not retained. <b>Kinesis Data Streams</b>: an append-only log where <b>each consumer reads the whole stream independently</b>, data is <b>retained</b> (24h default, up to 365 days) so a consumer that fell behind can <b>replay</b>, and the <b>partition key</b> keeps records ordered within a shard. When a question says "multiple independent consumers each need every record," "catch up after downtime," "replay/reprocess," and "ordered per key at high throughput" — that combination is <b>Kinesis</b>, every time.</p></div>
+
+  <h3>Orchestration &amp; migration</h3>
+  <ul class="tight">
+    <li><b>Step Functions</b> — coordinate a multi-step workflow with branching, retries, error handling, parallelism, and human approval as a managed state machine. <b>Standard</b> workflows: long-running (up to a year), exactly-once, audited. <b>Express</b>: high-volume, short (&lt;5 min), cheaper per run. Use it instead of hand-wiring Lambdas together with queues when you need <em>state and control flow</em>.</li>
+    <li><b>Amazon MQ</b> — managed ActiveMQ / RabbitMQ. The answer when you're <b>migrating an existing app</b> that already speaks JMS/AMQP/MQTT/STOMP and you don't want to rewrite it onto SQS/SNS. Building new on AWS? Use SQS/SNS instead.</li>
+  </ul>
+
+  <div class="box field"><p class="lab">// fun aside</p><p>There's an old engineering joke: the two hardest problems in distributed systems are (1) exactly-once delivery, (2) ordering, and (1) exactly-once delivery. That's not just a gag — it's why "exactly-once" lives in SQS <em>FIFO</em> and Step Functions <em>Standard</em>, why "at-least-once" is the cheap default everywhere else, and why the exam keeps asking you to make idempotency the safety net. If you can hold "at-least-once → make it idempotent" in your head, half the messaging traps disarm themselves.</p></div>
+
+  <div class="quizhead"><span class="ttl">Quick check</span><span class="rule"></span><span class="meta">5 questions · one fact each</span></div>
+  <div id="s3-drill"></div>
+  <div class="quizhead"><span class="ttl">Scenario pressure</span><span class="rule"></span><span class="meta">7 questions · exam difficulty + your headline miss</span></div>
+  <div id="s3-exam"></div>
+</section>
+
+<!-- ===================== SUMMARY ===================== -->
+<section class="summary">
+  <div class="scorecard">
+    <div class="lab2">Session readiness</div>
+    <div class="big"><span id="sc-pct">—</span></div>
+    <div class="note"><span id="sc-line">Answer some questions and your readiness score appears here.</span></div>
+    <div class="misslist" id="sc-miss"></div>
+  </div>
+  <p class="foot">File 2 / 5 · Decoupling &amp; Integration · 50 questions · press <kbd style="font-family:var(--mono)">?</kbd> for keys · next up: File 3 — Databases &amp; Caching (Aurora Global DB, Multi-AZ vs read replica, DAX vs global tables vs Redis).</p>
+</section>
+
+</div><!-- /wrap -->
+
+<script>
+/* ---------------- QUESTION BANK ----------------
+   c = index (or array) of correct option(s), 0-based
+   multi:true => Select TWO; tag => "miss" | "win"          */
+const BANK = [
+
+/* ====== S1 DRILL — SQS ====== */
+{g:"s1-drill",id:"2.01",d:"drill",q:"What does the SQS visibility timeout do?",
+o:["Deletes a message after a set time","Hides a received message from other consumers until it's deleted or the timer expires","Delays delivery of new messages","Encrypts the message in transit"],c:1,
+e:`The <b>visibility timeout</b> hides an in-flight message so two workers don't grab it at once. If it isn't deleted before the timer expires, it reappears for redelivery. ✗ Deletion-after-time is retention; ✗ delaying new messages is a delay queue; ✗ encryption is SSE/TLS.`},
+
+{g:"s1-drill",id:"2.02",d:"drill",q:"Which SQS queue type guarantees strict ordering and exactly-once processing?",
+o:["Standard","FIFO","Delay queue","Dead-letter queue"],c:1,
+e:`<b>FIFO</b> queues preserve order within a message group and process each message exactly once (with dedup). Standard is best-effort order and at-least-once. DLQ and delay queue are features, not delivery guarantees.`},
+
+{g:"s1-drill",id:"2.03",d:"drill",q:"A malformed message keeps failing and blocking the queue. After several failed attempts, where should it go?",
+o:["Back to the producer","A dead-letter queue (DLQ)","An SNS topic","S3 Glacier"],c:1,
+e:`After <code>maxReceiveCount</code> attempts, SQS moves the poison message to a <b>DLQ</b> so it stops blocking healthy work and can be inspected. The other options aren't the SQS failure-isolation mechanism.`},
+
+{g:"s1-drill",id:"2.04",d:"drill",q:"How do you cut the number of empty receive responses (and cost) when reading from SQS?",
+o:["Short polling","Long polling (WaitTimeSeconds up to 20s)","A larger instance","FIFO mode"],c:1,
+e:`<b>Long polling</b> waits up to 20s for a message before returning, avoiding the empty responses (and per-request cost) of short polling. Instance size and FIFO don't address poll efficiency.`},
+
+{g:"s1-drill",id:"2.05",d:"drill",q:"What is the maximum time SQS can retain a message?",
+o:["12 hours","4 days","14 days","365 days"],c:2,
+e:`SQS retention defaults to 4 days and maxes at <b>14 days</b>. (12 hours is the max visibility timeout; 365 days is Kinesis stream retention.)`},
+
+{g:"s1-drill",id:"2.06",d:"drill",q:"You want an Auto Scaling group of SQS workers to grow and shrink with the backlog. Which signal should drive scaling?",
+o:["Average CPU only","Queue depth (ApproximateNumberOfMessagesVisible) / backlog per instance","The number of SNS subscriptions","ALB request count"],c:1,
+e:`Scale on <b>queue depth</b> (or backlog-per-instance) with target tracking — the backlog is the truest measure of work waiting. CPU can lag; SNS/ALB metrics describe other systems.`},
+
+{g:"s1-drill",id:"2.07",d:"drill",q:"Within a single SQS queue, each message is delivered to how many consumers for processing?",
+o:["Every subscriber gets a copy","Exactly one consumer (it's a queue, not fan-out)","Two, for redundancy","As many as are polling"],c:1,
+e:`A queue hands each message to <b>one</b> consumer, which then deletes it. SQS does not fan out — for "every consumer gets a copy" you need SNS (or Kinesis).`},
+
+{g:"s1-drill",id:"2.08",d:"drill",q:"You want newly sent messages to be invisible for the first 60 seconds. What feature do you use?",
+o:["A delay queue / message timer (up to 15 min)","A longer visibility timeout","A DLQ","Long polling"],c:0,
+e:`<b>Delay queues</b> (or per-message timers) postpone delivery of new messages up to 15 minutes. Visibility timeout applies <i>after</i> receipt; DLQ and long polling are unrelated.`},
+
+/* ====== S1 EXAM — SQS ====== */
+{g:"s1-exam",id:"2.09",d:"exam",tag:"miss",q:"Batch workers pull from a Standard SQS queue. Operators notice some messages are processed twice, causing duplicate charges. Investigation shows individual jobs occasionally run longer than the queue's visibility timeout, so a second worker grabs the still-in-progress message. What is the BEST fix?",
+o:["Switch to short polling","Set the visibility timeout greater than the maximum processing time (and/or extend it via ChangeMessageVisibility), and make the consumer idempotent","Increase message retention to 14 days","Move the workers to larger instances"],c:1,
+e:`The duplicates come from the timeout expiring mid-job, so the message reappears and is reprocessed. <b>Raise the visibility timeout above worst-case processing time</b> (or heartbeat-extend it), and since Standard delivery is at-least-once, <b>idempotent processing</b> is the durable safety net. ✗ Polling style, retention, and instance size don't stop the redelivery race.<span class="flip"><span class="fl">flip it</span>If the requirement were "absolutely no duplicates ever," you'd move to an <b>SQS FIFO</b> queue (exactly-once processing).</span>`},
+
+{g:"s1-exam",id:"2.10",d:"exam",tag:"win",q:"During flash sales, the order-processing backend can't keep up and some orders are silently dropped. The team needs every order captured and processed when capacity allows, with minimal code change.",
+o:["Place an SQS queue between the web tier and the processing tier so requests are buffered","Increase the ALB idle timeout and enable connection draining","Move processing to a larger instance with provisioned IOPS","Enable ALB sticky sessions so each user hits the same backend"],c:0,
+e:`A <b>queue</b> buffers the surge: the web tier always enqueues, workers drain at their own pace, nothing is dropped — minimal change. ✗ Idle timeout/draining don't add durability; ✗ a bigger box still has a ceiling and no buffer; ✗ stickiness is irrelevant to capacity.`},
+
+{g:"s1-exam",id:"2.11",d:"exam",q:"Events for a given customer must be processed strictly in the order produced, and the same event must never be processed twice. Which messaging choice fits?",
+o:["SQS Standard with idempotent consumers","SQS FIFO with the customer ID as the message group ID","SNS Standard topic","A delay queue"],c:1,
+e:`<b>SQS FIFO</b> preserves order within a message group and guarantees exactly-once processing — set the <b>message group ID to the customer ID</b> so each customer's events stay ordered while different customers process in parallel. ✗ Standard can't guarantee order or no-duplicates; ✗ SNS isn't a queue; ✗ delay queues only postpone delivery.`},
+
+{g:"s1-exam",id:"2.12",d:"exam",tag:"miss",q:"Users upload images; each takes 5–10 minutes to process. At peak, uploads spike and work is dropped. Some images repeatedly fail processing and must not block the rest. Which design handles the spike AND the bad images?",
+o:["Process synchronously and raise the ALB idle timeout","SQS queue between tiers; an ASG of workers scaling on queue depth; visibility timeout > 10 min; a DLQ for messages that exceed the retry count","SNS topic that pushes each image directly to a Lambda","A FIFO queue with a single worker"],c:1,
+e:`Decouple with <b>SQS</b> (buffers the spike), scale workers on <b>queue depth</b>, set the <b>visibility timeout above the 10-minute job</b> so it isn't redelivered mid-process, and route repeat failures to a <b>DLQ</b> so poison images don't block the line. ✗ Synchronous coupling drops work; ✗ pushing 10-min jobs straight to Lambda risks the timeout and has no backlog buffer; ✗ a single FIFO worker can't absorb the spike.`},
+
+{g:"s1-exam",id:"2.13",d:"exam",q:"A consumer needs up to 90 minutes to process certain messages, longer than the visibility timeout it was created with. How do you prevent premature redelivery without a giant fixed timeout?",
+o:["Delete the message immediately on receipt, then process","Periodically call ChangeMessageVisibility to extend the timeout while still working (a heartbeat)","Move the message to a DLQ and back","Use short polling"],c:1,
+e:`Extend the lock as you work: a <b>ChangeMessageVisibility heartbeat</b> keeps the message hidden only as long as processing actually continues. ✗ Deleting before completion loses the message if the worker crashes; ✗ DLQ shuffling and polling style don't address long jobs.`},
+
+{g:"s1-exam",id:"2.14",d:"exam",q:"A producer and consumer must scale independently, and if every consumer is offline for a few hours the data must NOT be lost and should be processed once consumers return. Which service fits with the least complexity?",
+o:["SNS topic with the consumers as subscribers","SQS queue (messages persist up to 14 days until consumed)","Direct synchronous API calls with retries","An EventBridge rule to a Lambda"],c:1,
+e:`<b>SQS</b> durably holds messages (up to 14 days) until a consumer pulls them, so a consumer outage just builds backlog — nothing is lost. ✗ Plain SNS drops messages to subscribers that are offline; ✗ synchronous calls couple the two tiers; ✗ EventBridge→Lambda has no consumer-controlled durable buffer the way a queue does.`},
+
+{g:"s1-exam",id:"2.15",d:"exam",q:"An application must send messages larger than the 256 KB SQS limit (e.g. 5 MB payloads). What's the recommended approach?",
+o:["Compress until under 256 KB no matter what","Store the payload in S3 and send a pointer using the SQS Extended Client","Split into many small messages and reassemble","Switch to FIFO, which has no size limit"],c:1,
+e:`The standard pattern is <b>payload in S3, pointer in SQS</b> via the Extended Client library. ✗ Compression isn't guaranteed to fit; ✗ manual splitting/reassembly is fragile; ✗ FIFO has the same 256 KB limit.`},
+
+/* ====== MIX 1 ====== */
+{g:"mix-1",id:"M1.1",d:"mixed",tag:"win",q:"Application logs go to S3, accessed often for 30 days, rarely after, retained 7 years, and retrieval after 30 days may take hours. Lowest storage cost?",
+o:["Keep everything in S3 Standard, delete after 7 years","Lifecycle rule: transition to Glacier (or Glacier Deep Archive) after 30 days, expire after 7 years","S3 One Zone-IA from day one","Replicate to a second Region"],c:1,
+e:`A <b>lifecycle rule to Glacier/Deep Archive after 30 days, expire at 7 years</b> matches the access pattern (hours-long retrieval is fine for archive). ✗ All-Standard wastes money; ✗ One Zone-IA isn't archival pricing and sacrifices AZ durability; ✗ replication adds cost, not savings.`},
+
+{g:"mix-1",id:"M1.2",d:"mixed",tag:"win",q:"A dev/test database is used unpredictably — heavy for a few hours, then idle for days. The team wants to avoid paying for idle capacity with minimal management.",
+o:["A right-sized Reserved Instance","Amazon Aurora Serverless, which scales with load and can pause when idle","A large On-Demand instance stopped manually each night","DynamoDB with high provisioned capacity"],c:1,
+e:`<b>Aurora Serverless</b> scales capacity to load and pauses when idle — ideal for spiky dev/test with little admin. ✗ RIs assume steady use; ✗ manual stop/start is toil and error-prone; ✗ over-provisioned DynamoDB wastes money and changes the data model.`},
+
+{g:"mix-1",id:"M1.3",d:"mixed",tag:"miss",q:"In an Organization, a production-account app assumes a cross-account IAM role in the shared-services account. sts:AssumeRole succeeds, but s3:GetObject on the target bucket returns AccessDenied. Most likely cause?",
+o:["The assumed role lacks an inline policy for s3:GetObject","The S3 bucket policy in the shared-services account doesn't grant s3:GetObject to the cross-account role's ARN","A CORS rule is blocking the request","The bucket has versioning disabled"],c:1,
+e:`Cross-account S3 is a two-lock door. AssumeRole working means the identity side is fine; the failure is the <b>resource side — the bucket policy must explicitly allow the assumed role's ARN</b>. ✗ A missing identity policy would also block, but the stem says the role assumed fine and is meant to read S3; the resource-policy gap is the classic cause. ✗ CORS affects browsers, not SDK GetObject; ✗ versioning is unrelated.`},
+
+{g:"mix-1",id:"M1.4",d:"mixed",tag:"win",q:"A web app repeatedly runs the same expensive read queries against a relational DB; the data changes rarely and slightly stale results are acceptable. Best way to cut DB load?",
+o:["Put an ElastiCache layer in front of the database to cache query results","Move the DB to a larger instance","Enable Multi-AZ","Add a NAT gateway in front of the DB subnet"],c:0,
+e:`<b>ElastiCache</b> serves the repeated reads from memory, slashing DB CPU — and stale-tolerant data is the perfect cache candidate. ✗ A bigger box delays the problem; ✗ Multi-AZ is for failover; ✗ a NAT gateway is networking, not caching.`},
+
+/* ====== S2 DRILL — SNS / EventBridge ====== */
+{g:"s2-drill",id:"2.16",d:"drill",q:"One published message must reach many subscribers, each receiving its own copy via push. Which service?",
+o:["SQS","SNS","Kinesis Data Firehose","Amazon MQ"],c:1,
+e:`<b>SNS</b> is push pub/sub: publish once, every subscription gets a copy. SQS is one-consumer-per-message; Firehose is a delivery pipe; Amazon MQ is a migration broker.`},
+
+{g:"s2-drill",id:"2.17",d:"drill",q:"You want durable fan-out where each consumer has its own buffer and can process at its own pace, surviving downtime. What's the pattern?",
+o:["SNS topic with multiple SQS queue subscribers","A single SQS queue with many consumers","SNS direct to many Lambdas only","Kinesis Firehose to S3"],c:0,
+e:`The <b>SNS → multiple SQS</b> fan-out gives each consumer a private, durable buffer — the canonical resilient fan-out. ✗ One shared queue means consumers compete, not each-gets-a-copy; ✗ SNS→Lambda alone has no per-consumer buffer; ✗ Firehose isn't fan-out.`},
+
+{g:"s2-drill",id:"2.18",d:"drill",q:"A subscriber should receive only messages where the 'eventType' attribute is 'ORDER_SHIPPED'. How?",
+o:["Create a separate topic per event type","Apply an SNS subscription filter policy","Use a DLQ","Switch to FIFO"],c:1,
+e:`<b>SNS message filtering</b> (a subscription filter policy) routes only matching messages to that subscriber. ✗ A topic per type is unnecessary sprawl; ✗ DLQ/FIFO don't filter by content.`},
+
+{g:"s2-drill",id:"2.19",d:"drill",q:"You need pub/sub fan-out that also preserves ordering and removes duplicates. Which?",
+o:["SNS Standard topic","SNS FIFO topic (delivering to SQS FIFO queues)","EventBridge default bus","SQS Standard"],c:1,
+e:`<b>SNS FIFO</b> adds ordering and dedup to fan-out, delivering to SQS FIFO subscribers. Standard SNS doesn't order; EventBridge isn't an ordering-guarantee service; a single SQS queue isn't fan-out.`},
+
+{g:"s2-drill",id:"2.20",d:"drill",q:"Which service is a serverless event bus that filters on event content and routes to many AWS targets, plus SaaS partner events and a schema registry?",
+o:["Amazon SNS","Amazon EventBridge","Amazon SQS","AWS Step Functions"],c:1,
+e:`That description is <b>EventBridge</b>: content-based rules, broad AWS/SaaS targets, schema registry, archive & replay. SNS is simpler fan-out; SQS is a queue; Step Functions orchestrates workflows.`},
+
+{g:"s2-drill",id:"2.21",d:"drill",q:"You need to run a job on a cron schedule, fully serverless, without managing any server. What's the cleanest option?",
+o:["A cron daemon on a t3.micro that runs 24/7","EventBridge Scheduler (or a scheduled rule)","An SQS delay queue","A Lambda that sleeps in a loop"],c:1,
+e:`<b>EventBridge Scheduler</b> fires targets on cron/rate expressions with no servers. ✗ An always-on micro instance is wasteful toil; ✗ delay queues postpone messages, they don't schedule recurring jobs; ✗ a sleeping Lambda is an anti-pattern.`},
+
+{g:"s2-drill",id:"2.22",d:"drill",q:"Between SNS and EventBridge, which is purpose-built for the highest-throughput, lowest-latency pub/sub fan-out?",
+o:["EventBridge","SNS","They are identical","Neither — use SQS"],c:1,
+e:`<b>SNS</b> wins on raw throughput and latency for simple fan-out and A2P messaging. EventBridge trades some throughput/latency for richer filtering, schema, replay, and target variety.`},
+
+{g:"s2-drill",id:"2.23",d:"drill",q:"You want to retain events and re-process them later for debugging or backfilling a new consumer. Which built-in feature helps?",
+o:["SNS message filtering","EventBridge archive & replay","SQS short polling","Step Functions Express mode"],c:1,
+e:`<b>EventBridge archive & replay</b> stores matched events so you can replay them to targets later. SNS filtering selects messages; SQS polling style and Step Functions modes are unrelated to replay.`},
+
+/* ====== S2 EXAM — SNS / EventBridge ====== */
+{g:"s2-exam",id:"2.24",d:"exam",q:"A new order event must trigger four independent systems — email, analytics, fulfillment, and fraud. Each must receive every event and process at its own pace; if one is down for maintenance it must not lose events or block the others. Simplest durable design?",
+o:["A single SQS queue that all four poll","An SNS topic fanning out to four separate SQS queues, one per system","Four direct API calls from the order service","SNS pushing directly to four Lambdas with no queues"],c:1,
+e:`<b>SNS → four SQS queues</b> gives each system its own copy <i>and</i> its own durable buffer, so a system can be offline and catch up from its queue. ✗ One shared queue means they compete for messages, not each-gets-one; ✗ direct calls couple the producer to four consumers; ✗ SNS→Lambda alone loses events for a down consumer (no buffer).`},
+
+{g:"s2-exam",id:"2.25",d:"exam",q:"A platform must ingest events from dozens of SaaS tools and AWS services, route them to different targets based on what's inside each event, and let teams add new consumers without changing producers. Which service is the backbone?",
+o:["Amazon SNS","Amazon EventBridge","Amazon SQS","AWS Step Functions"],c:1,
+e:`<b>EventBridge</b> is built for exactly this: SaaS + AWS event sources, content-based routing, and producer-independent consumers (add a rule, no producer change). ✗ SNS filtering is coarser and SaaS-source support is EventBridge's domain; ✗ SQS is point-to-point; ✗ Step Functions orchestrates, it doesn't route ecosystem events.`},
+
+{g:"s2-exam",id:"2.26",d:"exam",q:"A retailer needs to notify customers by SMS and email AND simultaneously push the same event to several backend processing queues. Which single service covers both the person-facing notifications and the system fan-out?",
+o:["EventBridge","SNS (supports app-to-person SMS/email/push and app-to-app fan-out to SQS)","SQS","Amazon MQ"],c:1,
+e:`<b>SNS</b> uniquely spans app-to-person (SMS/email/mobile push) and app-to-app (fan-out to SQS/Lambda) from one topic. ✗ EventBridge doesn't send SMS/email to customers; ✗ SQS is a queue; ✗ Amazon MQ is a migration broker.`},
+
+{g:"s2-exam",id:"2.27",d:"exam",q:"A microservice must react to AWS service events such as 'EC2 instance state-change' and 'S3 object created', running logic only for events matching certain patterns. What's the natural fit?",
+o:["Poll CloudTrail logs on a schedule","EventBridge rules on the default bus matching the event patterns, targeting a Lambda","An SQS queue the services write to directly","SNS topic per AWS service"],c:1,
+e:`AWS service events flow onto the <b>EventBridge default bus</b>; a <b>rule with an event pattern</b> invokes your Lambda only on matches. ✗ Polling CloudTrail is laggy and heavy; ✗ services don't write to your SQS queue directly; ✗ per-service SNS topics is reinventing the bus.`},
+
+{g:"s2-exam",id:"2.28",d:"exam",q:"A company is moving an on-premises application to AWS. It already uses RabbitMQ with AMQP and JMS clients, and the team wants minimal code changes to the messaging layer. Which service?",
+o:["Rewrite onto Amazon SQS and SNS","Amazon MQ (managed RabbitMQ/ActiveMQ)","Amazon Kinesis Data Streams","Amazon EventBridge"],c:1,
+e:`<b>Amazon MQ</b> speaks the standard broker protocols (AMQP, JMS, MQTT, STOMP), so the app migrates with minimal rewrite. ✗ SQS/SNS would require re-architecting the messaging code; ✗ Kinesis/EventBridge are different paradigms entirely.<span class="flip"><span class="fl">flip it</span>If the app were brand-new on AWS, the answer flips to <b>SQS/SNS</b> — Amazon MQ is specifically the migration/compatibility choice.</span>`},
+
+{g:"s2-exam",id:"2.29",d:"exam",q:"A team wants to take records from a source (e.g. an SQS queue or stream), filter and enrich each one, and deliver to a target — without writing and operating glue Lambda code for the plumbing. What's the modern fit?",
+o:["EventBridge Pipes","A custom Lambda polling loop","Step Functions Standard workflow","SNS with filter policies"],c:0,
+e:`<b>EventBridge Pipes</b> is point-to-point source→(filter→enrich)→target with no glue code to maintain. ✗ A custom Lambda loop is the toil you're trying to avoid; ✗ Step Functions is for multi-step orchestration; ✗ SNS filtering doesn't do source-to-target enrichment pipelines.`},
+
+{g:"s2-exam",id:"2.30",d:"exam",q:"Two independent consumers must each receive every event AND process events in the exact order produced, with no duplicates. Using pub/sub, what's the right construction?",
+o:["SNS Standard topic → two SQS Standard queues","SNS FIFO topic → two SQS FIFO queues","A single SQS FIFO queue both consumers poll","EventBridge bus → two Lambdas"],c:1,
+e:`<b>SNS FIFO → two SQS FIFO queues</b> gives each consumer its own ordered, deduplicated copy. ✗ Standard loses ordering and allows duplicates; ✗ one shared FIFO queue means they compete, not each-gets-every-event; ✗ EventBridge doesn't guarantee strict ordering.`},
+
+/* ====== MIX 2 ====== */
+{g:"mix-2",id:"M2.1",d:"mixed",tag:"win",q:"EC2 instances in a private subnet must download OS patches and call external APIs over the internet, but must not be reachable from the internet. What do you deploy?",
+o:["An internet gateway on the private subnet's route table","A NAT gateway in a public subnet, with the private subnet routing 0.0.0.0/0 to it","VPC peering to a public VPC","Elastic IPs on each private instance"],c:1,
+e:`A <b>NAT gateway</b> in a public subnet gives private instances outbound internet while remaining unreachable inbound. ✗ An IGW route makes them public; ✗ peering doesn't grant internet; ✗ EIPs make them publicly reachable.`},
+
+{g:"mix-2",id:"M2.2",d:"mixed",tag:"miss",q:"An app in a private subnet must write to S3 with no traffic leaving the AWS network and no additional hourly cost. What do you configure?",
+o:["A Gateway VPC endpoint for S3, added to the route table","An Interface VPC endpoint for S3","A NAT gateway in a public subnet","An S3 access point over a VPN"],c:0,
+e:`<b>Gateway endpoints (S3 and DynamoDB) are free</b> and route privately via the route table — exactly the no-hourly-cost, stays-on-AWS requirement. ✗ Interface endpoints have hourly + per-GB cost; ✗ a NAT gateway sends traffic out and bills hourly; ✗ the access-point/VPN combo is needless complexity.`},
+
+{g:"mix-2",id:"M2.3",d:"mixed",q:"A public-facing application behind an ALB is being hit with SQL injection attempts. What should you deploy to block them while allowing legitimate traffic?",
+o:["AWS Shield Standard","AWS WAF on the ALB with a SQL injection match rule","A Network ACL blocking SQL patterns","GuardDuty with auto-remediation"],c:1,
+e:`<b>WAF</b> inspects Layer-7 requests and blocks SQLi/XSS — attach it to the ALB. ✗ Shield is for DDoS (L3/4); ✗ NACLs filter IPs/ports, not request payloads; ✗ GuardDuty detects threats but doesn't inline-block requests.`},
+
+{g:"mix-2",id:"M2.4",d:"mixed",tag:"miss",q:"A nightly ETL fleet runs jobs that take 2–4 hours, process independent shards, and can safely restart if interrupted. It runs 365 days a year and the team wants the GREATEST cost savings. Best purchasing strategy?",
+o:["1-year Standard All-Upfront Reserved Instances for the exact type","Spot Instances diversified across several instance types and multiple AZs, with interruption handling to replace lost capacity","50% Spot, 50% On-Demand","On-Demand only, for reliability"],c:1,
+e:`Interruption-tolerant, restartable work is the ideal <b>Spot</b> case — diversify across <b>many instance types and AZs</b> so no single pool drying up sinks the fleet, giving the deepest savings. ✗ RIs lock you to one type and cost more than Spot; ✗ half On-Demand leaves savings on the table; ✗ all On-Demand is the most expensive. (Full Spot/SP/RI tree: File 5.)`},
+
+/* ====== S3 DRILL — Kinesis / orchestration ====== */
+{g:"s3-drill",id:"2.31",d:"drill",q:"Which Kinesis service delivers streaming data to S3 / Redshift / OpenSearch with no shards or consumer apps to manage?",
+o:["Kinesis Data Streams","Kinesis Data Firehose","Managed Service for Apache Flink","Kinesis Video Streams"],c:1,
+e:`<b>Data Firehose</b> is the zero-management delivery pipe to common stores (near-real-time, buffered). Data Streams needs shard/consumer management; Flink is analytics; Video Streams is media.`},
+
+{g:"s3-drill",id:"2.32",d:"drill",q:"In Kinesis Data Streams, what determines which shard a record lands on and keeps related records ordered?",
+o:["The record timestamp","The partition key","The consumer group","The retention period"],c:1,
+e:`The <b>partition key</b> hashes a record to a shard; records sharing a key go to the same shard and stay ordered there. Timestamp, consumer, and retention don't control placement/ordering.`},
+
+{g:"s3-drill",id:"2.33",d:"drill",q:"How can a Kinesis consumer that was offline for hours catch up on the records it missed?",
+o:["It can't — missed records are gone","Records are retained (24h default, up to 365 days) and the consumer reads from its own position, replaying what it missed","Re-subscribe to get future records only","Restore from an S3 backup"],c:1,
+e:`A Kinesis stream is a <b>retained log</b>; each consumer tracks its own position and can <b>replay</b> from where it left off. This replay/catch-up is the core thing queues and plain SNS can't do.`},
+
+{g:"s3-drill",id:"2.34",d:"drill",q:"For high-volume, very short (<5 min), at-least-once workflow executions, which Step Functions type is cheaper and more appropriate?",
+o:["Standard workflows","Express workflows","Either, they're priced the same","Neither — use a single Lambda"],c:1,
+e:`<b>Express workflows</b> target high-throughput, short-lived executions at lower per-run cost (at-least-once). Standard is for long-running, exactly-once, audited workflows.`},
+
+{g:"s3-drill",id:"2.35",d:"drill",q:"You need to run real-time SQL/analytics computations directly on a Kinesis stream. Which service?",
+o:["Kinesis Data Firehose","Managed Service for Apache Flink (Kinesis Data Analytics)","Amazon Athena","Amazon QuickSight"],c:1,
+e:`<b>Managed Service for Apache Flink</b> runs streaming SQL/Flink on live data. Firehose only delivers; Athena queries S3 at rest; QuickSight visualizes.`},
+
+/* ====== S3 EXAM — Kinesis / orchestration ====== */
+{g:"s3-exam",id:"2.36",d:"exam",tag:"miss",q:"A logistics service publishes shipment events ('picked up', 'in transit', 'delivered'). Three independent consumers — billing, customer notifications, and analytics — each need to receive EVERY event and process at their own pace. If a consumer goes offline for maintenance it must catch up on missed events with no data loss. Events must be ordered per shipment tracking number. Volume is ~2,000/sec, bursting to 8,000. Which architecture fits ALL requirements?",
+o:["Publish to an SNS FIFO topic; subscribe each consumer via its own SQS FIFO queue","Publish to a Kinesis Data Stream with the tracking number as the partition key; each consumer runs its own KCL application reading the whole stream","Publish to one SQS FIFO queue that all three consumers poll","Publish to EventBridge, fanning out to three SQS Standard queues"],c:1,
+e:`Every requirement points one way. <b>Many independent consumers each needing every record + replay/catch-up after downtime + ordering per key + high, bursty throughput = Kinesis Data Streams.</b> The <b>tracking number as partition key</b> orders each shipment's events on one shard, and each consumer reads the full retained log at its own offset.<br>✗ SNS FIFO → SQS FIFO can fan out and order, but it's a delivery/queue model tuned for lower throughput and isn't the clean "replayable log many consumers reprocess" fit the stem describes. ✗ One shared SQS queue means consumers <i>compete</i> — they don't each get every event. ✗ EventBridge → SQS Standard loses per-key ordering.<span class="flip"><span class="fl">flip it</span>If each event needed to go to exactly one worker once (no replay, no multi-consumer), the answer would drop back to <b>SQS</b>. The "every consumer, replayable" clause is what forces Kinesis.</span>`},
+
+{g:"s3-exam",id:"2.37",d:"exam",q:"A clickstream produces very high-throughput events. Several analytics teams must each consume the same data in real time and independently, and the team needs the ability to replay history to reprocess with new logic. Which service?",
+o:["SQS Standard","Kinesis Data Streams (with enhanced fan-out for independent consumers)","SNS Standard","Amazon MQ"],c:1,
+e:`High throughput + multiple independent real-time consumers + replay = <b>Kinesis Data Streams</b>; <b>enhanced fan-out</b> gives each consumer dedicated throughput. ✗ SQS deletes on consume (no replay, competing consumers); ✗ SNS doesn't retain for replay; ✗ Amazon MQ is a broker for migrations.`},
+
+{g:"s3-exam",id:"2.38",d:"exam",q:"A team just needs to land streaming application logs into S3 and OpenSearch in near-real-time, with the least operational overhead and no custom consumer code. Which service?",
+o:["Kinesis Data Streams with a custom KCL consumer writing to S3 and OpenSearch","Kinesis Data Firehose with S3 and OpenSearch as destinations","SQS with worker fleet writing to both","EventBridge to a Lambda that writes to both"],c:1,
+e:`<b>Firehose</b> delivers straight to S3/OpenSearch with no shards or consumer apps — minimal ops. ✗ Data Streams + custom KCL is exactly the overhead to avoid; ✗ SQS/Lambda glue is more code to run.<span class="flip"><span class="fl">flip it</span>If you needed replay or multiple independent consumers of the raw stream, you'd choose <b>Data Streams</b> — Firehose is delivery-only.</span>`},
+
+{g:"s3-exam",id:"2.39",d:"exam",q:"An order process has six steps with conditional branches, automatic retries on failures, and a manual approval gate before shipping. The team wants managed state and visibility, not hand-wired Lambdas glued by queues. What fits?",
+o:["Chain Lambdas together using SQS between each step","AWS Step Functions (Standard) with a task-token callback for the approval step","A single large Lambda with try/catch","EventBridge rules between each Lambda"],c:1,
+e:`<b>Step Functions Standard</b> models branching, retries, and a human-approval gate (task token / callback) as a visible, managed state machine. ✗ SQS-chained Lambdas reinvent orchestration with no built-in state/retry/approval; ✗ one giant Lambda is brittle and time-limited; ✗ EventBridge routes events but doesn't manage workflow state.`},
+
+{g:"s3-exam",id:"2.40",d:"exam",tag:"miss",q:"Independent work items each need to be processed once by a single worker. There's no need for replay, no multiple consumers of the same item, and the team wants the simplest, cheapest decoupling. Which service — and which trap to avoid?",
+o:["Kinesis Data Streams, for future flexibility","SQS — a simple queue; reaching for Kinesis here adds shards and consumer management you don't need","SNS, so every worker gets the item","Step Functions for each item"],c:1,
+e:`When each item goes to one worker once with no replay, <b>SQS is the right, cheapest tool</b>. The trap is over-reaching for Kinesis because it sounds powerful — but you'd take on shard and consumer-position management for no benefit. ✗ SNS fans out (wrong — you want one worker); ✗ Step Functions orchestrates multi-step flows, overkill for single items.`},
+
+{g:"s3-exam",id:"2.41",d:"exam",q:"In a Kinesis Data Stream, two consumer applications read the same stream, but they're contending for the shard's read throughput and seeing added latency. You need each consumer to have dedicated, low-latency throughput. What do you enable?",
+o:["More shards only","Enhanced fan-out (a dedicated throughput pipe per consumer)","A larger consumer instance","Firehose delivery"],c:1,
+e:`<b>Enhanced fan-out</b> gives each registered consumer its own dedicated throughput (pushed over HTTP/2) so consumers don't share/contend on the shard. ✗ Adding shards raises total capacity but consumers still share classic read throughput; ✗ instance size doesn't change Kinesis read limits; ✗ Firehose is a different model.`},
+
+{g:"s3-exam",id:"2.42",d:"exam",q:"A fraud system must run a short multi-step decision per event at extremely high volume, as cheaply as possible, where occasional duplicate executions are tolerable. Which orchestration choice fits best?",
+o:["Step Functions Standard workflows","Step Functions Express workflows","A single Standard workflow per day","Amazon MQ"],c:1,
+e:`High volume + short duration + cost-sensitive + at-least-once tolerable = <b>Step Functions Express</b>. ✗ Standard is for long-running, exactly-once, audited flows and costs more per transition at this volume; ✗ one daily workflow doesn't model per-event processing; ✗ Amazon MQ isn't an orchestrator.`}
+
+];
+
+/* ---------------- RENDER ---------------- */
+const L=["A","B","C","D","E"];
+const state={};
+let total=BANK.length;
+
+function tagChip(t){
+  if(t==="miss") return '<span class="chip miss">↻ your miss</span>';
+  if(t==="win")  return '<span class="chip win">✓ lock it in</span>';
+  return "";
+}
+function diffChip(d,multi){
+  let base = d==="exam"?'<span class="chip exam">exam</span>'
+           : d==="mixed"?'<span class="chip mixed">mixed</span>'
+           : '<span class="chip drill">drill</span>';
+  if(multi) base += ' <span class="chip two">select two</span>';
+  return base;
+}
+
+BANK.forEach(item=>{
+  const host=document.getElementById(item.g);
+  if(!host)return;
+  const card=document.createElement("div");
+  card.className="q";
+  card.tabIndex=0;
+  card.dataset.id=item.id;
+  const correctArr = Array.isArray(item.c)?item.c:[item.c];
+  const multi = item.multi===true || correctArr.length>1;
+
+  card.innerHTML =
+    '<div class="qtop"><span class="qid">Q '+item.id+'</span>'+diffChip(item.d,multi)+tagChip(item.tag)+'</div>'+
+    '<div class="stem">'+item.q+'</div>'+
+    '<ul class="opts">'+item.o.map((t,i)=>
+      '<button class="opt" data-i="'+i+'"><span class="ltr">'+L[i]+'</span><span class="otext">'+t+'</span><span class="mark"></span></button>'
+    ).join('')+'</ul>'+
+    (multi?'<button class="checkbtn" disabled>Check answer</button>':'')+
+    '<div class="reveal"><div class="rv-inner"></div></div>';
+
+  host.appendChild(card);
+
+  const opts=[...card.querySelectorAll(".opt")];
+  const checkBtn=card.querySelector(".checkbtn");
+  const reveal=card.querySelector(".reveal");
+  const rvInner=card.querySelector(".rv-inner");
+  let locked=false;
+  let sel=new Set();
+
+  function settle(){
+    locked=true;
+    const ok = sel.size===correctArr.length && [...sel].every(i=>correctArr.includes(i));
+    opts.forEach((b,i)=>{
+      b.disabled=true; b.classList.remove("sel");
+      const mark=b.querySelector(".mark");
+      if(correctArr.includes(i)){b.classList.add("correct");mark.textContent="✓ correct";}
+      else if(sel.has(i)){b.classList.add("wrong");mark.textContent="✗ your pick";}
+    });
+    if(checkBtn)checkBtn.style.display="none";
+    rvInner.innerHTML='<div class="verdict '+(ok?'r-ok':'r-no')+'">'+(ok?'Correct':'Not quite')+'</div>'+item.e;
+    reveal.classList.add("show");
+    state[item.id]={answered:true,correct:ok};
+    updateHUD();
+  }
+
+  card._select=function(i){
+    if(locked||i<0||i>=opts.length)return;
+    if(multi){
+      if(sel.has(i)){sel.delete(i);opts[i].classList.remove("sel");}
+      else{sel.add(i);opts[i].classList.add("sel");}
+      if(checkBtn)checkBtn.disabled = sel.size===0;
+    } else { sel=new Set([i]); settle(); }
+  };
+  card._check=function(){ if(!locked&&multi&&sel.size)settle(); };
+  card._locked=()=>locked;
+  card._multi=multi;
+
+  opts.forEach(b=>b.addEventListener("click",()=>card._select(+b.dataset.i)));
+  if(checkBtn)checkBtn.addEventListener("click",()=>card._check());
+});
+
+/* ---------------- VIM NAVIGATION ---------------- */
+const cards=[...document.querySelectorAll(".q")];
+let cur=-1, lastG=0;
+
+function setCurrent(i){
+  if(cur>=0&&cards[cur])cards[cur].classList.remove("current");
+  cur=i;
+  if(cur>=0&&cards[cur])cards[cur].classList.add("current");
+}
+function focusCard(i){
+  if(!cards.length)return;
+  i=Math.max(0,Math.min(cards.length-1,i));
+  setCurrent(i);
+  cards[i].focus({preventScroll:true});
+  cards[i].scrollIntoView({behavior:"smooth",block:"center"});
+}
+function nextUnanswered(){
+  for(let off=1;off<=cards.length;off++){
+    const i=( (cur<0?0:cur) +off)%cards.length;
+    if(!state[cards[i].dataset.id]){focusCard(i);return;}
+  }
+}
+cards.forEach((c,i)=>c.addEventListener("focusin",()=>setCurrent(i)));
+
+const help=document.getElementById("help");
+function toggleHelp(){help.classList.toggle("show");}
+
+document.addEventListener("keydown",e=>{
+  // don't hijack typing in form fields (none here, but safe)
+  const tag=(e.target.tagName||"").toLowerCase();
+  if(tag==="input"||tag==="textarea")return;
+
+  if(e.key==="Escape"){help.classList.remove("show");return;}
+  if(e.key==="?"){e.preventDefault();toggleHelp();return;}
+  if(help.classList.contains("show"))return;
+
+  // selection: 1-5 or a-e on the current card
+  let idx=-1;
+  if(e.key>="1"&&e.key<="5")idx=+e.key-1;
+  const lk=(e.key||"").toLowerCase();
+  if(lk>="a"&&lk<="e"&&e.key.length===1)idx=lk.charCodeAt(0)-97;
+
+  if(idx>=0){
+    if(cur<0)focusCard(0);
+    if(cur>=0){e.preventDefault();cards[cur]._select(idx);}
+    return;
+  }
+  switch(e.key){
+    case"j":e.preventDefault();focusCard(cur<0?0:cur+1);break;
+    case"k":e.preventDefault();focusCard(cur<0?0:cur-1);break;
+    case"G":e.preventDefault();focusCard(cards.length-1);break;
+    case"g":{const now=Date.now();if(now-lastG<500){e.preventDefault();focusCard(0);lastG=0;}else lastG=now;break;}
+    case"n":e.preventDefault();nextUnanswered();break;
+    case"Enter":if(cur>=0&&cards[cur]._multi&&!cards[cur]._locked()){e.preventDefault();cards[cur]._check();}break;
+  }
+});
+document.getElementById("h-help").addEventListener("click",toggleHelp);
+
+/* ---------------- HUD + SUMMARY ---------------- */
+document.getElementById("h-tot").textContent=total;
+function updateHUD(){
+  const answered=Object.keys(state).length;
+  const correct=Object.values(state).filter(s=>s.correct).length;
+  const pct=answered?Math.round(100*correct/answered):0;
+  document.getElementById("h-ans").textContent=answered;
+  document.getElementById("h-pct").textContent=answered?pct+"%":"—";
+  document.getElementById("h-bar").style.width=(100*answered/total)+"%";
+
+  const scP=document.getElementById("sc-pct");
+  const scL=document.getElementById("sc-line");
+  const scM=document.getElementById("sc-miss");
+  if(answered===0){scP.textContent="—";scL.textContent="Answer some questions and your readiness score appears here.";scM.innerHTML="";return;}
+  scP.textContent=pct+"%";
+  let v;
+  if(answered<total) v=correct+" / "+answered+" so far — "+(total-answered)+" left. Press n for the next unanswered.";
+  else if(pct>=80) v="Strong. The Kinesis-vs-queue reflex is rewiring. On to File 3.";
+  else if(pct>=70) v="On the pass line. Redo the misses below — especially any Kinesis ones — then File 3.";
+  else v="Below target. Re-read the SQS-vs-SNS-vs-Kinesis box, redo the misses, run it again.";
+  scL.textContent=v;
+
+  const missed=Object.entries(state).filter(([k,val])=>!val.correct).map(([k])=>k);
+  scM.innerHTML = missed.length
+    ? "review: "+missed.map(id=>'<a href="#" onclick="jump(\''+id+'\');return false;">Q'+id+'</a>').join("")
+    : (answered===total?"clean sweep — nothing flagged.":"");
+}
+function jump(id){
+  const i=cards.findIndex(q=>q.dataset.id===id);
+  if(i>=0)focusCard(i);
+}
+document.getElementById("h-reset").addEventListener("click",()=>location.reload());
+updateHUD();
+</script>
+</body>
+</html>

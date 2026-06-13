@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SAA-C03 · File 5 · Cost Optimization</title>
+<style>
+  :root{
+    --bg:#0e1620; --bg2:#0a1019; --panel:#15212e; --panel2:#1a2836; --panel3:#1f2f40;
+    --line:#26384a; --line-strong:#36506a;
+    --text:#e7eef6; --soft:#a3b5c7; --muted:#6f8298;
+    --accent:#f59e3c; --accent-2:#f7b260; --accent-tint:rgba(245,158,60,.12);
+    --ok:#3fcf8e; --ok-bg:rgba(63,207,142,.13); --ok-line:rgba(63,207,142,.45);
+    --no:#ff7062; --no-bg:rgba(255,112,98,.13); --no-line:rgba(255,112,98,.45);
+    --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);
+    line-height:1.62;font-size:17px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:860px;margin:0 auto;padding:0 22px}
+  ::selection{background:rgba(245,158,60,.3)}
+
+  .hud{position:sticky;top:0;z-index:50;background:rgba(10,16,25,.96);
+    border-bottom:1px solid #1d2c3c;backdrop-filter:saturate(1.2) blur(7px)}
+  .hud-inner{max-width:860px;margin:0 auto;padding:9px 22px;display:flex;gap:16px;
+    align-items:center;font-family:var(--mono);font-size:12.5px;flex-wrap:wrap}
+  .hud .dot{color:var(--accent);font-weight:700;letter-spacing:.04em}
+  .hud .stat b{color:var(--text);font-weight:700}
+  .hud .stat{color:var(--muted)}
+  .bar{flex:1;min-width:110px;height:7px;background:#10202f;border-radius:99px;overflow:hidden}
+  .bar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    transition:width .35s ease}
+  .hud button{font-family:var(--mono);font-size:11.5px;color:var(--soft);background:transparent;
+    border:1px solid #2c4055;border-radius:6px;padding:3px 9px;cursor:pointer}
+  .hud button:hover{color:var(--text);border-color:var(--accent)}
+
+  header.top{padding:54px 0 30px;border-bottom:1px solid var(--line)}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--accent);margin:0 0 14px}
+  h1{font-size:40px;line-height:1.05;margin:0 0 12px;font-weight:800;letter-spacing:-.018em}
+  h1 .thin{font-weight:400;color:var(--soft)}
+  .lede{font-size:18px;color:var(--soft);margin:0;max-width:60ch}
+  .filechips{display:flex;gap:7px;flex-wrap:wrap;margin-top:22px;font-family:var(--mono);font-size:11.5px}
+  .fc{padding:4px 10px;border:1px solid var(--line-strong);border-radius:99px;color:var(--muted)}
+  .fc.here{background:var(--accent);color:#1a1206;border-color:var(--accent);font-weight:700}
+  .fc.done{color:var(--soft);border-color:var(--line);text-decoration:line-through;text-decoration-color:var(--muted)}
+
+  .legend{margin:26px 0 0;padding:16px 18px;background:var(--panel);border:1px solid var(--line);
+    border-radius:12px;font-size:14px;color:var(--soft)}
+  .legend b{color:var(--text)}
+  .legend .row{display:flex;gap:10px;align-items:baseline;margin:7px 0}
+  .legend .tg{flex:none}
+  .keys{margin-top:13px;padding-top:12px;border-top:1px solid var(--line);
+    font-family:var(--mono);font-size:13px;color:var(--soft);display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:5px 18px}
+  .keys b{color:var(--text);font-weight:600}
+  .keys kbd{background:var(--panel3);border:1px solid var(--line-strong);border-bottom-width:2px;
+    border-radius:5px;padding:1px 7px;color:var(--accent-2);font-weight:600;margin-right:7px;
+    display:inline-block;min-width:20px;text-align:center}
+
+  section{padding:46px 0;border-bottom:1px solid var(--line)}
+  .sec-tag{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--accent);display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .sec-tag .n{background:var(--accent);color:#1a1206;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700}
+  h2{font-size:28px;line-height:1.12;margin:0 0 6px;font-weight:800;letter-spacing:-.015em}
+  h3{font-size:18.5px;margin:30px 0 8px;font-weight:700;letter-spacing:-.01em;color:var(--text)}
+  p{margin:13px 0}
+  .sub{color:var(--soft);font-size:16px;margin-top:2px}
+  code{font-family:var(--mono);font-size:.85em;background:#0c1a27;border:1px solid var(--line);
+    padding:1px 6px;border-radius:5px;color:var(--accent-2);white-space:nowrap}
+  strong{font-weight:700;color:var(--text)}
+  ul.tight{margin:12px 0;padding-left:20px}
+  ul.tight li{margin:7px 0}
+  em{color:var(--soft)}
+
+  .box{margin:22px 0;border-radius:12px;padding:16px 18px 16px 20px;border:1px solid var(--line);
+    background:var(--panel);position:relative;overflow:hidden}
+  .box .lab{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+    margin:0 0 6px;font-weight:700}
+  .box.key{border-color:rgba(245,158,60,.4);background:var(--accent-tint)}
+  .box.key:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent)}
+  .box.key .lab{color:var(--accent-2)}
+  .box.trap{border-color:var(--no-line);background:var(--no-bg)}
+  .box.trap:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--no)}
+  .box.trap .lab{color:var(--no)}
+  .box.field{background:var(--panel3);border-color:var(--line-strong)}
+  .box.field:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent)}
+  .box.field .lab{color:var(--accent)}
+  .box p:first-of-type{margin-top:0}.box p:last-child{margin-bottom:0}
+
+  .tw{overflow-x:auto;margin:22px 0}
+  table{border-collapse:collapse;width:100%;font-size:14.5px}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;
+    color:var(--muted);font-weight:600;border-bottom:2px solid var(--line-strong)}
+  td b{color:var(--text)}
+  tr:last-child td{border-bottom:none}
+
+  .quizhead{display:flex;align-items:center;gap:10px;margin:34px 0 4px;flex-wrap:wrap}
+  .quizhead .ttl{font-family:var(--mono);font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--text);font-weight:700}
+  .quizhead .meta{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  .quizhead .rule{flex:1;height:1px;background:var(--line)}
+
+  .q{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:18px 18px 6px;margin:16px 0;position:relative}
+  .qtop{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:9px}
+  .qid{font-family:var(--mono);font-size:11.5px;color:var(--muted);font-weight:600}
+  .chip{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+    padding:2px 7px;border-radius:5px;font-weight:700}
+  .chip.drill{background:#1c2c3b;color:#8fb4d6}
+  .chip.exam{background:var(--accent);color:#1a1206}
+  .chip.mixed{background:var(--accent-tint);color:var(--accent-2);border:1px solid rgba(245,158,60,.4)}
+  .chip.two{background:rgba(150,110,210,.18);color:#bfa3e8;border:1px solid rgba(150,110,210,.4)}
+  .chip.miss{background:var(--no-bg);color:var(--no);border:1px solid var(--no-line)}
+  .chip.win{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-line)}
+  .stem{font-size:16.5px;margin:2px 0 13px;line-height:1.5;color:var(--text)}
+  .opts{list-style:none;margin:0;padding:0}
+  .opt{display:flex;gap:11px;align-items:flex-start;width:100%;text-align:left;cursor:pointer;
+    border:1px solid var(--line);background:var(--panel2);border-radius:9px;padding:11px 13px;margin:7px 0;
+    font:inherit;font-size:15.5px;color:var(--text);transition:border-color .12s,background .12s}
+  .opt:hover:not(:disabled){border-color:var(--line-strong);background:var(--panel3)}
+  .opt:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .opt:disabled{cursor:default}
+  .opt .ltr{flex:none;font-family:var(--mono);font-weight:700;font-size:13px;color:var(--accent-2);
+    width:18px;text-align:center;padding-top:1px}
+  .opt .otext{flex:1}
+  .opt.sel{border-color:var(--accent);background:var(--accent-tint)}
+  .opt.correct{border-color:var(--ok-line);background:var(--ok-bg)}
+  .opt.correct .ltr{color:var(--ok)}
+  .opt.wrong{border-color:var(--no-line);background:var(--no-bg)}
+  .opt.wrong .ltr{color:var(--no)}
+  .opt .mark{margin-left:auto;font-family:var(--mono);font-weight:700;font-size:13px;white-space:nowrap}
+  .opt.correct .mark{color:var(--ok)}.opt.wrong .mark{color:var(--no)}
+  .checkbtn{font-family:var(--mono);font-size:12.5px;font-weight:700;letter-spacing:.04em;
+    background:var(--accent);color:#1a1206;border:none;border-radius:8px;padding:9px 16px;cursor:pointer;margin:6px 0 2px}
+  .checkbtn:hover{background:var(--accent-2)}.checkbtn:disabled{opacity:.35;cursor:default}
+  .reveal{max-height:0;overflow:hidden;transition:max-height .3s ease}
+  .reveal.show{max-height:1900px}
+  .rv-inner{border-top:1px solid var(--line);margin-top:12px;padding:13px 2px 12px;font-size:15px;color:var(--soft);line-height:1.58}
+  .rv-inner .verdict{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;margin-bottom:6px}
+  .verdict.r-ok{color:var(--ok)}.verdict.r-no{color:var(--no)}
+  .rv-inner b{color:var(--text)}
+  .flip{display:block;margin-top:10px;padding:9px 12px;background:var(--panel3);border-radius:8px;font-size:14.5px;border:1px solid var(--line)}
+  .flip .fl{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-2);font-weight:700;margin-right:6px}
+
+  #help{position:fixed;inset:0;z-index:90;background:rgba(6,11,17,.72);display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+  #help.show{display:flex}
+  .help-card{background:var(--panel2);border:1px solid var(--line-strong);border-radius:14px;padding:24px 26px;max-width:380px;width:calc(100% - 44px)}
+  .help-card h4{margin:0 0 4px;font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+  .help-card .hk{display:flex;justify-content:space-between;gap:14px;padding:6px 0;font-size:14.5px;border-bottom:1px solid var(--line)}
+  .help-card .hk:last-of-type{border-bottom:none}
+  .help-card kbd{font-family:var(--mono);background:var(--panel3);border:1px solid var(--line-strong);border-bottom-width:2px;border-radius:5px;padding:1px 8px;color:var(--accent-2);font-weight:600}
+  .help-card .close{margin-top:14px;font-family:var(--mono);font-size:12px;color:var(--muted);text-align:center}
+
+  .summary{padding:46px 0 70px}
+  .scorecard{background:linear-gradient(160deg,var(--panel3),var(--panel));color:var(--text);
+    border:1px solid var(--line-strong);border-radius:16px;padding:26px 26px 22px;text-align:center}
+  .scorecard .big{font-size:54px;font-weight:800;letter-spacing:-.02em;line-height:1}
+  .scorecard .lab2{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+  .scorecard .note{color:var(--soft);font-size:14.5px;margin-top:10px}
+  .misslist{margin-top:18px;font-family:var(--mono);font-size:13px}
+  .misslist a{color:var(--accent-2);text-decoration:none;border-bottom:1px dotted var(--accent);margin:0 4px;display:inline-block}
+  .foot{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:center;margin-top:30px}
+
+  @media (max-width:560px){
+    body{font-size:16px} h1{font-size:31px} h2{font-size:23px}
+    .hud-inner{font-size:11px;gap:10px} .stem{font-size:15.5px}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<div class="hud">
+  <div class="hud-inner">
+    <span class="dot">▰ SAA-C03</span>
+    <span class="stat"><b id="h-ans">0</b>/<span id="h-tot">0</span> answered</span>
+    <span class="stat"><b id="h-pct">—</b> correct</span>
+    <div class="bar"><i id="h-bar"></i></div>
+    <button id="h-help">? keys</button>
+    <button id="h-reset">reset</button>
+  </div>
+</div>
+
+<div id="help"><div class="help-card">
+  <h4>Vim scrolling · smooth</h4>
+  <div class="hk"><span>Glide down / up (hold to flow)</span><span><kbd>j</kbd> <kbd>k</kbd></span></div>
+  <div class="hk"><span>Half page down / up</span><span><kbd>d</kbd> <kbd>u</kbd></span></div>
+  <div class="hk"><span>Full page down / up</span><span><kbd>f</kbd> <kbd>b</kbd></span></div>
+  <div class="hk"><span>Top of page</span><span><kbd>g</kbd><kbd>g</kbd></span></div>
+  <div class="hk"><span>Bottom of page</span><span><kbd>G</kbd></span></div>
+  <div class="hk"><span>Toggle this help</span><span><kbd>?</kbd></span></div>
+  <div class="close">Answer questions by clicking · esc closes help</div>
+</div></div>
+
+<div class="wrap">
+<header class="top">
+  <p class="eyebrow">Weakness-targeted drill · File 5 of 5 · dark</p>
+  <h1>Cost Optimization<br><span class="thin">Spot · Reserved · Savings Plans · scheduling · right-sizing · cost tooling</span></h1>
+  <p class="lede">The last file. One decision tree carries this domain — On-Demand vs Reserved vs Savings Plans vs Spot — and it's exactly where you picked Reserved when the answer was Spot. We drill it, then the quieter wins: turn things off, right-size them, and watch the bill with the right tools.</p>
+  <div class="filechips">
+    <span class="fc done">1 · Compute</span>
+    <span class="fc done">2 · Decoupling</span>
+    <span class="fc done">3 · Databases</span>
+    <span class="fc done">4 · Resilience &amp; DR</span>
+    <span class="fc here">5 · Cost</span>
+  </div>
+  <div class="legend">
+    <div class="row"><span class="tg chip drill">drill</span><span><b>Quick check.</b> Exam-real, one fact at a time.</span></div>
+    <div class="row"><span class="tg chip exam">exam</span><span><b>Scenario.</b> Full SAA-C03 difficulty — several options save money, one saves most.</span></div>
+    <div class="row"><span class="tg chip mixed">mixed</span><span><b>All-topics review</b> so Files 1–4 stay sharp going into exam day.</span></div>
+    <div class="row"><span class="tg chip miss">↻ your miss</span><span>You got this exact concept wrong on a mock or the timed exam.</span></div>
+    <div class="row"><span class="tg chip win">✓ lock it in</span><span>You answered this right before — prove it sticks.</span></div>
+    <div class="keys">
+      <span><kbd>j</kbd><kbd>k</kbd>glide</span>
+      <span><kbd>d</kbd><kbd>u</kbd>half page</span>
+      <span><kbd>f</kbd><kbd>b</kbd>full page</span>
+      <span><kbd>g</kbd><kbd>g</kbd>top &nbsp; <kbd>G</kbd>bottom</span>
+      <span><kbd>?</kbd>help</span>
+      <span><b>click</b> to answer</span>
+    </div>
+  </div>
+</header>
+</div>
+
+<div class="wrap">
+
+<!-- ===================== SECTION 1 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">01</span> Compute purchasing — the decision tree</div>
+  <h2>Match the commitment to the workload's shape</h2>
+  <p class="sub">Four ways to buy the same compute, at wildly different prices. The stem tells you which by describing how steady, how interruptible, and how flexible the workload is.</p>
+
+  <div class="tw"><table>
+    <tr><th>Option</th><th>Pick it when…</th><th>Discount</th></tr>
+    <tr><td><b>On-Demand</b></td><td>spiky, unpredictable, short, can't commit, can't be interrupted</td><td>none (baseline)</td></tr>
+    <tr><td><b>Savings Plans</b></td><td>steady spend you'll commit to for 1–3 yr; want flexibility</td><td>up to ~66–72%</td></tr>
+    <tr><td><b>Reserved Instances</b></td><td>steady, specific instance, 1–3 yr; or you need the capacity reservation</td><td>up to ~72%</td></tr>
+    <tr><td><b>Spot</b></td><td>fault-tolerant, stateless, restartable, flexible on timing</td><td>up to ~90%</td></tr>
+  </table></div>
+
+  <div class="box key"><p class="lab">Key fact — Savings Plans &amp; RI flavors</p>
+  <p><b>Compute Savings Plan</b> = most flexible: covers any instance family, Region, OS, tenancy — and Fargate and Lambda. <b>EC2 Instance Savings Plan</b> = locks a family in a Region for a bigger discount. <b>Standard RI</b> = biggest RI discount but rigid; <b>Convertible RI</b> = exchangeable for different attributes during the term. For most steady workloads, Savings Plans have replaced RIs because of the flexibility — but RIs still appear when a question stresses a <em>specific</em> instance or a capacity guarantee.</p></div>
+
+  <div class="box trap"><p class="lab">The Spot-vs-Reserved trap</p><p>When a workload is <b>interruption-tolerant and restartable</b> — nightly batch, ETL, CI, rendering — the <em>greatest</em> savings come from <b>Spot</b>, not Reserved. The fact that it runs every day makes RI tempting, but "can safely restart if interrupted" is the signal that Spot wins. Protect the fleet by <b>diversifying across several instance types and AZs</b> and using the <b>capacity-optimized</b> (or price-capacity-optimized) allocation strategy so one pool drying up can't sink the job.</p></div>
+
+  <p><strong>Two more:</strong> <b>On-Demand Capacity Reservations (ODCR)</b> guarantee capacity in a specific AZ (a launch guarantee, not a discount). <b>Dedicated Hosts</b> give you a physical server for socket/core-based BYOL licensing and compliance.</p>
+
+  <div class="box field"><p class="lab">// field note — buying the leftovers</p><p>Spot Instances (launched 2009) are AWS selling its spare capacity at up to ~90% off. The catch is they can be reclaimed with a <b>two-minute warning</b> when AWS needs the hardware back. Early Spot used a live bidding market — you literally bid a price — but around 2017 AWS scrapped the auction for smoother, demand-based pricing, so today it's far more predictable. The mental model that survives: Spot is the bargain bin, and you only shop there for things you can afford to put back.</p></div>
+
+  <div class="quizhead"><span class="ttl">Quick check</span><span class="rule"></span><span class="meta">8 questions · one fact each</span></div>
+  <div id="s1-drill"></div>
+  <div class="quizhead"><span class="ttl">Scenario pressure</span><span class="rule"></span><span class="meta">7 questions · exam difficulty + your headline miss</span></div>
+  <div id="s1-exam"></div>
+</section>
+
+<!-- ===================== MIXED 1 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">↻</span> Mixed review — all domains</div>
+  <h2>Keep Files 1–4 warm</h2>
+  <p class="sub">Four across storage, resilience and decoupling — three are previous misses worth one more rep.</p>
+  <div id="mix-1"></div>
+</section>
+
+<!-- ===================== SECTION 2 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">02</span> Right-sizing, scheduling &amp; elasticity</div>
+  <h2>The cheapest resource is the one that's off</h2>
+  <p class="sub">Before you optimize what you pay per hour, cut the hours and the size. This is where most real-world (and exam) savings actually live.</p>
+
+  <ul class="tight">
+    <li><b>Turn it off</b> — dev/test, internal tools, and batch boxes rarely need to run nights and weekends. Schedule stop/start (Instance Scheduler or scheduled scaling).</li>
+    <li><b>Right-size</b> — use <b>Compute Optimizer</b>'s ML recommendations to shrink over-provisioned EC2, ASGs, EBS, and Lambda based on real utilization.</li>
+    <li><b>Go ARM</b> — <b>Graviton</b> instances (and Lambda on ARM) give better price-performance for compatible workloads.</li>
+    <li><b>Scale, don't over-provision</b> — let Auto Scaling follow demand instead of running peak capacity 24/7.</li>
+    <li><b>Fargate Spot</b> for interruption-tolerant containers; <b>gp3</b> over gp2 for cheaper EBS with independent IOPS/throughput.</li>
+    <li><b>Storage tiers</b> — S3 lifecycle to Glacier for known cold data; <b>S3 Intelligent-Tiering</b> when the access pattern is unknown or changing (no retrieval fees, no lifecycle logic to build).</li>
+  </ul>
+
+  <div class="box key"><p class="lab">Key fact — Lambda cost levers</p><p>A Lambda's memory setting also sets its CPU, so right-sizing memory tunes both speed <em>and</em> cost (AWS Lambda Power Tuning helps find the sweet spot). Switching the function to <b>ARM/Graviton</b> typically cuts cost further with no code changes. Provisioned concurrency <em>adds</em> cost — only use it when cold starts genuinely hurt.</p></div>
+
+  <div class="box field"><p class="lab">// the math that sells scheduling</p><p>A weekday-only environment running 8 a.m.–8 p.m. is on for just 60 of the 168 hours in a week — so a schedule that stops it nights and weekends drops roughly <b>64%</b> of its compute hours, with zero performance trade-off because nobody's using it anyway. Industry FinOps surveys consistently estimate that around a third of all cloud spend is wasted on idle or oversized resources. On the exam, "used only during business hours" almost always means: schedule it off.</p></div>
+
+  <div class="quizhead"><span class="ttl">Quick check</span><span class="rule"></span><span class="meta">8 questions · one fact each</span></div>
+  <div id="s2-drill"></div>
+  <div class="quizhead"><span class="ttl">Scenario pressure</span><span class="rule"></span><span class="meta">7 questions · exam difficulty + your scheduling &amp; right-sizing misses</span></div>
+  <div id="s2-exam"></div>
+</section>
+
+<!-- ===================== MIXED 2 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">↻</span> Mixed review — all domains</div>
+  <h2>Keep the rest warm</h2>
+  <p class="sub">Four more across databases, security and networking.</p>
+  <div id="mix-2"></div>
+</section>
+
+<!-- ===================== SECTION 3 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">03</span> Cost governance &amp; tooling</div>
+  <h2>You can't optimize what you can't see</h2>
+  <p class="sub">The exam expects you to match the question — analyze, alert, detect, or right-size — to the right billing tool.</p>
+
+  <div class="tw"><table>
+    <tr><th>Need</th><th>Tool</th></tr>
+    <tr><td>Visualize &amp; analyze cost/usage trends, filter by service/account/tag, forecast</td><td><b>Cost Explorer</b></td></tr>
+    <tr><td>Most granular line-item billing data for custom analysis</td><td><b>Cost &amp; Usage Report (CUR)</b> → S3 → Athena/QuickSight</td></tr>
+    <tr><td>Alert (or act) when spend/usage crosses a threshold</td><td><b>AWS Budgets</b></td></tr>
+    <tr><td>ML-detect unusual spend spikes automatically</td><td><b>Cost Anomaly Detection</b></td></tr>
+    <tr><td>Right-sizing recommendations from utilization</td><td><b>Compute Optimizer</b></td></tr>
+    <tr><td>Quick checks for idle/underused resources</td><td><b>Trusted Advisor</b> (cost category)</td></tr>
+    <tr><td>One bill, aggregated volume discounts, shared SP/RI across many accounts</td><td><b>Organizations / consolidated billing</b></td></tr>
+  </table></div>
+
+  <div class="box key"><p class="lab">Key fact — analyze across many accounts</p><p>To analyze and break down spend across all accounts in an Organization, use <b>Cost Explorer in the management (payer) account</b> — consolidated billing rolls every linked account's cost into one place, and Cost Explorer lets you group by account, service, or tag. Reach for the <b>CUR</b> only when you need the raw line-item detail to build custom dashboards. And <b>cost allocation tags</b> are what make per-team / per-project breakdowns possible in either tool.</p></div>
+
+  <div class="box field"><p class="lab">// fun aside</p><p>The fastest way to cut a cloud bill isn't a clever architecture — it's deleting something. Unattached EBS volumes, idle load balancers, forgotten dev stacks, an EIP nobody released: Trusted Advisor and Compute Optimizer exist mostly to point at the stuff you forgot you were paying for. "Turn it off and right-size it" beats "buy a discount on waste" every single time — which is also the trap behind the oversized Reserved Instance.</p></div>
+
+  <div class="quizhead"><span class="ttl">Quick check</span><span class="rule"></span><span class="meta">5 questions · one fact each</span></div>
+  <div id="s3-drill"></div>
+  <div class="quizhead"><span class="ttl">Scenario pressure</span><span class="rule"></span><span class="meta">7 questions · exam difficulty + your multi-account miss</span></div>
+  <div id="s3-exam"></div>
+</section>
+
+<!-- ===================== SUMMARY ===================== -->
+<section class="summary">
+  <div class="scorecard">
+    <div class="lab2">Session readiness</div>
+    <div class="big"><span id="sc-pct">—</span></div>
+    <div class="note"><span id="sc-line">Answer some questions and your readiness score appears here.</span></div>
+    <div class="misslist" id="sc-miss"></div>
+  </div>
+  <p class="foot">File 5 / 5 · Cost Optimization · 50 questions · the set is complete — 250 questions across all five domains.</p>
+</section>
+
+</div><!-- /wrap -->
+
+<script>
+const BANK = [
+
+/* ====== S1 DRILL — purchasing ====== */
+{g:"s1-drill",id:"5.01",d:"drill",q:"A workload runs 24/7 with steady, predictable utilization and the company will run it for 3 years. Lowest cost for a specific instance?",
+o:["On-Demand","Spot","A 3-year Standard Reserved Instance (or Savings Plan)","Dedicated Host billed On-Demand"],c:2,
+e:`Steady, long-term, predictable = a commitment discount: a <b>3-year Standard RI</b> (or Savings Plan) gives the deepest savings. ✗ On-Demand has no discount; ✗ Spot can be interrupted (bad for 24/7 critical); ✗ Dedicated Hosts are for licensing, costlier.`},
+
+{g:"s1-drill",id:"5.02",d:"drill",q:"A fault-tolerant batch job can be safely restarted if interrupted and isn't time-critical. Which purchasing option gives the deepest discount?",
+o:["On-Demand","Reserved Instances","Spot Instances","Dedicated Instances"],c:2,
+e:`Interruptible + restartable = <b>Spot</b> (up to ~90% off). RIs/On-Demand cost far more; Dedicated Instances are for isolation, not savings.`},
+
+{g:"s1-drill",id:"5.03",d:"drill",q:"Traffic is spiky and unpredictable, runs short, can't be interrupted, and the team won't commit to a term. Which option?",
+o:["Spot","On-Demand","3-year Reserved Instances","Savings Plan"],c:1,
+e:`No commitment + can't be interrupted + unpredictable = <b>On-Demand</b>. ✗ Spot risks interruption; ✗ RIs/Savings Plans require a 1–3 yr commitment.`},
+
+{g:"s1-drill",id:"5.04",d:"drill",q:"Which commitment offers the MOST flexibility — covering any instance family, Region, and OS, plus Fargate and Lambda?",
+o:["Standard Reserved Instance","EC2 Instance Savings Plan","Compute Savings Plan","Spot Fleet"],c:2,
+e:`The <b>Compute Savings Plan</b> is the most flexible commitment, spanning families/Regions/OS and even Fargate and Lambda. ✗ Standard RIs and EC2 Instance SPs lock attributes; ✗ Spot Fleet isn't a commitment discount.`},
+
+{g:"s1-drill",id:"5.05",d:"drill",q:"How much warning does AWS give before reclaiming a Spot Instance?",
+o:["No warning","2 minutes","1 hour","24 hours"],c:1,
+e:`Spot gives a <b>2-minute interruption notice</b> (plus an earlier rebalance recommendation). Design Spot workloads to checkpoint or drain within that window.`},
+
+{g:"s1-drill",id:"5.06",d:"drill",q:"You must guarantee that capacity will be available to launch instances in a specific AZ for a planned event, without a long commitment. Which feature?",
+o:["Spot Instances","On-Demand Capacity Reservation","Reserved Instances","Savings Plan"],c:1,
+e:`An <b>On-Demand Capacity Reservation</b> guarantees capacity in an AZ (a launch guarantee, not a discount) with no long-term commitment. ✗ Spot can be reclaimed; ✗ RIs/SPs are commitments and don't by themselves reserve capacity in an AZ.`},
+
+{g:"s1-drill",id:"5.07",d:"drill",q:"You need a physical server dedicated to you to satisfy socket/core-based BYOL licensing and compliance. Which option?",
+o:["Dedicated Host","Spot Instance","Reserved Instance","Compute Savings Plan"],c:0,
+e:`<b>Dedicated Hosts</b> give visibility into sockets/cores for BYOL licensing and compliance. The others are pricing/scheduling mechanisms, not dedicated physical hardware.`},
+
+{g:"s1-drill",id:"5.08",d:"drill",q:"Which Spot allocation strategy best minimizes the chance of interruptions?",
+o:["Lowest-price","Capacity-optimized (or price-capacity-optimized)","Single instance type","Random"],c:1,
+e:`<b>Capacity-optimized</b> (or price-capacity-optimized) draws from the pools least likely to be reclaimed, reducing interruptions. ✗ Lowest-price chases the cheapest (often most volatile) pool; single-type concentrates risk.`},
+
+/* ====== S1 EXAM — purchasing ====== */
+{g:"s1-exam",id:"5.09",d:"exam",tag:"miss",q:"A nightly ETL fleet runs jobs of 2–4 hours that process independent shards and can safely restart from the beginning if interrupted. It runs 365 days a year, must finish by 8 a.m., and starts at midnight with buffer to retry. The firm wants the GREATEST cost savings. Best strategy?",
+o:["1-year Compute Savings Plans for the nightly workload, On-Demand for overflow","Spot Instances diversified across at least 4 instance types and 3 AZs, with capacity-optimized allocation and interruption handling to replace lost capacity","1-year Standard All-Upfront Reserved Instances for the exact instance type","A 50/50 mix of Spot and On-Demand"],c:1,
+e:`The job is interruption-tolerant and restartable with retry buffer — the <b>greatest</b> savings come from <b>Spot</b>, made resilient by diversifying across instance types and AZs. ✗ A Compute SP saves less than Spot for interruptible work; ✗ RIs lock one type at higher cost; ✗ half On-Demand leaves savings on the table.<span class="flip"><span class="fl">flip it</span>If the jobs could NOT be interrupted and ran 24/7, the answer flips to a <b>Savings Plan / Reserved Instances</b>.</span>`},
+
+{g:"s1-exam",id:"5.10",d:"exam",tag:"win",q:"An app has a weekday baseline of 4 instances, a predictable lunch spike to 12, a weekend low of 2, and one unpredictable monthly flash sale needing up to 30 for a few hours. Minimize cost while guaranteeing capacity for all patterns.",
+o:["12 Reserved Instances to cover the lunch peak; scale down otherwise","A Compute Savings Plan covering the steady minimum; Scheduled Scaling for the lunch rush; Spot with On-Demand fallback for flash-sale bursts","On-Demand for everything","30 Reserved Instances to cover the flash sale"],c:1,
+e:`Layer the options to the pattern: a <b>Savings Plan</b> for the always-on minimum, <b>scheduled scaling</b> for the predictable lunch peak, and <b>Spot (with On-Demand fallback)</b> for the rare flash burst. ✗ Buying RIs for a peak wastes them off-peak; ✗ all On-Demand is most expensive.`},
+
+{g:"s1-exam",id:"5.11",d:"exam",q:"A company will commit to steady compute for 3 years but wants the freedom to change instance families and Regions over the term as its architecture evolves. Which gives commitment savings with that flexibility?",
+o:["Standard Reserved Instances","Compute Savings Plan","Spot Instances","On-Demand"],c:1,
+e:`A <b>Compute Savings Plan</b> applies the discount across any family/Region/OS automatically, so changing instances mid-term doesn't waste the commitment. ✗ Standard RIs lock the family/Region; ✗ Spot/On-Demand aren't commitment discounts.`},
+
+{g:"s1-exam",id:"5.12",d:"exam",q:"A production service runs 24/7 on a single instance family in one Region and will not change for 3 years. The team wants the maximum possible discount on that exact usage.",
+o:["Compute Savings Plan","EC2 Instance Savings Plan (or a Standard RI) for that family/Region","Spot Instances","On-Demand Capacity Reservation"],c:1,
+e:`For a fixed family in one Region that won't change, an <b>EC2 Instance Savings Plan</b> (or Standard RI) gives the deepest discount by trading flexibility you don't need. ✗ Compute SP discounts a bit less; ✗ Spot can't run a 24/7 critical service reliably; ✗ ODCR is a capacity guarantee, not a discount.`},
+
+{g:"s1-exam",id:"5.13",d:"exam",q:"For a high-stakes launch, a team must be certain instances can launch in a specific AZ at the planned time, but they don't want a 1–3 year commitment. What should they set up?",
+o:["Buy 3-year Reserved Instances","Create an On-Demand Capacity Reservation in that AZ","Use Spot Instances with diversification","Rely on On-Demand at launch time"],c:1,
+e:`An <b>On-Demand Capacity Reservation</b> guarantees the capacity is there when they launch, with no long commitment. ✗ RIs are a multi-year commitment; ✗ Spot can be reclaimed; ✗ plain On-Demand has no guarantee capacity will be available at the moment.`},
+
+{g:"s1-exam",id:"5.14",d:"exam",q:"A stateless, fault-tolerant web tier wants to cut cost with Spot but must stay available even if Spot capacity is reclaimed. Best configuration?",
+o:["100% Spot, single instance type, lowest-price","A mixed instances policy with an On-Demand baseline plus Spot across several instance types and AZs (capacity-optimized)","All Reserved Instances","All On-Demand"],c:1,
+e:`A <b>mixed instances policy</b> keeps an On-Demand baseline for availability while filling the rest with diversified Spot (capacity-optimized) for savings. ✗ Single-type all-Spot concentrates interruption risk; ✗ all-RI/On-Demand forgoes Spot savings.`},
+
+{g:"s1-exam",id:"5.15",d:"exam",q:"A company wants Reserved Instance savings but expects to exchange for different instance families partway through the term as needs change. Which RI type?",
+o:["Standard Reserved Instance","Convertible Reserved Instance","Spot Instance","On-Demand Capacity Reservation"],c:1,
+e:`<b>Convertible RIs</b> can be exchanged for RIs with different attributes during the term — flexibility at a slightly lower discount than Standard. ✗ Standard RIs can't change family; ✗ Spot/ODCR aren't RI commitment discounts.`},
+
+/* ====== MIX 1 ====== */
+{g:"mix-1",id:"M1.1",d:"mixed",tag:"win",q:"A media company stores 80 TB in S3 with mixed, shifting access patterns and wants to reduce cost without building lifecycle logic or hurting retrieval times. Which strategy?",
+o:["Lifecycle to Standard-IA then Glacier on a fixed schedule","S3 Intelligent-Tiering (without activating the archive tiers, to keep instant retrieval)","S3 One Zone-IA for everything","Keep all in S3 Standard"],c:1,
+e:`<b>S3 Intelligent-Tiering</b> auto-moves objects between access tiers with no retrieval fees and no lifecycle logic — ideal for unknown/changing patterns; skip the archive tiers if instant retrieval is required. ✗ Fixed lifecycle assumes a known pattern; ✗ One Zone-IA sacrifices AZ durability; ✗ all-Standard misses savings.`},
+
+{g:"mix-1",id:"M1.2",d:"mixed",tag:"miss",q:"An application needs an RTO of a few minutes, with a fully functional (scaled-down) environment already running in the DR Region that's scaled up on failover — but not full dual-Region production. Which DR strategy?",
+o:["Backup & Restore","Pilot Light","Warm Standby","Multi-Site Active-Active"],c:2,
+e:`'Already fully functional, just scale up, RTO of minutes, not full production everywhere' = <b>Warm Standby</b>. ✗ Backup & Restore is hours; ✗ Pilot Light keeps compute off/minimal; ✗ Multi-Site is full dual-Region (more cost).`},
+
+{g:"mix-1",id:"M1.3",d:"mixed",tag:"win",q:"A company runs its primary app in us-east-1 and a standby in us-west-2 and needs DNS to automatically send users to the standby if the primary is unhealthy. Which Route 53 policy?",
+o:["Latency-based routing","Failover routing with health checks","Weighted routing 50/50","Geolocation routing"],c:1,
+e:`<b>Failover routing with health checks</b> is the active-passive DR pattern — automatic cutover to the standby. ✗ Latency is performance; ✗ weighted/geolocation aren't health-driven failover.`},
+
+{g:"mix-1",id:"M1.4",d:"mixed",tag:"miss",q:"Batch workers on a Standard SQS queue process some messages twice because jobs occasionally run longer than the queue's visibility timeout. Best fix?",
+o:["Switch to short polling","Set the visibility timeout greater than the max processing time (and make the consumer idempotent)","Increase retention to 14 days","Use larger instances"],c:1,
+e:`Duplicates come from the timeout expiring mid-job, so <b>raise the visibility timeout above worst-case processing time</b> and make processing idempotent (Standard is at-least-once). ✗ Polling style, retention, and instance size don't stop the redelivery race.`},
+
+/* ====== S2 DRILL — right-sizing / scheduling ====== */
+{g:"s2-drill",id:"5.16",d:"drill",q:"Which service gives ML-based right-sizing recommendations for EC2, Auto Scaling groups, EBS, and Lambda based on utilization?",
+o:["AWS Budgets","AWS Compute Optimizer","Cost Explorer","Trusted Advisor"],c:1,
+e:`<b>Compute Optimizer</b> analyzes utilization and recommends right-sized resources. Budgets alerts on spend; Cost Explorer visualizes cost; Trusted Advisor does broad checks (it flags idle resources but Compute Optimizer is the sizing engine).`},
+
+{g:"s2-drill",id:"5.17",d:"drill",q:"A dev/test environment is only used during business hours. What's the simplest big cost cut?",
+o:["Buy Reserved Instances","Stop/start the instances on a schedule (off nights and weekends)","Add a read replica","Enable Multi-AZ"],c:1,
+e:`<b>Scheduling stop/start</b> stops paying for compute when no one's using it — the biggest, simplest win for business-hours-only workloads. ✗ RIs still pay while idle; replicas/Multi-AZ add cost.`},
+
+{g:"s2-drill",id:"5.18",d:"drill",q:"For an ARM-compatible workload, what's an easy way to lower compute cost for the same performance?",
+o:["Move to Graviton (ARM) instances","Buy more On-Demand x86 capacity","Switch to Dedicated Hosts","Enable detailed monitoring"],c:0,
+e:`<b>Graviton</b> (ARM) instances offer better price-performance for compatible workloads. The others add cost or don't reduce it.`},
+
+{g:"s2-drill",id:"5.19",d:"drill",q:"You run interruption-tolerant containers on AWS Fargate and want to cut cost. What should you use?",
+o:["Fargate Spot","Provisioned concurrency","Dedicated Hosts","A larger task size"],c:0,
+e:`<b>Fargate Spot</b> runs interruption-tolerant tasks at a steep discount. Provisioned concurrency is a Lambda feature (and adds cost); Dedicated Hosts/bigger tasks don't save here.`},
+
+{g:"s2-drill",id:"5.20",d:"drill",q:"Why is gp3 generally preferred over gp2 for EBS on cost?",
+o:["gp3 is faster only","gp3 is cheaper per GB and lets you provision IOPS/throughput independently of size","gp3 supports Multi-Attach and gp2 doesn't","gp3 is an HDD"],c:1,
+e:`<b>gp3</b> costs less per GB and decouples IOPS/throughput from volume size, so you don't over-buy capacity to get performance. (Both are SSDs; Multi-Attach is an io1/io2 feature.)`},
+
+{g:"s2-drill",id:"5.21",d:"drill",q:"Access patterns for an S3 dataset are unknown and changing. Which storage class auto-optimizes cost with no retrieval fees and no lifecycle logic to build?",
+o:["S3 Standard","S3 Intelligent-Tiering","S3 Glacier Deep Archive","S3 One Zone-IA"],c:1,
+e:`<b>S3 Intelligent-Tiering</b> moves objects between access tiers automatically, no retrieval fees — built for unknown/changing patterns. The others assume you know the pattern or sacrifice durability.`},
+
+{g:"s2-drill",id:"5.22",d:"drill",q:"For a Lambda function, the memory setting also determines what — making it a key cost/performance lever?",
+o:["The number of concurrent executions","The proportional CPU allocated","The Region it runs in","The runtime language"],c:1,
+e:`Lambda allocates <b>CPU in proportion to memory</b>, so right-sizing memory tunes both speed and cost (Power Tuning helps). Concurrency, Region, and runtime are separate settings.`},
+
+{g:"s2-drill",id:"5.23",d:"drill",q:"Instances in private subnets reach S3 and DynamoDB through a NAT gateway, and data-processing charges are high. What removes those charges for S3/DynamoDB traffic?",
+o:["A larger NAT gateway","Gateway VPC endpoints for S3 and DynamoDB (free, bypass the NAT)","An Interface endpoint for everything","A second NAT gateway"],c:1,
+e:`<b>Gateway endpoints for S3 and DynamoDB are free</b> and keep that traffic off the NAT gateway, eliminating its data-processing charges for those services. ✗ Bigger/more NAT gateways add cost; ✗ Interface endpoints bill hourly + per-GB.`},
+
+/* ====== S2 EXAM — right-sizing / scheduling ====== */
+{g:"s2-exam",id:"5.24",d:"exam",tag:"miss",q:"A development/test environment on EC2 is used only 8 a.m.–6 p.m. on weekdays and sits idle otherwise. The team wants the largest cost reduction with the least effort. What should they do?",
+o:["Purchase Reserved Instances for the dev/test instances","Use a schedule (Instance Scheduler or scheduled scaling) to stop the instances outside business hours","Switch the instances to a slightly smaller size","Move the workload to Spot Instances"],c:1,
+e:`Idle nights/weekends are pure waste — <b>schedule the instances off outside business hours</b> for the biggest, simplest cut (~64%+ fewer hours). ✗ RIs keep paying while idle; ✗ downsizing is a small partial win; ✗ Spot risks interruption for interactive dev/test.`},
+
+{g:"s2-exam",id:"5.25",d:"exam",tag:"miss",q:"A non-critical internal analytics database runs on a Multi-AZ RDS db.r5.2xlarge but is lightly used and has no high-availability requirement. What's the most effective cost change?",
+o:["Buy a Reserved Instance for the current db.r5.2xlarge","Convert to Single-AZ and right-size the instance to actual usage","Add a read replica","Migrate to Aurora Global Database"],c:1,
+e:`No HA need means Multi-AZ is paying for failover you don't use — <b>go Single-AZ and right-size</b> the over-provisioned instance. ✗ An RI just locks in the oversized, doubled cost; ✗ a replica adds cost; ✗ Global Database is the opposite direction.`},
+
+{g:"s2-exam",id:"5.26",d:"exam",tag:"miss",q:"A Lambda function is invoked millions of times per month and the team wants to lower its cost without changing application logic. What's the most effective approach?",
+o:["Add provisioned concurrency","Switch the function to the ARM/Graviton architecture and right-size its memory (using utilization data / Power Tuning)","Always set memory to the maximum for speed","Migrate to EC2 immediately"],c:1,
+e:`<b>Move to ARM/Graviton and right-size memory</b> — ARM is cheaper for compatible runtimes and memory tuning controls CPU (and thus duration cost), with no logic changes. ✗ Provisioned concurrency <i>adds</i> cost; ✗ max memory wastes money if unneeded; ✗ jumping to EC2 is premature without data.`},
+
+{g:"s2-exam",id:"5.27",d:"exam",q:"A fleet of EC2 instances consistently runs at ~10% CPU and memory. The team wants a data-driven way to cut cost. What should they use?",
+o:["Buy Reserved Instances for the current oversized instances","Use Compute Optimizer recommendations to right-size (and/or let Auto Scaling reduce the count)","Add more instances for headroom","Enable Multi-AZ"],c:1,
+e:`<b>Compute Optimizer</b> turns the 10% utilization into concrete downsizing recommendations — pay for what you use. ✗ Buying RIs for oversized instances locks in waste; ✗ more instances/Multi-AZ increase cost.`},
+
+{g:"s2-exam",id:"5.28",d:"exam",q:"A global static site served directly from S3 has high internet data-transfer (egress) costs. What reduces both cost and latency?",
+o:["Enable S3 Transfer Acceleration","Put CloudFront in front of the S3 origin","Replicate the bucket to every Region","Move to S3 One Zone-IA"],c:1,
+e:`<b>CloudFront</b> caches at the edge, cutting both latency and origin egress (and edge data transfer is cheaper), so it reduces the data-transfer bill. ✗ Transfer Acceleration speeds uploads; ✗ replicating everywhere adds cost; ✗ a storage class change doesn't address egress.`},
+
+{g:"s2-exam",id:"5.29",d:"exam",q:"An Auto Scaling group is fixed at its peak size 24/7 even though demand varies widely through the day. How do you cut cost while still meeting demand?",
+o:["Replace instances with a single larger one","Use target-tracking (and/or scheduled) scaling so capacity follows actual demand","Buy Reserved Instances for the peak count","Disable Auto Scaling to simplify"],c:1,
+e:`Let the group <b>scale with demand</b> via target-tracking/scheduled policies instead of paying for peak all day. ✗ A bigger single instance loses elasticity and HA; ✗ RIs for peak waste capacity off-peak; ✗ disabling scaling is the opposite of the fix.`},
+
+{g:"s2-exam",id:"5.30",d:"exam",q:"Content editors must retrieve any object within minutes, but 60% of an 80 TB S3 dataset is rarely accessed. The team wants automatic cost optimization without lifecycle scripts and without slowing retrieval. Which approach?",
+o:["S3 Intelligent-Tiering without activating the archive access tiers","Lifecycle to Glacier Flexible Retrieval after 90 days","S3 One Zone-IA for the cold 60%","Glacier Deep Archive for the cold 60%"],c:0,
+e:`<b>S3 Intelligent-Tiering</b> auto-optimizes with no scripts and no retrieval fees; leaving the <b>archive tiers off</b> keeps everything instantly retrievable (minutes). ✗ Glacier tiers add retrieval delay (hours); ✗ One Zone-IA sacrifices AZ durability and still needs lifecycle rules.`},
+
+/* ====== MIX 2 ====== */
+{g:"mix-2",id:"M2.1",d:"mixed",tag:"win",q:"A DynamoDB-backed app needs microsecond read latency for a read-intensive, eventually-consistent workload, with no application rewrite. What do you add?",
+o:["DynamoDB Accelerator (DAX)","A DynamoDB global table","A separate ElastiCache the app queries directly","Provisioned capacity with auto scaling"],c:0,
+e:`<b>DAX</b> is the microsecond in-memory cache built into the DynamoDB API — drop-in. ✗ Global tables are multi-Region; ✗ a separate cache means a rewrite; ✗ auto scaling adjusts capacity, not microsecond latency.`},
+
+{g:"mix-2",id:"M2.2",d:"mixed",tag:"miss",q:"A company uses Direct Connect to its VPC and a new rule requires all data in transit to be encrypted. Most operationally efficient solution?",
+o:["Enable an encryption setting on the Direct Connect connection","Run a Site-to-Site VPN (IPsec) over the Direct Connect link","Replace Direct Connect with an internet VPN","Encrypt data with CloudHSM before sending"],c:1,
+e:`<b>Direct Connect is private but unencrypted</b> — layer an IPsec <b>VPN over the DX link</b> for private + encrypted. ✗ There's no DX encryption toggle; ✗ dropping DX loses the dedicated line; ✗ app/CloudHSM encryption is heavier and incomplete.`},
+
+{g:"mix-2",id:"M2.3",d:"mixed",q:"A stateful app uses UDP with static IPs that clients hardcode in firewalls, runs on EC2 across AZs, and must keep serving on the SAME static IPs if an AZ fails. Which load balancer?",
+o:["ALB with Elastic IPs","NLB with an Elastic IP per AZ and cross-zone enabled","Global Accelerator to an ALB","Round-robin DNS"],c:1,
+e:`UDP + static IPs + survive AZ failure on the same IPs = <b>NLB with Elastic IPs per AZ</b>. ✗ ALB can't hold Elastic IPs or carry UDP; ✗ fronting an ALB doesn't fix the UDP/static-IP requirement; ✗ DNS round-robin has no health-based failover.`},
+
+{g:"mix-2",id:"M2.4",d:"mixed",tag:"win",q:"A web app repeatedly runs the same expensive read queries against a relational DB; data changes rarely and slightly stale results are acceptable. Best way to cut DB load?",
+o:["Put ElastiCache in front of the database to cache query results","Move to a larger DB instance","Enable Multi-AZ","Add a NAT gateway"],c:0,
+e:`<b>ElastiCache</b> serves repeated reads from memory, cutting DB CPU — and stale-tolerant data is the ideal cache candidate. ✗ A bigger box delays the problem; ✗ Multi-AZ is failover; ✗ NAT is networking.`},
+
+/* ====== S3 DRILL — governance / tooling ====== */
+{g:"s3-drill",id:"5.31",d:"drill",q:"Which tool visualizes and analyzes cost and usage trends, lets you filter by service/account/tag, and forecasts spend?",
+o:["AWS Budgets","Cost Explorer","Cost & Usage Report","Trusted Advisor"],c:1,
+e:`<b>Cost Explorer</b> is the interactive analysis/visualization/forecasting tool. Budgets alerts; CUR is raw data; Trusted Advisor does checks.`},
+
+{g:"s3-drill",id:"5.32",d:"drill",q:"You need the most granular, line-item billing data to build custom analyses in Athena/QuickSight. Which source?",
+o:["Cost Explorer","The Cost & Usage Report (CUR) delivered to S3","AWS Budgets","Billing alarms"],c:1,
+e:`The <b>Cost & Usage Report</b> is the most detailed billing dataset, delivered to S3 for querying with Athena/QuickSight. Cost Explorer is for visualization, not raw line items.`},
+
+{g:"s3-drill",id:"5.33",d:"drill",q:"You want to be alerted when monthly spend exceeds a set threshold. Which service?",
+o:["Cost Explorer","AWS Budgets (with alerts)","Compute Optimizer","CUR"],c:1,
+e:`<b>AWS Budgets</b> sets cost/usage thresholds and sends alerts (and can trigger actions). The others analyze or recommend but don't set budget alerts.`},
+
+{g:"s3-drill",id:"5.34",d:"drill",q:"Which service uses machine learning to automatically detect unusual spend spikes and alert you?",
+o:["AWS Cost Anomaly Detection","AWS Budgets","Cost Explorer","Trusted Advisor"],c:0,
+e:`<b>Cost Anomaly Detection</b> applies ML to spot abnormal spend and alert. Budgets is threshold-based; Cost Explorer is manual analysis; Trusted Advisor is rule-based checks.`},
+
+{g:"s3-drill",id:"5.35",d:"drill",q:"Which provides a single bill, aggregated volume discounts, and the ability to share Savings Plans/RIs across many accounts?",
+o:["Cost Explorer","AWS Organizations with consolidated billing","AWS Budgets","Compute Optimizer"],c:1,
+e:`<b>Consolidated billing</b> in AWS Organizations gives one payer, aggregated volume pricing, and SP/RI sharing across linked accounts. The others are analysis/alerting/recommendation tools.`},
+
+/* ====== S3 EXAM — governance / tooling ====== */
+{g:"s3-exam",id:"5.36",d:"exam",tag:"miss",q:"A company wants to analyze and break down cost and usage across all 20 accounts in its AWS Organization — grouping by account and service and spotting trends — without building a custom data pipeline. What's the best tool?",
+o:["Enable the Cost & Usage Report and query it with Athena","Use Cost Explorer in the management (payer) account, where consolidated billing aggregates all accounts","Check each account's billing console manually","Set an AWS Budget per account"],c:1,
+e:`<b>Cost Explorer in the management account</b> sees every linked account via consolidated billing and lets you group/filter by account, service, and tag with no pipeline to build. ✗ CUR+Athena is the heavier raw-data route; ✗ per-account console checks don't aggregate; ✗ Budgets alerts, it doesn't analyze trends.<span class="flip"><span class="fl">flip it</span>If you needed the raw line-item detail for a custom QuickSight dashboard, the answer becomes the <b>Cost & Usage Report</b>.</span>`},
+
+{g:"s3-exam",id:"5.37",d:"exam",q:"A FinOps team needs the most detailed line-item billing data to build fully custom cost dashboards and run SQL queries against historical usage. Which source?",
+o:["Cost Explorer exports","The Cost & Usage Report (CUR) → S3 → Athena/QuickSight","AWS Budgets reports","Trusted Advisor"],c:1,
+e:`The <b>CUR</b> delivers the finest-grained billing data to S3 for SQL/BI tooling — the right base for custom dashboards. ✗ Cost Explorer is good for analysis but not raw line items; ✗ Budgets/Trusted Advisor aren't data sources for custom dashboards.`},
+
+{g:"s3-exam",id:"5.38",d:"exam",q:"Leadership wants cost broken down by team, project, and environment across shared accounts. What's the prerequisite that makes this possible in Cost Explorer and the CUR?",
+o:["Separate AWS accounts per team only","Activate and apply cost allocation tags on resources","Buy Reserved Instances","Enable Multi-AZ"],c:1,
+e:`<b>Cost allocation tags</b> (activated in billing and applied to resources) are what let you slice spend by team/project/environment in Cost Explorer and the CUR. ✗ Splitting accounts is heavier and not always feasible; ✗ RIs/Multi-AZ are unrelated.`},
+
+{g:"s3-exam",id:"5.39",d:"exam",q:"A misconfigured job could cause a sudden, unexpected cost spike, and the team wants to be alerted automatically as soon as spend looks abnormal — not at month-end. What should they enable?",
+o:["A monthly manual bill review","AWS Cost Anomaly Detection (optionally with Budgets for hard thresholds)","Cost Explorer reports only","Trusted Advisor checks only"],c:1,
+e:`<b>Cost Anomaly Detection</b> watches for abnormal spend with ML and alerts quickly. ✗ Monthly review is too late; ✗ Cost Explorer is manual; ✗ Trusted Advisor flags idle resources, not real-time spend anomalies.`},
+
+{g:"s3-exam",id:"5.40",d:"exam",q:"A new architect wants a quick way to surface idle load balancers, underutilized instances, and unassociated Elastic IPs that are wasting money. What's the fastest first stop?",
+o:["Build a custom CUR pipeline","Trusted Advisor cost-optimization checks (with Compute Optimizer for sizing)","Read the raw bill line by line","AWS Budgets"],c:1,
+e:`<b>Trusted Advisor</b>'s cost checks quickly flag idle/underused resources; <b>Compute Optimizer</b> then recommends sizing. ✗ A custom pipeline or reading the raw bill is slow; ✗ Budgets alerts on thresholds, it doesn't enumerate waste.`},
+
+{g:"s3-exam",id:"5.41",d:"exam",q:"A company with many accounts in an Organization wants its committed-use discounts to automatically apply wherever there's matching usage across the org. What enables this?",
+o:["Buying Savings Plans/RIs separately in each account","Consolidated billing, which shares Savings Plans and Reserved Instance discounts across the organization","Tagging every resource","Cost Anomaly Detection"],c:1,
+e:`<b>Consolidated billing</b> shares SP/RI discounts across all linked accounts, so commitments apply wherever matching usage exists. ✗ Per-account buying fragments the discount; ✗ tagging is for reporting; ✗ anomaly detection is alerting.`},
+
+{g:"s3-exam",id:"5.42",d:"exam",q:"Finance wants a hard monthly cost ceiling per environment, with automatic alerts (and ideally an automated action) when a budget is exceeded. Which service?",
+o:["Cost Explorer","AWS Budgets (with budget alerts and budget actions)","The Cost & Usage Report","Compute Optimizer"],c:1,
+e:`<b>AWS Budgets</b> sets cost/usage ceilings, sends alerts, and can trigger budget actions (e.g., apply a restrictive policy) when exceeded. ✗ Cost Explorer/CUR analyze; ✗ Compute Optimizer right-sizes — none enforce a budget.`}
+
+];
+
+/* ---------------- RENDER (click to answer) ---------------- */
+const L=["A","B","C","D","E"];
+const state={};
+let total=BANK.length;
+function tagChip(t){ return t==="miss"?'<span class="chip miss">↻ your miss</span>':t==="win"?'<span class="chip win">✓ lock it in</span>':""; }
+function diffChip(d,multi){
+  let base = d==="exam"?'<span class="chip exam">exam</span>':d==="mixed"?'<span class="chip mixed">mixed</span>':'<span class="chip drill">drill</span>';
+  if(multi) base += ' <span class="chip two">select two</span>';
+  return base;
+}
+BANK.forEach(item=>{
+  const host=document.getElementById(item.g);
+  if(!host)return;
+  const card=document.createElement("div");
+  card.className="q"; card.dataset.id=item.id;
+  const correctArr = Array.isArray(item.c)?item.c:[item.c];
+  const multi = item.multi===true || correctArr.length>1;
+  card.innerHTML =
+    '<div class="qtop"><span class="qid">Q '+item.id+'</span>'+diffChip(item.d,multi)+tagChip(item.tag)+'</div>'+
+    '<div class="stem">'+item.q+'</div>'+
+    '<ul class="opts">'+item.o.map((t,i)=>
+      '<button class="opt" data-i="'+i+'"><span class="ltr">'+L[i]+'</span><span class="otext">'+t+'</span><span class="mark"></span></button>'
+    ).join('')+'</ul>'+
+    (multi?'<button class="checkbtn" disabled>Check answer</button>':'')+
+    '<div class="reveal"><div class="rv-inner"></div></div>';
+  host.appendChild(card);
+
+  const opts=[...card.querySelectorAll(".opt")];
+  const checkBtn=card.querySelector(".checkbtn");
+  const reveal=card.querySelector(".reveal");
+  const rvInner=card.querySelector(".rv-inner");
+  let locked=false, sel=new Set();
+  function settle(){
+    locked=true;
+    const ok = sel.size===correctArr.length && [...sel].every(i=>correctArr.includes(i));
+    opts.forEach((b,i)=>{
+      b.disabled=true; b.classList.remove("sel");
+      const mark=b.querySelector(".mark");
+      if(correctArr.includes(i)){b.classList.add("correct");mark.textContent="✓ correct";}
+      else if(sel.has(i)){b.classList.add("wrong");mark.textContent="✗ your pick";}
+    });
+    if(checkBtn)checkBtn.style.display="none";
+    rvInner.innerHTML='<div class="verdict '+(ok?'r-ok':'r-no')+'">'+(ok?'Correct':'Not quite')+'</div>'+item.e;
+    reveal.classList.add("show");
+    state[item.id]={answered:true,correct:ok};
+    updateHUD();
+  }
+  function select(i){
+    if(locked||i<0||i>=opts.length)return;
+    if(multi){
+      if(sel.has(i)){sel.delete(i);opts[i].classList.remove("sel");}
+      else{sel.add(i);opts[i].classList.add("sel");}
+      if(checkBtn)checkBtn.disabled = sel.size===0;
+    } else { sel=new Set([i]); settle(); }
+  }
+  opts.forEach(b=>b.addEventListener("click",()=>select(+b.dataset.i)));
+  if(checkBtn)checkBtn.addEventListener("click",()=>{ if(!locked&&sel.size)settle(); });
+});
+
+/* ---------------- SMOOTH VIM PAGE SCROLLING ---------------- */
+const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+let lastG=0, rafId=null, targetY=window.scrollY;
+const help=document.getElementById("help");
+function toggleHelp(){help.classList.toggle("show");}
+function maxY(){ return Math.max(0, document.documentElement.scrollHeight - window.innerHeight); }
+function tick(){
+  const cur=window.scrollY, diff=targetY-cur;
+  if(Math.abs(diff)<0.6){ window.scrollTo(0,Math.round(targetY)); rafId=null; return; }
+  window.scrollTo(0, cur + diff*0.16);   // eased glide toward target
+  rafId=requestAnimationFrame(tick);
+}
+function glide(dy){
+  if(reduce){ window.scrollBy(0,dy); return; }
+  if(rafId===null) targetY=window.scrollY;       // resync when starting fresh
+  targetY=Math.max(0,Math.min(maxY(),targetY+dy));
+  if(rafId===null) rafId=requestAnimationFrame(tick);
+}
+function glideTo(y){
+  if(reduce){ window.scrollTo(0,y); return; }
+  targetY=Math.max(0,Math.min(maxY(),y));
+  if(rafId===null) rafId=requestAnimationFrame(tick);
+}
+// hand control back to the browser if the user scrolls another way, so we resync next keypress
+["wheel","touchmove"].forEach(ev=>window.addEventListener(ev,()=>{ if(rafId){cancelAnimationFrame(rafId);rafId=null;} },{passive:true}));
+
+document.addEventListener("keydown",e=>{
+  const tag=(e.target.tagName||"").toLowerCase();
+  if(tag==="input"||tag==="textarea")return;
+  if(e.metaKey||e.ctrlKey||e.altKey)return;
+  if(e.key==="Escape"){help.classList.remove("show");return;}
+  if(e.key==="?"){e.preventDefault();toggleHelp();return;}
+  if(help.classList.contains("show"))return;
+  const vh=window.innerHeight;
+  switch(e.key){
+    case"j":e.preventDefault();glide(80);break;
+    case"k":e.preventDefault();glide(-80);break;
+    case"d":e.preventDefault();glide(vh*0.5);break;
+    case"u":e.preventDefault();glide(-vh*0.5);break;
+    case"f":e.preventDefault();glide(vh*0.9);break;
+    case"b":e.preventDefault();glide(-vh*0.9);break;
+    case"G":e.preventDefault();glideTo(maxY());break;
+    case"g":{const now=Date.now();if(now-lastG<500){e.preventDefault();glideTo(0);lastG=0;}else lastG=now;break;}
+  }
+});
+document.getElementById("h-help").addEventListener("click",toggleHelp);
+
+/* ---------------- HUD + SUMMARY ---------------- */
+document.getElementById("h-tot").textContent=total;
+function updateHUD(){
+  const answered=Object.keys(state).length;
+  const correct=Object.values(state).filter(s=>s.correct).length;
+  const pct=answered?Math.round(100*correct/answered):0;
+  document.getElementById("h-ans").textContent=answered;
+  document.getElementById("h-pct").textContent=answered?pct+"%":"—";
+  document.getElementById("h-bar").style.width=(100*answered/total)+"%";
+  const scP=document.getElementById("sc-pct"), scL=document.getElementById("sc-line"), scM=document.getElementById("sc-miss");
+  if(answered===0){scP.textContent="—";scL.textContent="Answer some questions and your readiness score appears here.";scM.innerHTML="";return;}
+  scP.textContent=pct+"%";
+  let v;
+  if(answered<total) v=correct+" / "+answered+" so far — "+(total-answered)+" left.";
+  else if(pct>=80) v="Strong finish. The Spot-vs-Reserved reflex and the cost tools are landing. You've now covered all five domains.";
+  else if(pct>=70) v="On the pass line. Redo the misses below — especially the Spot-vs-Reserved one — and you're ready.";
+  else v="Below target. Re-read the purchasing decision tree and the 'turn it off / right-size' boxes, redo the misses, run it again.";
+  scL.textContent=v;
+  const missed=Object.entries(state).filter(([k,val])=>!val.correct).map(([k])=>k);
+  scM.innerHTML = missed.length
+    ? "review: "+missed.map(id=>'<a href="#" onclick="jump(\''+id+'\');return false;">Q'+id+'</a>').join("")
+    : (answered===total?"clean sweep — nothing flagged.":"");
+}
+function jump(id){
+  const el=[...document.querySelectorAll(".q")].find(q=>q.dataset.id===id);
+  if(el)el.scrollIntoView({behavior:"smooth",block:"center"});
+}
+document.getElementById("h-reset").addEventListener("click",()=>location.reload());
+updateHUD();
+</script>
+</body>
+</html>
