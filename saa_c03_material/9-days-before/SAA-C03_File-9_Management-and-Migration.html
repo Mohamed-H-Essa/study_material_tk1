@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SAA-C03 · File 9 · Management &amp; Migration</title>
+<style>
+  :root{
+    /* dark theme — palette shared with File 5 */
+    --ink:#e7eef6; --ink-soft:#a3b5c7; --muted:#6f8298;
+    --paper:#0e1620; --panel:#15212e; --panel2:#1a2836; --panel3:#1f2f40; --line:#26384a; --line-strong:#36506a;
+    --accent:#f59e3c; --accent-2:#f7b260; --accent-deep:#f7b260; --accent-tint:rgba(245,158,60,.12);
+    --navy:#1a2836; --navy-tint:#1f2f40;
+    --ok:#3fcf8e; --ok-bg:rgba(63,207,142,.13); --ok-line:rgba(63,207,142,.45);
+    --no:#ff7062; --no-bg:rgba(255,112,98,.13); --no-line:rgba(255,112,98,.45);
+    --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+    line-height:1.62;font-size:17px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:860px;margin:0 auto;padding:0 22px}
+  ::selection{background:rgba(245,158,60,.3)}
+
+  /* ---------- HUD ---------- */
+  .hud{position:sticky;top:0;z-index:50;background:rgba(28,43,62,.97);color:#fff;
+    border-bottom:1px solid #0e1622;backdrop-filter:saturate(1.2) blur(6px)}
+  .hud-inner{max-width:860px;margin:0 auto;padding:9px 22px;display:flex;gap:16px;
+    align-items:center;font-family:var(--mono);font-size:12.5px;flex-wrap:wrap}
+  .hud .dot{color:var(--accent);font-weight:700;letter-spacing:.04em}
+  .hud .stat b{color:#fff;font-weight:700}
+  .hud .stat{color:#9fb0c4}
+  .bar{flex:1;min-width:120px;height:7px;background:#0f1b2a;border-radius:99px;overflow:hidden}
+  .bar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),#f0a850);
+    transition:width .35s ease}
+  .hud button{font-family:var(--mono);font-size:11.5px;color:#9fb0c4;background:transparent;
+    border:1px solid #33445a;border-radius:6px;padding:3px 9px;cursor:pointer}
+  .hud button:hover{color:#fff;border-color:var(--accent)}
+
+  /* ---------- header ---------- */
+  header.top{padding:54px 0 30px;border-bottom:1px solid var(--line)}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--accent-deep);margin:0 0 14px}
+  h1{font-size:40px;line-height:1.05;margin:0 0 12px;font-weight:800;letter-spacing:-.018em}
+  h1 .thin{font-weight:400;color:var(--ink-soft)}
+  .lede{font-size:18px;color:var(--ink-soft);margin:0;max-width:60ch}
+  .filechips{display:flex;gap:7px;flex-wrap:wrap;margin-top:22px;font-family:var(--mono);font-size:11.5px}
+  .fc{padding:4px 10px;border:1px solid var(--line-strong);border-radius:99px;color:var(--muted)}
+  .fc.here{background:var(--navy);color:#fff;border-color:var(--navy)}
+
+  .legend{margin:26px 0 0;padding:16px 18px;background:var(--panel);border:1px solid var(--line);
+    border-radius:12px;font-size:14px;color:var(--ink-soft)}
+  .legend b{color:var(--ink)}
+  .legend .row{display:flex;gap:10px;align-items:baseline;margin:7px 0}
+  .legend .tg{flex:none}
+
+  /* ---------- sections ---------- */
+  section{padding:46px 0;border-bottom:1px solid var(--line)}
+  .sec-tag{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--accent-deep);display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .sec-tag .n{background:var(--navy);color:#fff;border-radius:6px;padding:2px 8px;font-size:11px}
+  h2{font-size:28px;line-height:1.12;margin:0 0 6px;font-weight:800;letter-spacing:-.015em}
+  h3{font-size:18.5px;margin:30px 0 8px;font-weight:700;letter-spacing:-.01em}
+  p{margin:13px 0}
+  .sub{color:var(--ink-soft);font-size:16px;margin-top:2px}
+  code{font-family:var(--mono);font-size:.86em;background:var(--panel2,#1f2f40);padding:1.5px 6px;border-radius:5px;
+    color:#cfe0d6; white-space:nowrap}
+  strong{font-weight:700}
+  ul.tight{margin:12px 0;padding-left:20px}
+  ul.tight li{margin:7px 0}
+
+  /* ---------- callouts ---------- */
+  .box{margin:22px 0;border-radius:12px;padding:16px 18px 16px 20px;border:1px solid var(--line);
+    background:var(--panel);position:relative;overflow:hidden}
+  .box .lab{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+    margin:0 0 6px;font-weight:600}
+  .box.key{border-color:rgba(245,158,60,.4);background:var(--accent-tint)}
+  .box.key:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent)}
+  .box.key .lab{color:var(--accent-deep)}
+  .box.trap{border-color:var(--no-line);background:var(--no-bg)}
+  .box.trap:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--no)}
+  .box.trap .lab{color:var(--no)}
+  .box.field{background:var(--navy);color:#dfe7f0;border-color:var(--navy)}
+  .box.field .lab{color:var(--accent)}
+  .box.field b{color:#fff}
+  .box p:first-of-type{margin-top:0}.box p:last-child{margin-bottom:0}
+
+  /* ---------- table ---------- */
+  .tw{overflow-x:auto;margin:22px 0}
+  table{border-collapse:collapse;width:100%;font-size:14.5px}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;
+    color:var(--muted);font-weight:600;border-bottom:2px solid var(--line-strong)}
+  td b{color:var(--ink)}
+  tr:last-child td{border-bottom:none}
+
+  /* ---------- quiz ---------- */
+  .quizhead{display:flex;align-items:center;gap:10px;margin:34px 0 4px;flex-wrap:wrap}
+  .quizhead .ttl{font-family:var(--mono);font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--ink);font-weight:700}
+  .quizhead .meta{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  .quizhead .rule{flex:1;height:1px;background:var(--line)}
+
+  .q{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:18px 18px 6px;
+    margin:16px 0;transition:border-color .2s}
+  .q:focus-within{border-color:var(--line-strong)}
+  .q:focus{outline:2px solid var(--accent);outline-offset:2px}
+  .qtop{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:9px}
+  .qid{font-family:var(--mono);font-size:11.5px;color:var(--muted);font-weight:600}
+  .chip{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+    padding:2px 7px;border-radius:5px;font-weight:700}
+  .chip.drill{background:#22323f;color:#9fc0d8}
+  .chip.exam{background:#36506a;color:#eaf2fb}
+  .chip.mixed{background:var(--accent-tint);color:var(--accent-deep)}
+  .chip.two{background:rgba(154,118,224,.18);color:#bba6e8}
+  .chip.miss{background:var(--no-bg);color:var(--no);border:1px solid var(--no-line)}
+  .chip.win{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-line)}
+  .stem{font-size:16.5px;margin:2px 0 13px;line-height:1.5}
+  .opts{list-style:none;margin:0;padding:0}
+  .opt{display:flex;gap:11px;align-items:flex-start;width:100%;text-align:left;cursor:pointer;
+    border:1px solid var(--line);background:var(--navy-tint);border-radius:9px;padding:11px 13px;margin:7px 0;
+    font:inherit;font-size:15.5px;color:var(--ink);transition:border-color .12s,background .12s}
+  .opt:hover:not(:disabled){border-color:var(--line-strong);background:#243749}
+  .opt:disabled{cursor:default}
+  .opt .ltr{flex:none;font-family:var(--mono);font-weight:700;font-size:13px;color:var(--accent-deep);
+    width:18px;text-align:center;padding-top:1px}
+  .opt.sel{border-color:var(--accent);background:var(--accent-tint)}
+  .opt.sel .ltr{color:var(--accent-deep)}
+  .opt.correct{border-color:var(--ok-line);background:var(--ok-bg)}
+  .opt.correct .ltr{color:var(--ok)}
+  .opt.wrong{border-color:var(--no-line);background:var(--no-bg)}
+  .opt.wrong .ltr{color:var(--no)}
+  .opt .mark{margin-left:auto;font-family:var(--mono);font-weight:700;font-size:13px}
+  .opt.correct .mark{color:var(--ok)}.opt.wrong .mark{color:var(--no)}
+  .checkbtn{font-family:var(--mono);font-size:12.5px;font-weight:700;letter-spacing:.04em;
+    background:var(--navy);color:#fff;border:none;border-radius:8px;padding:9px 16px;cursor:pointer;
+    margin:6px 0 2px}
+  .checkbtn:hover{background:#0f1d2c}.checkbtn:disabled{opacity:.4;cursor:default}
+  .reveal{max-height:0;overflow:hidden;transition:max-height .3s ease}
+  .reveal.show{max-height:1600px}
+  .rv-inner{border-top:1px solid var(--line);margin-top:12px;padding:13px 2px 12px;font-size:15px;
+    color:var(--ink-soft);line-height:1.58}
+  .rv-inner .verdict{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;
+    font-weight:700;margin-bottom:6px}
+  .verdict.r-ok{color:var(--ok)}.verdict.r-no{color:var(--no)}
+  .rv-inner b{color:var(--ink)}
+  .flip{display:block;margin-top:10px;padding:9px 12px;background:var(--navy-tint);border-radius:8px;
+    font-size:14.5px}
+  .flip .fl{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--accent-deep);font-weight:700;margin-right:6px}
+
+  /* ---------- summary ---------- */
+  .summary{padding:46px 0 70px}
+  .scorecard{background:var(--navy);color:#fff;border-radius:16px;padding:26px 26px 22px;text-align:center}
+  .scorecard .big{font-size:54px;font-weight:800;letter-spacing:-.02em;line-height:1}
+  .scorecard .lab2{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--accent);margin-bottom:8px}
+  .scorecard .note{color:#b9c6d6;font-size:14.5px;margin-top:10px}
+  .misslist{margin-top:18px;font-family:var(--mono);font-size:13px}
+  .misslist a{color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent);
+    margin:0 4px;display:inline-block}
+  .foot{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:center;margin-top:30px}
+
+  /* ---------- vim help overlay ---------- */
+  #help{position:fixed;inset:0;z-index:90;background:rgba(6,11,17,.72);display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+  #help.show{display:flex}
+  .help-card{background:var(--panel2);border:1px solid var(--line-strong);border-radius:14px;padding:24px 26px;max-width:380px;width:calc(100% - 44px)}
+  .help-card h4{margin:0 0 4px;font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+  .help-card .hk{display:flex;justify-content:space-between;gap:14px;padding:6px 0;font-size:14.5px;border-bottom:1px solid var(--line)}
+  .help-card .hk:last-of-type{border-bottom:none}
+  .help-card kbd{font-family:var(--mono);background:var(--panel3);border:1px solid var(--line-strong);border-bottom-width:2px;border-radius:5px;padding:1px 8px;color:var(--accent-2);font-weight:600}
+  .help-card .close{margin-top:14px;font-family:var(--mono);font-size:12px;color:var(--muted);text-align:center}
+  .q.current{border-color:var(--accent)}
+
+  @media (max-width:560px){
+    body{font-size:16px} h1{font-size:31px} h2{font-size:23px}
+    .hud-inner{font-size:11px;gap:10px} .stem{font-size:15.5px}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<div class="hud">
+  <div class="hud-inner">
+    <span class="dot">▰ SAA-C03</span>
+    <span class="stat"><b id="h-ans">0</b>/<span id="h-tot">0</span> answered</span>
+    <span class="stat"><b id="h-pct">—</b> correct</span>
+    <div class="bar"><i id="h-bar"></i></div>
+    <button id="h-help">? keys</button>
+    <button id="h-reset">reset</button>
+  </div>
+</div>
+
+<div id="help"><div class="help-card">
+  <h4>Vim scrolling · smooth</h4>
+  <div class="hk"><span>Glide down / up (hold to flow)</span><span><kbd>j</kbd> <kbd>k</kbd></span></div>
+  <div class="hk"><span>Half page down / up</span><span><kbd>d</kbd> <kbd>u</kbd></span></div>
+  <div class="hk"><span>Full page down / up</span><span><kbd>f</kbd> <kbd>b</kbd></span></div>
+  <div class="hk"><span>Top of page</span><span><kbd>g</kbd><kbd>g</kbd></span></div>
+  <div class="hk"><span>Bottom of page</span><span><kbd>G</kbd></span></div>
+  <div class="hk"><span>Toggle this help</span><span><kbd>?</kbd></span></div>
+  <div class="close">Answer questions by clicking · esc closes help</div>
+</div></div>
+
+<div class="wrap">
+<header class="top">
+  <p class="eyebrow">Weakness-targeted drill · File 9 of 10</p>
+  <h1>Management &amp; Migration<br><span class="thin">CloudWatch · CloudTrail · Config · Organizations · SSM · migration tools</span></h1>
+  <p class="lede">The operational glue and the on-ramp. This file owns the services that watch, govern, and move your estate — the ones the exam quietly tests in a "least operational overhead" clause. Three pillars: observability (who did what, how is it performing, is it compliant), governance at scale (Organizations, SSM, CloudFormation), and migration (which tool for DBs, servers, files, and petabytes). It opens with wins, then walks into the distinctions people fumble.</p>
+  <div class="filechips">
+    <span class="fc">1 · Compute &amp; Traffic</span>
+    <span class="fc">2 · Decoupling</span>
+    <span class="fc">3 · Databases</span>
+    <span class="fc">4 · Resilience &amp; DR</span>
+    <span class="fc">5 · Cost</span>
+    <span class="fc">6 · Security &amp; Identity</span>
+    <span class="fc">7 · Storage</span>
+    <span class="fc">8 · Networking</span>
+    <span class="fc here">9 · Management &amp; Migration</span>
+    <span class="fc">10 · Analytics &amp; App Integration</span>
+  </div>
+  <div class="legend">
+    <div class="row"><span class="tg chip drill">drill</span><span><b>Quick check.</b> Exam-real, but tests one fact at a time. Confidence fuel.</span></div>
+    <div class="row"><span class="tg chip exam">exam</span><span><b>Scenario.</b> Full SAA-C03 difficulty — multiple plausible services, one fatal flaw.</span></div>
+    <div class="row"><span class="tg chip mixed">mixed</span><span><b>All-topics review</b> dropped between sections so nothing goes stale.</span></div>
+    <div class="row"><span class="tg chip miss">↻ your miss</span><span>A management/migration concept that's commonly missed — worth locking down.</span></div>
+    <div class="row"><span class="tg chip win">✓ lock it in</span><span>A concept from earlier files revisited to keep it warm.</span></div>
+    <p style="margin:12px 0 0;font-size:13.5px;color:var(--muted)">Click an option to answer (or focus a card and press <code>1–5</code>; <code>Enter</code> checks Select-TWO). Every answer reveals why the right one wins, why each distractor dies, and the <b>Flip it</b> — the small stem change that would make a wrong answer correct.</p>
+  </div>
+</header>
+</div>
+
+<div class="wrap">
+
+<!-- ===================== SECTION 1 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">01</span> Observability — logs, metrics &amp; the audit trail</div>
+  <h2>Three services, three questions they answer</h2>
+  <p class="sub">The exam's favorite confusion lives here. CloudWatch asks <em>"how is it performing?"</em>, CloudTrail asks <em>"who did what?"</em>, and Config asks <em>"what is the configuration now, and was it ever non-compliant?"</em> Get those three sentences right and a whole class of questions falls over.</p>
+
+  <h3>CloudWatch — metrics, alarms, logs</h3>
+  <p>CloudWatch collects <strong>metrics</strong> (CPU, network, custom), fires <strong>alarms</strong> on thresholds, stores <strong>Logs</strong>, and lets you query them with <strong>Logs Insights</strong>. The catch the exam loves: the hypervisor cannot see <em>inside</em> the OS, so <strong>memory and disk usage are NOT default metrics</strong> — you install the <strong>CloudWatch agent</strong> to push them. A <strong>composite alarm</strong> combines several alarms with AND/OR logic so you alert on a real condition instead of a single noisy signal.</p>
+
+  <div class="box key"><p class="lab">Key fact — memory needs the agent</p><p>Any stem that says <b>"alert on memory utilization"</b> or <b>"track disk space inside the instance"</b> is pointing at the <b>CloudWatch agent</b> (or a custom metric). EC2's built-in metrics stop at the hypervisor boundary: CPU, network, disk <em>I/O</em> — but never RAM or filesystem free space. Picking "use the default EC2 memory metric" is the trap, because it does not exist.</p></div>
+
+  <h3>EventBridge vs CloudWatch Events</h3>
+  <p><strong>EventBridge</strong> is the evolution of CloudWatch Events — same event bus, broader reach (SaaS partners, custom buses, schema registry). For the exam treat them as the same engine: an <strong>event pattern or schedule</strong> matches an event and routes it to a <strong>target</strong> (Lambda, SQS, SNS, Step Functions). "Run something on a cron schedule" or "react to an AWS API event" → an EventBridge rule.</p>
+
+  <h3>CloudTrail — the audit log</h3>
+  <p>CloudTrail records <strong>API calls</strong>. <strong>Management events</strong> (control-plane: <code>RunInstances</code>, <code>CreateBucket</code>) are on by default; <strong>data events</strong> (S3 object-level <code>GetObject</code>/<code>PutObject</code>, Lambda invokes) are high-volume and opt-in. A <strong>multi-region trail</strong> captures every Region into one place; <strong>log file integrity validation</strong> produces a hash digest so you can prove logs weren't tampered with — the compliance answer.</p>
+
+  <h3>AWS Config — configuration state &amp; compliance</h3>
+  <p>Config records the <strong>configuration history</strong> of resources, evaluates them against <strong>rules</strong> (managed or custom), flags <strong>non-compliant</strong> resources, and can <strong>auto-remediate</strong> via SSM Automation. "Continuously check that no security group allows <code>0.0.0.0/0</code> on 22, and fix it" is a Config rule + remediation, not CloudTrail.</p>
+
+  <div class="tw"><table>
+    <tr><th>Service</th><th>Answers</th><th>Records</th><th>Stem tell</th></tr>
+    <tr><td><b>CloudWatch</b></td><td>How is it performing?</td><td>Metrics, logs, alarms, dashboards</td><td>"monitor", "alarm on", "memory/disk → agent", "dashboard"</td></tr>
+    <tr><td><b>CloudTrail</b></td><td>Who did what, when?</td><td>API call history (mgmt + data events)</td><td>"who deleted", "audit API calls", "log integrity", "across all Regions"</td></tr>
+    <tr><td><b>AWS Config</b></td><td>What's the config, is it compliant?</td><td>Resource config history + compliance</td><td>"track configuration changes", "compliance rule", "remediate non-compliant"</td></tr>
+  </table></div>
+
+  <div class="box trap"><p class="lab">Classic trap — track config changes vs record API calls</p><p>The single most reused observability question: <b>"track configuration changes on resources AND record a history of API calls."</b> The answer is <b>Config for the config changes, CloudTrail for the API calls</b>. Swap them and you've picked the trap. CloudWatch never "records API calls" — it watches performance. If you see CloudWatch offered as the API-history tool, it's bait.</p></div>
+
+  <div class="box field"><p class="lab">// field note — the digest that proves nothing was touched</p><p>When auditors ask "can you prove these logs weren't edited," CloudTrail's <b>log file integrity validation</b> is the receipt. Every hour CloudTrail writes a <b>digest file</b> to S3 containing SHA-256 hashes of the log files for that period, and the digest itself is signed. Change one byte of a delivered log and the hash no longer matches — tamper-evident by design. It's the kind of feature you never think about until a compliance question hinges on it, and then it's the only right answer.</p></div>
+
+  <!-- DRILL -->
+  <div class="quizhead"><span class="ttl">Quick check</span><span class="rule"></span><span class="meta">7 questions · one fact each</span></div>
+  <div id="s1-drill"></div>
+
+  <!-- SCENARIO -->
+  <div class="quizhead"><span class="ttl">Scenario pressure</span><span class="rule"></span><span class="meta">7 questions · exam difficulty</span></div>
+  <div id="s1-exam"></div>
+</section>
+
+<!-- ===================== MIXED 1 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">↻</span> Mixed review — all domains</div>
+  <h2>Keep the rest warm</h2>
+  <p class="sub">Four pulled from across the blueprint — compute, decoupling, databases, cost — so the knowledge from Files 1–5 doesn't go stale while you drill management.</p>
+  <div id="mix-1"></div>
+</section>
+
+<!-- ===================== SECTION 2 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">02</span> Governance &amp; operations at scale</div>
+  <h2>Run a hundred accounts like one</h2>
+  <p class="sub">Once you have more than a couple of accounts, the exam expects you to govern centrally: Organizations for the boundary, Control Tower for the guardrails, Systems Manager for the day-to-day, CloudFormation for the blueprint.</p>
+
+  <h3>AWS Organizations &amp; Control Tower</h3>
+  <p><strong>Organizations</strong> groups accounts into <strong>OUs</strong>, gives you <strong>consolidated billing</strong> (one bill, shared volume discounts and Reserved/Savings pooling), and enforces <strong>Service Control Policies (SCPs)</strong>. <strong>Control Tower</strong> sits on top: it sets up a <strong>landing zone</strong> (multi-account baseline) and applies <strong>guardrails</strong> — preventive (SCPs) and detective (Config rules) — from a dashboard.</p>
+
+  <div class="box key"><p class="lab">Key fact — what an SCP actually does</p><p>An SCP sets the <b>maximum permissions</b> for accounts in an OU — it's a guardrail, not a grant. It <b>never gives access</b>; an action is allowed only if <em>both</em> the SCP <em>and</em> an IAM policy permit it. SCPs don't apply to the <b>management (payer) account</b>, and they don't touch service-linked roles. "Centrally prevent any account from leaving a Region / disabling CloudTrail / using a banned service" → SCP.</p></div>
+
+  <div class="tw"><table>
+    <tr><th>SCP behavior</th><th>Reality</th></tr>
+    <tr><td>Grants permissions?</td><td><b>No</b> — only restricts. You still need IAM allow.</td></tr>
+    <tr><td>Applies to management account?</td><td><b>No</b> — the payer account is exempt.</td></tr>
+    <tr><td>Default behavior</td><td><code>FullAWSAccess</code> attached at root; you add deny or allow-lists.</td></tr>
+    <tr><td>Affects existing IAM users/roles?</td><td>Yes — caps everyone in member accounts, including root.</td></tr>
+  </table></div>
+
+  <h3>Systems Manager (SSM) — the operations toolbox</h3>
+  <ul class="tight">
+    <li><b>Session Manager</b> — shell access to instances <em>with no SSH, no bastion, no open inbound ports, no key pairs</em>. Needs the SSM agent + an instance role. The "secure access, least overhead" answer.</li>
+    <li><b>Patch Manager</b> — define patch baselines and maintenance windows; automate OS/app patching across the fleet.</li>
+    <li><b>Run Command</b> — execute a command/script across many instances at once, on demand, no SSH.</li>
+    <li><b>State Manager</b> — keep instances in a defined state (config drift correction).</li>
+    <li><b>Parameter Store</b> — config &amp; secrets (SecureString via KMS); free standard tier. Secrets Manager adds managed rotation.</li>
+  </ul>
+
+  <div class="box trap"><p class="lab">Classic trap — Session Manager vs Run Command vs Patch Manager</p><p>They sound interchangeable but the verbs differ. <b>Interactive shell</b> into one box without SSH → <b>Session Manager</b>. <b>Run a script across many</b> boxes once → <b>Run Command</b>. <b>Keep them patched on a schedule</b> → <b>Patch Manager</b>. A stem saying "patch all instances regularly" that offers "use Session Manager to patch" is the bait — Session Manager connects, it doesn't orchestrate patching.</p></div>
+
+  <h3>CloudFormation — infrastructure as code</h3>
+  <p>A <strong>template</strong> creates a <strong>stack</strong>. <strong>StackSets</strong> deploy the same stack across <strong>many accounts and Regions</strong> in one operation. <strong>Change sets</strong> preview what an update will do before you apply it. <strong>Drift detection</strong> finds resources changed outside CloudFormation. <strong>Nested stacks</strong> compose reusable components within one stack.</p>
+
+  <div class="tw"><table>
+    <tr><th>Feature</th><th>Use it when…</th></tr>
+    <tr><td><b>StackSets</b></td><td>One template deployed to <b>multiple accounts and/or Regions</b> centrally (often from the Organizations management account).</td></tr>
+    <tr><td><b>Nested stacks</b></td><td>Break one large stack into reusable child templates <b>within a single account/stack</b>.</td></tr>
+    <tr><td><b>Change sets</b></td><td>Preview the impact of an update before executing it.</td></tr>
+    <tr><td><b>Drift detection</b></td><td>Detect manual changes that diverged from the template.</td></tr>
+  </table></div>
+
+  <p><strong>Other governance reflexes:</strong> <b>Service Catalog</b> lets a central team publish approved, pre-configured products (CloudFormation-backed) that users self-serve within guardrails — "let developers launch only approved configurations." <b>Trusted Advisor</b> checks across five pillars (cost optimization, performance, security, fault tolerance, service limits). <b>AWS Health Dashboard</b> tells you about events affecting <em>your</em> resources. <b>Elastic Beanstalk</b> is the PaaS option: hand it code, it provisions and manages the EC2/ASG/ELB stack for you — "deploy a web app with the least operational effort and full control of the underlying resources."</p>
+
+  <div class="box field"><p class="lab">// field note — the guardrail that saves the bill</p><p>A favorite real-world Organizations pattern: a single <b>SCP on the root OU denying every Region except the two you operate in</b>. New accounts inherit it automatically, so a developer who fat-fingers a launch into <code>ap-south-1</code> simply can't — the API is denied before any resource exists. No CloudWatch alarm, no nightly cleanup Lambda, no surprise cross-Region data-transfer charges. One preventive guardrail beats a dozen detective ones, which is exactly the instinct the "least operational overhead" clause rewards.</p></div>
+
+  <div class="quizhead"><span class="ttl">Quick check</span><span class="rule"></span><span class="meta">8 questions · one fact each</span></div>
+  <div id="s2-drill"></div>
+
+  <div class="quizhead"><span class="ttl">Scenario pressure</span><span class="rule"></span><span class="meta">7 questions · exam difficulty</span></div>
+  <div id="s2-exam"></div>
+</section>
+
+<!-- ===================== MIXED 2 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">↻</span> Mixed review — all domains</div>
+  <h2>Keep the rest warm</h2>
+  <p class="sub">Four more across security, storage, resilience and networking — the cross-topic jumps the real exam makes every other question.</p>
+  <div id="mix-2"></div>
+</section>
+
+<!-- ===================== SECTION 3 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">03</span> Migration &amp; data transfer</div>
+  <h2>Match the workload to the mover</h2>
+  <p class="sub">Almost every migration question is really a matching exercise: a database wants DMS, whole servers want MGN, online files want DataSync, and petabytes with no bandwidth want Snow. Learn the four tells and the rest is detail.</p>
+
+  <h3>The 7 Rs, in one breath</h3>
+  <p>Retire, Retain, Rehost (lift-and-shift), Relocate (e.g. VMware), Repurchase (move to SaaS), Replatform (lift-tinker-shift, e.g. to RDS), Refactor (re-architect for cloud-native). The exam mostly cares about <strong>Rehost</strong> (→ MGN) and <strong>Replatform</strong> (→ managed DB via DMS).</p>
+
+  <h3>The four movers</h3>
+  <div class="tw"><table>
+    <tr><th>Tool</th><th>Moves</th><th>Tell</th></tr>
+    <tr><td><b>AWS DMS</b></td><td>Databases (live, with minimal downtime via CDC)</td><td>"migrate the database", "keep source online during migration", "ongoing replication"</td></tr>
+    <tr><td><b>MGN (Application Migration Service)</b></td><td>Whole servers / VMs — lift-and-shift</td><td>"rehost", "migrate physical/VMware servers as-is", "no code changes"</td></tr>
+    <tr><td><b>DataSync</b></td><td>File/object data <b>online</b> over the network</td><td>"NFS/SMB to S3/EFS/FSx", "you have bandwidth", "scheduled/recurring transfer"</td></tr>
+    <tr><td><b>Snow Family</b></td><td>Bulk data <b>offline</b> (physical device)</td><td>"petabytes", "limited/no bandwidth", "weeks over the wire is too slow"</td></tr>
+  </table></div>
+
+  <div class="box key"><p class="lab">Key fact — DMS homogeneous vs heterogeneous</p><p><b>Same engine to same engine</b> (Oracle→Oracle on RDS, MySQL→Aurora MySQL) is <b>homogeneous</b> — DMS alone. <b>Different engine</b> (Oracle→Aurora PostgreSQL, SQL Server→MySQL) is <b>heterogeneous</b> and needs the <b>Schema Conversion Tool (SCT)</b> first to convert schema/code, <em>then</em> DMS to move the data. "Convert the schema then migrate" with a different target engine is the two-step SCT + DMS answer.</p></div>
+
+  <h3>The supporting cast</h3>
+  <ul class="tight">
+    <li><b>Migration Hub</b> — single pane to <em>track</em> migration progress across tools and accounts (discovery + status), not a mover itself.</li>
+    <li><b>Transfer Family</b> — fully managed <b>SFTP/FTPS/FTP</b> endpoint that lands files straight into S3/EFS. "Partners upload via SFTP, minimal ops" → Transfer Family, not an EC2 SFTP server.</li>
+    <li><b>Snowball Edge</b> (Storage / Compute Optimized), <b>Snowcone</b> (smallest, rugged), and the retired Snowmobile — choose by data size and edge-compute needs.</li>
+    <li><b>DataSync + DMS combo</b> — DataSync for the bulk initial file copy, DMS CDC for ongoing DB sync, when both data types move together.</li>
+  </ul>
+
+  <div class="box trap"><p class="lab">Classic trap — DataSync vs Snowball on bandwidth</p><p>The deciding factor is almost always <b>time-over-the-wire</b>. Do the arithmetic the exam implies: many petabytes on a constrained link would take <em>months</em> → <b>Snowball Edge</b> (ship it). Tens of terabytes with a healthy connection, or a <b>recurring</b> sync → <b>DataSync</b>. A stem that stresses "limited bandwidth / would take too long online" is steering you to Snow; one that stresses "ongoing / scheduled / over Direct Connect" is steering you to DataSync.</p></div>
+
+  <div class="box field"><p class="lab">// field note — a truck full of disks</p><p>AWS once shipped <b>Snowmobile</b>: a 45-foot shipping container towed by a semi-truck, holding up to 100 PB, for customers moving entire data centers or exabyte archives. The physics is the punchline of an old networking adage — <em>"never underestimate the bandwidth of a truck full of tapes hurtling down the highway."</em> When a transfer would take a year online, the fastest network on Earth is a vehicle. Snowmobile has since been retired, but the Snow family lives on for the same reason: past a certain scale, offline beats online.</p></div>
+
+  <div class="quizhead"><span class="ttl">Quick check</span><span class="rule"></span><span class="meta">6 questions · one fact each</span></div>
+  <div id="s3-drill"></div>
+
+  <div class="quizhead"><span class="ttl">Scenario pressure</span><span class="rule"></span><span class="meta">7 questions · exam difficulty</span></div>
+  <div id="s3-exam"></div>
+</section>
+
+<!-- ===================== SUMMARY ===================== -->
+<section class="summary">
+  <div class="scorecard">
+    <div class="lab2">Session readiness</div>
+    <div class="big"><span id="sc-pct">—</span></div>
+    <div class="note"><span id="sc-line">Answer some questions and your readiness score appears here.</span></div>
+    <div class="misslist" id="sc-miss"></div>
+  </div>
+  <p class="foot">File 9 / 10 · Management &amp; Migration · 50 questions · say the word and I'll build File 10 (Analytics &amp; App Integration) next, or bolt 10 more scenarios onto any section here.</p>
+</section>
+
+</div><!-- /wrap -->
+
+<script>
+/* ---------------- QUESTION BANK ----------------
+   c = index (or array) of correct option(s), 0-based
+   multi:true => Select TWO; tag => "miss" | "win"          */
+const BANK = [
+
+/* ====== S1 DRILL ====== */
+{g:"s1-drill",id:"9.01",d:"drill",q:"Which service records a history of API calls made in your account so you can answer 'who deleted this resource and when?'",
+o:["Amazon CloudWatch","AWS CloudTrail","AWS Config","Amazon Inspector"],c:1,
+e:`<b>CloudTrail</b> logs API activity — the audit trail of who did what. CloudWatch watches performance; Config tracks resource configuration state; Inspector scans for vulnerabilities.<span class="flip"><span class="fl">flip it</span>If the question were "what is this resource's current configuration and was it ever non-compliant?", that's <b>AWS Config</b>.</span>`},
+
+{g:"s1-drill",id:"9.02",d:"drill",q:"You need to alert when an EC2 instance's MEMORY utilization crosses 80%. What must you do?",
+o:["Create a CloudWatch alarm on the default memory metric","Install the CloudWatch agent to publish memory as a custom metric, then alarm on it","Enable detailed monitoring","Turn on CloudTrail data events"],c:1,
+e:`Memory is <b>not</b> a default EC2 metric — the hypervisor can't see inside the OS. Install the <b>CloudWatch agent</b> to push memory/disk, then alarm. Detailed monitoring only changes metric frequency; CloudTrail logs API calls.`,tag:"miss"},
+
+{g:"s1-drill",id:"9.03",d:"drill",q:"A company must track configuration changes on its AWS resources AND record a history of API calls. Which pairing is correct?",
+o:["CloudTrail for config changes, Config for API calls","Config for config changes, CloudTrail for API calls","Config for both","CloudWatch for API calls, Config for config changes"],c:1,
+e:`<b>Config tracks configuration changes; CloudTrail records API calls.</b> This is the most-reused observability question — swapping the two is the trap, and CloudWatch never records API call history.`,tag:"miss"},
+
+{g:"s1-drill",id:"9.04",d:"drill",q:"You want to run a Lambda function automatically every day at 02:00 UTC. What's the simplest mechanism?",
+o:["An EventBridge (CloudWatch Events) scheduled rule targeting the Lambda","A CloudWatch alarm","An SQS delay queue","A Config remediation rule"],c:0,
+e:`A <b>scheduled EventBridge rule</b> (cron) invokes the Lambda on a calendar — purpose-built. Alarms react to metrics; SQS delay queues defer messages, not schedule jobs; Config rules evaluate compliance.`},
+
+{g:"s1-drill",id:"9.05",d:"drill",q:"Which CloudTrail feature lets you prove that delivered log files have not been altered?",
+o:["Multi-region trail","Log file integrity validation (digest files)","Data events","CloudWatch Logs subscription"],c:1,
+e:`<b>Log file integrity validation</b> writes signed SHA-256 digest files so tampering is detectable — the compliance answer. A multi-region trail captures all Regions; data events log object-level access; subscriptions stream logs elsewhere.`},
+
+{g:"s1-drill",id:"9.06",d:"drill",q:"You need to continuously check that no security group allows unrestricted inbound SSH (0.0.0.0/0 on port 22) and automatically fix violations. What do you use?",
+o:["A CloudTrail trail","An AWS Config rule with automatic remediation","A CloudWatch dashboard","Amazon Macie"],c:1,
+e:`<b>Config rule + remediation</b> evaluates resources against a desired state and fixes drift via SSM Automation. CloudTrail only records the API call after the fact; dashboards visualize metrics; Macie classifies sensitive data in S3.`},
+
+{g:"s1-drill",id:"9.07",d:"drill",q:"Which CloudWatch capability lets you query and analyze log data interactively with a purpose-built query language?",
+o:["CloudWatch Logs Insights","CloudWatch Alarms","CloudWatch Synthetics","CloudWatch Anomaly Detection"],c:0,
+e:`<b>Logs Insights</b> runs ad-hoc queries over log groups. Alarms watch metric thresholds; Synthetics runs canary checks; Anomaly Detection bands a metric's expected range.`},
+
+/* ====== S1 EXAM ====== */
+{g:"s1-exam",id:"9.08",d:"exam",tag:"miss",q:"A regulated company must send ALL AWS Systems Manager Session Manager session logs to a central S3 bucket for archival, with the MOST operational efficiency, and wants the data delivered continuously rather than in nightly batch exports. Which approach fits?",
+o:["Install the CloudWatch agent, push to a log group, and run a daily export job to S3","Configure Session Manager to log session data directly to the S3 bucket in its preferences","Stream session logs to CloudWatch Logs, add a subscription filter to a Kinesis Data Firehose delivery stream with S3 as the destination","Create an SSM document that uploads logs nightly via an EventBridge rule"],c:2,
+e:`Session Manager can send logs to CloudWatch Logs; a <b>subscription filter feeding Kinesis Data Firehose to S3</b> gives continuous, near-real-time delivery with no batch jobs to run.<br>✗ Daily export jobs are batch, not continuous, and you own the scheduling. ✗ Native S3 logging works but the question's "continuous streaming from CloudWatch" framing points at Firehose. ✗ A nightly SSM document is the batch/effort trap.<span class="flip"><span class="fl">flip it</span>If the requirement were simply "archive sessions to S3, simplest setup," enabling <b>Session Manager's built-in S3 logging</b> is the least-effort answer.</span>`},
+
+{g:"s1-exam",id:"9.09",d:"exam",q:"A security team needs an immutable, tamper-evident record of every API call across ALL Regions, delivered to a central account, surviving even if an attacker gains admin in a member account. What's the strongest design?",
+o:["A per-Region CloudTrail trail in each account writing to that account's local bucket","An organization trail (multi-region) delivering to a central S3 bucket in a separate account, with log file validation and bucket protections","CloudWatch Logs with a 90-day retention policy","AWS Config aggregator across all accounts"],c:1,
+e:`An <b>organization-wide, multi-region trail</b> to a hardened central bucket with <b>log file validation</b> centralizes and protects the audit record beyond any single member admin's reach.<br>✗ Per-account local buckets are deletable by that account's admin. ✗ CloudWatch Logs isn't the API-audit source of truth and 90 days isn't immutable. ✗ Config aggregates configuration, not API calls.`},
+
+{g:"s1-exam",id:"9.10",d:"exam",q:"Operations wants a single alert that fires only when BOTH the application error-rate alarm AND the latency alarm are breaching at the same time, to cut noise from isolated blips. What CloudWatch feature delivers this?",
+o:["A metric math expression on one alarm","A composite alarm combining the two alarms with an AND rule","Two separate alarms both notifying the same SNS topic","An anomaly detection alarm"],c:1,
+e:`A <b>composite alarm</b> combines child alarms with AND/OR logic so you alert on a genuine condition, not a single noisy signal.<br>✗ Metric math builds a derived metric but doesn't combine alarm states. ✗ Two independent alarms each fire on their own, the opposite of the goal. ✗ Anomaly detection bands one metric; it doesn't correlate two alarms.`},
+
+{g:"s1-exam",id:"9.11",d:"exam",q:"After a production change, a team needs to know exactly who modified a specific IAM role and from what source IP last Tuesday. Where do they look?",
+o:["AWS Config timeline for the role","CloudTrail event history (management events) filtered to the IAM API calls","CloudWatch Logs Insights","Trusted Advisor security checks"],c:1,
+e:`<b>CloudTrail management events</b> capture the IAM API call, the identity, and the source IP — exactly 'who did what, from where.'<br>✗ Config shows the configuration change but not the caller's IP and identity the way CloudTrail does. ✗ Logs Insights queries log data, not the API audit trail. ✗ Trusted Advisor gives best-practice checks, not event forensics.<span class="flip"><span class="fl">flip it</span>If you only needed "what did the role's permissions look like at each point in time," <b>Config</b>'s configuration timeline is the cleaner answer.</span>`},
+
+{g:"s1-exam",id:"9.12",d:"exam",tag:"miss",q:"A team must capture object-level read/write activity on a sensitive S3 bucket (every GetObject/PutObject) for audit. They enabled a CloudTrail trail but see only bucket-level operations. Why, and what fixes it?",
+o:["S3 access isn't logged by CloudTrail at all; use S3 server access logging only","Object-level access is a CloudTrail data event, which is opt-in; enable data events for the bucket","Management events were disabled; re-enable them","They must enable AWS Config for S3"],c:1,
+e:`CloudTrail logs <b>management events</b> by default; high-volume <b>data events</b> (object-level S3, Lambda invokes) are <b>opt-in</b>. Enable data events for the bucket to capture GetObject/PutObject.<br>✗ CloudTrail does log S3 data events once enabled. ✗ Management events cover the control plane, not object access. ✗ Config tracks configuration, not object reads.`},
+
+{g:"s1-exam",id:"9.13",d:"exam",q:"A compliance rule requires that any newly created EBS volume must be encrypted, and non-compliant volumes should be flagged automatically and where possible remediated, with the least ongoing effort. What's the best fit?",
+o:["A scheduled Lambda that scans volumes nightly","An AWS Config managed rule (encrypted-volumes) with an automatic remediation action","A CloudTrail trail with an alarm","Trusted Advisor"],c:1,
+e:`A <b>Config managed rule</b> continuously evaluates volumes and can trigger <b>auto-remediation</b> — least ongoing effort.<br>✗ A nightly Lambda is custom code you own and isn't continuous. ✗ CloudTrail records the create call but doesn't evaluate compliance. ✗ Trusted Advisor doesn't do per-resource compliance rules with remediation.`},
+
+{g:"s1-exam",id:"9.14",d:"exam",q:"A company centralizes application logs from hundreds of EC2 instances into CloudWatch Logs and wants to run fast ad-hoc investigations (e.g. 'top 10 IPs returning 500s in the last hour') without standing up extra infrastructure. Which is most appropriate?",
+o:["Export logs to S3 and query with Athena every time","CloudWatch Logs Insights queries over the log groups","Stream to OpenSearch and build dashboards","Download the logs and grep locally"],c:1,
+e:`<b>Logs Insights</b> queries the log groups directly — no extra infrastructure, ideal for ad-hoc investigation.<br>✗ Athena-on-S3 works but adds an export step and table setup for quick checks. ✗ OpenSearch is powerful but heavier to operate for ad-hoc questions. ✗ Local grep doesn't scale across hundreds of instances.<span class="flip"><span class="fl">flip it</span>If you needed rich, persistent dashboards and full-text search at scale, the answer shifts toward <b>OpenSearch</b>.</span>`},
+
+/* ====== MIX 1 ====== */
+{g:"mix-1",id:"M1.1",d:"mixed",tag:"win",q:"A fleet of EC2 workers pulls jobs from an SQS queue. At peak the backlog grows and jobs wait too long. How should the Auto Scaling group scale to clear the backlog efficiently?",
+o:["Scale on average CPU only","Scale on a target tracking policy using the queue's ApproximateNumberOfMessages (backlog per instance) metric","Use a fixed large instance count","Scale on network throughput"],c:1,
+e:`Scaling on <b>queue depth (backlog per instance)</b> ties capacity to actual work waiting — the canonical SQS + ASG pattern. CPU may stay low even with a huge backlog, so it misleads; a fixed count wastes money off-peak; network isn't the bottleneck signal here.`},
+
+{g:"mix-1",id:"M1.2",d:"mixed",tag:"win",q:"A read-heavy reporting workload is slowing a single RDS instance; writes are light and must not be affected. How do you scale reads with least change?",
+o:["Enable Multi-AZ","Add RDS read replicas and direct read traffic to them","Increase only storage IOPS","Migrate to DynamoDB"],c:1,
+e:`<b>Read replicas</b> scale read throughput without touching the writer. Multi-AZ is for failover (the standby serves no reads); more IOPS isn't more read capacity; a DynamoDB migration is a major redesign, not 'least change'.<span class="flip"><span class="fl">flip it</span>If the goal were automatic failover on AZ loss, the answer is <b>Multi-AZ</b>.</span>`},
+
+{g:"mix-1",id:"M1.3",d:"mixed",tag:"win",q:"A fault-tolerant batch job runs whenever capacity is cheap and can tolerate interruption. Which EC2 purchasing option minimizes cost?",
+o:["On-Demand","Spot Instances","Reserved Instances","Dedicated Hosts"],c:1,
+e:`<b>Spot</b> offers the deepest discount for interruption-tolerant, flexible work. On-Demand is the costly baseline; Reserved/Savings Plans suit steady predictable usage; Dedicated Hosts serve licensing/compliance, not cost minimization.`},
+
+{g:"mix-1",id:"M1.4",d:"mixed",q:"An application must store database credentials securely and have them rotated automatically by AWS with no custom rotation code. Which service fits best?",
+o:["Systems Manager Parameter Store standard string","AWS Secrets Manager","An encrypted S3 object","Environment variables on the instance"],c:1,
+e:`<b>Secrets Manager</b> provides managed, scheduled secret rotation out of the box. Parameter Store can hold SecureStrings but doesn't natively rotate RDS credentials for you; an S3 object and env vars provide no rotation and weaker controls.<span class="flip"><span class="fl">flip it</span>If you just needed cheap encrypted config with no rotation requirement, <b>Parameter Store SecureString</b> is the lower-cost pick.</span>`},
+
+/* ====== S2 DRILL ====== */
+{g:"s2-drill",id:"9.15",d:"drill",q:"You need interactive shell access to private EC2 instances with no SSH keys, no bastion host, and no inbound ports open. Which service?",
+o:["EC2 Instance Connect over SSH","Systems Manager Session Manager","A bastion host in a public subnet","Site-to-Site VPN"],c:1,
+e:`<b>Session Manager</b> gives auditable shell access with no open ports, no keys, no bastion — just the SSM agent and an instance role. The other options all require open SSH paths or extra infrastructure.`},
+
+{g:"s2-drill",id:"9.16",d:"drill",q:"What does a Service Control Policy (SCP) in AWS Organizations do?",
+o:["Grants permissions to accounts","Sets the maximum available permissions (guardrail) for member accounts; it never grants access","Replaces IAM entirely","Applies to the management account"],c:1,
+e:`An SCP is a <b>guardrail</b> — it caps what's allowed but grants nothing; you still need an IAM allow. It also does <b>not</b> apply to the management (payer) account.`},
+
+{g:"s2-drill",id:"9.17",d:"drill",q:"You must deploy the same CloudFormation template across 30 accounts in 3 Regions from one operation. What do you use?",
+o:["Nested stacks","CloudFormation StackSets","A change set","Drift detection"],c:1,
+e:`<b>StackSets</b> deploy one template to many accounts and Regions centrally. Nested stacks compose within a single stack; change sets preview updates; drift detection finds manual changes.`},
+
+{g:"s2-drill",id:"9.18",d:"drill",q:"Which Systems Manager capability runs a command or script across many instances at once, on demand, without SSH?",
+o:["Session Manager","Run Command","Patch Manager","Parameter Store"],c:1,
+e:`<b>Run Command</b> executes ad-hoc commands across a fleet. Session Manager is an interactive shell to one box; Patch Manager schedules patching; Parameter Store holds config/secrets.`},
+
+{g:"s2-drill",id:"9.19",d:"drill",q:"A central platform team wants developers to launch only pre-approved, pre-configured infrastructure templates in a self-service way. Which service?",
+o:["AWS Service Catalog","AWS Config","Trusted Advisor","CloudWatch"],c:0,
+e:`<b>Service Catalog</b> publishes approved CloudFormation-backed products for self-service within guardrails. Config evaluates compliance; Trusted Advisor gives best-practice checks; CloudWatch monitors.`},
+
+{g:"s2-drill",id:"9.20",d:"drill",q:"Which service provides automated checks across cost optimization, performance, security, fault tolerance, and service limits?",
+o:["AWS Config","AWS Trusted Advisor","Amazon Inspector","AWS Health Dashboard"],c:1,
+e:`<b>Trusted Advisor</b> covers those five pillars. Config checks resource compliance; Inspector scans for vulnerabilities; the Health Dashboard reports events affecting your resources.`},
+
+{g:"s2-drill",id:"9.21",d:"drill",q:"A team wants to deploy a web application without managing the underlying EC2, Auto Scaling, and load balancer setup themselves, while still retaining access to those resources. Which service?",
+o:["AWS Lambda","AWS Elastic Beanstalk","Amazon ECS on Fargate","AWS CloudFormation"],c:1,
+e:`<b>Elastic Beanstalk</b> is the PaaS that provisions and manages the EC2/ASG/ELB stack from your uploaded code, while leaving the resources visible and tunable. Lambda is serverless functions; Fargate runs containers; CloudFormation is raw IaC, not a managed app platform.`},
+
+{g:"s2-drill",id:"9.22",d:"drill",q:"Before applying a CloudFormation stack update, you want to preview exactly which resources will be added, modified, or replaced. What do you create?",
+o:["A change set","A StackSet","A drift detection report","A nested stack"],c:0,
+e:`A <b>change set</b> previews the impact of an update before execution. StackSets span accounts/Regions; drift detection compares live vs template; nested stacks compose templates.`},
+
+/* ====== S2 EXAM ====== */
+{g:"s2-exam",id:"9.23",d:"exam",tag:"miss",q:"A company manages dozens of EC2 instances and must apply OS patches on a regular, automated schedule across the whole fleet with the least administrative overhead. Which solution fits best?",
+o:["Use Session Manager to log into each instance and patch manually","Configure Systems Manager Patch Manager with patch baselines and a maintenance window","Write a Lambda function that SSHes in and runs the package manager","Use Run Command manually whenever patches are needed"],c:1,
+e:`<b>Patch Manager</b> with baselines and a maintenance window automates fleet patching on a schedule — least overhead.<br>✗ Session Manager connects but doesn't orchestrate patching across the fleet. ✗ A Lambda+SSH build is custom and high-maintenance. ✗ Run Command is on-demand and manual, not a recurring schedule.<span class="flip"><span class="fl">flip it</span>If the task were "run this one script across all instances right now," the answer is <b>Run Command</b>.</span>`},
+
+{g:"s2-exam",id:"9.24",d:"exam",q:"A company must prevent every account in an organizational unit from being used outside two approved Regions, automatically applied to new accounts too, with no ongoing detective cleanup. What's the most effective control?",
+o:["A Config rule in each account that alerts on out-of-Region resources","An SCP on the OU that denies all actions outside the approved Regions","An IAM policy attached to every user denying other Regions","A CloudWatch alarm on cross-Region API calls"],c:1,
+e:`A <b>region-restriction SCP on the OU</b> preventively denies the API before any resource exists, and new accounts inherit it automatically — no cleanup.<br>✗ A Config rule only detects after the fact. ✗ Per-user IAM policies don't scale and miss new principals. ✗ A CloudWatch alarm notifies but doesn't prevent.`},
+
+{g:"s2-exam",id:"9.25",d:"exam",q:"A growing company wants to stand up a secure, multi-account environment with a baseline of guardrails, centralized logging, and an account factory, with minimal manual setup. Which service is purpose-built for this?",
+o:["AWS Organizations alone","AWS Control Tower","AWS Config aggregator","AWS Service Catalog"],c:1,
+e:`<b>Control Tower</b> sets up a landing zone — multi-account baseline, guardrails (SCPs + Config rules), centralized logging, and an account factory — with minimal effort.<br>✗ Organizations alone gives the structure but not the opinionated baseline and account factory. ✗ Config aggregator only consolidates compliance data. ✗ Service Catalog distributes approved products, not a landing zone.`},
+
+{g:"s2-exam",id:"9.26",d:"exam",q:"An application on EC2 reads a database password at startup. Security requires the value encrypted at rest, retrievable via the instance role, at the lowest cost, and the team does NOT need automatic rotation. What's the best store?",
+o:["Secrets Manager with rotation enabled","Systems Manager Parameter Store SecureString, granted via the instance role","A plaintext file baked into the AMI","Hardcoded in the application code"],c:1,
+e:`<b>Parameter Store SecureString</b> encrypts with KMS, is retrievable via the instance role, and the standard tier is free — best when rotation isn't required.<br>✗ Secrets Manager adds per-secret cost for rotation you don't need. ✗ A baked-in plaintext file and ✗ hardcoded credentials both violate encryption-at-rest and good practice.<span class="flip"><span class="fl">flip it</span>Add "must auto-rotate the credential" and the answer becomes <b>Secrets Manager</b>.</span>`},
+
+{g:"s2-exam",id:"9.27",d:"exam",tag:"miss",q:"A solutions architect needs a single, automated way to provision identical, repeatable infrastructure (VPC, subnets, EC2, security groups) across the dev, test, and prod accounts, version-controlled and previewable before changes. What's the right foundation?",
+o:["Click-deploy through the console and document the steps","CloudFormation templates in source control, deployed via StackSets, with change sets to preview updates","A runbook of CLI commands run by hand","AMI copies shared between accounts"],c:1,
+e:`<b>CloudFormation in source control</b> gives repeatable, versioned IaC; <b>StackSets</b> push it across accounts and <b>change sets</b> preview updates — exactly the foundation described.<br>✗ Manual console clicks aren't repeatable or version-controlled. ✗ Hand-run CLI is error-prone and not declarative. ✗ Shared AMIs are images, not full infrastructure definitions.`},
+
+{g:"s2-exam",id:"9.28",d:"exam",q:"A company with consolidated billing across many accounts wants one place to see cost-optimization, security, and service-limit recommendations spanning all member accounts. What should they use?",
+o:["Trusted Advisor from the management (payer) account","A separate CloudWatch dashboard per account","AWS Config in each account","CloudTrail Insights"],c:0,
+e:`<b>Trusted Advisor in the management account</b> surfaces recommendations across the organization's accounts in one view.<br>✗ Per-account CloudWatch dashboards don't give Trusted Advisor's recommendation categories. ✗ Config checks compliance, not the five-pillar advice. ✗ CloudTrail Insights detects unusual API activity, not cost/limit advice.`},
+
+{g:"s2-exam",id:"9.29",d:"exam",q:"During an AWS-side service event, an operations team wants proactive, account-specific notifications about issues affecting THEIR resources (e.g. an EC2 instance scheduled for retirement). Which source should they monitor?",
+o:["The public AWS Service Health page only","AWS Health Dashboard (Personalized Health) events, optionally routed via EventBridge","Trusted Advisor","CloudWatch billing alarms"],c:1,
+e:`The <b>AWS Health Dashboard</b> (Personalized Health) reports events affecting <em>your</em> account/resources and can push to EventBridge for automation.<br>✗ The public health page is generic, not account-specific. ✗ Trusted Advisor gives best-practice checks, not live event notices. ✗ Billing alarms watch spend, not service events.`},
+
+/* ====== MIX 2 ====== */
+{g:"mix-2",id:"M2.1",d:"mixed",tag:"win",q:"A company needs an automatic failover for its primary RDS database if an Availability Zone fails, with no application changes. What should it enable?",
+o:["Read replicas","Multi-AZ deployment","Cross-Region snapshots","DAX"],c:1,
+e:`<b>Multi-AZ</b> maintains a synchronous standby in another AZ and fails over automatically via the same endpoint — no app change. Read replicas scale reads (and need a promote step); cross-Region snapshots are backups; DAX caches DynamoDB.`},
+
+{g:"mix-2",id:"M2.2",d:"mixed",tag:"win",q:"An S3 bucket in Account A must be readable by a role in partner Account B, following best practice with least overhead. What's the setup?",
+o:["Make the bucket public","Email pre-signed URLs daily","Add a bucket policy in A granting B's role the read actions, and allow it in B's IAM policy","Share IAM access keys from A"],c:2,
+e:`Cross-account S3 is a two-lock door: a <b>bucket policy in A</b> granting B's principal plus an <b>IAM allow in B</b>. Public buckets leak; pre-signed URLs by email don't scale; sharing long-lived keys is forbidden practice.`},
+
+{g:"mix-2",id:"M2.3",d:"mixed",q:"A web tier behind Route 53 must fail over to a static S3-hosted maintenance site if the primary endpoint becomes unhealthy. Which Route 53 configuration?",
+o:["Weighted routing","Failover routing with a health check on the primary","Latency-based routing","Simple routing"],c:1,
+e:`<b>Failover routing</b> with a health check sends traffic to the secondary (the S3 site) when the primary is unhealthy. Weighted splits by ratio; latency picks the fastest Region; simple routing has no health-based failover.`},
+
+{g:"mix-2",id:"M2.4",d:"mixed",q:"Several VPCs in different accounts must communicate, and the team wants a single hub to manage routing instead of a mesh of peering connections. What should they use?",
+o:["VPC peering between every pair","AWS Transit Gateway as a central hub","A NAT gateway in each VPC","Internet gateways with public IPs"],c:1,
+e:`<b>Transit Gateway</b> is the hub-and-spoke router that replaces an N-to-N peering mesh. Full-mesh peering doesn't scale; NAT gateways provide outbound internet, not inter-VPC routing; internet gateways expose resources publicly.`},
+
+/* ====== S3 DRILL ====== */
+{g:"s3-drill",id:"9.30",d:"drill",q:"You must migrate an on-premises database to AWS while keeping the source online and the target continuously synchronized until cutover. Which service?",
+o:["AWS DataSync","AWS Database Migration Service (DMS) with ongoing replication (CDC)","AWS Snowball Edge","Application Migration Service (MGN)"],c:1,
+e:`<b>DMS with CDC</b> keeps the source live and replicates ongoing changes to the target for a minimal-downtime cutover. DataSync moves files, not live DB changes; Snowball is offline bulk; MGN rehosts whole servers.`},
+
+{g:"s3-drill",id:"9.31",d:"drill",q:"You are migrating Oracle to Amazon Aurora PostgreSQL (a different engine). What's needed in addition to DMS?",
+o:["Nothing — DMS handles schema conversion automatically","The AWS Schema Conversion Tool (SCT) to convert the schema first","A Snowball device","Elastic Beanstalk"],c:1,
+e:`Different source and target engines = <b>heterogeneous</b> migration, so use <b>SCT to convert schema/code</b>, then DMS to move the data. (Homogeneous same-engine moves need DMS alone.)`},
+
+{g:"s3-drill",id:"9.32",d:"drill",q:"A company wants to lift-and-shift hundreds of on-premises VMware servers to EC2 as-is with no application code changes. Which service is purpose-built?",
+o:["AWS DataSync","AWS Application Migration Service (MGN)","AWS DMS","AWS Snowcone"],c:1,
+e:`<b>Application Migration Service (MGN)</b> is the rehost/lift-and-shift tool that replicates whole servers into EC2. DataSync moves files; DMS moves databases; Snowcone is a small offline transfer device.`},
+
+{g:"s3-drill",id:"9.33",d:"drill",q:"You must transfer 30 TB of files from an on-premises NFS share to Amazon S3 over an existing high-bandwidth link, on a recurring schedule. Which service?",
+o:["AWS Snowball Edge","AWS DataSync","AWS Transfer Family","AWS DMS"],c:1,
+e:`<b>DataSync</b> is the online file-transfer service for NFS/SMB to S3/EFS/FSx, with scheduling and verification. Snowball is for offline/limited-bandwidth bulk; Transfer Family is a managed SFTP endpoint; DMS is for databases.`},
+
+{g:"s3-drill",id:"9.34",d:"drill",q:"A site must accept large file uploads from external partners over SFTP, landing directly in S3, with minimal operational overhead and no servers to manage. Which service?",
+o:["Run an SFTP server on EC2 behind an NLB","AWS Transfer Family (managed SFTP)","AWS DataSync","Amazon S3 multipart upload only"],c:1,
+e:`<b>Transfer Family</b> is a fully managed SFTP/FTPS/FTP endpoint that writes straight to S3/EFS — no servers to run. The EC2 SFTP build is the operational-overhead trap; DataSync is agent-based file sync, not a partner SFTP endpoint; multipart upload alone isn't an SFTP service.`},
+
+{g:"s3-drill",id:"9.35",d:"drill",q:"A company must move 400 TB to AWS but its internet link would take many months to transfer that online. What's the right tool?",
+o:["AWS DataSync over the internet","AWS Snowball Edge (offline shipping)","AWS DMS","S3 Transfer Acceleration"],c:1,
+e:`When the wire would take months, ship it: <b>Snowball Edge</b> moves bulk data offline. DataSync/Transfer Acceleration still depend on the slow link; DMS is for databases.<span class="flip"><span class="fl">flip it</span>If bandwidth were ample and the transfer recurring, <b>DataSync</b> would win.</span>`},
+
+/* ====== S3 EXAM ====== */
+{g:"s3-exam",id:"9.36",d:"exam",multi:true,tag:"miss",q:"A company is migrating an on-premises PostgreSQL database to Amazon Aurora PostgreSQL. The source must stay online and accessible, and Aurora must remain synchronized with it until cutover. Which TWO actions accomplish this? (Choose TWO.)",
+o:["Create an AWS DMS replication instance","Create an ongoing replication (CDC) task in DMS","Convert the schema with AWS SCT","Take a one-time database backup and restore it","Order a Snowball Edge device for the data"],c:[0,1],
+e:`Same engine to same engine (PostgreSQL→Aurora PostgreSQL) is <b>homogeneous</b>, so no schema conversion is needed. You need a <b>DMS replication instance</b> plus an <b>ongoing CDC replication task</b> to keep the source live and the target synchronized.<br>✗ SCT is only for heterogeneous (different-engine) migrations. ✗ A one-time backup doesn't keep them in sync. ✗ Snowball is offline bulk, not live DB replication.`},
+
+{g:"s3-exam",id:"9.37",d:"exam",q:"A company must migrate a 5 PB on-premises archive to S3. The data center has a modest internet connection, and transferring online would take well over a year. Edge pre-processing is not required. What's the most appropriate approach?",
+o:["AWS DataSync over Direct Connect","Multiple AWS Snowball Edge Storage Optimized devices","AWS Transfer Family","S3 Transfer Acceleration with multipart uploads"],c:1,
+e:`5 PB over a modest link is a years-long transfer, so go offline with <b>Snowball Edge Storage Optimized</b> devices.<br>✗ DataSync (even over DX) is bounded by link bandwidth. ✗ Transfer Family is a managed SFTP endpoint, not bulk migration. ✗ Transfer Acceleration still rides the same slow connection.<span class="flip"><span class="fl">flip it</span>If the volume were ~50 TB with a healthy link or a recurring sync, the answer flips to <b>DataSync</b>.</span>`},
+
+{g:"s3-exam",id:"9.38",d:"exam",tag:"miss",q:"A company must migrate a large on-premises file store AND its backing database to AWS together, keeping downtime minimal. The files are large but the link is adequate; the database must stay synchronized until cutover. Which combination is best?",
+o:["DataSync for both the files and the database","DataSync for the file data plus DMS with CDC for the database","Snowball for the files plus DataSync for the database","MGN for the files plus SCT for the database"],c:1,
+e:`Use the right mover for each data type: <b>DataSync</b> for the bulk file copy and <b>DMS with CDC</b> to keep the database synchronized until cutover.<br>✗ DataSync can't replicate live database changes. ✗ DataSync isn't a database sync tool. ✗ MGN rehosts servers (not file shares) and SCT only converts schema for heterogeneous DB moves.`},
+
+{g:"s3-exam",id:"9.39",d:"exam",q:"A company is rehosting 200 mixed physical and VMware servers to EC2 with no application rewrites, and wants continuous block-level replication with a short cutover window. Which service is designed for this?",
+o:["AWS DMS","AWS Application Migration Service (MGN)","AWS DataSync","AWS Elastic Beanstalk"],c:1,
+e:`<b>MGN</b> performs agent-based, continuous block-level replication of whole servers into EC2 for a fast lift-and-shift cutover.<br>✗ DMS migrates databases, not whole servers. ✗ DataSync moves files. ✗ Elastic Beanstalk deploys new app code, it doesn't replicate existing servers.`},
+
+{g:"s3-exam",id:"9.40",d:"exam",q:"A migration program spans several teams using different tools across multiple accounts, and leadership wants a single dashboard to discover servers and track overall migration progress. Which service provides this?",
+o:["AWS Migration Hub","AWS Config","AWS Systems Manager Inventory","AWS CloudFormation"],c:0,
+e:`<b>Migration Hub</b> gives a single pane to discover resources and track migration status across tools and accounts.<br>✗ Config tracks resource configuration/compliance. ✗ SSM Inventory catalogs software on managed instances, not migration progress. ✗ CloudFormation provisions infrastructure.`},
+
+{g:"s3-exam",id:"9.41",d:"exam",q:"A company is migrating a self-managed Microsoft SQL Server database to a fully managed AWS database while keeping the SAME engine and minimizing downtime. What's the simplest valid path?",
+o:["Use SCT to convert the schema, then DMS","Use DMS directly to migrate to SQL Server on Amazon RDS with ongoing replication","Lift-and-shift the server with MGN","Export to S3 with DataSync and import manually"],c:1,
+e:`Same engine (SQL Server → SQL Server on RDS) is <b>homogeneous</b>, so <b>DMS alone</b> with ongoing replication suffices.<br>✗ SCT is only needed for different-engine targets. ✗ MGN rehosts the server rather than moving to a managed database. ✗ DataSync export/import means more downtime and manual steps.<span class="flip"><span class="fl">flip it</span>Change the target to Aurora PostgreSQL and you now need <b>SCT + DMS</b>.</span>`},
+
+{g:"s3-exam",id:"9.42",d:"exam",tag:"miss",q:"A retail company runs a remote site with intermittent connectivity that must collect data locally, run some edge processing, and periodically ship the data to AWS. Which device fits a small, rugged footprint?",
+o:["AWS Snowmobile","AWS Snowcone","AWS Direct Connect","AWS Storage Gateway only"],c:1,
+e:`<b>Snowcone</b> is the smallest, rugged, portable Snow device with onboard compute for edge processing and periodic data shipping — built for constrained remote sites.<br>✗ Snowmobile is the retired exabyte-scale truck. ✗ Direct Connect needs a stable dedicated link. ✗ Storage Gateway is a hybrid file/volume/tape service, not a rugged edge device for intermittent sites.<span class="flip"><span class="fl">flip it</span>If the requirement were petabytes with edge compute at a connected facility, that's <b>Snowball Edge</b>.</span>`}
+
+];
+
+/* ---------------- RENDER ---------------- */
+const L=["A","B","C","D","E"];
+const state={}; // id -> {answered, correct}
+let total=BANK.length;
+
+/* ---------------- PERSISTENCE ----------------
+   One shared store for all files, keyed by FILE_KEY.
+   Shape: { "file-1": { answers:{ "1.01":[0], ... }, scroll:1234 }, "file-2": {...}, ... } */
+const STORE_KEY="saa_c03_progress";
+const FILE_KEY="file-9";
+function loadStore(){ try{return JSON.parse(localStorage.getItem(STORE_KEY))||{};}catch(e){return {};} }
+function saveStore(s){ try{localStorage.setItem(STORE_KEY,JSON.stringify(s));}catch(e){} }
+function fileData(){ const s=loadStore(); return s[FILE_KEY]||{answers:{},scroll:0}; }
+function writeFileData(fd){ const s=loadStore(); s[FILE_KEY]=fd; saveStore(s); }
+function saveAnswer(id,picks){ const fd=fileData(); fd.answers=fd.answers||{}; fd.answers[id]=picks; writeFileData(fd); }
+function saveScroll(y){ const fd=fileData(); fd.scroll=y; writeFileData(fd); }
+function clearFile(){ const s=loadStore(); delete s[FILE_KEY]; saveStore(s); }
+const SAVED=fileData();
+
+function tagChip(t){
+  if(t==="miss") return '<span class="chip miss">↻ your miss</span>';
+  if(t==="win")  return '<span class="chip win">✓ lock it in</span>';
+  return "";
+}
+function diffChip(d,multi){
+  let base = d==="exam"?'<span class="chip exam">exam</span>'
+           : d==="mixed"?'<span class="chip mixed">mixed</span>'
+           : '<span class="chip drill">drill</span>';
+  if(multi) base += ' <span class="chip two">select two</span>';
+  return base;
+}
+
+BANK.forEach(item=>{
+  const host=document.getElementById(item.g);
+  if(!host)return;
+  const card=document.createElement("div");
+  card.className="q";
+  card.tabIndex=0;
+  card.dataset.id=item.id;
+  const correctArr = Array.isArray(item.c)?item.c:[item.c];
+  const multi = item.multi===true || correctArr.length>1;
+
+  card.innerHTML =
+    '<div class="qtop"><span class="qid">Q '+item.id+'</span>'+diffChip(item.d,multi)+tagChip(item.tag)+'</div>'+
+    '<div class="stem">'+item.q+'</div>'+
+    '<ul class="opts">'+item.o.map((t,i)=>
+      '<button class="opt" data-i="'+i+'"><span class="ltr">'+L[i]+'</span><span class="otext">'+t+'</span><span class="mark"></span></button>'
+    ).join('')+'</ul>'+
+    (multi?'<button class="checkbtn" disabled>Check answer</button>':'')+
+    '<div class="reveal"><div class="rv-inner"></div></div>';
+
+  host.appendChild(card);
+
+  const opts=[...card.querySelectorAll(".opt")];
+  const checkBtn=card.querySelector(".checkbtn");
+  const reveal=card.querySelector(".reveal");
+  const rvInner=card.querySelector(".rv-inner");
+  let locked=false;
+  let sel=new Set();
+
+  function settle(){
+    locked=true;
+    const userArr=[...sel];
+    const ok = userArr.length===correctArr.length && userArr.every(i=>correctArr.includes(i));
+    opts.forEach((b,i)=>{
+      b.disabled=true; b.classList.remove("sel");
+      const mark=b.querySelector(".mark");
+      if(correctArr.includes(i)){b.classList.add("correct");mark.textContent="✓ correct";}
+      else if(sel.has(i)){b.classList.add("wrong");mark.textContent="✗ your pick";}
+    });
+    if(checkBtn)checkBtn.style.display="none";
+    rvInner.innerHTML='<div class="verdict '+(ok?'r-ok':'r-no')+'">'+(ok?'Correct':'Not quite')+'</div>'+item.e;
+    reveal.classList.add("show");
+    state[item.id]={answered:true,correct:ok};
+    if(!window.__saaRestoring) saveAnswer(item.id,userArr);
+    updateHUD();
+  }
+
+  opts.forEach(b=>{
+    b.addEventListener("click",()=>{
+      if(locked)return;
+      const i=+b.dataset.i;
+      if(multi){
+        if(sel.has(i)){sel.delete(i);b.classList.remove("sel");}
+        else{sel.add(i);b.classList.add("sel");}
+        if(checkBtn)checkBtn.disabled = sel.size===0;
+      } else {
+        sel=new Set([i]); settle();
+      }
+    });
+  });
+  if(checkBtn)checkBtn.addEventListener("click",()=>{if(!locked&&sel.size)settle();});
+
+  // keyboard: 1-5 / a-e select; Enter checks (multi)
+  card.addEventListener("keydown",e=>{
+    if(locked)return;
+    let idx=-1;
+    if(e.key>="1"&&e.key<="5")idx=+e.key-1;
+    const lk=e.key.toLowerCase();
+    if(lk>="a"&&lk<="e")idx=lk.charCodeAt(0)-97;
+    if(idx>=0&&idx<opts.length){e.preventDefault();opts[idx].click();}
+    else if(e.key==="Enter"&&multi&&sel.size){e.preventDefault();settle();}
+  });
+});
+
+/* ---------------- HUD + SUMMARY ---------------- */
+document.getElementById("h-tot").textContent=total;
+function updateHUD(){
+  const answered=Object.keys(state).length;
+  const correct=Object.values(state).filter(s=>s.correct).length;
+  const pct = answered? Math.round(100*correct/answered):0;
+  document.getElementById("h-ans").textContent=answered;
+  document.getElementById("h-pct").textContent= answered? pct+"%":"—";
+  document.getElementById("h-bar").style.width=(100*answered/total)+"%";
+
+  const scP=document.getElementById("sc-pct");
+  const scL=document.getElementById("sc-line");
+  const scM=document.getElementById("sc-miss");
+  if(answered===0){scP.textContent="—";scL.textContent="Answer some questions and your readiness score appears here.";scM.innerHTML="";return;}
+  scP.textContent=pct+"%";
+  let verdict;
+  if(answered<total) verdict=correct+" / "+answered+" so far — "+(total-answered)+" left. The bar at the very top tracks your run.";
+  else if(pct>=80) verdict="Strong. 80%+ on a weakness-targeted set means these concepts are sticking. Move to File 10.";
+  else if(pct>=70) verdict="On the pass line for this set. Re-take the ones below, then File 10.";
+  else verdict="Below your target. Re-read the section boxes, redo the misses below, and run it again before moving on.";
+  scL.textContent=verdict;
+
+  const missed=Object.entries(state).filter(([k,v])=>!v.correct).map(([k])=>k);
+  scM.innerHTML = missed.length
+    ? "review: "+missed.map(id=>'<a href="#" onclick="jump(\''+id+'\');return false;">Q'+id+'</a>').join("")
+    : (answered===total?"clean sweep — nothing flagged.":"");
+}
+function jump(id){
+  const el=[...document.querySelectorAll(".q")].find(q=>q.dataset.id===id);
+  if(el){el.scrollIntoView({behavior:"smooth",block:"center"});el.focus({preventScroll:true});}
+}
+document.getElementById("h-reset").addEventListener("click",()=>{clearFile();location.reload()});
+updateHUD();
+
+/* ---------------- SMOOTH VIM PAGE SCROLLING ---------------- */
+const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+let lastG=0, rafId=null, targetY=window.scrollY;
+const help=document.getElementById("help");
+function toggleHelp(){help.classList.toggle("show");}
+function maxY(){ return Math.max(0, document.documentElement.scrollHeight - window.innerHeight); }
+function tick(){
+  const cur=window.scrollY, diff=targetY-cur;
+  if(Math.abs(diff)<0.6){ window.scrollTo(0,Math.round(targetY)); rafId=null; return; }
+  window.scrollTo(0, cur + diff*0.16);   // eased glide toward target
+  rafId=requestAnimationFrame(tick);
+}
+function glide(dy){
+  if(reduce){ window.scrollBy(0,dy); return; }
+  if(rafId===null) targetY=window.scrollY;
+  targetY=Math.max(0,Math.min(maxY(),targetY+dy));
+  if(rafId===null) rafId=requestAnimationFrame(tick);
+}
+function glideTo(y){
+  if(reduce){ window.scrollTo(0,y); return; }
+  targetY=Math.max(0,Math.min(maxY(),y));
+  if(rafId===null) rafId=requestAnimationFrame(tick);
+}
+["wheel","touchmove"].forEach(ev=>window.addEventListener(ev,()=>{ if(rafId){cancelAnimationFrame(rafId);rafId=null;} },{passive:true}));
+document.addEventListener("keydown",e=>{
+  const tag=(e.target.tagName||"").toLowerCase();
+  if(tag==="input"||tag==="textarea")return;
+  if(e.metaKey||e.ctrlKey||e.altKey)return;
+  if(e.key==="Escape"){help.classList.remove("show");return;}
+  if(e.key==="?"){e.preventDefault();toggleHelp();return;}
+  if(help.classList.contains("show"))return;
+  // 1-5 / a-e are handled per-card (when a card is focused); let them through
+  if((e.key>="1"&&e.key<="5") || (e.key.length===1 && e.key.toLowerCase()>="a" && e.key.toLowerCase()<="e")) return;
+  const vh=window.innerHeight;
+  switch(e.key){
+    case"j":e.preventDefault();glide(80);break;
+    case"k":e.preventDefault();glide(-80);break;
+    case"d":e.preventDefault();glide(vh*0.5);break;
+    case"u":e.preventDefault();glide(-vh*0.5);break;
+    case"f":e.preventDefault();glide(vh*0.9);break;
+    case"b":e.preventDefault();glide(-vh*0.9);break;
+    case"G":e.preventDefault();glideTo(maxY());break;
+    case"g":{const now=Date.now();if(now-lastG<500){e.preventDefault();glideTo(0);lastG=0;}else lastG=now;break;}
+  }
+});
+document.getElementById("h-help").addEventListener("click",toggleHelp);
+
+/* ---------------- RESTORE SAVED ANSWERS ----------------
+   Replay each saved answer by simulating the same option clicks the user made.
+   The __saaRestoring flag stops settle() from re-saving during replay. */
+function restoreAnswers(){
+  const answers=SAVED.answers||{};
+  window.__saaRestoring=true;
+  document.querySelectorAll(".q").forEach(card=>{
+    const picks=answers[card.dataset.id];
+    if(!Array.isArray(picks)||!picks.length)return;
+    const opts=[...card.querySelectorAll(".opt")];
+    picks.forEach(i=>{ if(opts[i])opts[i].click(); });          // single-select settles on the click
+    const checkBtn=card.querySelector(".checkbtn");             // multi-select needs the explicit check
+    if(checkBtn&&checkBtn.style.display!=="none")checkBtn.click();
+  });
+  window.__saaRestoring=false;
+}
+restoreAnswers();
+
+/* ---------------- SCROLL POSITION ---------------- */
+// restore scroll after the DOM (and replayed answers) are laid out
+if(SAVED.scroll){
+  const y=SAVED.scroll;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>window.scrollTo(0,y)));
+}
+// save scroll position, throttled
+let scrollTimer=null;
+window.addEventListener("scroll",()=>{
+  if(scrollTimer)return;
+  scrollTimer=setTimeout(()=>{scrollTimer=null;saveScroll(window.scrollY||window.pageYOffset||0);},250);
+},{passive:true});
+</script>
+</body>
+</html>

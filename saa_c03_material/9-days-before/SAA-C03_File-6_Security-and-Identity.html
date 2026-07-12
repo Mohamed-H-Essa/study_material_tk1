@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SAA-C03 · File 6 · Security &amp; Identity</title>
+<style>
+  :root{
+    /* dark theme — palette shared with File 5 */
+    --ink:#e7eef6; --ink-soft:#a3b5c7; --muted:#6f8298;
+    --paper:#0e1620; --panel:#15212e; --panel2:#1a2836; --panel3:#1f2f40; --line:#26384a; --line-strong:#36506a;
+    --accent:#f59e3c; --accent-2:#f7b260; --accent-deep:#f7b260; --accent-tint:rgba(245,158,60,.12);
+    --navy:#1a2836; --navy-tint:#1f2f40;
+    --ok:#3fcf8e; --ok-bg:rgba(63,207,142,.13); --ok-line:rgba(63,207,142,.45);
+    --no:#ff7062; --no-bg:rgba(255,112,98,.13); --no-line:rgba(255,112,98,.45);
+    --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+    line-height:1.62;font-size:17px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:860px;margin:0 auto;padding:0 22px}
+  ::selection{background:rgba(245,158,60,.3)}
+
+  /* ---------- HUD ---------- */
+  .hud{position:sticky;top:0;z-index:50;background:rgba(28,43,62,.97);color:#fff;
+    border-bottom:1px solid #0e1622;backdrop-filter:saturate(1.2) blur(6px)}
+  .hud-inner{max-width:860px;margin:0 auto;padding:9px 22px;display:flex;gap:16px;
+    align-items:center;font-family:var(--mono);font-size:12.5px;flex-wrap:wrap}
+  .hud .dot{color:var(--accent);font-weight:700;letter-spacing:.04em}
+  .hud .stat b{color:#fff;font-weight:700}
+  .hud .stat{color:#9fb0c4}
+  .bar{flex:1;min-width:120px;height:7px;background:#0f1b2a;border-radius:99px;overflow:hidden}
+  .bar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),#f0a850);
+    transition:width .35s ease}
+  .hud button{font-family:var(--mono);font-size:11.5px;color:#9fb0c4;background:transparent;
+    border:1px solid #33445a;border-radius:6px;padding:3px 9px;cursor:pointer}
+  .hud button:hover{color:#fff;border-color:var(--accent)}
+
+  /* ---------- header ---------- */
+  header.top{padding:54px 0 30px;border-bottom:1px solid var(--line)}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--accent-deep);margin:0 0 14px}
+  h1{font-size:40px;line-height:1.05;margin:0 0 12px;font-weight:800;letter-spacing:-.018em}
+  h1 .thin{font-weight:400;color:var(--ink-soft)}
+  .lede{font-size:18px;color:var(--ink-soft);margin:0;max-width:60ch}
+  .filechips{display:flex;gap:7px;flex-wrap:wrap;margin-top:22px;font-family:var(--mono);font-size:11.5px}
+  .fc{padding:4px 10px;border:1px solid var(--line-strong);border-radius:99px;color:var(--muted)}
+  .fc.here{background:var(--navy);color:#fff;border-color:var(--navy)}
+
+  .legend{margin:26px 0 0;padding:16px 18px;background:var(--panel);border:1px solid var(--line);
+    border-radius:12px;font-size:14px;color:var(--ink-soft)}
+  .legend b{color:var(--ink)}
+  .legend .row{display:flex;gap:10px;align-items:baseline;margin:7px 0}
+  .legend .tg{flex:none}
+
+  /* ---------- sections ---------- */
+  section{padding:46px 0;border-bottom:1px solid var(--line)}
+  .sec-tag{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--accent-deep);display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .sec-tag .n{background:var(--navy);color:#fff;border-radius:6px;padding:2px 8px;font-size:11px}
+  h2{font-size:28px;line-height:1.12;margin:0 0 6px;font-weight:800;letter-spacing:-.015em}
+  h3{font-size:18.5px;margin:30px 0 8px;font-weight:700;letter-spacing:-.01em}
+  p{margin:13px 0}
+  .sub{color:var(--ink-soft);font-size:16px;margin-top:2px}
+  code{font-family:var(--mono);font-size:.86em;background:var(--panel2,#1f2f40);padding:1.5px 6px;border-radius:5px;
+    color:#cfe0d6; white-space:nowrap}
+  strong{font-weight:700}
+  ul.tight{margin:12px 0;padding-left:20px}
+  ul.tight li{margin:7px 0}
+
+  /* ---------- callouts ---------- */
+  .box{margin:22px 0;border-radius:12px;padding:16px 18px 16px 20px;border:1px solid var(--line);
+    background:var(--panel);position:relative;overflow:hidden}
+  .box .lab{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+    margin:0 0 6px;font-weight:600}
+  .box.key{border-color:rgba(245,158,60,.4);background:var(--accent-tint)}
+  .box.key:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent)}
+  .box.key .lab{color:var(--accent-deep)}
+  .box.trap{border-color:var(--no-line);background:var(--no-bg)}
+  .box.trap:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--no)}
+  .box.trap .lab{color:var(--no)}
+  .box.field{background:var(--navy);color:#dfe7f0;border-color:var(--navy)}
+  .box.field .lab{color:var(--accent)}
+  .box.field b{color:#fff}
+  .box p:first-of-type{margin-top:0}.box p:last-child{margin-bottom:0}
+
+  /* ---------- table ---------- */
+  .tw{overflow-x:auto;margin:22px 0}
+  table{border-collapse:collapse;width:100%;font-size:14.5px}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;
+    color:var(--muted);font-weight:600;border-bottom:2px solid var(--line-strong)}
+  td b{color:var(--ink)}
+  tr:last-child td{border-bottom:none}
+
+  /* ---------- quiz ---------- */
+  .quizhead{display:flex;align-items:center;gap:10px;margin:34px 0 4px;flex-wrap:wrap}
+  .quizhead .ttl{font-family:var(--mono);font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--ink);font-weight:700}
+  .quizhead .meta{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  .quizhead .rule{flex:1;height:1px;background:var(--line)}
+
+  .q{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:18px 18px 6px;
+    margin:16px 0;transition:border-color .2s}
+  .q:focus-within{border-color:var(--line-strong)}
+  .q:focus{outline:2px solid var(--accent);outline-offset:2px}
+  .qtop{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:9px}
+  .qid{font-family:var(--mono);font-size:11.5px;color:var(--muted);font-weight:600}
+  .chip{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+    padding:2px 7px;border-radius:5px;font-weight:700}
+  .chip.drill{background:#22323f;color:#9fc0d8}
+  .chip.exam{background:#36506a;color:#eaf2fb}
+  .chip.mixed{background:var(--accent-tint);color:var(--accent-deep)}
+  .chip.two{background:rgba(154,118,224,.18);color:#bba6e8}
+  .chip.miss{background:var(--no-bg);color:var(--no);border:1px solid var(--no-line)}
+  .chip.win{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-line)}
+  .stem{font-size:16.5px;margin:2px 0 13px;line-height:1.5}
+  .opts{list-style:none;margin:0;padding:0}
+  .opt{display:flex;gap:11px;align-items:flex-start;width:100%;text-align:left;cursor:pointer;
+    border:1px solid var(--line);background:var(--navy-tint);border-radius:9px;padding:11px 13px;margin:7px 0;
+    font:inherit;font-size:15.5px;color:var(--ink);transition:border-color .12s,background .12s}
+  .opt:hover:not(:disabled){border-color:var(--line-strong);background:#243749}
+  .opt:disabled{cursor:default}
+  .opt .ltr{flex:none;font-family:var(--mono);font-weight:700;font-size:13px;color:var(--accent-deep);
+    width:18px;text-align:center;padding-top:1px}
+  .opt.sel{border-color:var(--accent);background:var(--accent-tint)}
+  .opt.sel .ltr{color:var(--accent-deep)}
+  .opt.correct{border-color:var(--ok-line);background:var(--ok-bg)}
+  .opt.correct .ltr{color:var(--ok)}
+  .opt.wrong{border-color:var(--no-line);background:var(--no-bg)}
+  .opt.wrong .ltr{color:var(--no)}
+  .opt .mark{margin-left:auto;font-family:var(--mono);font-weight:700;font-size:13px}
+  .opt.correct .mark{color:var(--ok)}.opt.wrong .mark{color:var(--no)}
+  .checkbtn{font-family:var(--mono);font-size:12.5px;font-weight:700;letter-spacing:.04em;
+    background:var(--navy);color:#fff;border:none;border-radius:8px;padding:9px 16px;cursor:pointer;
+    margin:6px 0 2px}
+  .checkbtn:hover{background:#0f1d2c}.checkbtn:disabled{opacity:.4;cursor:default}
+  .reveal{max-height:0;overflow:hidden;transition:max-height .3s ease}
+  .reveal.show{max-height:1600px}
+  .rv-inner{border-top:1px solid var(--line);margin-top:12px;padding:13px 2px 12px;font-size:15px;
+    color:var(--ink-soft);line-height:1.58}
+  .rv-inner .verdict{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;
+    font-weight:700;margin-bottom:6px}
+  .verdict.r-ok{color:var(--ok)}.verdict.r-no{color:var(--no)}
+  .rv-inner b{color:var(--ink)}
+  .flip{display:block;margin-top:10px;padding:9px 12px;background:var(--navy-tint);border-radius:8px;
+    font-size:14.5px}
+  .flip .fl{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--accent-deep);font-weight:700;margin-right:6px}
+
+  /* ---------- summary ---------- */
+  .summary{padding:46px 0 70px}
+  .scorecard{background:var(--navy);color:#fff;border-radius:16px;padding:26px 26px 22px;text-align:center}
+  .scorecard .big{font-size:54px;font-weight:800;letter-spacing:-.02em;line-height:1}
+  .scorecard .lab2{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--accent);margin-bottom:8px}
+  .scorecard .note{color:#b9c6d6;font-size:14.5px;margin-top:10px}
+  .misslist{margin-top:18px;font-family:var(--mono);font-size:13px}
+  .misslist a{color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent);
+    margin:0 4px;display:inline-block}
+  .foot{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:center;margin-top:30px}
+
+  /* ---------- vim help overlay ---------- */
+  #help{position:fixed;inset:0;z-index:90;background:rgba(6,11,17,.72);display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+  #help.show{display:flex}
+  .help-card{background:var(--panel2);border:1px solid var(--line-strong);border-radius:14px;padding:24px 26px;max-width:380px;width:calc(100% - 44px)}
+  .help-card h4{margin:0 0 4px;font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+  .help-card .hk{display:flex;justify-content:space-between;gap:14px;padding:6px 0;font-size:14.5px;border-bottom:1px solid var(--line)}
+  .help-card .hk:last-of-type{border-bottom:none}
+  .help-card kbd{font-family:var(--mono);background:var(--panel3);border:1px solid var(--line-strong);border-bottom-width:2px;border-radius:5px;padding:1px 8px;color:var(--accent-2);font-weight:600}
+  .help-card .close{margin-top:14px;font-family:var(--mono);font-size:12px;color:var(--muted);text-align:center}
+  .q.current{border-color:var(--accent)}
+
+  @media (max-width:560px){
+    body{font-size:16px} h1{font-size:31px} h2{font-size:23px}
+    .hud-inner{font-size:11px;gap:10px} .stem{font-size:15.5px}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<div class="hud">
+  <div class="hud-inner">
+    <span class="dot">▰ SAA-C03</span>
+    <span class="stat"><b id="h-ans">0</b>/<span id="h-tot">0</span> answered</span>
+    <span class="stat"><b id="h-pct">—</b> correct</span>
+    <div class="bar"><i id="h-bar"></i></div>
+    <button id="h-help">? keys</button>
+    <button id="h-reset">reset</button>
+  </div>
+</div>
+
+<div id="help"><div class="help-card">
+  <h4>Vim scrolling · smooth</h4>
+  <div class="hk"><span>Glide down / up (hold to flow)</span><span><kbd>j</kbd> <kbd>k</kbd></span></div>
+  <div class="hk"><span>Half page down / up</span><span><kbd>d</kbd> <kbd>u</kbd></span></div>
+  <div class="hk"><span>Full page down / up</span><span><kbd>f</kbd> <kbd>b</kbd></span></div>
+  <div class="hk"><span>Top of page</span><span><kbd>g</kbd><kbd>g</kbd></span></div>
+  <div class="hk"><span>Bottom of page</span><span><kbd>G</kbd></span></div>
+  <div class="hk"><span>Toggle this help</span><span><kbd>?</kbd></span></div>
+  <div class="close">Answer questions by clicking · esc closes help</div>
+</div></div>
+
+<div class="wrap">
+<header class="top">
+  <p class="eyebrow">Weakness-targeted drill · File 6 of 10</p>
+  <h1>Security &amp; Identity<br><span class="thin">IAM · KMS · Cognito · WAF/Shield · GuardDuty &amp; the detective stack</span></h1>
+  <p class="lede">This is the biggest slice of the exam — security and identity is roughly 30% of your score. The questions are rarely "what is IAM"; they're "which control, attached where, with the least operational effort," and the wrong answers are services that <em>almost</em> fit. Get the deny-beats-allow reflex and the SSE/KMS/HSM family straight and a third of the exam stops fighting you.</p>
+  <div class="filechips">
+    <span class="fc">1 · Compute &amp; Traffic</span>
+    <span class="fc">2 · Decoupling</span>
+    <span class="fc">3 · Databases</span>
+    <span class="fc">4 · Resilience &amp; DR</span>
+    <span class="fc">5 · Cost</span>
+    <span class="fc here">6 · Security &amp; Identity</span>
+    <span class="fc">7 · Storage</span>
+    <span class="fc">8 · Networking</span>
+    <span class="fc">9 · Management &amp; Migration</span>
+    <span class="fc">10 · Analytics &amp; App Integration</span>
+  </div>
+  <div class="legend">
+    <div class="row"><span class="tg chip drill">drill</span><span><b>Quick check.</b> Exam-real, but tests one fact at a time. Confidence fuel.</span></div>
+    <div class="row"><span class="tg chip exam">exam</span><span><b>Scenario.</b> Full SAA-C03 difficulty — multiple plausible services, one fatal flaw.</span></div>
+    <div class="row"><span class="tg chip mixed">mixed</span><span><b>All-topics review</b> dropped between sections so nothing goes stale.</span></div>
+    <div class="row"><span class="tg chip miss">↻ your miss</span><span>You got this exact concept wrong on a mock or the timed exam.</span></div>
+    <div class="row"><span class="tg chip win">✓ lock it in</span><span>You got this right before — proving it sticks.</span></div>
+    <p style="margin:12px 0 0;font-size:13.5px;color:var(--muted)">Click an option to answer (or focus a card and press <code>1–5</code>; <code>Enter</code> checks Select-TWO). Every answer reveals why the right one wins, why each distractor dies, and the <b>Flip it</b> — the small stem change that would make a wrong answer correct.</p>
+  </div>
+</header>
+</div>
+
+<div class="wrap">
+
+<!-- ===================== SECTION 1 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">01</span> Identity &amp; access management, deep</div>
+  <h2>Deny beats allow, and nobody should hold a long-lived key</h2>
+  <p class="sub">IAM is the spine of the whole domain. The exam tests how policies <em>combine</em> across accounts, who can do what, and the two reflexes it rewards every time: least privilege, and temporary credentials over static keys.</p>
+
+  <h3>The four building blocks</h3>
+  <p><b>Users</b> are long-lived humans/apps (avoid where possible). <b>Groups</b> attach policies to many users at once — groups can't be nested and aren't principals. <b>Roles</b> are the hero of the exam: an identity with no permanent credentials that <em>anyone trusted</em> (an EC2 instance, a Lambda, another account, a federated user) assumes to get <b>temporary</b> credentials via STS. <b>Policies</b> are JSON documents granting/denying actions.</p>
+
+  <h3>How a request is actually evaluated</h3>
+  <p>For every API call AWS gathers all applicable policies and applies this order: an <b>explicit Deny anywhere wins, always</b>. Otherwise, the action must be explicitly <b>Allowed</b> by something; the default is an implicit deny. So the mental model is: <em>explicit deny &gt; explicit allow &gt; implicit deny</em>. SCPs, permission boundaries, identity policies and resource policies all feed into this — and any one of them denying is fatal.</p>
+
+  <div class="box key"><p class="lab">Key fact — identity policy vs resource policy</p><p>An <b>identity-based policy</b> hangs off a user/group/role and says "this principal can do X." A <b>resource-based policy</b> hangs off the resource (an S3 bucket policy, an SQS queue policy, a KMS key policy) and says "these principals can touch <em>me</em>." <b>Cross-account access is the resource-policy's home turf</b>: the resource grants the external account, and that account's IAM also allows the action — both locks must open.</p></div>
+
+  <h3>The org-level guardrails</h3>
+  <div class="tw"><table>
+    <tr><th>Control</th><th>What it is</th><th>Stem tell</th></tr>
+    <tr><td><b>SCP</b> (Service Control Policy)</td><td>Org/OU-level <em>maximum</em> permission boundary. Never grants — only limits what accounts <em>can</em> do.</td><td>"across all accounts in the organization", "even the root user can't…", attach to OU</td></tr>
+    <tr><td><b>Permission boundary</b></td><td>A managed policy that caps the max permissions of a single <em>IAM user or role</em>.</td><td>"let admins delegate user creation without privilege escalation"</td></tr>
+    <tr><td><b>IAM Identity Center</b></td><td>Successor to AWS SSO: central workforce sign-on + permission sets across many accounts, federates to your IdP.</td><td>"single sign-on across all accounts", "manage access centrally"</td></tr>
+    <tr><td><b>IAM Access Analyzer</b></td><td>Finds resources shared with external principals; validates policies.</td><td>"identify which buckets/roles are exposed externally"</td></tr>
+  </table></div>
+
+  <div class="box trap"><p class="lab">Classic trap — SCP vs permission boundary on an OU</p><p>When the requirement is "enforce a rule across <b>every account</b> in the org (or an OU), so that even the root user obeys it," the answer is an <b>SCP attached to the OU</b> — <em>not</em> a permission boundary. Permission boundaries cap a single user/role and <b>can't be attached to an OU</b> at all. An SCP that denies <code>ec2:CreateVolume</code> when <code>ec2:Encrypted</code> is false is a real exam answer; the same idea phrased as a permission boundary on the OU is the bait.</p></div>
+
+  <p><strong>Cross-account &amp; instance reflexes:</strong> EC2 gets permissions through an <b>instance profile</b> (a wrapper around a role) — never store access keys on the box. To use another account, you <code>sts:AssumeRole</code> a role there that trusts you; STS hands back short-lived creds. External/web identities (Google, SAML corporate IdP) reach AWS through <b>federation</b>, again landing on a role. The recurring right answer to "stop using long-lived keys" is: <b>use a role</b>.</p>
+
+  <div class="box field"><p class="lab">// field note — the keys in the GitHub repo</p><p>The most common way AWS accounts get drained isn't a clever exploit — it's an access key committed to a public Git repo. Bots scrape GitHub within <em>seconds</em>; people have woken to five-figure crypto-mining bills from a key pushed minutes earlier. AWS now scans public repos and auto-quarantines leaked keys, but the architectural lesson is the exam's favorite reflex: <b>roles and temporary credentials can't be committed to a repo because they don't exist until they're assumed</b>. Every "minimize credential management / no long-lived keys" question is pointing at this.</p></div>
+
+  <!-- DRILL -->
+  <div class="quizhead"><span class="ttl">Quick check</span><span class="rule"></span><span class="meta">8 questions · one fact each</span></div>
+  <div id="s1-drill"></div>
+
+  <!-- SCENARIO -->
+  <div class="quizhead"><span class="ttl">Scenario pressure</span><span class="rule"></span><span class="meta">7 questions · exam difficulty</span></div>
+  <div id="s1-exam"></div>
+</section>
+
+<!-- ===================== MIXED 1 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">↻</span> Mixed review — all domains</div>
+  <h2>Keep the rest warm</h2>
+  <p class="sub">Four pulled from across the blueprint — compute, decoupling, databases, DR — so the files you've "finished" don't fade while you grind through security.</p>
+  <div id="mix-1"></div>
+</section>
+
+<!-- ===================== SECTION 2 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">02</span> Data protection &amp; encryption</div>
+  <h2>Who holds the key decides the answer</h2>
+  <p class="sub">Nearly every encryption question reduces to one axis: how much of the key lifecycle does AWS manage, and how much do you. Get the SSE family and the KMS-vs-CloudHSM line straight and these become free points.</p>
+
+  <h3>KMS &amp; envelope encryption</h3>
+  <p><b>KMS</b> manages symmetric/asymmetric keys backed by FIPS-validated HSMs, with a <b>key policy</b> (a resource policy) as the root of access control. Keys come two ways: <b>AWS-managed</b> (auto-created per service, e.g. <code>aws/s3</code>, you can't edit the policy or control rotation) and <b>customer-managed (CMK)</b> — you control the key policy, grants, and <b>rotation</b> (automatic annual rotation is a checkbox on CMKs). KMS does <b>envelope encryption</b>: it encrypts a per-object <em>data key</em> with the master key, so KMS never has to encrypt your gigabytes directly — the service encrypts data with the plaintext data key and stores the wrapped key alongside.</p>
+
+  <div class="box key"><p class="lab">Key fact — KMS vs CloudHSM</p><p><b>KMS</b> is multi-tenant, fully managed, FIPS 140-2 <b>Level 3</b> validated, and integrates with everything — the default for "encrypt at rest with least effort." <b>CloudHSM</b> is a <em>single-tenant, dedicated</em> hardware appliance you control entirely, also FIPS 140-2 Level 3, for when you must hold the keys yourself, run your own PKI, or satisfy a regulation that forbids a shared service. You can even back a KMS <b>custom key store</b> with CloudHSM to get KMS integration plus dedicated hardware.</p></div>
+
+  <h3>The S3 server-side encryption family</h3>
+  <div class="tw"><table>
+    <tr><th>Mode</th><th>Who manages the key</th><th>Reach for it when</th></tr>
+    <tr><td><b>SSE-S3</b></td><td>AWS, fully (AES-256, <code>aws/s3</code>)</td><td>default "just encrypt it," no audit/rotation control needed</td></tr>
+    <tr><td><b>SSE-KMS</b></td><td>AWS HSMs, key in your KMS</td><td>need an audit trail (CloudTrail), key policies, rotation, separation of duties</td></tr>
+    <tr><td><b>SSE-C</b></td><td>You — supply the key on every request</td><td>you must own/keep the keys outside AWS; AWS never stores them</td></tr>
+    <tr><td><b>DSSE-KMS</b></td><td>AWS, two layers of KMS</td><td>regulatory <em>double</em> encryption mandates</td></tr>
+  </table></div>
+
+  <div class="box trap"><p class="lab">Classic trap — Secrets Manager vs Parameter Store</p><p>Both store secrets encrypted with KMS. The deciding word is <b>rotation</b>: <b>Secrets Manager has built-in automatic rotation</b> (and Lambda hooks for DB credentials, plus cross-Region replication) — pick it when the stem says "rotate credentials automatically." <b>SSM Parameter Store</b> is free for standard parameters and great for config/plaintext or SecureString values, but it has <b>no native rotation</b>. "Minimize operational overhead of credential rotation" → Secrets Manager; "store config cheaply" → Parameter Store.</p></div>
+
+  <p><strong>Where encryption shows up everywhere else:</strong> <b>EBS, RDS, EFS, and S3</b> all do at-rest encryption with KMS keys (RDS encryption must be set at creation — you can't encrypt an existing unencrypted DB in place; you snapshot, copy-with-encryption, restore). <b>ACM</b> issues and auto-renews free public TLS certs for in-transit encryption on ALB/CloudFront/API Gateway (ACM public certs don't attach to EC2 directly). In transit = TLS; at rest = KMS.</p>
+
+  <div class="box field"><p class="lab">// field note — encrypt the snapshot, not the disk</p><p>Engineers routinely get stuck trying to "turn on encryption" for a running, unencrypted RDS instance or EBS volume — there's no toggle, and the support forums are full of the discovery. The real path is the copy trick: <b>snapshot → copy the snapshot with encryption enabled (choosing a KMS key) → restore from the encrypted copy</b>. It's a one-time migration, not a setting, and it's exactly the kind of "which sequence of steps" the exam likes to test.</p></div>
+
+  <div class="quizhead"><span class="ttl">Quick check</span><span class="rule"></span><span class="meta">7 questions · one fact each</span></div>
+  <div id="s2-drill"></div>
+
+  <div class="quizhead"><span class="ttl">Scenario pressure</span><span class="rule"></span><span class="meta">7 questions · exam difficulty</span></div>
+  <div id="s2-exam"></div>
+</section>
+
+<!-- ===================== MIXED 2 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">↻</span> Mixed review — all domains</div>
+  <h2>Keep the rest warm</h2>
+  <p class="sub">Four more across cost, databases and decoupling — the cross-topic jumps the real exam makes every other question, including a security tie-in you'll see again.</p>
+  <div id="mix-2"></div>
+</section>
+
+<!-- ===================== SECTION 3 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">03</span> Edge protection &amp; the detective stack</div>
+  <h2>Block at the edge, then watch everything</h2>
+  <p class="sub">Two clusters live here. The <em>preventive</em> edge — WAF, Shield, firewalls — and the <em>detective</em> stack — GuardDuty, Inspector, Macie, Config, Security Hub. The exam tests "which one finds X," and they're easy to confuse.</p>
+
+  <h3>The edge: WAF, Shield, firewalls</h3>
+  <p><b>WAF</b> filters HTTP/S at Layer 7 with managed rule groups (OWASP, bot control, SQL-injection) and <b>rate-based rules</b>; it attaches to <b>CloudFront, ALB, API Gateway, AppSync</b> — never an NLB or EC2 directly. <b>Shield Standard</b> is free, automatic L3/L4 DDoS protection for everyone; <b>Shield Advanced</b> adds L7 protection, a 24/7 response team, and cost-protection for scaling during an attack. <b>Network Firewall</b> is a managed, stateful VPC-level firewall (filters all traffic in/out of a VPC, not just HTTP) — the VPC-wide complement to WAF's app-layer focus. <b>Firewall Manager</b> centrally manages WAF/Shield/Network Firewall/security-group rules across <em>all</em> accounts in an Organization.</p>
+
+  <div class="box key"><p class="lab">Key fact — the detective trio</p><p>Three "find the bad thing" services the exam loves to swap: <b>GuardDuty</b> = intelligent <em>threat detection</em> from logs (VPC Flow, DNS, CloudTrail) — "is someone attacking / is an instance compromised / crypto-mining." <b>Inspector</b> = automated <em>vulnerability</em> scanning of EC2, ECR images and Lambda for CVEs and unintended network exposure. <b>Macie</b> = ML that finds <em>sensitive data / PII</em> sitting in S3. Threat → GuardDuty, CVE → Inspector, PII-in-S3 → Macie.</p></div>
+
+  <div class="tw"><table>
+    <tr><th>Service</th><th>Answers the question</th><th>Data it looks at</th></tr>
+    <tr><td><b>GuardDuty</b></td><td>"Is something malicious happening?"</td><td>CloudTrail, VPC Flow Logs, DNS logs, EKS/S3 logs</td></tr>
+    <tr><td><b>Inspector</b></td><td>"Am I running vulnerable software (CVEs)?"</td><td>EC2, ECR container images, Lambda</td></tr>
+    <tr><td><b>Macie</b></td><td>"Is sensitive data / PII exposed?"</td><td>S3 objects</td></tr>
+    <tr><td><b>AWS Config</b></td><td>"Are my resources compliant over time?"</td><td>resource configuration history</td></tr>
+    <tr><td><b>Security Hub</b></td><td>"Show me all findings in one place"</td><td>aggregates GuardDuty/Inspector/Macie/Config</td></tr>
+  </table></div>
+
+  <h3>Cognito: two pools, two jobs</h3>
+  <div class="tw"><table>
+    <tr><th>Pool</th><th>Does</th><th>Tell</th></tr>
+    <tr><td><b>User pool</b></td><td><em>Authentication</em> — a user directory; sign-up/sign-in, MFA, social/SAML federation; issues tokens (great as an API Gateway authorizer)</td><td>"manage users / who are you / sign in"</td></tr>
+    <tr><td><b>Identity pool</b></td><td><em>Authorization</em> — exchanges a token for temporary AWS credentials so users can reach AWS services directly</td><td>"give the app temporary AWS access to S3/DynamoDB"</td></tr>
+  </table></div>
+
+  <div class="box trap"><p class="lab">Classic trap — Config vs CloudTrail vs GuardDuty</p><p>They sound similar but answer different questions. <b>CloudTrail</b> = <em>who did what</em> (API call audit log). <b>Config</b> = <em>what does my resource look like and is it compliant</em> (configuration state + rules over time). <b>GuardDuty</b> = <em>is the activity malicious</em> (threat intelligence on the logs). "Detect a security group that was opened to 0.0.0.0/0 and flag non-compliance" → <b>Config rule</b>. "Detect that the open port is being exploited by a known-bad IP" → <b>GuardDuty</b>.</p></div>
+
+  <div class="box field"><p class="lab">// field note — Capital One and the metadata door</p><p>In 2019 a misconfigured WAF on Capital One's infrastructure was tricked into making requests to the EC2 instance metadata endpoint, handing an attacker the instance role's temporary credentials, which were then used to read ~100 million customer records from S3. The breach is the canonical case for several exam reflexes at once: <b>least-privilege roles</b> (the role had broad S3 read), <b>GuardDuty</b> would flag the anomalous S3 access, <b>Macie</b> would have flagged the unprotected PII, and IMDSv2 closes the metadata door. One misconfiguration, the entire detective stack as the lesson.</p></div>
+
+  <div class="quizhead"><span class="ttl">Quick check</span><span class="rule"></span><span class="meta">8 questions · one fact each</span></div>
+  <div id="s3-drill"></div>
+
+  <div class="quizhead"><span class="ttl">Scenario pressure</span><span class="rule"></span><span class="meta">7 questions · exam difficulty + your confident misses</span></div>
+  <div id="s3-exam"></div>
+</section>
+
+<!-- ===================== SUMMARY ===================== -->
+<section class="summary">
+  <div class="scorecard">
+    <div class="lab2">Session readiness</div>
+    <div class="big"><span id="sc-pct">—</span></div>
+    <div class="note"><span id="sc-line">Answer some questions and your readiness score appears here.</span></div>
+    <div class="misslist" id="sc-miss"></div>
+  </div>
+  <p class="foot">File 6 / 10 · Security &amp; Identity · 50 questions · say the word and I'll build File 7 (Storage) next, or bolt 10 more scenarios onto any section here.</p>
+</section>
+
+</div><!-- /wrap -->
+
+<script>
+/* ---------------- QUESTION BANK ----------------
+   c = index (or array) of correct option(s), 0-based
+   multi:true => Select TWO; tag => "miss" | "win"          */
+const BANK = [
+
+/* ====== S1 DRILL ====== */
+{g:"s1-drill",id:"6.01",d:"drill",q:"Two policies apply to a request: an identity policy explicitly Allows an action, and an SCP explicitly Denies it. What happens?",
+o:["The request is allowed — an explicit Allow wins","The request is denied — an explicit Deny always wins","It depends on which policy was created first","The request is allowed but logged as a violation"],c:1,
+e:`In IAM evaluation an <b>explicit Deny anywhere overrides any Allow</b> — full stop. Order of creation is irrelevant, and there's no "allow-but-flag" outcome.<span class="flip"><span class="fl">flip it</span>Remove the explicit deny and leave only the implicit default deny, and the explicit <b>Allow</b> would then win.</span>`},
+
+{g:"s1-drill",id:"6.02",d:"drill",q:"An EC2 instance needs to read from S3 without storing any access keys on the instance. What do you attach?",
+o:["An IAM user with access keys baked into the AMI","An instance profile containing an IAM role","A bucket policy on the instance","An SCP on the instance's OU"],c:1,
+e:`An <b>instance profile</b> delivers a role's temporary, auto-rotated credentials to the instance — no keys on disk. ✗ Baking keys in an AMI is the anti-pattern. ✗ Bucket policies attach to buckets, not instances. ✗ SCPs limit accounts, they don't grant an instance access.`},
+
+{g:"s1-drill",id:"6.03",d:"drill",q:"You want to enforce that NO account in an Organizational Unit can ever disable CloudTrail, not even the root user. Which control?",
+o:["A permission boundary on each IAM user","A Service Control Policy (SCP) attached to the OU","An IAM group policy","A resource-based policy on CloudTrail"],c:1,
+e:`An <b>SCP on the OU</b> sets the permission ceiling for every account beneath it — even root obeys it. ✗ Permission boundaries cap a single user/role and can't attach to an OU. ✗ Group policies only affect that group's users. ✗ CloudTrail has no resource policy that constrains accounts org-wide.`},
+
+{g:"s1-drill",id:"6.04",d:"drill",q:"Which credential type does AWS STS hand out?",
+o:["Permanent access keys for a new IAM user","Temporary, time-limited security credentials","A KMS data key","A TLS certificate"],c:1,
+e:`<b>STS issues short-lived credentials</b> when a role is assumed or a user federates — the basis of roles, cross-account access, and federation. ✗ It never creates permanent keys, ✗ data keys are KMS, ✗ certs are ACM.`},
+
+{g:"s1-drill",id:"6.05",d:"drill",q:"To allow a principal in Account B to read an S3 bucket in Account A with best practice, what must be true?",
+o:["Only Account A's bucket policy needs to allow B","Only B's IAM policy needs to allow the action","Both A's bucket (resource) policy AND B's IAM policy must allow the action","The bucket must be made public"],c:2,
+e:`Cross-account access is a <b>two-lock door</b>: the resource policy in A grants B's principal, and B's IAM policy permits the action. ✗ Either lock alone fails. ✗ Public is never the best-practice answer.`},
+
+{g:"s1-drill",id:"6.06",d:"drill",q:"You need to identify which S3 buckets and IAM roles in your account are shared with external (outside-the-account) principals. Which service?",
+o:["AWS Config","IAM Access Analyzer","Amazon Macie","AWS Trusted Advisor only"],c:1,
+e:`<b>IAM Access Analyzer</b> is purpose-built to surface resources accessible from outside your account/org. ✗ Config tracks configuration compliance, ✗ Macie finds PII content, ✗ Trusted Advisor gives broad checks but isn't the external-access analyzer.`},
+
+{g:"s1-drill",id:"6.07",d:"drill",q:"A company wants central single sign-on for its workforce across dozens of AWS accounts, federated from its corporate identity provider. Which service?",
+o:["IAM Identity Center","An IAM user in every account","Amazon Cognito identity pools","AWS Directory Service Simple AD only"],c:0,
+e:`<b>IAM Identity Center</b> (formerly AWS SSO) gives central permission sets across all org accounts and federates to your IdP. ✗ Per-account users are the unmanageable opposite. ✗ Cognito is for app end-users, not workforce SSO. ✗ Simple AD is just a directory, not the SSO layer.`},
+
+{g:"s1-drill",id:"6.08",d:"drill",q:"What is the purpose of an IAM permission boundary?",
+o:["To grant a user extra permissions beyond their policies","To set the MAXIMUM permissions an IAM user or role can have, even if their policies grant more","To replace the need for SCPs in an Organization","To rotate access keys automatically"],c:1,
+e:`A <b>permission boundary caps</b> the effective permissions of a single user/role — useful for safely delegating user creation. It never grants; it limits. ✗ It doesn't replace SCPs (different scope), ✗ and rotation is Secrets Manager's job.`},
+
+/* ====== S1 EXAM ====== */
+{g:"s1-exam",id:"6.09",d:"exam",tag:"miss",q:"A company runs many accounts under AWS Organizations. Security mandates that EVERY account — including any new ones and the root user — must be unable to create unencrypted EBS volumes, with minimal effect on the engineers who legitimately create volumes. What meets this with the least ongoing effort?",
+o:["Create an IAM permission boundary on the root OU that denies ec2:CreateVolume when ec2:Encrypted is false","Create an SCP attached to the root OU that denies ec2:CreateVolume when ec2:Encrypted is false","Add a deny policy to an IAM group in each account","Write a Config rule that flags unencrypted volumes after they are created"],c:1,
+e:`Org-wide, every-account, even-root enforcement is exactly what an <b>SCP on the OU</b> does, and the condition lets normal (encrypted) creates through untouched.<br>✗ Permission boundaries cap a single user/role and <b>cannot be attached to an OU</b> — the headline trap. ✗ Per-account group policies miss new accounts and root. ✗ A Config rule only <i>detects</i> after the fact; it doesn't prevent.<span class="flip"><span class="fl">flip it</span>If the goal were "let a delegated admin create users but never escalate beyond a set ceiling," that's a <b>permission boundary</b>.</span>`},
+
+{g:"s1-exam",id:"6.10",d:"exam",q:"A Lambda function in the data account must read objects from an S3 bucket owned by a separate logging account, following least privilege. What is the correct cross-account setup?",
+o:["Embed an IAM user's access keys from the logging account in the Lambda environment variables","In the logging account create a role that trusts the data account; the Lambda's execution role calls sts:AssumeRole, and the bucket policy/role allows the read","Make the logging bucket public-read","Use the same IAM role in both accounts via account merging"],c:1,
+e:`The clean pattern is a <b>role in the logging account that trusts the data account</b>; Lambda assumes it via STS for temporary creds, with the bucket/role granting the read.<br>✗ Embedding long-lived keys violates the no-static-keys reflex. ✗ Public-read exposes the data. ✗ You can't share one IAM role across two accounts by "merging."`},
+
+{g:"s1-exam",id:"6.11",d:"exam",q:"EC2 instances connect to an Aurora database using a username and password stored in a local file. The company wants to minimize the operational overhead of credential management and rotate the credentials automatically. What should the architect do?",
+o:["Store the credentials in AWS Secrets Manager and enable automatic rotation","Store the credentials in an encrypted S3 object and read it at boot","Bake the credentials into the AMI and rebuild monthly","Store the credentials in an environment variable on each instance"],c:0,
+e:`<b>Secrets Manager with automatic rotation</b> removes the manual credential lifecycle entirely and integrates with RDS/Aurora rotation Lambdas — least overhead, exactly the requirement.<br>✗ Encrypted S3, ✗ AMI baking, and ✗ env vars all keep you manually rotating long-lived secrets.<span class="flip"><span class="fl">flip it</span>If the stem only needed cheap static config storage with no rotation, <b>SSM Parameter Store</b> would be the pick.</span>`},
+
+{g:"s1-exam",id:"6.12",d:"exam",q:"A team needs to grant a third-party SaaS vendor (a different AWS account) read access to specific resources, but is worried the vendor's account ID could be guessed or the role assumed by an impostor. What hardens the cross-account role?",
+o:["Add an external ID condition to the role's trust policy that the vendor must supply","Share the role's ARN publicly so only the vendor finds it","Give the vendor an IAM user with console access","Disable CloudTrail to reduce the attack surface"],c:0,
+e:`The <b>external ID</b> is the AWS-recommended defense against the confused-deputy problem: the trust policy requires a secret value only you and the vendor know.<br>✗ Obscuring the ARN isn't security. ✗ A console IAM user is long-lived and broader than needed. ✗ Disabling CloudTrail removes your audit trail — the opposite of hardening.`},
+
+{g:"s1-exam",id:"6.13",d:"exam",q:"A mobile game lets users sign in with Google or Facebook, after which the app must call DynamoDB directly with each user scoped to their own data. What's the right identity design with the least custom code?",
+o:["Create an IAM user per player","Use a Cognito identity pool to exchange the social token for temporary, scoped AWS credentials","Embed a shared IAM role's access keys in the mobile app","Proxy every DynamoDB call through a long-lived EC2 instance holding admin keys"],c:1,
+e:`A <b>Cognito identity pool</b> federates the social login and vends temporary, per-user AWS credentials (usable with IAM condition keys to scope rows) — purpose-built for this.<br>✗ An IAM user per player doesn't scale. ✗ Embedding keys in a client app leaks them instantly. ✗ A static-key proxy is heavy and insecure.<span class="flip"><span class="fl">flip it</span>If the requirement were just "authenticate users / who are you" for an API, that's a Cognito <b>user pool</b> authorizer.</span>`},
+
+{g:"s1-exam",id:"6.14",d:"exam",tag:"miss",q:"A junior administrator must be allowed to create new IAM roles for developers, but security requires that any role the admin creates can NEVER have permissions broader than a defined set — even if the admin attaches an admin policy. What enforces this?",
+o:["Attach a permission boundary to the roles the admin creates (and require it via the admin's policy condition)","Put the admin in a group with a deny-all policy","Use an SCP that allows only iam:CreateRole","Enable MFA on the admin's account"],c:0,
+e:`A <b>permission boundary</b> caps the maximum permissions of the created roles regardless of attached policies, and conditioning the admin's <code>iam:CreateRole</code> on setting that boundary makes delegation safe.<br>✗ A deny-all group stops the admin from working at all. ✗ An SCP allowing only CreateRole doesn't bound what the <i>created</i> roles can do. ✗ MFA proves identity but doesn't cap permissions.`},
+
+{g:"s1-exam",id:"6.15",d:"exam",q:"A security audit wants a single report of every S3 bucket in the account that grants access to principals outside the account or organization, with the least setup. What's the fastest path?",
+o:["Manually read every bucket policy","Enable IAM Access Analyzer (S3 findings) to identify externally shared buckets","Turn on S3 server access logging and parse it","Run Macie across all buckets"],c:1,
+e:`<b>IAM Access Analyzer</b> continuously evaluates resource policies and reports exactly which buckets are reachable externally — near-zero setup.<br>✗ Manual review doesn't scale and misses drift. ✗ Access logging records requests, not who <i>could</i> access. ✗ Macie finds sensitive data, not external-sharing posture.`},
+
+/* ====== MIX 1 ====== */
+{g:"mix-1",id:"M1.1",d:"mixed",tag:"win",q:"A read-heavy reporting workload is overwhelming a single RDS PostgreSQL instance and slowing the app; writes are light and must be unaffected. How do you scale reads with the least change?",
+o:["Convert to Multi-AZ","Add RDS read replicas and direct read traffic to them","Increase the instance to the largest size permanently","Migrate to DynamoDB"],c:1,
+e:`<b>Read replicas</b> offload read/reporting traffic without touching the writer — the canonical read-scaling answer (File 3).<br>✗ Multi-AZ is for failover, its standby serves no reads. ✗ Vertical scaling has a ceiling and wastes money. ✗ A full DynamoDB migration is a rewrite, not "least change."`},
+
+{g:"mix-1",id:"M1.2",d:"mixed",tag:"win",q:"An image-processing tier silently drops uploads during traffic spikes. You need every upload eventually processed and the workers to scale to the backlog. Core design?",
+o:["Put an SQS queue between the web tier and workers; scale workers on queue depth","Add ALB sticky sessions","Increase the web instance size","Process synchronously with a longer idle timeout"],c:0,
+e:`<b>SQS</b> buffers the spike and decouples the tiers; workers in an ASG scale on <code>ApproximateNumberOfMessages</code> (File 2).<br>✗ Stickiness, ✗ bigger web instances, and ✗ longer timeouts all keep upload and processing coupled — the spike still drops work.`},
+
+{g:"mix-1",id:"M1.3",d:"mixed",tag:"miss",q:"A company has an AWS Direct Connect link to its VPC and a new rule requires all data in transit over it to be encrypted, with the least operational effort. What do they do?",
+o:["Toggle an 'encryption' setting on the Direct Connect connection","Run an IPsec Site-to-Site VPN over the Direct Connect link","Replace Direct Connect with an internet VPN","Encrypt every object with KMS before sending"],c:1,
+e:`<b>Direct Connect is private but not encrypted</b>; layering an <b>IPsec VPN over the DX link</b> adds encryption while keeping the dedicated path (File 8 territory, but a recurring security ask).<br>✗ There's no DX encryption toggle. ✗ Dropping DX loses the low-latency line. ✗ Per-object KMS doesn't cover all in-transit traffic and is far more work.`},
+
+{g:"mix-1",id:"M1.4",d:"mixed",q:"A serverless app (API Gateway + Lambda + DynamoDB) is the target of bursty traffic and the team wants to keep stored session/cart items but auto-expire them after 24 hours with zero servers. What fits best?",
+o:["DynamoDB with a TTL attribute set to 24 hours","A self-managed Redis cluster on EC2","RDS with a nightly cron cleanup","Store everything in Lambda /tmp"],c:0,
+e:`<b>DynamoDB TTL</b> auto-deletes expired items, is fully serverless, and pairs naturally with Lambda (File 3).<br>✗ Self-managed Redis adds servers to run. ✗ RDS + cron is heavier and not serverless. ✗ Lambda <code>/tmp</code> is ephemeral per-execution, not a store.`},
+
+/* ====== S2 DRILL ====== */
+{g:"s2-drill",id:"6.16",d:"drill",q:"You need an S3 encryption mode that gives you a CloudTrail audit trail of key usage and lets you control rotation and key policies. Which one?",
+o:["SSE-S3","SSE-KMS","SSE-C","No encryption, rely on bucket ACLs"],c:1,
+e:`<b>SSE-KMS</b> uses your KMS key, so every decrypt is logged in CloudTrail and you own the policy and rotation. ✗ SSE-S3 is AWS-managed with no per-key audit/control. ✗ SSE-C means you supply keys per request (no AWS-side audit). ✗ ACLs aren't encryption.`},
+
+{g:"s2-drill",id:"6.17",d:"drill",q:"What is envelope encryption in AWS KMS?",
+o:["Encrypting the same data twice with two KMS keys","Using a KMS master key to encrypt a data key, which in turn encrypts the actual data","Encrypting only the file's metadata","Wrapping TLS around an API call"],c:1,
+e:`<b>Envelope encryption</b> = KMS encrypts a per-object <b>data key</b>, the service uses the plaintext data key to encrypt the bulk data, and stores the wrapped key alongside. ✗ Double-KMS is DSSE. ✗ Metadata-only and ✗ TLS-wrapping are unrelated.`},
+
+{g:"s2-drill",id:"6.18",d:"drill",q:"You need a single-tenant, dedicated hardware security module that is FIPS 140-2 Level 3 and that you control entirely (for your own PKI). Which service?",
+o:["AWS KMS with an AWS-managed key","AWS CloudHSM","AWS Secrets Manager","Amazon Macie"],c:1,
+e:`<b>CloudHSM</b> is the dedicated, single-tenant FIPS 140-2 Level 3 appliance you fully control. ✗ KMS is multi-tenant managed. ✗ Secrets Manager stores secrets, ✗ Macie classifies data — neither is an HSM.`},
+
+{g:"s2-drill",id:"6.19",d:"drill",q:"Which statement about Secrets Manager vs SSM Parameter Store is correct?",
+o:["Both have built-in automatic secret rotation","Only Secrets Manager has built-in automatic rotation; Parameter Store does not","Parameter Store can rotate but Secrets Manager cannot","Neither can store encrypted values"],c:1,
+e:`The exam's deciding line: <b>Secrets Manager has native automatic rotation; Parameter Store does not</b>. Both encrypt with KMS, but rotation is the differentiator (and Parameter Store standard params are free).`},
+
+{g:"s2-drill",id:"6.20",d:"drill",q:"A company must use TLS certificates that auto-renew for an Application Load Balancer at no extra cost. Which service issues them?",
+o:["AWS Certificate Manager (ACM)","AWS KMS","AWS CloudHSM","Amazon Cognito"],c:0,
+e:`<b>ACM</b> provisions free public TLS certs and auto-renews them, integrating directly with ALB/CloudFront/API Gateway. ✗ KMS/CloudHSM manage encryption keys, not public TLS certs. ✗ Cognito is identity, not certificates.`},
+
+{g:"s2-drill",id:"6.21",d:"drill",q:"How do you encrypt an existing unencrypted RDS database instance?",
+o:["Toggle the 'encryption' checkbox on the running instance","Take a snapshot, copy the snapshot with encryption enabled, then restore from the encrypted copy","Attach a KMS key to the running instance live","You cannot encrypt RDS at all"],c:1,
+e:`There's no in-place toggle — you <b>snapshot, copy-with-encryption, then restore</b> the encrypted copy. ✗ No live checkbox, ✗ no live key attach. ✗ RDS absolutely supports encryption — just at create/restore time.`},
+
+{g:"s2-drill",id:"6.22",d:"drill",q:"Which SSE mode requires the client to supply the encryption key on every request, with AWS never storing it?",
+o:["SSE-S3","SSE-KMS","SSE-C (customer-provided keys)","DSSE-KMS"],c:2,
+e:`<b>SSE-C</b> has you provide the key per request; AWS uses it to encrypt/decrypt and immediately discards it. ✗ SSE-S3 and ✗ SSE-KMS manage keys for you. ✗ DSSE-KMS is double KMS-managed encryption.`},
+
+/* ====== S2 EXAM ====== */
+{g:"s2-exam",id:"6.23",d:"exam",tag:"miss",q:"A regulated company stores objects in S3 and must (1) keep an auditable record of every time a key is used to decrypt data, (2) control and automatically rotate the key annually, and (3) separate the duties of key admins from data users. Which encryption choice meets all three with the least effort?",
+o:["SSE-S3 (Amazon S3-managed keys)","SSE-KMS with a customer-managed key and automatic rotation enabled","SSE-C with keys held on-premises","Client-side encryption with a custom key server"],c:1,
+e:`<b>SSE-KMS with a customer-managed key</b> logs every decrypt to CloudTrail (audit), supports one-click annual rotation, and key policies separate admin from use — all three, managed.<br>✗ SSE-S3 gives no per-key audit or rotation control. ✗ SSE-C/client-side push all key management onto you — more effort, and SSE-C has no AWS audit trail.<span class="flip"><span class="fl">flip it</span>Drop every requirement except "just encrypt it" and <b>SSE-S3</b> becomes the least-effort pick.</span>`},
+
+{g:"s2-exam",id:"6.24",d:"exam",q:"A company must store database credentials so they rotate automatically every 30 days, are retrievable by applications via API, and are replicated to a second Region for DR. With the least custom code, which service?",
+o:["AWS Secrets Manager with rotation and multi-Region replication","SSM Parameter Store SecureString with a custom rotation Lambda you write and schedule","An encrypted DynamoDB table","A KMS key with the password as the key material"],c:0,
+e:`<b>Secrets Manager</b> does scheduled rotation natively, exposes a retrieval API, and supports cross-Region replication — no custom rotation code.<br>✗ Parameter Store has no native rotation, so you'd build and maintain the Lambda yourself. ✗ A DynamoDB table is a roll-your-own secret store. ✗ KMS keys aren't password vaults.`},
+
+{g:"s2-exam",id:"6.25",d:"exam",q:"A compliance regime forbids using a multi-tenant managed key service and requires the company to operate its own FIPS 140-2 Level 3 HSMs, yet the team still wants S3/EBS to integrate with KMS APIs. What's the architecture?",
+o:["Use SSE-S3 everywhere","Use a KMS custom key store backed by a CloudHSM cluster","Use SSE-C with keys in a spreadsheet","Disable encryption and rely on bucket policies"],c:1,
+e:`A <b>KMS custom key store backed by CloudHSM</b> keeps the keys in your dedicated, single-tenant HSMs while still exposing the familiar KMS integration to S3/EBS — exactly the "own the HSM but keep KMS APIs" ask.<br>✗ SSE-S3 is the multi-tenant managed key the rule forbids. ✗ SSE-C with manual keys is unmanaged and error-prone. ✗ Bucket policies aren't encryption.`},
+
+{g:"s2-exam",id:"6.26",d:"exam",q:"An application running on EC2 needs to encrypt sensitive fields with a key whose usage is tightly controlled and audited, but the dev team should be able to use the key for encrypt/decrypt without being able to delete or change its policy. How do you set this up?",
+o:["Give the team full kms:* on the key","Use a customer-managed KMS key whose key policy grants the team kms:Encrypt/Decrypt but reserves administrative actions for security","Share the AWS-managed aws/s3 key with the team","Embed the raw key material in the application config"],c:1,
+e:`A <b>customer-managed key with a key policy</b> separating usage (Encrypt/Decrypt) from administration (rotation, policy edits, deletion) gives least-privilege key use plus a CloudTrail audit trail.<br>✗ Full <code>kms:*</code> breaks separation of duties. ✗ AWS-managed keys can't have edited policies or delegated usage like this. ✗ Embedding raw key material defeats KMS entirely.`},
+
+{g:"s2-exam",id:"6.27",d:"exam",tag:"miss",multi:true,q:"Across an AWS Organization, every new EC2 instance launched in a Region — by any IAM user or root — must use encrypted EBS volumes, with minimal effect on engineers who legitimately create volumes. Which TWO steps together meet this? (Choose TWO.)",
+o:["Enable the EBS encryption-by-default account attribute (with a default KMS key) in the Region","Attach an SCP to the OU that denies ec2:CreateVolume when ec2:Encrypted is false","Add a permission boundary to the root OU denying unencrypted volume creation","Run a nightly Lambda that re-encrypts unencrypted volumes","Use SSE-C on the EBS volumes"],c:[0,1],
+e:`<b>EBS encryption-by-default</b> silently encrypts every new volume (minimal effect on engineers), and an <b>SCP on the OU</b> hard-blocks any unencrypted create org-wide, even by root — defense in depth, both managed.<br>✗ A permission boundary caps a single user/role and <b>cannot attach to an OU</b>. ✗ A nightly Lambda is after-the-fact and needs snapshot/copy to actually encrypt. ✗ SSE-C is an S3 object-encryption mode, not an EBS feature.`},
+
+{g:"s2-exam",id:"6.28",d:"exam",q:"A company runs containers in ECS that pull a database password at startup. Security wants the password encrypted at rest, retrieved over the API, and never printed in task definitions, with rotation handled for them. Which integration is simplest?",
+o:["Hard-code the password in the task definition environment variables","Reference a Secrets Manager secret in the task definition's 'secrets' block","Store the password in a public S3 object","Pass the password as a Docker build argument"],c:1,
+e:`ECS can inject a <b>Secrets Manager secret</b> directly via the task definition's <code>secrets</code> field — encrypted at rest, fetched at launch, never shown in plaintext, and rotated by Secrets Manager.<br>✗ Env vars, ✗ public S3, and ✗ build args all expose the secret and offer no rotation.`},
+
+{g:"s2-exam",id:"6.29",d:"exam",q:"Two applications in different VPCs and accounts share data through an SQS queue; the queue must only accept messages from a specific producer role in the other account. What enforces this?",
+o:["An identity policy on the consumer","An SQS resource-based (queue) policy allowing the specific producer role's ARN","A security group on the queue","An SCP on the producer's user"],c:1,
+e:`Cross-account access to a queue is granted by the <b>SQS resource policy</b> naming the producer role's ARN (paired with that role's IAM allow). ✗ A consumer identity policy doesn't gate producers. ✗ SQS has no security group. ✗ An SCP only limits, it can't grant cross-account access.`},
+
+/* ====== MIX 2 ====== */
+{g:"mix-2",id:"M2.1",d:"mixed",tag:"win",q:"A fault-tolerant batch fleet should run as cheaply as possible but survive a single Spot capacity pool drying up. Best configuration?",
+o:["All Spot, one instance type, lowest-price strategy","A mixed-instances policy spanning several instance types and AZs with the price-capacity-optimized strategy","100% On-Demand","Reserved Instances for the whole fleet"],c:1,
+e:`Diversifying across many <b>instance types and AZs</b> with <b>price-capacity-optimized</b> gives many pools and avoids the ones about to be reclaimed — cheap and resilient (File 5).<br>✗ One type concentrates interruption risk. ✗ On-Demand/RIs defeat "as cheaply as possible on Spot."`},
+
+{g:"mix-2",id:"M2.2",d:"mixed",tag:"win",q:"A DynamoDB-backed, read-heavy app needs microsecond read latency for eventually-consistent reads with no application rewrite. What do you add?",
+o:["DynamoDB Accelerator (DAX)","A global table","A separate ElastiCache the app queries directly","Provisioned capacity with auto scaling"],c:0,
+e:`<b>DAX</b> is the in-line, microsecond, write-through cache on the DynamoDB API path — drop-in (File 3).<br>✗ Global tables are multi-Region replication. ✗ A separate ElastiCache means rewriting the data path. ✗ Auto scaling adjusts capacity, not latency.`},
+
+{g:"mix-2",id:"M2.3",d:"mixed",tag:"miss",q:"A company needs all data in transit between an on-prem data center and AWS to be encrypted, with a private connection that does not traverse the public internet, balancing cost and security. What's a common answer?",
+o:["Site-to-Site VPN alone over the internet","Direct Connect alone","Direct Connect with an IPsec VPN running over it","NAT Gateway with TLS"],c:2,
+e:`<b>Direct Connect + VPN over it</b> gives a private path that is also encrypted — the recurring 'private and encrypted' combo.<br>✗ VPN-only over the internet is encrypted but not a private dedicated path. ✗ DX alone is private but unencrypted. ✗ A NAT Gateway is for outbound internet, not site-to-site encryption.`},
+
+{g:"mix-2",id:"M2.4",d:"mixed",q:"A static website's S3 origin loads slowly worldwide and the team wants edge caching plus the ability to attach a web ACL for filtering. What should front the bucket?",
+o:["S3 Transfer Acceleration","A CloudFront distribution (with AWS WAF attached) over the S3 origin","Cross-Region replication to every Region","An NLB in front of S3"],c:1,
+e:`<b>CloudFront</b> caches at the edge AND is a valid WAF attachment point — both requirements in one (File 1/8 + this file).<br>✗ Transfer Acceleration speeds uploads, not global reads, and takes no WAF. ✗ Replicating everywhere is costly and still not edge-cached. ✗ NLBs don't front S3 or take WAF.`},
+
+/* ====== S3 DRILL ====== */
+{g:"s3-drill",id:"6.30",d:"drill",q:"AWS WAF can be associated with which set of resources?",
+o:["Any load balancer including the NLB","CloudFront, Application Load Balancer, API Gateway, and AppSync","EC2 instances directly","Only CloudFront"],c:1,
+e:`<b>WAF attaches to CloudFront, ALB, API Gateway, and AppSync</b> — all Layer-7. ✗ It never attaches to an NLB or directly to EC2, and it's not CloudFront-only.`},
+
+{g:"s3-drill",id:"6.31",d:"drill",q:"Which service provides intelligent threat detection by analyzing CloudTrail, VPC Flow Logs, and DNS logs?",
+o:["Amazon Inspector","Amazon GuardDuty","Amazon Macie","AWS Config"],c:1,
+e:`<b>GuardDuty</b> is the managed threat-detection service mining those log sources for malicious or anomalous activity. ✗ Inspector scans for CVEs, ✗ Macie finds PII, ✗ Config tracks configuration compliance.`},
+
+{g:"s3-drill",id:"6.32",d:"drill",q:"You need automated scanning of EC2 instances and ECR container images for software vulnerabilities (CVEs). Which service?",
+o:["Amazon Inspector","Amazon GuardDuty","AWS Shield","Amazon Macie"],c:0,
+e:`<b>Amazon Inspector</b> continuously scans EC2, ECR images, and Lambda for CVEs and unintended network exposure. ✗ GuardDuty detects active threats, ✗ Shield is DDoS, ✗ Macie is data classification.`},
+
+{g:"s3-drill",id:"6.33",d:"drill",q:"Which service uses machine learning to discover and classify sensitive data such as PII in Amazon S3?",
+o:["Amazon Macie","Amazon GuardDuty","AWS Config","Amazon Inspector"],c:0,
+e:`<b>Macie</b> is the S3 data-classification service that flags PII and other sensitive content. ✗ GuardDuty = threats, ✗ Config = compliance state, ✗ Inspector = vulnerabilities.`},
+
+{g:"s3-drill",id:"6.34",d:"drill",q:"What does AWS Security Hub primarily do?",
+o:["Runs DDoS mitigation","Aggregates and prioritizes security findings from GuardDuty, Inspector, Macie, and Config in one place","Issues TLS certificates","Stores and rotates secrets"],c:1,
+e:`<b>Security Hub</b> is the central aggregator of findings across the detective services with compliance-standard checks. ✗ DDoS is Shield, ✗ certs are ACM, ✗ secrets are Secrets Manager.`},
+
+{g:"s3-drill",id:"6.35",d:"drill",q:"What is the difference between a Cognito user pool and an identity pool?",
+o:["They are the same thing","User pool = authentication (a user directory / sign-in); identity pool = authorization (temporary AWS credentials)","User pool gives AWS credentials; identity pool stores passwords","Identity pool is only for SAML"],c:1,
+e:`<b>User pool authenticates</b> (directory, sign-in, tokens); <b>identity pool authorizes</b> by exchanging a token for temporary AWS credentials. The other statements invert or oversimplify the roles.`},
+
+{g:"s3-drill",id:"6.36",d:"drill",q:"Which managed service is a stateful firewall that filters ALL traffic in and out of a VPC (not just HTTP)?",
+o:["AWS WAF","AWS Network Firewall","Amazon GuardDuty","AWS Shield Standard"],c:1,
+e:`<b>Network Firewall</b> is the VPC-level stateful firewall for all protocols. ✗ WAF is HTTP-only at L7 and attaches to CloudFront/ALB/etc. ✗ GuardDuty detects, doesn't filter. ✗ Shield is DDoS.`},
+
+{g:"s3-drill",id:"6.37",d:"drill",q:"What does AWS Shield Advanced add over Shield Standard?",
+o:["Nothing — they're identical","Enhanced L7 DDoS protection, 24/7 DDoS response team access, and cost protection during attacks","Free TLS certificates","SQL injection rules for HTTP"],c:1,
+e:`<b>Shield Advanced</b> adds L7 protection, the DDoS Response Team, and bill protection for attack-driven scaling. ✗ Standard is the free baseline. ✗ Certs are ACM. ✗ SQLi rules are WAF managed rules.`},
+
+/* ====== S3 EXAM ====== */
+{g:"s3-exam",id:"6.38",d:"exam",tag:"miss",q:"A public web app behind an ALB is being hit by a flood of HTTP requests from a small set of IPs and by SQL-injection attempts. The team wants to block the abusive IPs by request rate and stop common injection patterns, with the least operational effort. What should they deploy?",
+o:["A Network ACL deny rule for each abusive IP","AWS WAF on the ALB with a rate-based rule plus the AWS managed SQL-injection rule group","Amazon GuardDuty to automatically block the IPs","AWS Shield Standard"],c:1,
+e:`<b>WAF on the ALB</b> with a <b>rate-based rule</b> (auto-blocks IPs exceeding a request threshold) and the AWS-managed <b>SQLi rule group</b> hits both requirements with managed, low-effort rules.<br>✗ NACL rules are manual, static, and don't understand HTTP/rate or SQL patterns. ✗ GuardDuty detects but does not inline-block traffic. ✗ Shield Standard is L3/L4 DDoS, not L7 request filtering.<span class="flip"><span class="fl">flip it</span>If the attack were a large-scale L3/L4 volumetric DDoS, you'd lean on <b>Shield Advanced</b> instead.</span>`},
+
+{g:"s3-exam",id:"6.39",d:"exam",multi:true,q:"A security team wants continuous, agentless detection of compromised EC2 instances, credential exfiltration, and crypto-mining across all accounts, with every finding aggregated into one console. With the least setup, which TWO services should they enable? (Choose TWO.)",
+o:["Amazon GuardDuty enabled across the organization","AWS Security Hub to aggregate and prioritize the findings","Custom IDS agents on every instance","Amazon Macie on all S3 buckets","AWS WAF on every load balancer"],c:[0,1],
+e:`<b>GuardDuty</b> is agentless threat detection on CloudTrail/VPC Flow/DNS logs, and <b>Security Hub</b> is the single console that aggregates and prioritizes those findings — together they meet the whole ask with minimal setup.<br>✗ Custom IDS agents are exactly the operational overhead to avoid. ✗ Macie finds sensitive data in S3, not instance compromise. ✗ WAF filters HTTP requests, not host-level threats.`},
+
+{g:"s3-exam",id:"6.40",d:"exam",q:"Auditors require continuous proof that no S3 bucket in the account ever has public access and that every security group blocks unrestricted SSH (0.0.0.0/0 on port 22), with automatic flagging of violations over time. Which service fits best?",
+o:["AWS Config with managed rules (s3-bucket-public-read-prohibited, restricted-ssh)","Amazon GuardDuty","AWS WAF","Amazon Inspector"],c:0,
+e:`<b>AWS Config rules</b> continuously evaluate resource configuration against the desired state and flag non-compliant buckets/security groups over time — the compliance-posture tool.<br>✗ GuardDuty detects active threats, not configuration drift. ✗ WAF filters HTTP. ✗ Inspector scans for software CVEs, not config compliance.<span class="flip"><span class="fl">flip it</span>If the ask were 'detect that the open SSH port is being exploited by a known-bad host,' that's <b>GuardDuty</b>.</span>`},
+
+{g:"s3-exam",id:"6.41",d:"exam",q:"A company in many AWS accounts wants to centrally enforce one set of AWS WAF rules and a baseline of security-group rules across every account, including future ones, from a single place. Which service?",
+o:["AWS WAF configured separately in each account","AWS Firewall Manager","Amazon GuardDuty","AWS Config aggregator only"],c:1,
+e:`<b>Firewall Manager</b> centrally applies and audits WAF, Shield Advanced, Network Firewall, and security-group policies across all Organization accounts, including new ones.<br>✗ Per-account WAF is the manual sprawl this avoids. ✗ GuardDuty detects, doesn't enforce rules. ✗ A Config aggregator reports compliance but doesn't push firewall rules.`},
+
+{g:"s3-exam",id:"6.42",d:"exam",q:"An app fetches data from DynamoDB through a REST API in API Gateway. Users are managed in Amazon Cognito, and the company wants an AWS-managed way to control access to the API with the least development effort. What should they configure?",
+o:["A custom Lambda authorizer that validates each request","A Cognito user pool authorizer on the API Gateway method","An API key per user validated by Lambda","Send the user's email in a header and check it in Lambda"],c:1,
+e:`A <b>Cognito user pool authorizer</b> validates the user's token natively in API Gateway — fully managed, near-zero code.<br>✗ A Lambda authorizer is custom code to build and maintain. ✗ Per-user API keys plus Lambda validation is more work and weaker. ✗ Trusting an email header is insecure.`},
+
+{g:"s3-exam",id:"6.43",d:"exam",tag:"miss",q:"A healthcare company must scan its S3 data lake for personal health information and credit-card numbers, generate findings, and route everything into a single security dashboard alongside its threat findings. With the least operational effort, what should it use?",
+o:["Write a custom Lambda that regex-scans every object","Enable Amazon Macie for the account and send findings to AWS Security Hub","Turn on S3 server access logging and grep for SSNs","Use Amazon Inspector to scan the buckets"],c:1,
+e:`<b>Macie</b> is the managed ML service that classifies PII/PHI/financial data in S3, and its findings flow into <b>Security Hub</b> for the unified dashboard — minimal effort.<br>✗ A custom regex Lambda is exactly the overhead to avoid and misses ML classification. ✗ Access logs record requests, not content. ✗ Inspector scans software for CVEs, not data content.`},
+
+{g:"s3-exam",id:"6.44",d:"exam",tag:"win",q:"A global, read-heavy public site serves mostly cacheable HTTP content and is occasionally targeted by L7 floods. The team wants lower global latency, origin offload, and a place to attach managed bot/rate rules. Which front door?",
+o:["AWS Global Accelerator","Amazon CloudFront with AWS WAF attached","A regional NLB","Route 53 latency routing alone"],c:1,
+e:`<b>CloudFront</b> caches at the edge (latency + origin offload) and is a WAF attachment point for bot-control and rate-based rules — both needs in one (File 1/8 + this file).<br>✗ Global Accelerator improves the path but does not cache and isn't where you attach WAF rules for HTTP. ✗ An NLB takes no WAF. ✗ DNS routing neither caches nor filters.`}
+
+];
+
+/* ---------------- RENDER ---------------- */
+const L=["A","B","C","D","E"];
+const state={}; // id -> {answered, correct}
+let total=BANK.length;
+
+/* ---------------- PERSISTENCE ----------------
+   One shared store for all files, keyed by FILE_KEY.
+   Shape: { "file-1": { answers:{ "1.01":[0], ... }, scroll:1234 }, "file-2": {...}, ... } */
+const STORE_KEY="saa_c03_progress";
+const FILE_KEY="file-6";
+function loadStore(){ try{return JSON.parse(localStorage.getItem(STORE_KEY))||{};}catch(e){return {};} }
+function saveStore(s){ try{localStorage.setItem(STORE_KEY,JSON.stringify(s));}catch(e){} }
+function fileData(){ const s=loadStore(); return s[FILE_KEY]||{answers:{},scroll:0}; }
+function writeFileData(fd){ const s=loadStore(); s[FILE_KEY]=fd; saveStore(s); }
+function saveAnswer(id,picks){ const fd=fileData(); fd.answers=fd.answers||{}; fd.answers[id]=picks; writeFileData(fd); }
+function saveScroll(y){ const fd=fileData(); fd.scroll=y; writeFileData(fd); }
+function clearFile(){ const s=loadStore(); delete s[FILE_KEY]; saveStore(s); }
+const SAVED=fileData();
+
+function tagChip(t){
+  if(t==="miss") return '<span class="chip miss">↻ your miss</span>';
+  if(t==="win")  return '<span class="chip win">✓ lock it in</span>';
+  return "";
+}
+function diffChip(d,multi){
+  let base = d==="exam"?'<span class="chip exam">exam</span>'
+           : d==="mixed"?'<span class="chip mixed">mixed</span>'
+           : '<span class="chip drill">drill</span>';
+  if(multi) base += ' <span class="chip two">select two</span>';
+  return base;
+}
+
+BANK.forEach(item=>{
+  const host=document.getElementById(item.g);
+  if(!host)return;
+  const card=document.createElement("div");
+  card.className="q";
+  card.tabIndex=0;
+  card.dataset.id=item.id;
+  const correctArr = Array.isArray(item.c)?item.c:[item.c];
+  const multi = item.multi===true || correctArr.length>1;
+
+  card.innerHTML =
+    '<div class="qtop"><span class="qid">Q '+item.id+'</span>'+diffChip(item.d,multi)+tagChip(item.tag)+'</div>'+
+    '<div class="stem">'+item.q+'</div>'+
+    '<ul class="opts">'+item.o.map((t,i)=>
+      '<button class="opt" data-i="'+i+'"><span class="ltr">'+L[i]+'</span><span class="otext">'+t+'</span><span class="mark"></span></button>'
+    ).join('')+'</ul>'+
+    (multi?'<button class="checkbtn" disabled>Check answer</button>':'')+
+    '<div class="reveal"><div class="rv-inner"></div></div>';
+
+  host.appendChild(card);
+
+  const opts=[...card.querySelectorAll(".opt")];
+  const checkBtn=card.querySelector(".checkbtn");
+  const reveal=card.querySelector(".reveal");
+  const rvInner=card.querySelector(".rv-inner");
+  let locked=false;
+  let sel=new Set();
+
+  function settle(){
+    locked=true;
+    const userArr=[...sel];
+    const ok = userArr.length===correctArr.length && userArr.every(i=>correctArr.includes(i));
+    opts.forEach((b,i)=>{
+      b.disabled=true; b.classList.remove("sel");
+      const mark=b.querySelector(".mark");
+      if(correctArr.includes(i)){b.classList.add("correct");mark.textContent="✓ correct";}
+      else if(sel.has(i)){b.classList.add("wrong");mark.textContent="✗ your pick";}
+    });
+    if(checkBtn)checkBtn.style.display="none";
+    rvInner.innerHTML='<div class="verdict '+(ok?'r-ok':'r-no')+'">'+(ok?'Correct':'Not quite')+'</div>'+item.e;
+    reveal.classList.add("show");
+    state[item.id]={answered:true,correct:ok};
+    if(!window.__saaRestoring) saveAnswer(item.id,userArr);
+    updateHUD();
+  }
+
+  opts.forEach(b=>{
+    b.addEventListener("click",()=>{
+      if(locked)return;
+      const i=+b.dataset.i;
+      if(multi){
+        if(sel.has(i)){sel.delete(i);b.classList.remove("sel");}
+        else{sel.add(i);b.classList.add("sel");}
+        if(checkBtn)checkBtn.disabled = sel.size===0;
+      } else {
+        sel=new Set([i]); settle();
+      }
+    });
+  });
+  if(checkBtn)checkBtn.addEventListener("click",()=>{if(!locked&&sel.size)settle();});
+
+  // keyboard: 1-5 / a-e select; Enter checks (multi)
+  card.addEventListener("keydown",e=>{
+    if(locked)return;
+    let idx=-1;
+    if(e.key>="1"&&e.key<="5")idx=+e.key-1;
+    const lk=e.key.toLowerCase();
+    if(lk>="a"&&lk<="e")idx=lk.charCodeAt(0)-97;
+    if(idx>=0&&idx<opts.length){e.preventDefault();opts[idx].click();}
+    else if(e.key==="Enter"&&multi&&sel.size){e.preventDefault();settle();}
+  });
+});
+
+/* ---------------- HUD + SUMMARY ---------------- */
+document.getElementById("h-tot").textContent=total;
+function updateHUD(){
+  const answered=Object.keys(state).length;
+  const correct=Object.values(state).filter(s=>s.correct).length;
+  const pct = answered? Math.round(100*correct/answered):0;
+  document.getElementById("h-ans").textContent=answered;
+  document.getElementById("h-pct").textContent= answered? pct+"%":"—";
+  document.getElementById("h-bar").style.width=(100*answered/total)+"%";
+
+  const scP=document.getElementById("sc-pct");
+  const scL=document.getElementById("sc-line");
+  const scM=document.getElementById("sc-miss");
+  if(answered===0){scP.textContent="—";scL.textContent="Answer some questions and your readiness score appears here.";scM.innerHTML="";return;}
+  scP.textContent=pct+"%";
+  let verdict;
+  if(answered<total) verdict=correct+" / "+answered+" so far — "+(total-answered)+" left. The bar at the very top tracks your run.";
+  else if(pct>=80) verdict="Strong. 80%+ on the exam's biggest domain means security is no longer your weak spot. Move to File 7.";
+  else if(pct>=70) verdict="On the pass line for this set. Re-take the ones below, then File 7.";
+  else verdict="Below your target. Re-read the section boxes, redo the misses below, and run it again before moving on.";
+  scL.textContent=verdict;
+
+  const missed=Object.entries(state).filter(([k,v])=>!v.correct).map(([k])=>k);
+  scM.innerHTML = missed.length
+    ? "review: "+missed.map(id=>'<a href="#" onclick="jump(\''+id+'\');return false;">Q'+id+'</a>').join("")
+    : (answered===total?"clean sweep — nothing flagged.":"");
+}
+function jump(id){
+  const el=[...document.querySelectorAll(".q")].find(q=>q.dataset.id===id);
+  if(el){el.scrollIntoView({behavior:"smooth",block:"center"});el.focus({preventScroll:true});}
+}
+document.getElementById("h-reset").addEventListener("click",()=>{clearFile();location.reload()});
+updateHUD();
+
+/* ---------------- SMOOTH VIM PAGE SCROLLING ---------------- */
+const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+let lastG=0, rafId=null, targetY=window.scrollY;
+const help=document.getElementById("help");
+function toggleHelp(){help.classList.toggle("show");}
+function maxY(){ return Math.max(0, document.documentElement.scrollHeight - window.innerHeight); }
+function tick(){
+  const cur=window.scrollY, diff=targetY-cur;
+  if(Math.abs(diff)<0.6){ window.scrollTo(0,Math.round(targetY)); rafId=null; return; }
+  window.scrollTo(0, cur + diff*0.16);   // eased glide toward target
+  rafId=requestAnimationFrame(tick);
+}
+function glide(dy){
+  if(reduce){ window.scrollBy(0,dy); return; }
+  if(rafId===null) targetY=window.scrollY;
+  targetY=Math.max(0,Math.min(maxY(),targetY+dy));
+  if(rafId===null) rafId=requestAnimationFrame(tick);
+}
+function glideTo(y){
+  if(reduce){ window.scrollTo(0,y); return; }
+  targetY=Math.max(0,Math.min(maxY(),y));
+  if(rafId===null) rafId=requestAnimationFrame(tick);
+}
+["wheel","touchmove"].forEach(ev=>window.addEventListener(ev,()=>{ if(rafId){cancelAnimationFrame(rafId);rafId=null;} },{passive:true}));
+document.addEventListener("keydown",e=>{
+  const tag=(e.target.tagName||"").toLowerCase();
+  if(tag==="input"||tag==="textarea")return;
+  if(e.metaKey||e.ctrlKey||e.altKey)return;
+  if(e.key==="Escape"){help.classList.remove("show");return;}
+  if(e.key==="?"){e.preventDefault();toggleHelp();return;}
+  if(help.classList.contains("show"))return;
+  // 1-5 / a-e are handled per-card (when a card is focused); let them through
+  if((e.key>="1"&&e.key<="5") || (e.key.length===1 && e.key.toLowerCase()>="a" && e.key.toLowerCase()<="e")) return;
+  const vh=window.innerHeight;
+  switch(e.key){
+    case"j":e.preventDefault();glide(80);break;
+    case"k":e.preventDefault();glide(-80);break;
+    case"d":e.preventDefault();glide(vh*0.5);break;
+    case"u":e.preventDefault();glide(-vh*0.5);break;
+    case"f":e.preventDefault();glide(vh*0.9);break;
+    case"b":e.preventDefault();glide(-vh*0.9);break;
+    case"G":e.preventDefault();glideTo(maxY());break;
+    case"g":{const now=Date.now();if(now-lastG<500){e.preventDefault();glideTo(0);lastG=0;}else lastG=now;break;}
+  }
+});
+document.getElementById("h-help").addEventListener("click",toggleHelp);
+
+/* ---------------- RESTORE SAVED ANSWERS ----------------
+   Replay each saved answer by simulating the same option clicks the user made.
+   The __saaRestoring flag stops settle() from re-saving during replay. */
+function restoreAnswers(){
+  const answers=SAVED.answers||{};
+  window.__saaRestoring=true;
+  document.querySelectorAll(".q").forEach(card=>{
+    const picks=answers[card.dataset.id];
+    if(!Array.isArray(picks)||!picks.length)return;
+    const opts=[...card.querySelectorAll(".opt")];
+    picks.forEach(i=>{ if(opts[i])opts[i].click(); });          // single-select settles on the click
+    const checkBtn=card.querySelector(".checkbtn");             // multi-select needs the explicit check
+    if(checkBtn&&checkBtn.style.display!=="none")checkBtn.click();
+  });
+  window.__saaRestoring=false;
+}
+restoreAnswers();
+
+/* ---------------- SCROLL POSITION ---------------- */
+// restore scroll after the DOM (and replayed answers) are laid out
+if(SAVED.scroll){
+  const y=SAVED.scroll;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>window.scrollTo(0,y)));
+}
+// save scroll position, throttled
+let scrollTimer=null;
+window.addEventListener("scroll",()=>{
+  if(scrollTimer)return;
+  scrollTimer=setTimeout(()=>{scrollTimer=null;saveScroll(window.scrollY||window.pageYOffset||0);},250);
+},{passive:true});
+</script>
+</body>
+</html>

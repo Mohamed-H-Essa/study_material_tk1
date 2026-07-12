@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SAA-C03 · File 10 · Analytics &amp; App Integration</title>
+<style>
+  :root{
+    /* dark theme — palette shared with File 5 */
+    --ink:#e7eef6; --ink-soft:#a3b5c7; --muted:#6f8298;
+    --paper:#0e1620; --panel:#15212e; --panel2:#1a2836; --panel3:#1f2f40; --line:#26384a; --line-strong:#36506a;
+    --accent:#f59e3c; --accent-2:#f7b260; --accent-deep:#f7b260; --accent-tint:rgba(245,158,60,.12);
+    --navy:#1a2836; --navy-tint:#1f2f40;
+    --ok:#3fcf8e; --ok-bg:rgba(63,207,142,.13); --ok-line:rgba(63,207,142,.45);
+    --no:#ff7062; --no-bg:rgba(255,112,98,.13); --no-line:rgba(255,112,98,.45);
+    --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+    line-height:1.62;font-size:17px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:860px;margin:0 auto;padding:0 22px}
+  ::selection{background:rgba(245,158,60,.3)}
+
+  /* ---------- HUD ---------- */
+  .hud{position:sticky;top:0;z-index:50;background:rgba(28,43,62,.97);color:#fff;
+    border-bottom:1px solid #0e1622;backdrop-filter:saturate(1.2) blur(6px)}
+  .hud-inner{max-width:860px;margin:0 auto;padding:9px 22px;display:flex;gap:16px;
+    align-items:center;font-family:var(--mono);font-size:12.5px;flex-wrap:wrap}
+  .hud .dot{color:var(--accent);font-weight:700;letter-spacing:.04em}
+  .hud .stat b{color:#fff;font-weight:700}
+  .hud .stat{color:#9fb0c4}
+  .bar{flex:1;min-width:120px;height:7px;background:#0f1b2a;border-radius:99px;overflow:hidden}
+  .bar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),#f0a850);
+    transition:width .35s ease}
+  .hud button{font-family:var(--mono);font-size:11.5px;color:#9fb0c4;background:transparent;
+    border:1px solid #33445a;border-radius:6px;padding:3px 9px;cursor:pointer}
+  .hud button:hover{color:#fff;border-color:var(--accent)}
+
+  /* ---------- header ---------- */
+  header.top{padding:54px 0 30px;border-bottom:1px solid var(--line)}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--accent-deep);margin:0 0 14px}
+  h1{font-size:40px;line-height:1.05;margin:0 0 12px;font-weight:800;letter-spacing:-.018em}
+  h1 .thin{font-weight:400;color:var(--ink-soft)}
+  .lede{font-size:18px;color:var(--ink-soft);margin:0;max-width:60ch}
+  .filechips{display:flex;gap:7px;flex-wrap:wrap;margin-top:22px;font-family:var(--mono);font-size:11.5px}
+  .fc{padding:4px 10px;border:1px solid var(--line-strong);border-radius:99px;color:var(--muted)}
+  .fc.here{background:var(--navy);color:#fff;border-color:var(--navy)}
+
+  .legend{margin:26px 0 0;padding:16px 18px;background:var(--panel);border:1px solid var(--line);
+    border-radius:12px;font-size:14px;color:var(--ink-soft)}
+  .legend b{color:var(--ink)}
+  .legend .row{display:flex;gap:10px;align-items:baseline;margin:7px 0}
+  .legend .tg{flex:none}
+
+  /* ---------- sections ---------- */
+  section{padding:46px 0;border-bottom:1px solid var(--line)}
+  .sec-tag{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--accent-deep);display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .sec-tag .n{background:var(--navy);color:#fff;border-radius:6px;padding:2px 8px;font-size:11px}
+  h2{font-size:28px;line-height:1.12;margin:0 0 6px;font-weight:800;letter-spacing:-.015em}
+  h3{font-size:18.5px;margin:30px 0 8px;font-weight:700;letter-spacing:-.01em}
+  p{margin:13px 0}
+  .sub{color:var(--ink-soft);font-size:16px;margin-top:2px}
+  code{font-family:var(--mono);font-size:.86em;background:var(--panel2,#1f2f40);padding:1.5px 6px;border-radius:5px;
+    color:#cfe0d6; white-space:nowrap}
+  strong{font-weight:700}
+  ul.tight{margin:12px 0;padding-left:20px}
+  ul.tight li{margin:7px 0}
+
+  /* ---------- callouts ---------- */
+  .box{margin:22px 0;border-radius:12px;padding:16px 18px 16px 20px;border:1px solid var(--line);
+    background:var(--panel);position:relative;overflow:hidden}
+  .box .lab{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+    margin:0 0 6px;font-weight:600}
+  .box.key{border-color:rgba(245,158,60,.4);background:var(--accent-tint)}
+  .box.key:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent)}
+  .box.key .lab{color:var(--accent-deep)}
+  .box.trap{border-color:var(--no-line);background:var(--no-bg)}
+  .box.trap:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--no)}
+  .box.trap .lab{color:var(--no)}
+  .box.field{background:var(--navy);color:#dfe7f0;border-color:var(--navy)}
+  .box.field .lab{color:var(--accent)}
+  .box.field b{color:#fff}
+  .box p:first-of-type{margin-top:0}.box p:last-child{margin-bottom:0}
+
+  /* ---------- table ---------- */
+  .tw{overflow-x:auto;margin:22px 0}
+  table{border-collapse:collapse;width:100%;font-size:14.5px}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;
+    color:var(--muted);font-weight:600;border-bottom:2px solid var(--line-strong)}
+  td b{color:var(--ink)}
+  tr:last-child td{border-bottom:none}
+
+  /* ---------- quiz ---------- */
+  .quizhead{display:flex;align-items:center;gap:10px;margin:34px 0 4px;flex-wrap:wrap}
+  .quizhead .ttl{font-family:var(--mono);font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--ink);font-weight:700}
+  .quizhead .meta{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  .quizhead .rule{flex:1;height:1px;background:var(--line)}
+
+  .q{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:18px 18px 6px;
+    margin:16px 0;transition:border-color .2s}
+  .q:focus-within{border-color:var(--line-strong)}
+  .q:focus{outline:2px solid var(--accent);outline-offset:2px}
+  .qtop{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:9px}
+  .qid{font-family:var(--mono);font-size:11.5px;color:var(--muted);font-weight:600}
+  .chip{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+    padding:2px 7px;border-radius:5px;font-weight:700}
+  .chip.drill{background:#22323f;color:#9fc0d8}
+  .chip.exam{background:#36506a;color:#eaf2fb}
+  .chip.mixed{background:var(--accent-tint);color:var(--accent-deep)}
+  .chip.two{background:rgba(154,118,224,.18);color:#bba6e8}
+  .chip.miss{background:var(--no-bg);color:var(--no);border:1px solid var(--no-line)}
+  .chip.win{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-line)}
+  .stem{font-size:16.5px;margin:2px 0 13px;line-height:1.5}
+  .opts{list-style:none;margin:0;padding:0}
+  .opt{display:flex;gap:11px;align-items:flex-start;width:100%;text-align:left;cursor:pointer;
+    border:1px solid var(--line);background:var(--navy-tint);border-radius:9px;padding:11px 13px;margin:7px 0;
+    font:inherit;font-size:15.5px;color:var(--ink);transition:border-color .12s,background .12s}
+  .opt:hover:not(:disabled){border-color:var(--line-strong);background:#243749}
+  .opt:disabled{cursor:default}
+  .opt .ltr{flex:none;font-family:var(--mono);font-weight:700;font-size:13px;color:var(--accent-deep);
+    width:18px;text-align:center;padding-top:1px}
+  .opt.sel{border-color:var(--accent);background:var(--accent-tint)}
+  .opt.sel .ltr{color:var(--accent-deep)}
+  .opt.correct{border-color:var(--ok-line);background:var(--ok-bg)}
+  .opt.correct .ltr{color:var(--ok)}
+  .opt.wrong{border-color:var(--no-line);background:var(--no-bg)}
+  .opt.wrong .ltr{color:var(--no)}
+  .opt .mark{margin-left:auto;font-family:var(--mono);font-weight:700;font-size:13px}
+  .opt.correct .mark{color:var(--ok)}.opt.wrong .mark{color:var(--no)}
+  .checkbtn{font-family:var(--mono);font-size:12.5px;font-weight:700;letter-spacing:.04em;
+    background:var(--navy);color:#fff;border:none;border-radius:8px;padding:9px 16px;cursor:pointer;
+    margin:6px 0 2px}
+  .checkbtn:hover{background:#0f1d2c}.checkbtn:disabled{opacity:.4;cursor:default}
+  .reveal{max-height:0;overflow:hidden;transition:max-height .3s ease}
+  .reveal.show{max-height:1600px}
+  .rv-inner{border-top:1px solid var(--line);margin-top:12px;padding:13px 2px 12px;font-size:15px;
+    color:var(--ink-soft);line-height:1.58}
+  .rv-inner .verdict{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;
+    font-weight:700;margin-bottom:6px}
+  .verdict.r-ok{color:var(--ok)}.verdict.r-no{color:var(--no)}
+  .rv-inner b{color:var(--ink)}
+  .flip{display:block;margin-top:10px;padding:9px 12px;background:var(--navy-tint);border-radius:8px;
+    font-size:14.5px}
+  .flip .fl{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--accent-deep);font-weight:700;margin-right:6px}
+
+  /* ---------- summary ---------- */
+  .summary{padding:46px 0 70px}
+  .scorecard{background:var(--navy);color:#fff;border-radius:16px;padding:26px 26px 22px;text-align:center}
+  .scorecard .big{font-size:54px;font-weight:800;letter-spacing:-.02em;line-height:1}
+  .scorecard .lab2{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--accent);margin-bottom:8px}
+  .scorecard .note{color:#b9c6d6;font-size:14.5px;margin-top:10px}
+  .misslist{margin-top:18px;font-family:var(--mono);font-size:13px}
+  .misslist a{color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent);
+    margin:0 4px;display:inline-block}
+  .foot{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:center;margin-top:30px}
+
+  /* ---------- vim help overlay ---------- */
+  #help{position:fixed;inset:0;z-index:90;background:rgba(6,11,17,.72);display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+  #help.show{display:flex}
+  .help-card{background:var(--panel2);border:1px solid var(--line-strong);border-radius:14px;padding:24px 26px;max-width:380px;width:calc(100% - 44px)}
+  .help-card h4{margin:0 0 4px;font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+  .help-card .hk{display:flex;justify-content:space-between;gap:14px;padding:6px 0;font-size:14.5px;border-bottom:1px solid var(--line)}
+  .help-card .hk:last-of-type{border-bottom:none}
+  .help-card kbd{font-family:var(--mono);background:var(--panel3);border:1px solid var(--line-strong);border-bottom-width:2px;border-radius:5px;padding:1px 8px;color:var(--accent-2);font-weight:600}
+  .help-card .close{margin-top:14px;font-family:var(--mono);font-size:12px;color:var(--muted);text-align:center}
+  .q.current{border-color:var(--accent)}
+
+  @media (max-width:560px){
+    body{font-size:16px} h1{font-size:31px} h2{font-size:23px}
+    .hud-inner{font-size:11px;gap:10px} .stem{font-size:15.5px}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<div class="hud">
+  <div class="hud-inner">
+    <span class="dot">▰ SAA-C03</span>
+    <span class="stat"><b id="h-ans">0</b>/<span id="h-tot">0</span> answered</span>
+    <span class="stat"><b id="h-pct">—</b> correct</span>
+    <div class="bar"><i id="h-bar"></i></div>
+    <button id="h-help">? keys</button>
+    <button id="h-reset">reset</button>
+  </div>
+</div>
+
+<div id="help"><div class="help-card">
+  <h4>Vim scrolling · smooth</h4>
+  <div class="hk"><span>Glide down / up (hold to flow)</span><span><kbd>j</kbd> <kbd>k</kbd></span></div>
+  <div class="hk"><span>Half page down / up</span><span><kbd>d</kbd> <kbd>u</kbd></span></div>
+  <div class="hk"><span>Full page down / up</span><span><kbd>f</kbd> <kbd>b</kbd></span></div>
+  <div class="hk"><span>Top of page</span><span><kbd>g</kbd><kbd>g</kbd></span></div>
+  <div class="hk"><span>Bottom of page</span><span><kbd>G</kbd></span></div>
+  <div class="hk"><span>Toggle this help</span><span><kbd>?</kbd></span></div>
+  <div class="close">Answer questions by clicking · esc closes help</div>
+</div></div>
+
+<div class="wrap">
+<header class="top">
+  <p class="eyebrow">Weakness-targeted drill · File 10 of 10</p>
+  <h1>Analytics &amp; App Integration<br><span class="thin">Athena · Glue · EMR · QuickSight · API Gateway · AppSync</span></h1>
+  <p class="lede">The last file in the series. Two appetites to feed here: turning a pile of S3 objects into answers (Athena, Glue, EMR, QuickSight, the streaming-to-S3 pipeline) and standing up the API/integration front door (API Gateway, AppSync, and the fan-out services you already met in File 2). Nail these and the blueprint is closed — this is the finish line.</p>
+  <div class="filechips">
+    <span class="fc">1 · Compute &amp; Traffic</span>
+    <span class="fc">2 · Decoupling</span>
+    <span class="fc">3 · Databases</span>
+    <span class="fc">4 · Resilience &amp; DR</span>
+    <span class="fc">5 · Cost</span>
+    <span class="fc">6 · Security &amp; Identity</span>
+    <span class="fc">7 · Storage</span>
+    <span class="fc">8 · Networking</span>
+    <span class="fc">9 · Management &amp; Migration</span>
+    <span class="fc here">10 · Analytics &amp; App Integration</span>
+  </div>
+  <div class="legend">
+    <div class="row"><span class="tg chip drill">drill</span><span><b>Quick check.</b> Exam-real, but tests one fact at a time. Confidence fuel.</span></div>
+    <div class="row"><span class="tg chip exam">exam</span><span><b>Scenario.</b> Full SAA-C03 difficulty — multiple plausible services, one fatal flaw.</span></div>
+    <div class="row"><span class="tg chip mixed">mixed</span><span><b>All-topics review</b> dropped between sections so nothing goes stale.</span></div>
+    <div class="row"><span class="tg chip miss">↻ your miss</span><span>Commonly-missed analytics / integration concept — the kind that costs marks.</span></div>
+    <div class="row"><span class="tg chip win">✓ lock it in</span><span>A concept from earlier files, back to prove it still sticks.</span></div>
+    <p style="margin:12px 0 0;font-size:13.5px;color:var(--muted)">Click an option to answer (or focus a card and press <code>1–5</code>; <code>Enter</code> checks Select-TWO). Every answer reveals why the right one wins, why each distractor dies, and the <b>Flip it</b> — the small stem change that would make a wrong answer correct.</p>
+  </div>
+</header>
+</div>
+
+<div class="wrap">
+
+<!-- ===================== SECTION 1 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">01</span> Serverless analytics &amp; query</div>
+  <h2>Your data already lives in S3 — query it where it sits</h2>
+  <p class="sub">The reflex the exam rewards over and over: when the data is sitting in S3 and someone wants to "run SQL," "build a dashboard," or "generate a report" with the LEAST operational effort, you almost never spin up a cluster. You point a serverless engine at the bucket.</p>
+
+  <h3>Athena — serverless SQL on S3</h3>
+  <p>Amazon <b>Athena</b> runs standard SQL directly against files in S3 with <em>zero infrastructure</em>. There's no cluster to size, patch, or pay for when idle — you pay <strong>per terabyte scanned</strong>. That pricing model is the whole exam game: convert raw CSV/JSON to <b>columnar Parquet/ORC</b>, <b>compress</b>, and <b>partition</b> by date/region so a query touches a fraction of the data. Less scanned = cheaper and faster. Athena reads its table definitions from the <b>Glue Data Catalog</b>.</p>
+
+  <h3>Glue — serverless ETL &amp; the Data Catalog</h3>
+  <p>AWS <b>Glue</b> is serverless extract-transform-load on managed Spark. Its two exam-critical pieces: <b>crawlers</b> scan your data, infer schema, and populate the <b>Data Catalog</b> (the central metadata store Athena, EMR, and Redshift Spectrum all read); and <b>ETL jobs</b> transform/convert data (e.g. JSON → Parquet) with no servers to run. "LEAST operational overhead" + "transform data / discover schema" = Glue, not a hand-built Spark cluster.</p>
+
+  <div class="box key"><p class="lab">Key fact — the data-lake reflex</p><p>The default serverless analytics stack on the exam is <b>S3 (data lake) → Glue crawler/ETL (catalog + transform to Parquet) → Athena (SQL) → QuickSight (dashboards)</b>. Every box in that chain is serverless and pay-per-use. When a stem says "consolidate data into one place, run one-time queries, show KPIs, least overhead," that pipeline is the answer — reach for a cluster (Redshift/EMR) only when the stem forces you to.</p></div>
+
+  <h3>QuickSight — the BI layer</h3>
+  <p>Amazon <b>QuickSight</b> is the managed business-intelligence / dashboard service. It connects to Athena, S3, Redshift, RDS and more, and its in-memory engine <b>SPICE</b> caches data for fast interactive dashboards. When the requirement is "visualize," "dashboard," "KPIs," or "share reports with business users," that's QuickSight — not Athena (which only returns query results) and not OpenSearch (which is search/log analytics).</p>
+
+  <h3>The streaming-to-store layer: Firehose vs Data Streams vs Data Analytics</h3>
+  <p>You met Kinesis Data Streams in File 2 as a <em>stream-vs-queue</em> concept (warm). Here it's about the <em>loading</em> side:</p>
+  <div class="tw"><table>
+    <tr><th>Service</th><th>What it is</th><th>Stem tell</th></tr>
+    <tr><td><b>Kinesis Data Firehose</b></td><td>Fully-managed <em>delivery</em> stream. No shards, no consumers to code. Auto-loads to <b>S3, Redshift, OpenSearch, Splunk</b>; can buffer, compress, convert to Parquet, and invoke Lambda to transform en route.</td><td>"deliver / load streaming data to S3/Redshift/OpenSearch", "near-real-time", "least management"</td></tr>
+    <tr><td><b>Kinesis Data Streams</b></td><td>Real-time stream you read with your own consumers; shards, ordering, replay, sub-second. You manage scaling/consumers.</td><td>"custom real-time processing", "multiple consumers replay the same data", "millisecond"</td></tr>
+    <tr><td><b>Kinesis Data Analytics</b></td><td>Run SQL (or Apache Flink) <em>on the stream in flight</em> — windowed aggregations, real-time metrics.</td><td>"analyze / transform the streaming data with SQL as it arrives"</td></tr>
+  </table></div>
+  <div class="box trap"><p class="lab">Classic trap — Firehose is not real-time-for-consumers</p><p>Firehose is the <b>least-effort way to LAND streaming data in a store</b>, but it buffers (seconds–minutes) and you don't write consumer code against it. If a stem needs <b>sub-second delivery to custom consumers</b>, or <b>multiple independent apps to replay the same records</b>, that's <b>Data Streams</b>, not Firehose. And if it needs no destination at all — just "process records yourself" — Firehose, which exists only to <em>deliver</em>, is wrong.</p></div>
+
+  <div class="box field"><p class="lab">// field note — pay for what you scan</p><p>Athena's pay-per-scan model has a famous failure mode: teams point it at terabytes of raw JSON and watch the bill climb per query. AWS's own guidance is blunt — converting a dataset to <b>compressed, columnar Parquet</b> and partitioning it routinely cuts both cost and runtime by <b>30–90%</b>, because Athena reads only the columns and partitions a query needs. The lesson the exam keeps testing: the cheapest analytics tool is still expensive if you let it read everything.</p></div>
+
+  <!-- DRILL -->
+  <div class="quizhead"><span class="ttl">Quick check</span><span class="rule"></span><span class="meta">7 questions · one fact each</span></div>
+  <div id="s1-drill"></div>
+
+  <!-- SCENARIO -->
+  <div class="quizhead"><span class="ttl">Scenario pressure</span><span class="rule"></span><span class="meta">7 questions · exam difficulty</span></div>
+  <div id="s1-exam"></div>
+</section>
+
+<!-- ===================== MIXED 1 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">↻</span> Mixed review — all domains</div>
+  <h2>Keep the rest warm</h2>
+  <p class="sub">Four pulled from across the blueprint — compute, decoupling, databases, DR — so nothing you've already locked in goes stale while you focus on analytics.</p>
+  <div id="mix-1"></div>
+</section>
+
+<!-- ===================== SECTION 2 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">02</span> Big data clusters &amp; search</div>
+  <h2>When serverless isn't the answer — clusters, governance &amp; search</h2>
+  <p class="sub">Athena and Glue cover most "query the lake" questions, but the exam keeps a handful of services for when the stem forces a cluster, a governance layer, or full-text search. Knowing exactly when each one beats the serverless default is the whole skill.</p>
+
+  <h3>EMR — managed Hadoop / Spark</h3>
+  <p>Amazon <b>EMR</b> runs managed Hadoop, Spark, Hive, Presto, HBase on a cluster you size. Reach for it when the stem demands <b>heavy, custom big-data frameworks</b>, petabyte-scale batch processing, existing Hadoop/Spark code to migrate, or fine control over the engine — things Athena's pure-SQL serverless model can't do. For cost, EMR runs beautifully on <b>Spot</b> for task nodes and as a <b>transient cluster</b> (spin up, run the job, terminate). If a stem just says "run SQL on S3 occasionally, least effort," EMR is the over-engineered distractor; Athena wins.</p>
+
+  <div class="tw"><table>
+    <tr><th>Pick</th><th>When</th><th>Pay model</th></tr>
+    <tr><td><b>Athena</b></td><td>Ad-hoc / one-time SQL on S3, no infra to run, least effort</td><td>per TB scanned</td></tr>
+    <tr><td><b>EMR</b></td><td>Custom Spark/Hadoop frameworks, huge batch ETL, migrate existing Hadoop, ML pipelines</td><td>per cluster-hour (Spot-friendly)</td></tr>
+    <tr><td><b>Redshift</b></td><td>Petabyte-scale data warehouse, complex joins, frequent BI on structured data, consistent perf</td><td>per provisioned (or serverless) capacity</td></tr>
+  </table></div>
+
+  <h3>Lake Formation — governance for the lake</h3>
+  <p>AWS <b>Lake Formation</b> sits on top of S3 + Glue and adds <b>centralized, fine-grained permissions</b> — table-, column-, and row-level access for analysts across Athena, Redshift Spectrum, and EMR, managed in one place instead of juggling S3 bucket policies and IAM. Exam tell: "data lake" + "fine-grained / column-level access control" + "least administrative effort" → Lake Formation.</p>
+
+  <h3>OpenSearch — log analytics &amp; search</h3>
+  <p>Amazon <b>OpenSearch Service</b> (formerly Elasticsearch Service) is for <b>full-text search</b> and <b>log/operational analytics</b> with near-real-time dashboards (OpenSearch Dashboards / Kibana). The signature pipeline: <b>logs → Kinesis Data Firehose → OpenSearch → dashboards</b>. When a stem wants to search/index documents or interactively analyze and visualize log streams, it's OpenSearch — not Athena (batch SQL) and not QuickSight (BI on structured sources).</p>
+
+  <h3>Redshift recap + Spectrum + RA3</h3>
+  <p>Redshift basics were File 3 (warm). Two exam add-ons: <b>Redshift Spectrum</b> lets a Redshift cluster query data <em>directly in S3</em> without loading it — join warm warehouse tables to cold S3 history. <b>RA3</b> nodes separate compute from storage (scale them independently; managed S3-backed storage), and <b>AQUA</b> is a hardware-accelerated cache layer. <b>MSK</b> (Managed Streaming for Apache Kafka) is the pick when the stem explicitly says <b>Kafka</b> or "migrate an existing Kafka workload"; otherwise Kinesis is the AWS-native streaming default.</p>
+
+  <div class="box trap"><p class="lab">Classic trap — OpenSearch vs QuickSight vs Athena</p><p>Three "analytics" services, three different jobs. <b>Athena</b> = serverless SQL queries (you get rows back). <b>QuickSight</b> = BI dashboards for business KPIs on structured data. <b>OpenSearch</b> = full-text search + interactive <em>log</em> analytics. A stem about searching documents or live-troubleshooting log streams that pairs "QuickSight" is bait; one about business KPI dashboards that pairs "OpenSearch" is also bait.</p></div>
+
+  <div class="box field"><p class="lab">// field note — the rename nobody forgets</p><p>In 2021, after a licensing dispute with Elastic, AWS forked Elasticsearch and renamed its managed service <b>Amazon OpenSearch Service</b>. SAA-C03 questions still write it as "Amazon OpenSearch Service (Amazon Elasticsearch Service)" so candidates who learned the old name aren't tripped up. If you see either name, treat them as the same service — search and log analytics.</p></div>
+
+  <div class="quizhead"><span class="ttl">Quick check</span><span class="rule"></span><span class="meta">7 questions · one fact each</span></div>
+  <div id="s2-drill"></div>
+
+  <div class="quizhead"><span class="ttl">Scenario pressure</span><span class="rule"></span><span class="meta">7 questions · exam difficulty</span></div>
+  <div id="s2-exam"></div>
+</section>
+
+<!-- ===================== MIXED 2 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">↻</span> Mixed review — all domains</div>
+  <h2>Keep the rest warm</h2>
+  <p class="sub">Four more across security, storage, cost and networking — the cross-topic jumps the real exam makes every other question.</p>
+  <div id="mix-2"></div>
+</section>
+
+<!-- ===================== SECTION 3 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">03</span> API &amp; application integration front door</div>
+  <h2>The managed front door to your serverless backend</h2>
+  <p class="sub">The other half of this domain: standing up a managed, scalable, secured entry point for clients — and wiring the integration glue (fan-out, queues, orchestration) behind it. You've met the glue in File 2; here it joins the front door.</p>
+
+  <h3>API Gateway — three API flavors</h3>
+  <div class="tw"><table>
+    <tr><th>Type</th><th>Reach for it when…</th><th>Note</th></tr>
+    <tr><td><b>REST API</b></td><td>Full feature set: API keys + usage plans, request/response transforms, caching, WAF, fine-grained throttling, edge-optimized</td><td>most features, higher cost per call</td></tr>
+    <tr><td><b>HTTP API</b></td><td>Simpler, cheaper, lower-latency proxy to Lambda / HTTP backends; JWT auth built in</td><td>~70% cheaper; fewer features (no usage plans/caching)</td></tr>
+    <tr><td><b>WebSocket API</b></td><td>Two-way, stateful connections — chat, live feeds, push notifications</td><td>server can push to clients</td></tr>
+  </table></div>
+
+  <h3>Endpoints, throttling &amp; caching</h3>
+  <p>Endpoint types: <b>Edge-optimized</b> (default, fronted by CloudFront for global clients), <b>Regional</b> (clients in-Region, or you bring your own CloudFront), <b>Private</b> (only reachable from inside a VPC via an interface endpoint). API Gateway has <b>built-in throttling</b> (account + per-method limits) to protect the backend from spikes, and <b>caching</b> on REST APIs to cut backend calls and latency.</p>
+
+  <h3>Auth &amp; rate-limiting clients</h3>
+  <ul class="tight">
+    <li><b>Cognito user pool authorizer</b> — managed user sign-in/JWT validation with zero auth code. Least effort when the stem already uses Cognito.</li>
+    <li><b>Lambda authorizer</b> — custom auth logic (validate a third-party token, call an external IdP) when Cognito doesn't fit.</li>
+    <li><b>IAM authorization</b> — SigV4 for internal AWS callers.</li>
+    <li><b>API keys + usage plans</b> — identify callers and enforce <em>rate / quota per client</em> (e.g. throttle a tier of users). For blocking malicious traffic, pair with <b>AWS WAF</b>.</li>
+  </ul>
+
+  <div class="box key"><p class="lab">Key fact — the canonical serverless API</p><p><b>API Gateway → Lambda → DynamoDB</b> is the exam's default fully-managed, auto-scaling, no-servers-to-patch web backend. When a stem wants a REST/HTTP API with the least operational overhead and unpredictable traffic, this is the stack. Add a <b>Cognito user pool authorizer</b> for managed user auth, <b>usage plans</b> to rate-limit clients, and <b>WAF</b> to filter malicious requests.</p></div>
+
+  <h3>AppSync — managed GraphQL</h3>
+  <p>AWS <b>AppSync</b> is managed <b>GraphQL</b>: clients fetch exactly the fields they need in one request, with built-in <b>real-time subscriptions</b> and offline sync — ideal for mobile/web apps aggregating multiple data sources (DynamoDB, RDS, Lambda, OpenSearch). Exam tell: the word <b>GraphQL</b>, or "mobile app needs real-time updates and to combine several backends in one query." If it just says "REST API," that's API Gateway.</p>
+
+  <h3>The integration glue — recap as a win</h3>
+  <p>Behind the front door sit the File 2 services: <b>SNS</b> (pub/sub fan-out to many subscribers), <b>SQS</b> (durable decoupling buffer), <b>EventBridge</b> (event bus + routing rules + scheduling), and <b>Step Functions</b> (visual orchestration of multi-step / long-running workflows with retries and state). The exam loves API Gateway publishing straight to SNS/SQS (no Lambda needed) and Step Functions coordinating a sequence of Lambdas.</p>
+
+  <div class="box trap"><p class="lab">Classic trap — usage plans vs WAF vs authorizers</p><p>Three controls that all "protect the API," each with a distinct job. <b>Usage plans + API keys</b> = rate/quota limiting per client. <b>WAF</b> = block malicious patterns / bad IPs / SQLi. <b>Authorizers (Cognito/Lambda)</b> = verify <em>who</em> the caller is. A stem about throttling abusive-but-valid callers wants usage plans; one about filtering attack traffic wants WAF; one about validating logged-in users wants a Cognito authorizer. Mixing them up is a classic distractor.</p></div>
+
+  <div class="box field"><p class="lab">// field note — the API throttle that saved the launch</p><p>API Gateway's default account throttle (10,000 req/s, 5,000 burst) exists for one reason teams learn the hard way: a sudden traffic spike — a viral post, a misbehaving client in a retry loop — can stampede an unprotected Lambda+DynamoDB backend into throttling and cascading failures. The exam's lesson lands cleanly: the front door's job isn't only routing, it's <em>protecting</em> the backend, so "spiky/unpredictable traffic" stems reward API Gateway throttling and caching over a raw load balancer.</p></div>
+
+  <div class="quizhead"><span class="ttl">Quick check</span><span class="rule"></span><span class="meta">6 questions · one fact each</span></div>
+  <div id="s3-drill"></div>
+
+  <div class="quizhead"><span class="ttl">Scenario pressure</span><span class="rule"></span><span class="meta">7 questions · exam difficulty</span></div>
+  <div id="s3-exam"></div>
+</section>
+
+<!-- ===================== SUMMARY ===================== -->
+<section class="summary">
+  <div class="scorecard">
+    <div class="lab2">Session readiness</div>
+    <div class="big"><span id="sc-pct">—</span></div>
+    <div class="note"><span id="sc-line">Answer some questions and your readiness score appears here.</span></div>
+    <div class="misslist" id="sc-miss"></div>
+  </div>
+  <p class="foot">File 10 / 10 · Analytics &amp; App Integration · 50 questions · this is the last file — all ten domains are now covered. Run a clean sweep here, then go back and re-take any file where the bar at the top isn't green. You're ready.</p>
+</section>
+
+</div><!-- /wrap -->
+
+<script>
+/* ---------------- QUESTION BANK ----------------
+   c = index (or array) of correct option(s), 0-based
+   multi:true => Select TWO; tag => "miss" | "win"          */
+const BANK = [
+
+/* ====== S1 DRILL ====== */
+{g:"s1-drill",id:"10.01",d:"drill",tag:"miss",q:"Application logs are written to Amazon S3. An analyst occasionally needs to run ad-hoc SQL queries against them with no infrastructure to manage. What is the simplest choice?",
+o:["Load the logs into Amazon Redshift and query there","Use Amazon Athena to query the logs directly in S3","Stand up a transient Apache Spark cluster on Amazon EMR","Query the logs from the Amazon CloudWatch console"],c:1,
+e:`<b>Athena</b> runs serverless SQL straight against S3 — nothing to provision, pay only per query. Perfect for occasional ad-hoc queries.<br>✗ Redshift means loading and running a warehouse for occasional use. ✗ EMR is a cluster to manage. ✗ CloudWatch isn't where these S3 logs live and isn't a general SQL engine.<span class="flip"><span class="fl">flip it</span>If queries were constant and complex over petabytes of structured data, <b>Redshift</b> becomes the fit.</span>`},
+
+{g:"s1-drill",id:"10.02",d:"drill",q:"Athena bills you per terabyte scanned. Which change most reduces both cost and query time?",
+o:["Convert the data to compressed, columnar Parquet and partition it","Increase the Athena query timeout","Store the data in S3 Standard-Infrequent Access","Run the queries during off-peak hours"],c:0,
+e:`<b>Columnar Parquet + compression + partitioning</b> means Athena reads only the columns and partitions a query needs — directly cutting bytes scanned. ✗ Timeouts don't affect cost. ✗ The S3 storage class doesn't change Athena scan charges. ✗ Athena pricing isn't time-of-day based.`},
+
+{g:"s1-drill",id:"10.03",d:"drill",q:"What does an AWS Glue crawler do?",
+o:["Runs scheduled SQL reports","Scans data sources, infers schema, and populates the Glue Data Catalog","Caches dashboard data in memory","Encrypts objects in S3"],c:1,
+e:`A <b>Glue crawler</b> discovers data, infers its schema, and writes table definitions into the <b>Data Catalog</b> that Athena/EMR/Redshift Spectrum then read. The others describe QuickSight reports, SPICE, and SSE respectively.`},
+
+{g:"s1-drill",id:"10.04",d:"drill",q:"A business team needs interactive dashboards showing KPIs to non-technical stakeholders, sourced from Athena and Redshift. Which service?",
+o:["Amazon Athena","Amazon QuickSight","Amazon OpenSearch Service","AWS Glue DataBrew"],c:1,
+e:`<b>QuickSight</b> is the managed BI/dashboard service, with the in-memory SPICE engine for fast interactive visuals. ✗ Athena only returns query results. ✗ OpenSearch is search/log analytics. ✗ DataBrew is visual data prep, not dashboards.`},
+
+{g:"s1-drill",id:"10.05",d:"drill",tag:"miss",q:"Streaming data must be loaded into Amazon S3 in near-real-time with the least possible management — no shards to size, no consumer code. Which service?",
+o:["Amazon Kinesis Data Streams","Amazon Kinesis Data Firehose","Amazon SQS","Amazon MSK"],c:1,
+e:`<b>Kinesis Data Firehose</b> is the fully-managed delivery stream: no shards, no consumers, auto-loads to S3/Redshift/OpenSearch. ✗ Data Streams needs you to manage shards and write consumers. ✗ SQS is a queue, not a delivery pipeline to S3. ✗ MSK is managed Kafka — heavy and not a simple S3 loader.`},
+
+{g:"s1-drill",id:"10.06",d:"drill",q:"You need to run SQL aggregations over a Kinesis stream in flight (e.g. a 5-minute rolling count) without landing the data first. Which service?",
+o:["Amazon Kinesis Data Analytics","Amazon Athena","AWS Glue ETL","Amazon QuickSight"],c:0,
+e:`<b>Kinesis Data Analytics</b> runs SQL/Flink on the stream as records arrive — windowed real-time analytics. ✗ Athena queries data at rest in S3. ✗ Glue ETL is batch transform. ✗ QuickSight visualizes, it doesn't process streams.`},
+
+{g:"s1-drill",id:"10.07",d:"drill",q:"Which serverless service converts large JSON datasets in S3 into Parquet on a schedule with no servers to manage?",
+o:["An AWS Glue ETL job","An Amazon EMR Spark cluster","An EC2 cron job running Spark","Amazon Athena CTAS only, never Glue"],c:0,
+e:`A <b>Glue ETL job</b> runs serverless Spark to transform/convert data (JSON→Parquet) on a schedule — no infrastructure. ✗ EMR and EC2-Spark are clusters you manage. ✗ Athena CTAS can also write Parquet, but the question asks for the serverless ETL service that does this as a managed job — Glue.`},
+
+/* ====== S1 EXAM ====== */
+{g:"s1-exam",id:"10.08",d:"exam",tag:"miss",q:"A company consolidates data from many departments into a central S3 bucket. It needs to catalog and transform the incoming data into Apache Parquet, stage it in S3, let teams run one-time SQL queries, and show KPIs in a BI tool — all with the LEAST operational overhead. Which combination meets this? (Select TWO.)",
+o:["Use AWS Glue to crawl the sources and an ETL job to load the data into S3 as Parquet","Use Amazon Athena for the one-time queries and Amazon QuickSight for the KPI dashboards","Write custom Lambda functions to move records into an Amazon Redshift cluster","Use Amazon Kinesis Data Analytics for the one-time queries","Stand up an Amazon EMR cluster to run all the queries and build the dashboards"],c:[0,1],multi:true,
+e:`The serverless lake pipeline, exactly: <b>Glue</b> catalogs + converts to Parquet, <b>Athena</b> runs the one-time SQL, <b>QuickSight</b> shows KPIs — every piece serverless, least overhead.<br>✗ Custom Lambda + Redshift is code and a cluster to run. ✗ Kinesis Data Analytics is for streaming SQL, not one-time queries on stored data. ✗ EMR is a managed cluster — more overhead than Athena for ad-hoc SQL.`},
+
+{g:"s1-exam",id:"10.09",d:"exam",q:"A company streams clickstream events and must (1) deliver them to S3 for storage and (2) deliver a copy to an OpenSearch domain for near-real-time dashboards, with the least operational effort and no consumer code. What should the architect use?",
+o:["Two Kinesis Data Streams with custom consumer applications for each destination","Amazon Kinesis Data Firehose delivery streams to S3 and to OpenSearch Service","Amazon SQS with two queues and Lambda workers writing to each store","Amazon MSK with Kafka Connect sinks"],c:1,
+e:`<b>Firehose</b> delivers straight to S3 and to OpenSearch with no shards and no consumer code — minimum effort for "land it in a store."<br>✗ Data Streams + custom consumers is exactly the code you're trying to avoid. ✗ SQS + Lambda is more to build and operate. ✗ MSK/Kafka Connect is heavy and only the answer if Kafka is mandated.`},
+
+{g:"s1-exam",id:"10.10",d:"exam",q:"An analytics team's Athena bills have spiked. Queries scan an entire multi-terabyte S3 prefix of raw, uncompressed JSON every time, even when they filter to a single day. What is the MOST effective fix?",
+o:["Convert the data to compressed columnar Parquet and partition it by date","Move the JSON files to S3 Glacier Instant Retrieval","Increase the Athena workgroup's per-query data limit","Switch every query to SELECT *"],c:0,
+e:`<b>Parquet + compression + date partitioning</b> lets Athena prune to only the day and columns needed — slashing bytes scanned and therefore cost.<br>✗ Glacier IR changes storage class, not scan charges (and would add retrieval friction). ✗ Raising the data limit permits <i>more</i> scanning, not less. ✗ SELECT * scans every column — the opposite of the fix.`},
+
+{g:"s1-exam",id:"10.11",d:"exam",q:"A company wants a serverless query layer that joins data already in S3 with relational data in an Amazon RDS for PostgreSQL database, then publishes the results in dashboards — all with minimal infrastructure to manage. What fits best?",
+o:["Amazon Athena (with a Federated Query connector to RDS) feeding Amazon QuickSight","An Amazon EMR cluster running Presto against both sources","Export everything nightly into Amazon Redshift and query there","An EC2 instance running a custom Python ETL and Grafana"],c:0,
+e:`<b>Athena Federated Query</b> can join S3 data with RDS via a connector, all serverless, and <b>QuickSight</b> publishes the dashboards — minimal infra.<br>✗ EMR is a cluster to manage. ✗ Nightly export to Redshift adds a warehouse and a pipeline. ✗ A custom EC2 ETL is the highest operational effort here.`},
+
+{g:"s1-exam",id:"10.12",d:"exam",q:"A real-time pipeline must ingest streaming records, transform them with SQL as they arrive, write the transformed output to S3, and let analysts query that output with SQL afterward, with minimal management. Which design fits?",
+o:["Kinesis Data Streams → Kinesis Data Analytics (SQL transform) → Kinesis Data Firehose → S3, then Amazon Athena to query","Kinesis Data Firehose only, with analysts querying the stream directly","Amazon SQS → Lambda → S3, then the RDS query editor","Amazon EMR Spark Streaming writing to HDFS, queried with Hive"],c:0,
+e:`This is the canonical streaming-to-lake chain: <b>Data Streams</b> ingests, <b>Data Analytics</b> transforms with SQL in flight, <b>Firehose</b> lands it in S3, <b>Athena</b> queries the result.<br>✗ You can't query a Firehose stream with SQL directly. ✗ SQS/Lambda doesn't do in-flight SQL, and RDS query editor doesn't query S3. ✗ EMR/HDFS is a managed-cluster path, not minimal.`},
+
+{g:"s1-exam",id:"10.13",d:"exam",tag:"miss",q:"A team currently runs Apache Spark jobs on self-managed EC2 to process petabytes of data nightly and wants to keep their existing Spark code while cutting operational burden and cost. Which service is the best fit?",
+o:["Rewrite everything as Athena SQL queries","Amazon EMR (optionally transient clusters with Spot task nodes)","AWS Glue Python shell jobs only","Load the data into Amazon Redshift and use stored procedures"],c:1,
+e:`<b>EMR</b> runs their existing Spark code on a managed Hadoop/Spark cluster, and transient clusters + Spot task nodes cut cost — least disruption to working code.<br>✗ Rewriting petabyte Spark pipelines as Athena SQL is a massive, often impossible, rewrite. ✗ Glue fits serverless ETL but petabyte custom Spark with existing code leans EMR. ✗ Redshift is a warehouse, not a Spark runtime.<span class="flip"><span class="fl">flip it</span>If they had <i>no</i> existing code and wanted serverless ad-hoc SQL, <b>Athena</b> would win.</span>`},
+
+{g:"s1-exam",id:"10.14",d:"exam",q:"A company stores CloudFront access logs in S3 and wants standard SQL analysis plus visual dashboards, with the least operational overhead. What should they use?",
+o:["Amazon Athena to query the logs, with Amazon QuickSight to visualize the results","Amazon OpenSearch Service ingesting the logs via a managed cluster","An Amazon Redshift cluster loaded nightly from the logs","Amazon EMR with Presto and a self-hosted Superset dashboard"],c:0,
+e:`<b>Athena + QuickSight</b> is the serverless SQL-plus-dashboards pairing — zero clusters, least overhead, and exactly what AWS recommends for log analysis on S3.<br>✗ OpenSearch is a cluster and is for search/interactive log analytics, more than "standard SQL + dashboards" needs. ✗ Redshift adds a warehouse and a pipeline. ✗ EMR + self-hosted Superset is the highest-effort option.`},
+
+/* ====== MIX 1 ====== */
+{g:"mix-1",id:"M1.1",d:"mixed",tag:"win",q:"Images uploaded to a web tier each take 5–10 minutes to process. At peak, uploads spike and some are silently dropped. The team wants every upload eventually processed, decoupled, with workers scaling to the backlog. What's the core design?",
+o:["Put an SQS queue between the tiers; workers in an Auto Scaling group scale on queue depth, with a visibility timeout longer than the processing time","Enable ALB sticky sessions so uploads stay on one instance","Increase the web instance size to process inline","Use Kinesis Data Firehose to deliver uploads straight to processing"],c:0,
+e:`<b>SQS</b> buffers the spike; workers pull when ready and scale on <b>queue depth</b>; a <b>visibility timeout longer than the 5–10 min job</b> prevents double-processing. The File 2 decoupling reflex.<br>✗ Stickiness and bigger instances keep upload coupled to processing. ✗ Firehose only delivers to data stores, not a worker fleet.`},
+
+{g:"mix-1",id:"M1.2",d:"mixed",tag:"win",q:"A read-heavy reporting workload overwhelms a single RDS MySQL instance. Writes are light and must not be affected. How do you scale the reads?",
+o:["Convert to a Multi-AZ deployment","Add one or more RDS read replicas and route reads to them","Increase storage and IOPS only","Take nightly snapshots and query restored copies"],c:1,
+e:`<b>Read replicas</b> scale read throughput without touching writes. ✗ Multi-AZ is for HA failover; the standby serves no reads. ✗ More IOPS doesn't add read capacity like replicas do. ✗ Snapshot-restore is a batch hack.<span class="flip"><span class="fl">flip it</span>If the goal were "survive an AZ failure with automatic failover," the answer is <b>Multi-AZ</b>.</span>`},
+
+{g:"mix-1",id:"M1.3",d:"mixed",tag:"win",q:"A static website (HTML/CSS/JS/images) in S3 loads slowly for a global audience, and the team wants to offload requests from the origin. What should they implement?",
+o:["S3 Transfer Acceleration","A CloudFront distribution with the S3 bucket as origin","Cross-Region replicate the bucket everywhere","EC2 in multiple Regions behind Route 53 latency routing"],c:1,
+e:`<b>CloudFront</b> caches static content at edge locations worldwide and offloads the origin. ✗ Transfer Acceleration speeds uploads, not global reads. ✗ Replicating everywhere is costly and still not edge-cached. ✗ EC2 fleets are overkill for static files.`},
+
+{g:"mix-1",id:"M1.4",d:"mixed",q:"A workload needs an active-active database across two Regions so users in each Region read and write locally with single-digit-ms latency. Which option fits?",
+o:["Amazon RDS Multi-AZ","Amazon DynamoDB global tables","An RDS read replica in the second Region","Amazon ElastiCache global datastore for the primary store"],c:1,
+e:`<b>DynamoDB global tables</b> give multi-Region, active-active replication with local low-latency reads and writes. ✗ RDS Multi-AZ is single-Region HA. ✗ A cross-Region read replica is read-only, not active-active. ✗ ElastiCache is a cache, not the system of record.`},
+
+/* ====== S2 DRILL ====== */
+{g:"s2-drill",id:"10.15",d:"drill",q:"A team must run an occasional one-time SQL query on data in S3 with no cluster to manage. Which service over Amazon EMR?",
+o:["Amazon Athena","A transient Amazon EMR cluster","Amazon Redshift Spectrum only","Amazon QuickSight SPICE"],c:0,
+e:`<b>Athena</b> is serverless SQL on S3 — the least-effort pick for occasional queries. ✗ EMR is a cluster to spin up and manage. ✗ Redshift Spectrum requires a Redshift cluster. ✗ SPICE is QuickSight's cache, not a query engine.`},
+
+{g:"s2-drill",id:"10.16",d:"drill",tag:"miss",q:"You need centralized, fine-grained (table-, column-, row-level) access control over a data lake spanning S3, shared with many analysts, with the least admin effort. Which service?",
+o:["S3 bucket policies for every analyst","AWS Lake Formation","IAM users with inline policies per table","AWS Glue crawlers"],c:1,
+e:`<b>Lake Formation</b> centralizes fine-grained (column/row-level) lake permissions in one place across Athena, EMR, and Redshift Spectrum. ✗ Hand-managed bucket policies and per-table IAM don't scale and aren't column/row aware. ✗ Crawlers catalog data; they don't govern access.`},
+
+{g:"s2-drill",id:"10.17",d:"drill",tag:"miss",q:"A team must store application logs and run interactive full-text search and near-real-time log dashboards. Which service fits best?",
+o:["Amazon Athena","Amazon OpenSearch Service","Amazon QuickSight","Amazon Redshift"],c:1,
+e:`<b>OpenSearch Service</b> is built for full-text search and interactive near-real-time log analytics with dashboards. ✗ Athena is batch SQL on S3. ✗ QuickSight is BI on structured sources. ✗ Redshift is a warehouse, not a search engine.`},
+
+{g:"s2-drill",id:"10.18",d:"drill",q:"What does Amazon Redshift Spectrum let you do?",
+o:["Query data directly in S3 from Redshift without loading it first","Cache Redshift query results in memory","Replicate Redshift across Regions","Convert Redshift tables to Parquet automatically"],c:0,
+e:`<b>Redshift Spectrum</b> queries data sitting in S3 directly from a Redshift cluster — join hot warehouse tables to cold S3 history without loading. The others describe AQUA-ish caching, cross-Region replication, and Glue/CTAS conversion respectively.`},
+
+{g:"s2-drill",id:"10.19",d:"drill",q:"A company must migrate an existing self-managed Apache Kafka workload to AWS with minimal application change. Which service?",
+o:["Amazon Kinesis Data Streams","Amazon Managed Streaming for Apache Kafka (MSK)","Amazon SQS","Amazon Kinesis Data Firehose"],c:1,
+e:`<b>MSK</b> runs managed Apache Kafka, so existing Kafka producers/consumers work with minimal change. ✗ Kinesis is AWS-native streaming but not Kafka-compatible, requiring rewrites. ✗ SQS/Firehose aren't Kafka.<span class="flip"><span class="fl">flip it</span>For a brand-new AWS-native stream with no Kafka dependency, <b>Kinesis Data Streams</b> is the default.</span>`},
+
+{g:"s2-drill",id:"10.20",d:"drill",q:"When is Amazon EMR the better choice over Amazon Athena?",
+o:["When you only need occasional ad-hoc SQL on S3","When you must run custom Spark/Hadoop frameworks or migrate existing big-data code","When you want the least possible infrastructure to manage","When you only need to visualize KPIs"],c:1,
+e:`<b>EMR</b> wins when you need custom Spark/Hadoop/Hive frameworks, huge batch processing, or to lift existing Hadoop code. ✗ Occasional SQL and least-infra both point to Athena. ✗ Visualizing KPIs is QuickSight.`},
+
+{g:"s2-drill",id:"10.21",d:"drill",q:"Which Redshift feature separates compute from managed storage so you scale them independently?",
+o:["RA3 nodes","Dense Compute (DC2) nodes","AQUA","Concurrency Scaling"],c:0,
+e:`<b>RA3 nodes</b> decouple compute from S3-backed managed storage — scale each independently. ✗ DC2 couples local SSD storage to compute. ✗ AQUA is a hardware-accelerated cache layer. ✗ Concurrency Scaling adds transient capacity for query bursts, not storage separation.`},
+
+/* ====== S2 EXAM ====== */
+{g:"s2-exam",id:"10.22",d:"exam",tag:"miss",q:"A company wants a governed data lake: ingest from an RDS database into S3, catalog it, and enforce column-level access so each analyst team sees only permitted columns — with the least administrative effort. Which approach is best?",
+o:["Create the lake with AWS Lake Formation: use a Glue connection to RDS, register the S3 bucket in Lake Formation, and manage access with Lake Formation permissions","Copy data to S3 with a Lambda function, add a Glue crawler, and control access with per-prefix S3 bucket policies","Load everything into Redshift and use database GRANT statements per analyst","Expose the data through Athena and email pre-signed URLs to each analyst"],c:0,
+e:`<b>Lake Formation</b> is purpose-built for this: register the S3 lake, ingest via Glue, and apply <b>column/row-level permissions</b> centrally — least admin effort for fine-grained lake governance.<br>✗ S3 bucket policies can't do column-level control and don't scale per analyst. ✗ Redshift GRANTs mean loading a warehouse and managing it separately. ✗ Pre-signed URLs are no access model at all.`},
+
+{g:"s2-exam",id:"10.23",d:"exam",q:"A platform ingests real-time streaming data, must transform it before writing to S3, and analysts then query the transformed data with SQL. Which solutions meet this with the least operational overhead? (Select TWO.)",
+o:["Kinesis Data Streams → Kinesis Data Analytics to transform → Kinesis Data Firehose to S3 → Amazon Athena to query","Amazon MSK to stream → AWS Glue to transform and write to S3 → Amazon Athena to query","AWS DMS to ingest → Amazon EMR to transform and write to S3 → Athena to query","MSK to stream → Kinesis Data Analytics to write to S3 → the RDS query editor to query","Kinesis Data Streams → AWS Glue to transform → Firehose to S3 → RDS query editor to query"],c:[0,1],multi:true,
+e:`Two clean, low-overhead streaming-to-lake chains, both ending in <b>Athena</b> over S3: (A) the all-Kinesis path with in-flight SQL via Data Analytics, and (B) MSK + serverless Glue transform.<br>✗ DMS+EMR adds a managed cluster (more overhead). ✗ The RDS query editor cannot query S3 — both options using it fail.`},
+
+{g:"s2-exam",id:"10.24",d:"exam",q:"An operations team must ingest application logs in near-real-time, index them for full-text search, and give engineers interactive dashboards to troubleshoot. Which pipeline fits with the least custom code?",
+o:["Logs → Kinesis Data Firehose → Amazon OpenSearch Service → OpenSearch Dashboards","Logs → S3 → Amazon Athena → Amazon QuickSight","Logs → Kinesis Data Streams → custom Lambda consumers → DynamoDB","Logs → Amazon Redshift → QuickSight"],c:0,
+e:`<b>Firehose → OpenSearch → Dashboards</b> is the canonical near-real-time, searchable, interactive log-analytics pipeline with no consumer code.<br>✗ Athena+QuickSight is batch SQL + BI, not interactive full-text search/troubleshooting. ✗ Custom Lambda consumers add code and DynamoDB isn't a search engine. ✗ Redshift is a warehouse, not log search.`},
+
+{g:"s2-exam",id:"10.25",d:"exam",q:"A Redshift data warehouse holds the last 90 days of data hot; two years of historical data sits in S3 as Parquet. Analysts occasionally need to join recent warehouse data with the S3 history in one query, without loading the history into Redshift. What enables this?",
+o:["Redshift Spectrum to query the S3 data directly from Redshift","COPY the two years of history into Redshift first","A separate Athena query, manually merged in a spreadsheet","Kinesis Data Firehose to stream S3 into Redshift"],c:0,
+e:`<b>Redshift Spectrum</b> queries the S3 Parquet directly and joins it to warehouse tables in a single query — no loading.<br>✗ COPYing two years in defeats "without loading" and inflates the cluster. ✗ Manual spreadsheet merging isn't a query solution. ✗ Firehose loads streams, not a one-time historical join.`},
+
+{g:"s2-exam",id:"10.26",d:"exam",q:"A company processes petabytes of data nightly with a large library of existing Apache Spark and Hive jobs. They want managed infrastructure and the lowest cost for the transient nightly batch. What's the best fit?",
+o:["Amazon EMR transient clusters using Spot Instances for task nodes","Convert all jobs to Amazon Athena SQL","Run the jobs on a single very large EC2 instance","Amazon Redshift with external stored procedures"],c:0,
+e:`<b>EMR transient clusters with Spot task nodes</b> run the existing Spark/Hive jobs on managed infrastructure, spin up only for the nightly batch, and slash cost with Spot.<br>✗ Rewriting a large Spark/Hive library as Athena SQL is impractical. ✗ One big EC2 instance loses distributed scale and resilience. ✗ Redshift isn't a Spark/Hive runtime.`},
+
+{g:"s2-exam",id:"10.27",d:"exam",q:"A media company needs full-text search across millions of articles with typo-tolerance and relevance ranking, plus near-real-time analytics on search usage. Which service is purpose-built?",
+o:["Amazon OpenSearch Service","Amazon Athena","Amazon DynamoDB with a scan","Amazon QuickSight"],c:0,
+e:`<b>OpenSearch</b> is built for full-text search (relevance, fuzzy/typo matching) and near-real-time analytics. ✗ Athena is batch SQL, no relevance ranking. ✗ DynamoDB scans are slow and have no full-text search. ✗ QuickSight visualizes, it doesn't search.`},
+
+{g:"s2-exam",id:"10.28",d:"exam",tag:"win",q:"A company runs a self-managed Apache Kafka cluster on EC2 and is burdened by patching, scaling, and broker failures. It wants a managed Kafka-compatible service so existing producers and consumers keep working unchanged. What should it migrate to?",
+o:["Amazon Kinesis Data Streams","Amazon Managed Streaming for Apache Kafka (MSK)","Amazon SQS FIFO queues","Amazon EventBridge"],c:1,
+e:`<b>MSK</b> is managed Apache Kafka — AWS handles brokers, patching, and scaling, and existing Kafka clients work unchanged.<br>✗ Kinesis isn't Kafka-API compatible (rewrite needed). ✗ SQS/EventBridge are different messaging models entirely.`},
+
+/* ====== MIX 2 ====== */
+{g:"mix-2",id:"M2.1",d:"mixed",tag:"win",q:"An S3 bucket in Account A must be readable by a role in partner Account B, with least overhead and best practice. What's the right setup?",
+o:["Email pre-signed URLs for every object weekly","Make the bucket public","Create an IAM user in Account A and share its access keys","Add a bucket policy in A granting B's principal the read actions, and allow it in B's IAM policy"],c:3,
+e:`Cross-account S3 is a two-lock door: the <b>bucket policy in A grants B's principal</b>, and B's IAM policy allows the action. Maintainable, least-overhead, best practice. ✗ Pre-signed URLs by email don't scale; ✗ public buckets leak; ✗ sharing long-lived keys is forbidden.`},
+
+{g:"mix-2",id:"M2.2",d:"mixed",tag:"win",q:"A fault-tolerant batch fleet should run as cheaply as possible on Spot, but the team got burned when a single Spot pool dried up and killed the fleet. What protects capacity while keeping cost low?",
+o:["A mixed instances policy across several instance types and AZs with the price-capacity-optimized allocation strategy","All Spot, single instance type, lowest-price allocation","Reserved Instances for the entire fleet","100% On-Demand to guarantee capacity"],c:0,
+e:`Diversifying across <b>many instance types and AZs</b> gives many Spot pools, and <b>price-capacity-optimized</b> picks the least-likely-to-be-reclaimed pools — resilient and cheap. ✗ Single type + lowest-price concentrates risk. ✗ RIs/On-Demand defeat the "cheapest on Spot" goal.`},
+
+{g:"mix-2",id:"M2.3",d:"mixed",q:"S3 objects must be encrypted at rest, and the security team requires an audit trail of every key-use and the ability to rotate and disable the key centrally. Which encryption option?",
+o:["SSE-S3 (Amazon-managed keys)","SSE-KMS with a customer managed key","Client-side encryption with a key in the app config","No encryption, rely on bucket policies"],c:1,
+e:`<b>SSE-KMS with a customer managed key</b> gives CloudTrail logging of every key use, plus central rotation and disable control. ✗ SSE-S3 has no per-request audit trail or customer key control. ✗ App-config keys aren't centrally managed/audited. ✗ Bucket policies aren't encryption.`},
+
+{g:"mix-2",id:"M2.4",d:"mixed",q:"A company has one Direct Connect connection in us-east-1 and needs it to reach VPCs in us-west-2 and eu-west-1 as well. What enables this on the single connection?",
+o:["VPC peering across all three Regions","A Direct Connect Gateway associated with the Virtual Private Gateways in each Region","A separate Direct Connect connection per Region","A Transit Gateway with inter-Region peering only"],c:1,
+e:`A <b>Direct Connect Gateway</b> lets one DX connection fan out to VPCs in multiple Regions. ✗ Peering doesn't extend the DX link. ✗ Per-Region DX is the costly opposite of the requirement. ✗ TGW alone doesn't make one DX reach other Regions without a DX Gateway.`},
+
+/* ====== S3 DRILL ====== */
+{g:"s3-drill",id:"10.29",d:"drill",q:"An application already uses Amazon Cognito for users and wants API Gateway to validate each request with the least development effort. Which authorizer?",
+o:["A Lambda authorizer with custom token logic","An Amazon Cognito user pool authorizer","API keys checked by a Lambda function","Send the user's email in a header and validate it in Lambda"],c:1,
+e:`A <b>Cognito user pool authorizer</b> validates the user's token natively with zero auth code — least effort when Cognito is already in play. ✗ A Lambda authorizer is for custom logic Cognito can't handle. ✗ API-key-via-Lambda and email-in-header are home-grown and weaker.`},
+
+{g:"s3-drill",id:"10.30",d:"drill",tag:"miss",q:"You must enforce a per-client request rate and monthly quota so each customer tier is throttled independently. Which API Gateway feature?",
+o:["AWS WAF rules","Usage plans with API keys","A Cognito authorizer","CloudFront caching"],c:1,
+e:`<b>Usage plans + API keys</b> identify each client and enforce per-client rate limits and quotas. ✗ WAF blocks malicious patterns, not per-tier quotas. ✗ A Cognito authorizer verifies identity, not rate. ✗ Caching reduces backend load but doesn't meter clients.`},
+
+{g:"s3-drill",id:"10.31",d:"drill",q:"A mobile app needs to fetch exactly the fields it wants from several backends in a single request and receive real-time updates. Which service?",
+o:["Amazon API Gateway REST API","AWS AppSync (managed GraphQL)","Application Load Balancer","Amazon CloudFront"],c:1,
+e:`<b>AppSync</b> is managed GraphQL: clients request precisely the fields they need across multiple sources in one call, with built-in real-time subscriptions. ✗ REST API Gateway returns fixed payloads per endpoint. ✗ ALB/CloudFront are not GraphQL APIs.`},
+
+{g:"s3-drill",id:"10.32",d:"drill",q:"Which API Gateway endpoint type is reachable ONLY from within a VPC?",
+o:["Edge-optimized","Regional","Private","Public"],c:2,
+e:`A <b>Private</b> API Gateway endpoint is accessible only via an interface VPC endpoint from inside the VPC. ✗ Edge-optimized fronts a global CloudFront; ✗ Regional serves in-Region clients over the internet; ✗ "Public" isn't an endpoint type name.`},
+
+{g:"s3-drill",id:"10.33",d:"drill",q:"For a simple, low-cost, low-latency proxy from clients to Lambda without usage plans or response caching, which API Gateway type is the better fit?",
+o:["REST API","HTTP API","WebSocket API","Private REST API"],c:1,
+e:`<b>HTTP APIs</b> are cheaper and lower-latency for straightforward Lambda/HTTP proxying. ✗ REST APIs cost more and add features (usage plans, caching) you don't need here. ✗ WebSocket is for two-way connections. ✗ Private REST is about VPC reachability, not cost.`},
+
+{g:"s3-drill",id:"10.34",d:"drill",q:"A chat feature needs the server to push messages to connected clients over a persistent two-way connection. Which API Gateway type?",
+o:["REST API","HTTP API","WebSocket API","A REST API with long polling"],c:2,
+e:`<b>WebSocket APIs</b> maintain a stateful two-way connection so the server can push to clients — built for chat/live feeds. ✗ REST/HTTP are request-response. ✗ Long polling is a workaround, not the native fit.`},
+
+/* ====== S3 EXAM ====== */
+{g:"s3-exam",id:"10.35",d:"exam",tag:"win",q:"A startup wants a REST API backend that scales automatically with unpredictable traffic, has no servers to patch, and stores items in a NoSQL store with single-digit-ms latency. What's the canonical architecture?",
+o:["Amazon API Gateway → AWS Lambda → Amazon DynamoDB","An Auto Scaling group of EC2 behind an ALB → Amazon RDS","Amazon API Gateway → Amazon EC2 → Amazon Aurora","AWS Fargate tasks behind an NLB → Amazon ElastiCache"],c:0,
+e:`<b>API Gateway → Lambda → DynamoDB</b> is the fully-managed, auto-scaling, no-patching serverless backend — the exam default for unpredictable traffic.<br>✗ EC2/ASG + RDS means servers and a DB to manage and scale. ✗ EC2 behind API Gateway reintroduces servers. ✗ Fargate+ElastiCache is heavier and a cache isn't the system of record.`},
+
+{g:"s3-exam",id:"10.36",d:"exam",tag:"miss",q:"A public REST API on API Gateway + Lambda is being abused: some valid API keys are hammering it far beyond fair use, and separately there's a flood of SQL-injection attempts. The team wants to block unauthorized/malicious requests with the least effort. Which combination? (Select TWO.)",
+o:["Create a usage plan with API keys to throttle and cap each client's request rate","Attach AWS WAF to API Gateway to filter malicious request patterns","Add logic inside the Lambda function to inspect and drop bad IPs","Convert the public API to a private API and update DNS","Create an IAM role per user that each caller must assume"],c:[0,1],multi:true,
+e:`Two distinct problems, two managed controls: <b>usage plans + API keys</b> throttle/cap the abusive-but-valid callers, and <b>AWS WAF</b> filters the SQLi/malicious patterns at the edge.<br>✗ Inspecting IPs inside Lambda still runs (and bills) the function and is custom code. ✗ Going private breaks public clients. ✗ Per-user IAM roles is heavy and doesn't address the attack flood.`},
+
+{g:"s3-exam",id:"10.37",d:"exam",q:"A REST API on API Gateway calls a backend that is slow and being overwhelmed by repeated identical GET requests for data that changes only every few minutes. The team wants to cut backend load and improve latency with minimal change. What should they enable?",
+o:["API Gateway caching on the stage (with an appropriate TTL)","A Lambda authorizer on every method","A WebSocket API instead","Sticky sessions on the integration"],c:0,
+e:`<b>API Gateway caching</b> serves repeated identical reads from the cache for the TTL, cutting backend calls and latency — minimal change.<br>✗ A Lambda authorizer adds auth, not caching. ✗ WebSocket changes the whole interaction model. ✗ Sticky sessions aren't an API Gateway concept for this.`},
+
+{g:"s3-exam",id:"10.38",d:"exam",q:"An order service exposes an API Gateway endpoint that must reliably hand each incoming order to a backend for asynchronous processing, decoupling spikes, with no Lambda in the path if avoidable. What's the cleanest integration?",
+o:["API Gateway service integration that sends the message directly to an Amazon SQS queue","API Gateway integrated with a synchronous EC2 backend","API Gateway returning the order to the client to retry later","API Gateway writing directly to Amazon Redshift"],c:0,
+e:`API Gateway has a <b>direct service integration to SQS</b> — it drops each order into a durable queue with no Lambda needed, decoupling spikes from processing.<br>✗ A synchronous EC2 backend couples the spike to processing. ✗ Pushing retries onto the client is fragile. ✗ Redshift is a warehouse, not an order intake queue.<span class="flip"><span class="fl">flip it</span>If many independent subscribers each needed a copy of every order, integrate API Gateway with <b>SNS</b> for fan-out instead.</span>`},
+
+{g:"s3-exam",id:"10.39",d:"exam",tag:"miss",q:"A company hosts an API Gateway REST API in ca-central-1 and wants to serve it under its own custom domain with a TLS certificate. What is the correct setup?",
+o:["Create a Regional custom domain, request an ACM certificate in the SAME Region (ca-central-1), attach it, and point Route 53 at the endpoint","Request the ACM certificate in us-east-1 for a Regional endpoint","Use stage variables named Endpoint-URL to set the domain","Put the API behind an NLB with the certificate on the NLB"],c:0,
+e:`For a <b>Regional</b> custom domain, the ACM certificate must be in the <b>same Region</b> as the API; attach it and route via Route 53.<br>✗ The us-east-1 certificate rule applies to <b>edge-optimized</b> endpoints (they use CloudFront), not Regional. ✗ Stage variables don't set a domain. ✗ NLBs can't front API Gateway like this.<span class="flip"><span class="fl">flip it</span>If it were an <b>edge-optimized</b> endpoint, the certificate would indeed need to live in <b>us-east-1</b>.</span>`},
+
+{g:"s3-exam",id:"10.40",d:"exam",q:"A workflow runs several Lambda functions in sequence with branching, retries on failure, and a step that may wait hours for a human approval. The team wants managed orchestration with visibility into each step, not glue code. Which service?",
+o:["AWS Step Functions","A single large Lambda calling the others synchronously","Amazon SQS chaining the functions","Amazon EventBridge rules only"],c:0,
+e:`<b>Step Functions</b> orchestrates multi-step workflows with branching, built-in retries, and long waits (including human-approval callbacks) — visual state machine, no glue code. (File 2's orchestration win.)<br>✗ One giant Lambda hits the 15-min limit and hand-codes retries. ✗ SQS chaining has no built-in branching/state. ✗ EventBridge routes events but doesn't model a stateful sequence.`},
+
+{g:"s3-exam",id:"10.41",d:"exam",q:"A team needs an internal REST API reachable only from resources inside its VPC, never from the public internet, with the least networking effort. Which API Gateway configuration?",
+o:["A private API endpoint accessed through an interface VPC endpoint","An edge-optimized endpoint with a restrictive WAF rule","A regional endpoint in a public subnet","A WebSocket API inside the VPC"],c:0,
+e:`A <b>private API endpoint reached via an interface VPC endpoint</b> is the native way to keep an API VPC-only. ✗ Edge-optimized is internet-facing even with WAF. ✗ A regional endpoint is still public. ✗ WebSocket vs REST is about interaction model, not privacy.`},
+
+{g:"s3-exam",id:"10.42",d:"exam",tag:"win",q:"A serverless app behind API Gateway + Lambda needs a session/data store with single-digit-ms latency that auto-expires items after 24 hours and requires no servers to operate. What fits best?",
+o:["A self-managed Redis cluster on EC2","Amazon DynamoDB with a TTL attribute","Amazon RDS with a nightly cleanup cron job","Encrypted client-side cookies only"],c:1,
+e:`<b>DynamoDB with TTL</b> is serverless, single-digit-ms, and auto-expires items — a natural pairing with API Gateway + Lambda. ✗ Self-managed Redis is servers to operate. ✗ RDS + cron is heavier and not serverless. ✗ Cookies hit size/security limits for real session data.`}
+
+];
+
+/* ---------------- RENDER ---------------- */
+const L=["A","B","C","D","E"];
+const state={}; // id -> {answered, correct}
+let total=BANK.length;
+
+/* ---------------- PERSISTENCE ----------------
+   One shared store for all 5 files, keyed by FILE_KEY.
+   Shape: { "file-1": { answers:{ "1.01":[0], ... }, scroll:1234 }, "file-2": {...}, ... } */
+const STORE_KEY="saa_c03_progress";
+const FILE_KEY="file-10";
+function loadStore(){ try{return JSON.parse(localStorage.getItem(STORE_KEY))||{};}catch(e){return {};} }
+function saveStore(s){ try{localStorage.setItem(STORE_KEY,JSON.stringify(s));}catch(e){} }
+function fileData(){ const s=loadStore(); return s[FILE_KEY]||{answers:{},scroll:0}; }
+function writeFileData(fd){ const s=loadStore(); s[FILE_KEY]=fd; saveStore(s); }
+function saveAnswer(id,picks){ const fd=fileData(); fd.answers=fd.answers||{}; fd.answers[id]=picks; writeFileData(fd); }
+function saveScroll(y){ const fd=fileData(); fd.scroll=y; writeFileData(fd); }
+function clearFile(){ const s=loadStore(); delete s[FILE_KEY]; saveStore(s); }
+const SAVED=fileData();
+
+function tagChip(t){
+  if(t==="miss") return '<span class="chip miss">↻ your miss</span>';
+  if(t==="win")  return '<span class="chip win">✓ lock it in</span>';
+  return "";
+}
+function diffChip(d,multi){
+  let base = d==="exam"?'<span class="chip exam">exam</span>'
+           : d==="mixed"?'<span class="chip mixed">mixed</span>'
+           : '<span class="chip drill">drill</span>';
+  if(multi) base += ' <span class="chip two">select two</span>';
+  return base;
+}
+
+BANK.forEach(item=>{
+  const host=document.getElementById(item.g);
+  if(!host)return;
+  const card=document.createElement("div");
+  card.className="q";
+  card.tabIndex=0;
+  card.dataset.id=item.id;
+  const correctArr = Array.isArray(item.c)?item.c:[item.c];
+  const multi = item.multi===true || correctArr.length>1;
+
+  card.innerHTML =
+    '<div class="qtop"><span class="qid">Q '+item.id+'</span>'+diffChip(item.d,multi)+tagChip(item.tag)+'</div>'+
+    '<div class="stem">'+item.q+'</div>'+
+    '<ul class="opts">'+item.o.map((t,i)=>
+      '<button class="opt" data-i="'+i+'"><span class="ltr">'+L[i]+'</span><span class="otext">'+t+'</span><span class="mark"></span></button>'
+    ).join('')+'</ul>'+
+    (multi?'<button class="checkbtn" disabled>Check answer</button>':'')+
+    '<div class="reveal"><div class="rv-inner"></div></div>';
+
+  host.appendChild(card);
+
+  const opts=[...card.querySelectorAll(".opt")];
+  const checkBtn=card.querySelector(".checkbtn");
+  const reveal=card.querySelector(".reveal");
+  const rvInner=card.querySelector(".rv-inner");
+  let locked=false;
+  let sel=new Set();
+
+  function settle(){
+    locked=true;
+    const userArr=[...sel];
+    const ok = userArr.length===correctArr.length && userArr.every(i=>correctArr.includes(i));
+    opts.forEach((b,i)=>{
+      b.disabled=true; b.classList.remove("sel");
+      const mark=b.querySelector(".mark");
+      if(correctArr.includes(i)){b.classList.add("correct");mark.textContent="✓ correct";}
+      else if(sel.has(i)){b.classList.add("wrong");mark.textContent="✗ your pick";}
+    });
+    if(checkBtn)checkBtn.style.display="none";
+    rvInner.innerHTML='<div class="verdict '+(ok?'r-ok':'r-no')+'">'+(ok?'Correct':'Not quite')+'</div>'+item.e;
+    reveal.classList.add("show");
+    state[item.id]={answered:true,correct:ok};
+    if(!window.__saaRestoring) saveAnswer(item.id,userArr);
+    updateHUD();
+  }
+
+  opts.forEach(b=>{
+    b.addEventListener("click",()=>{
+      if(locked)return;
+      const i=+b.dataset.i;
+      if(multi){
+        if(sel.has(i)){sel.delete(i);b.classList.remove("sel");}
+        else{sel.add(i);b.classList.add("sel");}
+        if(checkBtn)checkBtn.disabled = sel.size===0;
+      } else {
+        sel=new Set([i]); settle();
+      }
+    });
+  });
+  if(checkBtn)checkBtn.addEventListener("click",()=>{if(!locked&&sel.size)settle();});
+
+  // keyboard: 1-5 / a-e select; Enter checks (multi)
+  card.addEventListener("keydown",e=>{
+    if(locked)return;
+    let idx=-1;
+    if(e.key>="1"&&e.key<="5")idx=+e.key-1;
+    const lk=e.key.toLowerCase();
+    if(lk>="a"&&lk<="e")idx=lk.charCodeAt(0)-97;
+    if(idx>=0&&idx<opts.length){e.preventDefault();opts[idx].click();}
+    else if(e.key==="Enter"&&multi&&sel.size){e.preventDefault();settle();}
+  });
+});
+
+/* ---------------- HUD + SUMMARY ---------------- */
+document.getElementById("h-tot").textContent=total;
+function updateHUD(){
+  const answered=Object.keys(state).length;
+  const correct=Object.values(state).filter(s=>s.correct).length;
+  const pct = answered? Math.round(100*correct/answered):0;
+  document.getElementById("h-ans").textContent=answered;
+  document.getElementById("h-pct").textContent= answered? pct+"%":"—";
+  document.getElementById("h-bar").style.width=(100*answered/total)+"%";
+
+  const scP=document.getElementById("sc-pct");
+  const scL=document.getElementById("sc-line");
+  const scM=document.getElementById("sc-miss");
+  if(answered===0){scP.textContent="—";scL.textContent="Answer some questions and your readiness score appears here.";scM.innerHTML="";return;}
+  scP.textContent=pct+"%";
+  let verdict;
+  if(answered<total) verdict=correct+" / "+answered+" so far — "+(total-answered)+" left. The bar at the very top tracks your run.";
+  else if(pct>=80) verdict="Strong. 80%+ on the final file means the whole blueprint is sticking. You're ready to sit the exam.";
+  else if(pct>=70) verdict="On the pass line for this set. Re-take the ones below, then do a clean sweep across all ten files.";
+  else verdict="Below your target. Re-read the section boxes, redo the misses below, and run it again before exam day.";
+  scL.textContent=verdict;
+
+  const missed=Object.entries(state).filter(([k,v])=>!v.correct).map(([k])=>k);
+  scM.innerHTML = missed.length
+    ? "review: "+missed.map(id=>'<a href="#" onclick="jump(\''+id+'\');return false;">Q'+id+'</a>').join("")
+    : (answered===total?"clean sweep — nothing flagged. The series is done.":"");
+}
+function jump(id){
+  const el=[...document.querySelectorAll(".q")].find(q=>q.dataset.id===id);
+  if(el){el.scrollIntoView({behavior:"smooth",block:"center"});el.focus({preventScroll:true});}
+}
+document.getElementById("h-reset").addEventListener("click",()=>{clearFile();location.reload()});
+updateHUD();
+
+/* ---------------- SMOOTH VIM PAGE SCROLLING ---------------- */
+const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+let lastG=0, rafId=null, targetY=window.scrollY;
+const help=document.getElementById("help");
+function toggleHelp(){help.classList.toggle("show");}
+function maxY(){ return Math.max(0, document.documentElement.scrollHeight - window.innerHeight); }
+function tick(){
+  const cur=window.scrollY, diff=targetY-cur;
+  if(Math.abs(diff)<0.6){ window.scrollTo(0,Math.round(targetY)); rafId=null; return; }
+  window.scrollTo(0, cur + diff*0.16);   // eased glide toward target
+  rafId=requestAnimationFrame(tick);
+}
+function glide(dy){
+  if(reduce){ window.scrollBy(0,dy); return; }
+  if(rafId===null) targetY=window.scrollY;
+  targetY=Math.max(0,Math.min(maxY(),targetY+dy));
+  if(rafId===null) rafId=requestAnimationFrame(tick);
+}
+function glideTo(y){
+  if(reduce){ window.scrollTo(0,y); return; }
+  targetY=Math.max(0,Math.min(maxY(),y));
+  if(rafId===null) rafId=requestAnimationFrame(tick);
+}
+["wheel","touchmove"].forEach(ev=>window.addEventListener(ev,()=>{ if(rafId){cancelAnimationFrame(rafId);rafId=null;} },{passive:true}));
+document.addEventListener("keydown",e=>{
+  const tag=(e.target.tagName||"").toLowerCase();
+  if(tag==="input"||tag==="textarea")return;
+  if(e.metaKey||e.ctrlKey||e.altKey)return;
+  if(e.key==="Escape"){help.classList.remove("show");return;}
+  if(e.key==="?"){e.preventDefault();toggleHelp();return;}
+  if(help.classList.contains("show"))return;
+  // 1-5 / a-e are handled per-card (when a card is focused); let them through
+  if((e.key>="1"&&e.key<="5") || (e.key.length===1 && e.key.toLowerCase()>="a" && e.key.toLowerCase()<="e")) return;
+  const vh=window.innerHeight;
+  switch(e.key){
+    case"j":e.preventDefault();glide(80);break;
+    case"k":e.preventDefault();glide(-80);break;
+    case"d":e.preventDefault();glide(vh*0.5);break;
+    case"u":e.preventDefault();glide(-vh*0.5);break;
+    case"f":e.preventDefault();glide(vh*0.9);break;
+    case"b":e.preventDefault();glide(-vh*0.9);break;
+    case"G":e.preventDefault();glideTo(maxY());break;
+    case"g":{const now=Date.now();if(now-lastG<500){e.preventDefault();glideTo(0);lastG=0;}else lastG=now;break;}
+  }
+});
+document.getElementById("h-help").addEventListener("click",toggleHelp);
+
+/* ---------------- RESTORE SAVED ANSWERS ----------------
+   Replay each saved answer by simulating the same option clicks the user made.
+   The __saaRestoring flag stops settle() from re-saving during replay. */
+function restoreAnswers(){
+  const answers=SAVED.answers||{};
+  window.__saaRestoring=true;
+  document.querySelectorAll(".q").forEach(card=>{
+    const picks=answers[card.dataset.id];
+    if(!Array.isArray(picks)||!picks.length)return;
+    const opts=[...card.querySelectorAll(".opt")];
+    picks.forEach(i=>{ if(opts[i])opts[i].click(); });          // single-select settles on the click
+    const checkBtn=card.querySelector(".checkbtn");             // multi-select needs the explicit check
+    if(checkBtn&&checkBtn.style.display!=="none")checkBtn.click();
+  });
+  window.__saaRestoring=false;
+}
+restoreAnswers();
+
+/* ---------------- SCROLL POSITION ---------------- */
+// restore scroll after the DOM (and replayed answers) are laid out
+if(SAVED.scroll){
+  const y=SAVED.scroll;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>window.scrollTo(0,y)));
+}
+// save scroll position, throttled
+let scrollTimer=null;
+window.addEventListener("scroll",()=>{
+  if(scrollTimer)return;
+  scrollTimer=setTimeout(()=>{scrollTimer=null;saveScroll(window.scrollY||window.pageYOffset||0);},250);
+},{passive:true});
+</script>
+</body>
+</html>

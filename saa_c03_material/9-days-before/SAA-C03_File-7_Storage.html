@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SAA-C03 · File 7 · Storage</title>
+<style>
+  :root{
+    /* dark theme — palette shared with File 5 */
+    --ink:#e7eef6; --ink-soft:#a3b5c7; --muted:#6f8298;
+    --paper:#0e1620; --panel:#15212e; --panel2:#1a2836; --panel3:#1f2f40; --line:#26384a; --line-strong:#36506a;
+    --accent:#f59e3c; --accent-2:#f7b260; --accent-deep:#f7b260; --accent-tint:rgba(245,158,60,.12);
+    --navy:#1a2836; --navy-tint:#1f2f40;
+    --ok:#3fcf8e; --ok-bg:rgba(63,207,142,.13); --ok-line:rgba(63,207,142,.45);
+    --no:#ff7062; --no-bg:rgba(255,112,98,.13); --no-line:rgba(255,112,98,.45);
+    --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+    line-height:1.62;font-size:17px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:860px;margin:0 auto;padding:0 22px}
+  ::selection{background:rgba(245,158,60,.3)}
+
+  /* ---------- HUD ---------- */
+  .hud{position:sticky;top:0;z-index:50;background:rgba(28,43,62,.97);color:#fff;
+    border-bottom:1px solid #0e1622;backdrop-filter:saturate(1.2) blur(6px)}
+  .hud-inner{max-width:860px;margin:0 auto;padding:9px 22px;display:flex;gap:16px;
+    align-items:center;font-family:var(--mono);font-size:12.5px;flex-wrap:wrap}
+  .hud .dot{color:var(--accent);font-weight:700;letter-spacing:.04em}
+  .hud .stat b{color:#fff;font-weight:700}
+  .hud .stat{color:#9fb0c4}
+  .bar{flex:1;min-width:120px;height:7px;background:#0f1b2a;border-radius:99px;overflow:hidden}
+  .bar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),#f0a850);
+    transition:width .35s ease}
+  .hud button{font-family:var(--mono);font-size:11.5px;color:#9fb0c4;background:transparent;
+    border:1px solid #33445a;border-radius:6px;padding:3px 9px;cursor:pointer}
+  .hud button:hover{color:#fff;border-color:var(--accent)}
+
+  /* ---------- header ---------- */
+  header.top{padding:54px 0 30px;border-bottom:1px solid var(--line)}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--accent-deep);margin:0 0 14px}
+  h1{font-size:40px;line-height:1.05;margin:0 0 12px;font-weight:800;letter-spacing:-.018em}
+  h1 .thin{font-weight:400;color:var(--ink-soft)}
+  .lede{font-size:18px;color:var(--ink-soft);margin:0;max-width:60ch}
+  .filechips{display:flex;gap:7px;flex-wrap:wrap;margin-top:22px;font-family:var(--mono);font-size:11.5px}
+  .fc{padding:4px 10px;border:1px solid var(--line-strong);border-radius:99px;color:var(--muted)}
+  .fc.here{background:var(--navy);color:#fff;border-color:var(--navy)}
+
+  .legend{margin:26px 0 0;padding:16px 18px;background:var(--panel);border:1px solid var(--line);
+    border-radius:12px;font-size:14px;color:var(--ink-soft)}
+  .legend b{color:var(--ink)}
+  .legend .row{display:flex;gap:10px;align-items:baseline;margin:7px 0}
+  .legend .tg{flex:none}
+
+  /* ---------- sections ---------- */
+  section{padding:46px 0;border-bottom:1px solid var(--line)}
+  .sec-tag{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--accent-deep);display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .sec-tag .n{background:var(--navy);color:#fff;border-radius:6px;padding:2px 8px;font-size:11px}
+  h2{font-size:28px;line-height:1.12;margin:0 0 6px;font-weight:800;letter-spacing:-.015em}
+  h3{font-size:18.5px;margin:30px 0 8px;font-weight:700;letter-spacing:-.01em}
+  p{margin:13px 0}
+  .sub{color:var(--ink-soft);font-size:16px;margin-top:2px}
+  code{font-family:var(--mono);font-size:.86em;background:var(--panel2,#1f2f40);padding:1.5px 6px;border-radius:5px;
+    color:#cfe0d6; white-space:nowrap}
+  strong{font-weight:700}
+  ul.tight{margin:12px 0;padding-left:20px}
+  ul.tight li{margin:7px 0}
+
+  /* ---------- callouts ---------- */
+  .box{margin:22px 0;border-radius:12px;padding:16px 18px 16px 20px;border:1px solid var(--line);
+    background:var(--panel);position:relative;overflow:hidden}
+  .box .lab{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+    margin:0 0 6px;font-weight:600}
+  .box.key{border-color:rgba(245,158,60,.4);background:var(--accent-tint)}
+  .box.key:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent)}
+  .box.key .lab{color:var(--accent-deep)}
+  .box.trap{border-color:var(--no-line);background:var(--no-bg)}
+  .box.trap:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--no)}
+  .box.trap .lab{color:var(--no)}
+  .box.field{background:var(--navy);color:#dfe7f0;border-color:var(--navy)}
+  .box.field .lab{color:var(--accent)}
+  .box.field b{color:#fff}
+  .box p:first-of-type{margin-top:0}.box p:last-child{margin-bottom:0}
+
+  /* ---------- table ---------- */
+  .tw{overflow-x:auto;margin:22px 0}
+  table{border-collapse:collapse;width:100%;font-size:14.5px}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;
+    color:var(--muted);font-weight:600;border-bottom:2px solid var(--line-strong)}
+  td b{color:var(--ink)}
+  tr:last-child td{border-bottom:none}
+
+  /* ---------- quiz ---------- */
+  .quizhead{display:flex;align-items:center;gap:10px;margin:34px 0 4px;flex-wrap:wrap}
+  .quizhead .ttl{font-family:var(--mono);font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--ink);font-weight:700}
+  .quizhead .meta{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  .quizhead .rule{flex:1;height:1px;background:var(--line)}
+
+  .q{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:18px 18px 6px;
+    margin:16px 0;transition:border-color .2s}
+  .q:focus-within{border-color:var(--line-strong)}
+  .q:focus{outline:2px solid var(--accent);outline-offset:2px}
+  .qtop{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:9px}
+  .qid{font-family:var(--mono);font-size:11.5px;color:var(--muted);font-weight:600}
+  .chip{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+    padding:2px 7px;border-radius:5px;font-weight:700}
+  .chip.drill{background:#22323f;color:#9fc0d8}
+  .chip.exam{background:#36506a;color:#eaf2fb}
+  .chip.mixed{background:var(--accent-tint);color:var(--accent-deep)}
+  .chip.two{background:rgba(154,118,224,.18);color:#bba6e8}
+  .chip.miss{background:var(--no-bg);color:var(--no);border:1px solid var(--no-line)}
+  .chip.win{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-line)}
+  .stem{font-size:16.5px;margin:2px 0 13px;line-height:1.5}
+  .opts{list-style:none;margin:0;padding:0}
+  .opt{display:flex;gap:11px;align-items:flex-start;width:100%;text-align:left;cursor:pointer;
+    border:1px solid var(--line);background:var(--navy-tint);border-radius:9px;padding:11px 13px;margin:7px 0;
+    font:inherit;font-size:15.5px;color:var(--ink);transition:border-color .12s,background .12s}
+  .opt:hover:not(:disabled){border-color:var(--line-strong);background:#243749}
+  .opt:disabled{cursor:default}
+  .opt .ltr{flex:none;font-family:var(--mono);font-weight:700;font-size:13px;color:var(--accent-deep);
+    width:18px;text-align:center;padding-top:1px}
+  .opt.sel{border-color:var(--accent);background:var(--accent-tint)}
+  .opt.sel .ltr{color:var(--accent-deep)}
+  .opt.correct{border-color:var(--ok-line);background:var(--ok-bg)}
+  .opt.correct .ltr{color:var(--ok)}
+  .opt.wrong{border-color:var(--no-line);background:var(--no-bg)}
+  .opt.wrong .ltr{color:var(--no)}
+  .opt .mark{margin-left:auto;font-family:var(--mono);font-weight:700;font-size:13px}
+  .opt.correct .mark{color:var(--ok)}.opt.wrong .mark{color:var(--no)}
+  .checkbtn{font-family:var(--mono);font-size:12.5px;font-weight:700;letter-spacing:.04em;
+    background:var(--navy);color:#fff;border:none;border-radius:8px;padding:9px 16px;cursor:pointer;
+    margin:6px 0 2px}
+  .checkbtn:hover{background:#0f1d2c}.checkbtn:disabled{opacity:.4;cursor:default}
+  .reveal{max-height:0;overflow:hidden;transition:max-height .3s ease}
+  .reveal.show{max-height:1600px}
+  .rv-inner{border-top:1px solid var(--line);margin-top:12px;padding:13px 2px 12px;font-size:15px;
+    color:var(--ink-soft);line-height:1.58}
+  .rv-inner .verdict{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;
+    font-weight:700;margin-bottom:6px}
+  .verdict.r-ok{color:var(--ok)}.verdict.r-no{color:var(--no)}
+  .rv-inner b{color:var(--ink)}
+  .flip{display:block;margin-top:10px;padding:9px 12px;background:var(--navy-tint);border-radius:8px;
+    font-size:14.5px}
+  .flip .fl{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--accent-deep);font-weight:700;margin-right:6px}
+
+  /* ---------- summary ---------- */
+  .summary{padding:46px 0 70px}
+  .scorecard{background:var(--navy);color:#fff;border-radius:16px;padding:26px 26px 22px;text-align:center}
+  .scorecard .big{font-size:54px;font-weight:800;letter-spacing:-.02em;line-height:1}
+  .scorecard .lab2{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--accent);margin-bottom:8px}
+  .scorecard .note{color:#b9c6d6;font-size:14.5px;margin-top:10px}
+  .misslist{margin-top:18px;font-family:var(--mono);font-size:13px}
+  .misslist a{color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent);
+    margin:0 4px;display:inline-block}
+  .foot{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:center;margin-top:30px}
+
+  /* ---------- vim help overlay ---------- */
+  #help{position:fixed;inset:0;z-index:90;background:rgba(6,11,17,.72);display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+  #help.show{display:flex}
+  .help-card{background:var(--panel2);border:1px solid var(--line-strong);border-radius:14px;padding:24px 26px;max-width:380px;width:calc(100% - 44px)}
+  .help-card h4{margin:0 0 4px;font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+  .help-card .hk{display:flex;justify-content:space-between;gap:14px;padding:6px 0;font-size:14.5px;border-bottom:1px solid var(--line)}
+  .help-card .hk:last-of-type{border-bottom:none}
+  .help-card kbd{font-family:var(--mono);background:var(--panel3);border:1px solid var(--line-strong);border-bottom-width:2px;border-radius:5px;padding:1px 8px;color:var(--accent-2);font-weight:600}
+  .help-card .close{margin-top:14px;font-family:var(--mono);font-size:12px;color:var(--muted);text-align:center}
+  .q.current{border-color:var(--accent)}
+
+  @media (max-width:560px){
+    body{font-size:16px} h1{font-size:31px} h2{font-size:23px}
+    .hud-inner{font-size:11px;gap:10px} .stem{font-size:15.5px}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<div class="hud">
+  <div class="hud-inner">
+    <span class="dot">▰ SAA-C03</span>
+    <span class="stat"><b id="h-ans">0</b>/<span id="h-tot">0</span> answered</span>
+    <span class="stat"><b id="h-pct">—</b> correct</span>
+    <div class="bar"><i id="h-bar"></i></div>
+    <button id="h-help">? keys</button>
+    <button id="h-reset">reset</button>
+  </div>
+</div>
+
+<div id="help"><div class="help-card">
+  <h4>Vim scrolling · smooth</h4>
+  <div class="hk"><span>Glide down / up (hold to flow)</span><span><kbd>j</kbd> <kbd>k</kbd></span></div>
+  <div class="hk"><span>Half page down / up</span><span><kbd>d</kbd> <kbd>u</kbd></span></div>
+  <div class="hk"><span>Full page down / up</span><span><kbd>f</kbd> <kbd>b</kbd></span></div>
+  <div class="hk"><span>Top of page</span><span><kbd>g</kbd><kbd>g</kbd></span></div>
+  <div class="hk"><span>Bottom of page</span><span><kbd>G</kbd></span></div>
+  <div class="hk"><span>Toggle this help</span><span><kbd>?</kbd></span></div>
+  <div class="close">Answer questions by clicking · esc closes help</div>
+</div></div>
+
+<div class="wrap">
+<header class="top">
+  <p class="eyebrow">Weakness-targeted drill · File 7 of 10</p>
+  <h1>Storage<br><span class="thin">S3 classes &amp; lifecycle · EBS vs EFS vs FSx · Gateway, DataSync &amp; Snow</span></h1>
+  <p class="lede">Files 1–5 only brushed EBS types and name-dropped S3. This is the deep version: every storage class and when it wins, the block-vs-file-vs-object decision, and the hybrid plumbing that moves petabytes on and off AWS. The mixed blocks drag the earlier domains back through so nothing you already learned goes cold.</p>
+  <div class="filechips">
+    <span class="fc">1 · Compute &amp; Traffic</span>
+    <span class="fc">2 · Decoupling</span>
+    <span class="fc">3 · Databases</span>
+    <span class="fc">4 · Resilience &amp; DR</span>
+    <span class="fc">5 · Cost</span>
+    <span class="fc">6 · Security &amp; Identity</span>
+    <span class="fc here">7 · Storage</span>
+    <span class="fc">8 · Networking</span>
+    <span class="fc">9 · Management &amp; Migration</span>
+    <span class="fc">10 · Analytics &amp; App Integration</span>
+  </div>
+  <div class="legend">
+    <div class="row"><span class="tg chip drill">drill</span><span><b>Quick check.</b> Exam-real, but tests one fact at a time. Confidence fuel.</span></div>
+    <div class="row"><span class="tg chip exam">exam</span><span><b>Scenario.</b> Full SAA-C03 difficulty — multiple plausible services, one fatal flaw.</span></div>
+    <div class="row"><span class="tg chip mixed">mixed</span><span><b>All-topics review</b> dropped between sections so nothing goes stale.</span></div>
+    <div class="row"><span class="tg chip miss">↻ your miss</span><span>A storage concept candidates routinely get wrong — drill it until it's automatic.</span></div>
+    <div class="row"><span class="tg chip win">✓ lock it in</span><span>Pulled from Files 1–5 — proving prior knowledge sticks.</span></div>
+    <p style="margin:12px 0 0;font-size:13.5px;color:var(--muted)">Click an option to answer (or focus a card and press <code>1–5</code>; <code>Enter</code> checks Select-TWO). Every answer reveals why the right one wins, why each distractor dies, and the <b>Flip it</b> — the small stem change that would make a wrong answer correct.</p>
+  </div>
+</header>
+</div>
+
+<div class="wrap">
+
+<!-- ===================== SECTION 1 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">01</span> Amazon S3 — classes, lifecycle &amp; controls</div>
+  <h2>The same bytes, seven prices — pick by how you'll touch them</h2>
+  <p class="sub">S3 questions are almost never "store the file." They're "store it for <em>this</em> access pattern, <em>this</em> retrieval SLA, <em>this</em> retention rule, at the lowest cost." Get the access pattern and the answer falls out.</p>
+
+  <h3>The storage classes, ranked by how often you read</h3>
+  <p>All classes (except One Zone) store across <strong>≥3 AZs</strong> and share the famous <strong>eleven nines (99.999999999%) of durability</strong>. What changes is <em>availability</em>, retrieval latency, minimum billable duration, and per-GB price.</p>
+  <div class="tw"><table>
+    <tr><th>Class</th><th>Use when</th><th>Retrieval</th><th>Min duration / AZs</th></tr>
+    <tr><td><b>S3 Standard</b></td><td>frequent access, low latency, no retrieval fee</td><td>instant (ms)</td><td>none · ≥3 AZ</td></tr>
+    <tr><td><b>Intelligent-Tiering</b></td><td><b>unknown / changing</b> access — auto-moves tiers, no retrieval fees</td><td>instant (frequent &amp; IA tiers)</td><td>none · ≥3 AZ · small monitoring fee/obj</td></tr>
+    <tr><td><b>Standard-IA</b></td><td>infrequent but needs instant access, can survive AZ loss</td><td>instant (ms)</td><td>30 days · ≥3 AZ</td></tr>
+    <tr><td><b>One Zone-IA</b></td><td>infrequent + <b>re-creatable</b> data; cheaper, single AZ</td><td>instant (ms)</td><td>30 days · <b>1 AZ</b></td></tr>
+    <tr><td><b>Glacier Instant Retrieval</b></td><td>archive accessed ~quarterly but needs <b>ms</b> retrieval</td><td>instant (ms)</td><td>90 days · ≥3 AZ</td></tr>
+    <tr><td><b>Glacier Flexible Retrieval</b></td><td>archive, retrieval in minutes–hours is fine</td><td>mins–12 h (Expedited/Standard/Bulk)</td><td>90 days · ≥3 AZ</td></tr>
+    <tr><td><b>Glacier Deep Archive</b></td><td>cheapest, rarely-touched, 7–10 yr retention; 12 h+ OK</td><td>12–48 h</td><td>180 days · ≥3 AZ</td></tr>
+  </table></div>
+
+  <div class="box key"><p class="lab">Key fact — Intelligent-Tiering vs Lifecycle</p><p>If the stem says <b>access patterns are unknown, changing, or unpredictable</b> → <b>S3 Intelligent-Tiering</b> (it moves objects between tiers automatically, no retrieval fees). If the stem says <b>known age-based pattern</b> ("after 30 days it's rarely read, after 1 year archive it") → write an <b>S3 Lifecycle</b> rule. Both can coexist. The word "unknown" is the tell for Intelligent-Tiering; a clock/age is the tell for Lifecycle.</p></div>
+
+  <h3>Lifecycle, versioning, replication</h3>
+  <p>Lifecycle rules do two things: <strong>transition</strong> objects to cheaper classes on a schedule, and <strong>expire</strong> (delete) them — including cleaning up noncurrent versions and <strong>incomplete multipart uploads</strong>. <strong>Versioning</strong> keeps every overwrite/delete (a delete just adds a delete marker), and is the prerequisite for replication and <strong>MFA Delete</strong> (requires the root user + MFA token to permanently delete versions). <strong>Replication</strong> is async and needs versioning on both ends: <strong>CRR</strong> (cross-Region — DR, latency, compliance) vs <strong>SRR</strong> (same-Region — log aggregation, prod→test). Add <strong>S3 Replication Time Control (RTC)</strong> for a 15-minute replication SLA.</p>
+
+  <h3>Access, edge &amp; protection</h3>
+  <ul class="tight">
+    <li><b>Pre-signed URLs</b> grant time-limited access to a private object using the signer's permissions — the canonical "let users upload/download without making the bucket public" answer.</li>
+    <li><b>Transfer Acceleration</b> speeds long-distance <em>uploads</em> via CloudFront edge locations; <b>multipart upload</b> parallelizes large objects (use it &gt;100 MB, required &gt;5 GB).</li>
+    <li><b>Object Lock (WORM)</b>: <b>Governance</b> mode = special permission can override; <b>Compliance</b> mode = <em>nobody</em>, not even root, can delete until retention expires. Needs versioning.</li>
+    <li><b>Block Public Access</b> is on by default at account + bucket level — the backstop against accidental public buckets.</li>
+    <li><b>Storage Lens</b> gives org-wide usage/activity analytics and cost-optimization recommendations; <b>S3 encryption is on by default</b> (SSE-S3 / AES-256) for all new objects.</li>
+  </ul>
+
+  <div class="box trap"><p class="lab">Classic trap — One Zone-IA durability</p><p>One Zone-IA still has eleven nines of durability <em>within its single AZ</em>, but if that AZ is destroyed the data is gone — it isn't replicated across AZs. So it's only correct when the data is <b>easily re-created</b> (thumbnails, secondary copies, processed derivatives). Any stem with "must not lose," "irreplaceable," or "compliance" + One Zone-IA is bait.</p></div>
+
+  <div class="box field"><p class="lab">// field note — the bucket that ate the headlines</p><p>For years the most common AWS breach wasn't a hacker — it was a misconfigured S3 bucket left public. So many leaks (voter records, telecom logs, defense contractor files) traced to one wrong toggle that in <b>2018 AWS shipped Block Public Access</b> and later turned it <b>on by default</b> for new buckets, plus painted public buckets bright orange in the console. The exam echoes this: when a stem says "prevent accidental public exposure across the whole account," the answer is <b>Block Public Access</b>, not a hand-written bucket policy.</p></div>
+
+  <div class="quizhead"><span class="ttl">Quick check</span><span class="rule"></span><span class="meta">7 questions · one fact each</span></div>
+  <div id="s1-drill"></div>
+
+  <div class="quizhead"><span class="ttl">Scenario pressure</span><span class="rule"></span><span class="meta">7 questions · exam difficulty</span></div>
+  <div id="s1-exam"></div>
+</section>
+
+<!-- ===================== MIXED 1 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">↻</span> Mixed review — all domains</div>
+  <h2>Keep the rest warm</h2>
+  <p class="sub">Four pulled from Files 1–5 — compute, decoupling, databases, DR, cost — so a deep storage day doesn't let the earlier domains drift.</p>
+  <div id="mix-1"></div>
+</section>
+
+<!-- ===================== SECTION 2 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">02</span> Block &amp; file storage — EBS, instance store, EFS, FSx</div>
+  <h2>Block, file, or object — the question answers itself once you spot the protocol</h2>
+  <p class="sub">One instance, one volume → <b>EBS</b>. Many Linux instances, one shared POSIX mount → <b>EFS</b>. Windows/SMB, HPC, or a specific filesystem feature → <b>FSx</b>. Throwaway scratch on the host → <b>instance store</b>.</p>
+
+  <h3>EBS volume types (recap + extend)</h3>
+  <div class="tw"><table>
+    <tr><th>Type</th><th>Class</th><th>Pick it for</th><th>Ceiling</th></tr>
+    <tr><td><b>gp3</b></td><td>SSD</td><td>default boot/general; IOPS &amp; throughput priced <b>independently</b> of size</td><td>16,000 IOPS / 1,000 MiB/s</td></tr>
+    <tr><td><b>gp2</b></td><td>SSD</td><td>legacy general; IOPS scale with size (3/GB)</td><td>16,000 IOPS</td></tr>
+    <tr><td><b>io1 / io2</b></td><td>SSD</td><td>high sustained IOPS, low latency; io2 = 99.999% durability</td><td>64,000 IOPS</td></tr>
+    <tr><td><b>io2 Block Express</b></td><td>SSD</td><td>highest IOPS/throughput, sub-ms; large DBs (SAP HANA, Oracle)</td><td>256,000 IOPS</td></tr>
+    <tr><td><b>st1</b></td><td>HDD</td><td>big <b>sequential</b> throughput (logs, big data); can't boot</td><td>500 MiB/s</td></tr>
+    <tr><td><b>sc1</b></td><td>HDD</td><td>coldest, cheapest, infrequent sequential; can't boot</td><td>250 MiB/s</td></tr>
+  </table></div>
+  <p><strong>EBS levers:</strong> snapshots are incremental and stored in S3; <strong>Fast Snapshot Restore (FSR)</strong> removes first-touch latency; <strong>Multi-Attach</strong> lets one io1/io2 volume attach to up to 16 Nitro instances <em>in the same AZ</em> (clustered apps only); volumes are <strong>AZ-locked</strong>; encryption (KMS) and resize/type-change happen live with elastic volumes.</p>
+
+  <div class="box key"><p class="lab">Key fact — EBS vs EFS vs instance store</p><p><b>EBS</b> = one volume, one instance, single AZ, block. <b>Instance store</b> = physically attached NVMe, fastest, but <b>ephemeral</b> — data dies on stop/terminate (great for cache/scratch/buffers). <b>EFS</b> = managed NFS, <b>multi-AZ regional</b>, mounts on thousands of Linux instances at once, grows automatically. When a stem says "shared across many instances and concurrently writable," EBS is wrong (Multi-Attach aside) — it's <b>EFS</b>.</p></div>
+
+  <h3>The FSx family — match the tell</h3>
+  <div class="tw"><table>
+    <tr><th>FSx flavor</th><th>Protocol</th><th>Stem tell</th></tr>
+    <tr><td><b>Windows File Server</b></td><td>SMB</td><td>Windows apps, <b>Active Directory</b> integration, NTFS ACLs, DFS</td></tr>
+    <tr><td><b>Lustre</b></td><td>Lustre/POSIX</td><td><b>HPC</b>, ML training, hundreds of GB/s, links to an <b>S3</b> data set</td></tr>
+    <tr><td><b>NetApp ONTAP</b></td><td>NFS, SMB, iSCSI</td><td>migrating <b>NetApp</b>, multi-protocol, snapshots/dedup/cloning</td></tr>
+    <tr><td><b>OpenZFS</b></td><td>NFS</td><td>moving from on-prem <b>ZFS</b>, low-latency NFS, snapshots</td></tr>
+  </table></div>
+
+  <div class="box trap"><p class="lab">Classic trap — EFS is Linux-only</p><p>EFS speaks <b>NFS</b>, so it serves Linux. The moment a stem mentions <b>Windows</b> instances needing a shared file share, EFS is wrong — reach for <b>FSx for Windows File Server</b> (SMB). And "HPC / Lustre / parallel access to S3 training data" is never EFS either; that's <b>FSx for Lustre</b>.</p></div>
+
+  <div class="box field"><p class="lab">// field note — the EBS that wasn't there</p><p>In the <b>April 2011 EBS outage</b> in <code>us-east-1</code>, a network change triggered a storm of EBS volumes frantically trying to re-mirror themselves, exhausting capacity and taking down a chunk of the internet (Reddit, Quora, Foursquare) for days. The architectural lesson the exam still tests: EBS is a <b>single-AZ</b> service. Snapshots live in S3 and span the Region, but the live volume does not — true resilience means snapshots, multi-AZ designs, or a regional file system like EFS.</p></div>
+
+  <div class="quizhead"><span class="ttl">Quick check</span><span class="rule"></span><span class="meta">7 questions · one fact each</span></div>
+  <div id="s2-drill"></div>
+
+  <div class="quizhead"><span class="ttl">Scenario pressure</span><span class="rule"></span><span class="meta">7 questions · exam difficulty</span></div>
+  <div id="s2-exam"></div>
+</section>
+
+<!-- ===================== MIXED 2 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">↻</span> Mixed review — all domains</div>
+  <h2>Keep the rest warm</h2>
+  <p class="sub">Four more across decoupling, databases, DR and cost — the cross-topic jumps the real exam makes every other question.</p>
+  <div id="mix-2"></div>
+</section>
+
+<!-- ===================== SECTION 3 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">03</span> Hybrid &amp; data movement — Gateway, DataSync, Transfer, Snow, Backup</div>
+  <h2>Getting data on and off AWS without melting the network link</h2>
+  <p class="sub">Two axes decide everything: is this an <em>ongoing</em> sync or a <em>one-time bulk</em> move, and do you have <em>bandwidth</em> or not. Online + ongoing → DataSync / Gateway. Offline + huge → Snow.</p>
+
+  <h3>Storage Gateway — keep on-prem apps, back them with AWS</h3>
+  <div class="tw"><table>
+    <tr><th>Gateway</th><th>On-prem sees</th><th>Use when</th></tr>
+    <tr><td><b>S3 File Gateway</b></td><td>NFS/SMB share</td><td>file access on-prem, objects land in <b>S3</b></td></tr>
+    <tr><td><b>Volume — Cached</b></td><td>iSCSI block</td><td>primary data in S3, <b>hot data cached</b> locally (low local footprint)</td></tr>
+    <tr><td><b>Volume — Stored</b></td><td>iSCSI block</td><td>primary data <b>kept on-prem</b>, async backup to S3 (low-latency local reads)</td></tr>
+    <tr><td><b>Tape Gateway (VTL)</b></td><td>virtual tape library</td><td>replace physical tape backups → Glacier</td></tr>
+  </table></div>
+
+  <h3>Movers</h3>
+  <ul class="tight">
+    <li><b>DataSync</b> — online, agent-based, fast incremental transfer between on-prem (NFS/SMB/HDFS) and AWS (S3/EFS/FSx); handles scheduling, encryption, validation. The default for "ongoing or one-time online migration with bandwidth."</li>
+    <li><b>AWS Transfer Family</b> — fully managed <b>SFTP/FTPS/FTP</b> endpoint in front of S3/EFS; for partners who only speak those protocols.</li>
+    <li><b>AWS Backup</b> — one place to schedule, run, and govern backups (with <b>Backup Vault Lock</b> for WORM) across EBS, EFS, RDS, DynamoDB, FSx, Storage Gateway, EC2 and more.</li>
+  </ul>
+
+  <h3>Snow family — offline bulk by size + connectivity</h3>
+  <div class="tw"><table>
+    <tr><th>Device</th><th>Capacity</th><th>Reach for it when</th></tr>
+    <tr><td><b>Snowcone</b></td><td>~8–14 TB</td><td>small, rugged, portable; edge/IoT; can ship or DataSync</td></tr>
+    <tr><td><b>Snowball Edge</b></td><td>~80 TB usable</td><td>TBs–low PBs; <b>Storage</b> or <b>Compute</b> optimized (edge compute)</td></tr>
+    <tr><td><b>Snowmobile</b></td><td>up to 100 PB</td><td>exabyte-scale data-center evacuations (a literal truck)</td></tr>
+  </table></div>
+
+  <div class="box key"><p class="lab">Key fact — the bandwidth math</p><p>The exam wants you to notice when the wire is too slow. Rough rule: shipping a <b>Snowball</b> beats the network when moving large data sets over a constrained link in a deadline. If a stem gives you "X TB, Y Mbps link, must finish in Z days," do the napkin math — if online transfer blows the deadline, the answer is <b>Snow</b>. If bandwidth is fine and it's <b>recurring</b>, it's <b>DataSync</b>.</p></div>
+
+  <div class="box trap"><p class="lab">Classic trap — File Gateway vs DataSync</p><p>Both touch S3, but they solve different problems. <b>DataSync</b> = move/copy data from A to B (a migration or scheduled sync job). <b>S3 File Gateway</b> = give on-prem apps an <em>ongoing NFS/SMB mount</em> whose files persist as S3 objects (a permanent access layer, with local caching). "Migrate then decommission" → DataSync. "On-prem apps keep using a file share long-term, backed by S3" → File Gateway.</p></div>
+
+  <div class="box field"><p class="lab">// field note — the truck is real</p><p><b>AWS Snowmobile</b> debuted at re:Invent 2016 as a <b>45-foot shipping container on a semi-truck</b> holding up to 100 PB, driven to your data center with an armed escort. The point wasn't theater: at exabyte scale, the fastest network connection on earth still loses to physically moving disks. It's the literal embodiment of "never underestimate the bandwidth of a truck full of hard drives." (AWS has since retired Snowmobile, but the principle — and the exam answer for the largest migrations — endures in the Snow family.)</p></div>
+
+  <div class="quizhead"><span class="ttl">Quick check</span><span class="rule"></span><span class="meta">7 questions · one fact each</span></div>
+  <div id="s3-drill"></div>
+
+  <div class="quizhead"><span class="ttl">Scenario pressure</span><span class="rule"></span><span class="meta">7 questions · exam difficulty</span></div>
+  <div id="s3-exam"></div>
+</section>
+
+<!-- ===================== SUMMARY ===================== -->
+<section class="summary">
+  <div class="scorecard">
+    <div class="lab2">Session readiness</div>
+    <div class="big"><span id="sc-pct">—</span></div>
+    <div class="note"><span id="sc-line">Answer some questions and your readiness score appears here.</span></div>
+    <div class="misslist" id="sc-miss"></div>
+  </div>
+  <p class="foot">File 7 / 10 · Storage · 50 questions · say the word and I'll build File 8 (Networking) next, or bolt 10 more scenarios onto any section here.</p>
+</section>
+
+</div><!-- /wrap -->
+
+<script>
+/* ---------------- QUESTION BANK ----------------
+   c = index (or array) of correct option(s), 0-based
+   multi:true => Select TWO; tag => "miss" | "win"          */
+const BANK = [
+
+/* ====== S1 DRILL ====== */
+{g:"s1-drill",id:"7.01",d:"drill",q:"Objects are accessed unpredictably — some hot, some cold, and the pattern keeps changing. You want automatic cost optimization with no retrieval fees and no manual rules. Which storage class?",
+o:["S3 Standard","S3 Standard-IA","S3 Intelligent-Tiering","S3 Glacier Flexible Retrieval"],c:2,
+e:`<b>S3 Intelligent-Tiering</b> moves objects between access tiers automatically based on usage, with no retrieval charges — built for unknown/changing patterns.<br>✗ Standard never tiers down (no savings on cold data). ✗ Standard-IA assumes a known infrequent pattern and charges retrieval. ✗ Glacier needs a defined archive intent.<span class="flip"><span class="fl">flip it</span>If the pattern were a known age ("rarely read after 30 days"), you'd write an <b>S3 Lifecycle</b> rule instead.</span>`},
+
+{g:"s1-drill",id:"7.02",d:"drill",tag:"miss",q:"Which statement about S3 durability and Availability Zones is correct?",
+o:["All S3 classes including One Zone-IA replicate across at least 3 AZs","S3 Standard, Standard-IA and Glacier store across ≥3 AZs; One Zone-IA stores in a single AZ","S3 Standard stores in one AZ for speed","Glacier classes store in a single AZ to cut cost"],c:1,
+e:`Every S3 class offers eleven nines of durability, but <b>One Zone-IA is the lone single-AZ class</b> — Standard, Standard-IA and all Glacier tiers span ≥3 AZs. That single-AZ caveat is exactly why One Zone-IA is only safe for re-creatable data.`},
+
+{g:"s1-drill",id:"7.03",d:"drill",q:"You need to let a user download a private S3 object for the next 15 minutes without making the bucket public or creating an IAM user for them. What do you use?",
+o:["A pre-signed URL","Enable static website hosting","S3 Transfer Acceleration","A bucket ACL granting public read"],c:0,
+e:`A <b>pre-signed URL</b> embeds time-limited, scoped access using the signer's credentials — exactly time-boxed private access.<br>✗ Website hosting serves public content. ✗ Transfer Acceleration speeds uploads, not access control. ✗ A public ACL exposes the object to everyone.`},
+
+{g:"s1-drill",id:"7.04",d:"drill",q:"Compliance requires that once written, financial records cannot be deleted or altered by ANYONE — not even the root user — for 7 years. Which S3 feature?",
+o:["S3 Object Lock in governance mode","S3 Object Lock in compliance mode","Bucket policy denying s3:DeleteObject","MFA Delete"],c:1,
+e:`<b>Object Lock compliance mode</b> makes objects truly immutable for the retention period — no one, including root, can delete them.<br>✗ Governance mode lets a privileged user override the lock. ✗ A bucket policy can be edited or removed. ✗ MFA Delete only adds a step; it doesn't enforce a fixed retention.<span class="flip"><span class="fl">flip it</span>If the requirement allowed an admin with special permission to override early, that's <b>governance mode</b>.</span>`},
+
+{g:"s1-drill",id:"7.05",d:"drill",q:"A team uploads 5 GB+ objects over a long-distance link and uploads are slow and failure-prone. Which TWO features directly help?",
+o:["S3 Transfer Acceleration","S3 Standard-IA","Multipart upload","S3 Object Lock"],c:[0,2],multi:true,
+e:`<b>Transfer Acceleration</b> routes uploads through the nearest edge location over the AWS backbone, and <b>multipart upload</b> parallelizes parts and retries only failed parts.<br>✗ Standard-IA is a storage class, not a transfer feature. ✗ Object Lock is retention/immutability.`},
+
+{g:"s1-drill",id:"7.06",d:"drill",q:"You want to replicate objects to a bucket in another Region for disaster recovery and lower-latency reads abroad. What's required and what is it called?",
+o:["Same-Region Replication (SRR), no prerequisites","Cross-Region Replication (CRR) with versioning enabled on both buckets","Transfer Acceleration to the second Region","A Lifecycle transition to the other Region"],c:1,
+e:`Cross-Region DR/latency = <b>CRR</b>, and replication of any kind requires <b>versioning on source and destination</b>.<br>✗ SRR stays in one Region (log aggregation, prod→test). ✗ Transfer Acceleration speeds uploads, not replication. ✗ Lifecycle transitions change storage class, not Region.`},
+
+{g:"s1-drill",id:"7.07",d:"drill",q:"Thumbnail images can be regenerated from originals at any time, are accessed infrequently, and the team wants the cheapest class that still gives instant access. Which class?",
+o:["S3 Standard-IA","S3 One Zone-IA","S3 Glacier Instant Retrieval","S3 Standard"],c:1,
+e:`Re-creatable + infrequent + instant + cheapest = <b>S3 One Zone-IA</b>: it skips cross-AZ redundancy (and its cost) which is fine when the data can be regenerated.<br>✗ Standard-IA costs more for the multi-AZ redundancy you don't need here. ✗ Glacier IR adds a 90-day minimum and is for true archive. ✗ Standard is the priciest for infrequent data.<span class="flip"><span class="fl">flip it</span>If the thumbnails were irreplaceable, you'd pay for <b>Standard-IA</b>'s multi-AZ safety instead.</span>`},
+
+/* ====== S1 EXAM ====== */
+{g:"s1-exam",id:"7.08",d:"exam",tag:"miss",q:"A company must retain audit logs for 10 years to satisfy a regulator. The logs are written daily, almost never read (and if read, hours of delay is acceptable), and the regulator demands the records be tamper-proof for the full period. The team wants the LOWEST storage cost. What should they do?",
+o:["Store the logs in S3 Standard for 10 years with a bucket policy denying deletes","Use a Lifecycle rule to transition logs from S3 Standard to S3 Glacier Deep Archive, and apply S3 Object Lock in compliance mode for the retention period","Store the logs in S3 Glacier Instant Retrieval with MFA Delete enabled","Use a Lifecycle rule to move logs to S3 One Zone-IA after 1 year and deny deletes via IAM"],c:1,
+e:`Rarely read + hours-of-delay-OK + cheapest = <b>Glacier Deep Archive</b>; tamper-proof for a fixed period = <b>Object Lock compliance mode</b>. The combination nails cost <i>and</i> immutability.<br>✗ Standard is far too expensive for write-once cold logs, and a bucket policy is editable (not tamper-proof). ✗ Glacier IR is pricier than Deep Archive and unnecessary since delays are acceptable. ✗ One Zone-IA risks total loss on AZ failure for compliance data, and IAM denies aren't WORM.<span class="flip"><span class="fl">flip it</span>If the logs needed <i>millisecond</i> retrieval despite being archival, swap Deep Archive for <b>Glacier Instant Retrieval</b>.</span>`},
+
+{g:"s1-exam",id:"7.09",d:"exam",q:"An analytics dataset in S3 Standard is heavily queried for 30 days after creation, then sharply drops off but must remain instantly retrievable for occasional ad-hoc queries for a year, then can move to deep archive for 5 more years. The access pattern is well known. What is the most cost-effective design?",
+o:["Enable S3 Intelligent-Tiering and let it move everything automatically","A Lifecycle rule: Standard → Standard-IA after 30 days → Glacier Deep Archive after 1 year","A Lifecycle rule: Standard → Glacier Flexible Retrieval after 30 days","Replicate the bucket to a cheaper Region after 30 days"],c:1,
+e:`The pattern is <b>known and age-based</b>, so a <b>Lifecycle rule</b> is the precise, cheapest fit: Standard-IA keeps instant access for the occasional year-one queries, then Deep Archive for the cold 5 years.<br>✗ Intelligent-Tiering adds per-object monitoring fees and is meant for <i>unknown</i> patterns. ✗ Glacier Flexible after 30 days breaks the "instant retrieval for a year" requirement. ✗ Cross-Region replication doesn't reduce class cost.`},
+
+{g:"s1-exam",id:"7.10",d:"exam",tag:"miss",q:"A static marketing website (HTML/CSS/JS/images) must be served globally with low latency and HTTPS, and the team wants to keep the S3 bucket private (not publicly readable). What's the right architecture?",
+o:["Enable S3 static website hosting and make the bucket public","Put a CloudFront distribution in front of the S3 bucket using Origin Access Control (OAC), keeping the bucket private","Serve the site from EC2 in every Region behind Route 53","Use S3 Transfer Acceleration on the bucket"],c:1,
+e:`<b>CloudFront + Origin Access Control</b> caches the site at edge locations (global low latency), terminates HTTPS, and lets <b>only CloudFront</b> read a private bucket — public access stays blocked.<br>✗ S3 website hosting alone needs a public bucket and gives no HTTPS on the S3 endpoint. ✗ EC2 fleets are massive overkill for static files. ✗ Transfer Acceleration is for uploads.`},
+
+{g:"s1-exam",id:"7.11",d:"exam",q:"A bucket holds production data and the security team wants to ensure no object can ever be silently overwritten or permanently deleted, and that any permanent version deletion requires extra authentication. Which combination meets this?",
+o:["Enable versioning and MFA Delete on the bucket","Enable Block Public Access only","Apply Object Lock in governance mode without versioning","Turn on default encryption and a deny-all bucket policy"],c:0,
+e:`<b>Versioning</b> preserves every overwrite and turns deletes into recoverable delete markers; <b>MFA Delete</b> requires the root user plus an MFA code to permanently remove versions — exactly the two asks.<br>✗ Block Public Access controls exposure, not overwrite/delete protection. ✗ Object Lock requires versioning and addresses retention, not the MFA-on-delete requirement specifically. ✗ Encryption protects confidentiality, not deletion.`},
+
+{g:"s1-exam",id:"7.12",d:"exam",q:"A platform team manages hundreds of S3 buckets across an organization and wants a single view of storage usage, activity trends, and recommendations to cut cost (e.g., spotting buckets that should use Intelligent-Tiering or have incomplete multipart uploads). Which feature?",
+o:["S3 Storage Lens","S3 Inventory only","CloudWatch billing alarms","S3 Access Analyzer"],c:0,
+e:`<b>S3 Storage Lens</b> delivers org-wide visibility into usage and activity with built-in cost-optimization recommendations — the dashboard the stem describes.<br>✗ S3 Inventory just lists objects/metadata. ✗ Billing alarms watch spend, not storage behavior. ✗ Access Analyzer surfaces external access risk, not cost.`},
+
+{g:"s1-exam",id:"7.13",d:"exam",q:"A company aggregates application logs from buckets in multiple accounts into one central bucket in the SAME Region for a security team, and wants the copies to appear automatically as logs are written. What's the cleanest approach?",
+o:["Same-Region Replication (SRR) into the central bucket","Cross-Region Replication (CRR) to a DR Region","A nightly batch copy job via Lambda","S3 Transfer Acceleration to the central bucket"],c:0,
+e:`Automatic, continuous copies within one Region = <b>Same-Region Replication</b> — the textbook log-aggregation/compliance-copy pattern.<br>✗ CRR is cross-Region (different use case). ✗ A nightly Lambda is batchy and operationally heavier than native replication. ✗ Transfer Acceleration speeds uploads, it doesn't replicate.`},
+
+{g:"s1-exam",id:"7.14",d:"exam",tag:"miss",q:"A media archive of millions of objects must support occasional retrieval where results can arrive in a few hours, at the lowest possible cost while still keeping data across multiple AZs. Files are kept for 7 years and almost never touched. Which class?",
+o:["S3 Glacier Instant Retrieval","S3 Glacier Flexible Retrieval","S3 Glacier Deep Archive","S3 One Zone-IA"],c:2,
+e:`Almost-never accessed + hours-of-delay acceptable + lowest cost + multi-AZ + 7-year retention = <b>Glacier Deep Archive</b>, the cheapest tier (12–48h retrieval, 180-day minimum).<br>✗ Glacier IR is for archives needing <i>millisecond</i> reads (costs more). ✗ Glacier Flexible is cheaper than IR but still pricier than Deep Archive when hours of delay are fine. ✗ One Zone-IA isn't multi-AZ and isn't an archive tier.<span class="flip"><span class="fl">flip it</span>If retrieval needed to be in minutes rather than hours, <b>Glacier Flexible Retrieval</b> (Expedited) becomes the pick.</span>`},
+
+/* ====== MIX 1 ====== */
+{g:"mix-1",id:"M1.1",d:"mixed",tag:"win",q:"A read-heavy reporting load is overwhelming a single RDS MySQL instance; writes are light and must not be affected. How do you scale reads with least effort?",
+o:["Convert the instance to Multi-AZ","Add one or more RDS read replicas and route reads to them","Increase allocated storage and IOPS only","Migrate to DynamoDB"],c:1,
+e:`<b>Read replicas</b> offload read traffic and scale horizontally without touching the writer.<br>✗ Multi-AZ is for failover, not read scaling — the standby serves no reads. ✗ More IOPS doesn't add read endpoints. ✗ A DynamoDB migration is a heavy rewrite, not "least effort."<span class="flip"><span class="fl">flip it</span>If the goal were surviving an AZ failure with automatic failover, the answer becomes <b>Multi-AZ</b>.</span>`},
+
+{g:"mix-1",id:"M1.2",d:"mixed",tag:"win",q:"Image uploads each take 5–10 minutes to process and work is silently dropped at peak. Every upload must eventually be processed, decoupled from the web tier, with workers scaling to the backlog. Core design?",
+o:["Put an SQS queue between the tiers; an ASG of workers scales on queue depth; set visibility timeout longer than processing time","Process inline on a bigger web instance","Enable ALB sticky sessions","Use SNS fan-out to all web servers"],c:0,
+e:`<b>SQS</b> buffers the spike, workers pull when ready and scale on <code>ApproximateNumberOfMessages</code>, and a <b>visibility timeout longer than the 5–10 min job</b> stops a second worker grabbing an in-flight message.<br>✗ Bigger instances still couple upload to processing. ✗ Stickiness doesn't add durability. ✗ SNS push doesn't buffer or guarantee one-time processing.`},
+
+{g:"mix-1",id:"M1.3",d:"mixed",q:"A workload runs fault-tolerant batch jobs and the team wants the lowest compute cost, accepting that instances can be reclaimed. Which purchasing option?",
+o:["On-Demand Instances","Reserved Instances","Spot Instances","Dedicated Hosts"],c:2,
+e:`Interruptible, fault-tolerant batch at the lowest price = <b>Spot Instances</b> (up to ~90% off).<br>✗ On-Demand is the baseline price. ✗ RIs commit to steady-state usage, not bursty batch. ✗ Dedicated Hosts are the most expensive (licensing/compliance).`},
+
+{g:"mix-1",id:"M1.4",d:"mixed",tag:"win",q:"A web tier must absorb unpredictable traffic swings and survive the loss of an entire Availability Zone. Which design fits both?",
+o:["One large EC2 instance with an Elastic IP","An Auto Scaling group across multiple AZs behind an ALB","EC2 instances in a single AZ behind an ALB","Several instances in one AZ with Route 53 round-robin"],c:1,
+e:`<b>ASG across multiple AZs behind an ALB</b> scales with demand and rides out an AZ failure — the canonical resilient web tier.<br>✗ A single instance is a SPOF with no elasticity. ✗ Single-AZ designs die with the AZ. ✗ Round-robin DNS gives no health-based failover or autoscaling.`},
+
+/* ====== S2 DRILL ====== */
+{g:"s2-drill",id:"7.15",d:"drill",q:"Hundreds of Linux EC2 instances must read and write the same files concurrently from a shared, automatically-growing POSIX file system. Which service?",
+o:["An EBS volume shared via Multi-Attach","Amazon EFS","Amazon S3","An instance store volume"],c:1,
+e:`<b>Amazon EFS</b> is a managed, elastic, multi-AZ NFS file system that thousands of Linux instances can mount and write concurrently.<br>✗ EBS Multi-Attach is single-AZ, capped at 16 instances, and for clustered apps. ✗ S3 is object storage (no POSIX file semantics). ✗ Instance store is local and ephemeral.`},
+
+{g:"s2-drill",id:"7.16",d:"drill",q:"Windows-based applications need a shared file system over SMB with Active Directory integration and NTFS permissions. Which service?",
+o:["Amazon EFS","Amazon FSx for Windows File Server","Amazon FSx for Lustre","Amazon S3 File Gateway"],c:1,
+e:`SMB + Active Directory + NTFS ACLs = <b>FSx for Windows File Server</b>.<br>✗ EFS is NFS/Linux-only. ✗ FSx for Lustre is for HPC/ML. ✗ File Gateway is a hybrid cache, not a native Windows file system.`},
+
+{g:"s2-drill",id:"7.17",d:"drill",tag:"miss",q:"What is true of an EC2 instance store volume?",
+o:["It persists data after the instance is stopped or terminated","It is high-performance local NVMe storage that is ephemeral — data is lost on stop/terminate","It can be detached and attached to another instance","It is replicated across AZs automatically"],c:1,
+e:`Instance store is <b>physically attached, very fast, and ephemeral</b> — perfect for cache, scratch, and buffers, but data vanishes on stop/terminate.<br>✗ It does not persist, ✗ cannot be moved between instances, and ✗ is not replicated.<span class="flip"><span class="fl">flip it</span>If you need persistent, detachable block storage, that's <b>EBS</b>.</span>`},
+
+{g:"s2-drill",id:"7.18",d:"drill",q:"A self-managed database needs sustained high IOPS, sub-millisecond latency and 99.999% volume durability. Which EBS type?",
+o:["gp3","st1","io2 (or io2 Block Express)","sc1"],c:2,
+e:`High sustained IOPS + sub-ms latency + 99.999% durability = <b>io2 / io2 Block Express</b> (Block Express reaches 256,000 IOPS).<br>✗ gp3 tops out at 16,000 IOPS. ✗ st1 is sequential HDD. ✗ sc1 is the coldest, slowest HDD.`},
+
+{g:"s2-drill",id:"7.19",d:"drill",q:"A big-data job does large sequential reads and writes (logs, streaming warehouse data) and wants maximum throughput at the lowest cost; the volume is never a boot disk. Which EBS type?",
+o:["gp3","io2","st1 (Throughput Optimized HDD)","sc1 (Cold HDD)"],c:2,
+e:`Large <b>sequential</b> throughput at low cost = <b>st1</b> (up to 500 MiB/s; can't boot).<br>✗ gp3/io2 are SSDs optimized for random IOPS, costlier here. ✗ sc1 is cheaper but lower throughput — for the coldest, rarely-touched data.<span class="flip"><span class="fl">flip it</span>"Rarely accessed, absolute lowest cost, throughput barely matters" flips it to <b>sc1</b>.</span>`},
+
+{g:"s2-drill",id:"7.20",d:"drill",q:"A clustered Linux application needs a single high-performance block volume attached to several instances at once for shared storage. What enables this, and what's the constraint?",
+o:["EBS Multi-Attach on an io1/io2 volume — instances must be in the same AZ","EFS — works across Regions","gp3 with a larger size","Instance store shared over the network"],c:0,
+e:`<b>EBS Multi-Attach</b> lets one io1/io2 volume attach to up to 16 Nitro instances — but only <b>within the same AZ</b>, and the app must coordinate concurrent writes.<br>✗ EFS is file (NFS), not block, and is the better answer for general shared file access. ✗ gp3 size doesn't add sharing. ✗ Instance store is local-only.`},
+
+{g:"s2-drill",id:"7.21",d:"drill",q:"An HPC/ML training job needs a file system delivering hundreds of GB/s of throughput and tight integration with a training dataset already in Amazon S3. Which service?",
+o:["Amazon EFS Max I/O","Amazon FSx for Lustre","Amazon FSx for Windows File Server","Amazon EBS io2 Block Express"],c:1,
+e:`Massive parallel throughput for HPC/ML + native S3 linkage = <b>FSx for Lustre</b>, which can present an S3 bucket as a file system and lazy-load data.<br>✗ EFS doesn't reach Lustre-class HPC throughput. ✗ FSx for Windows is SMB for Windows apps. ✗ io2 Block Express is single-instance block, not a shared parallel FS.`},
+
+/* ====== S2 EXAM ====== */
+{g:"s2-exam",id:"7.22",d:"exam",tag:"miss",q:"A company is migrating an on-prem Windows file share used by Windows applications. After migration, users must keep their existing NTFS permissions and authenticate against the corporate Active Directory, accessing the share over SMB with multi-AZ resilience. Least-effort managed solution?",
+o:["Amazon EFS with an NFS mount and POSIX permissions","Amazon FSx for Windows File Server (Multi-AZ) joined to AWS Managed Microsoft AD","An S3 bucket fronted by an S3 File Gateway","EBS volumes attached to a Windows EC2 file server you manage"],c:1,
+e:`Windows + SMB + NTFS ACLs + Active Directory + Multi-AZ, fully managed = <b>FSx for Windows File Server</b>.<br>✗ EFS is NFS/Linux and doesn't honor NTFS/AD. ✗ S3 File Gateway is object-backed and not a native Windows file system with AD ACLs. ✗ A self-managed Windows file server on EBS is the high-effort, you-own-HA option.`},
+
+{g:"s2-exam",id:"7.23",d:"exam",q:"A fleet of Linux web servers behind an ALB must all serve the same user-uploaded content, and the content must survive any single instance being terminated during scale-in. Which storage is appropriate?",
+o:["Store the content on each instance's EBS volume","Store the content on Amazon EFS mounted by all instances","Store the content on instance store volumes","Replicate content to each instance via a cron rsync job"],c:1,
+e:`Shared, concurrent, instance-independent file storage for many Linux servers = <b>Amazon EFS</b>; terminating an instance loses nothing because the data lives in the regional file system.<br>✗ Per-instance EBS isn't shared and dies with detachment logic. ✗ Instance store is ephemeral. ✗ rsync cron is brittle, eventually-consistent DIY.<span class="flip"><span class="fl">flip it</span>If it were a single instance needing a fast private volume, plain <b>EBS</b> would do.</span>`},
+
+{g:"s2-exam",id:"7.24",d:"exam",q:"Cost review finds a 4 TB gp2 boot/data volume on a database that only needs ~6,000 IOPS and 250 MiB/s. The team wants lower cost while decoupling IOPS/throughput from capacity. Best move?",
+o:["Migrate the volume to gp3 and provision exactly the IOPS/throughput needed","Migrate to io2 Block Express","Switch to st1","Take a snapshot and shrink the volume to 1 TB"],c:0,
+e:`<b>gp3</b> prices IOPS and throughput <i>independently</i> of size, so you keep capacity but pay only for the 6,000 IOPS / 250 MiB/s you need — cheaper than gp2's size-coupled IOPS.<br>✗ io2 Block Express is for far higher, premium IOPS. ✗ st1 is HDD (can't boot, wrong for a database's random I/O). ✗ EBS volumes can't be shrunk in place.`},
+
+{g:"s2-exam",id:"7.25",d:"exam",tag:"miss",q:"A team must restore production from EBS snapshots during a DR drill, but the first reads off the restored volumes are slow because blocks are lazily loaded from S3 on first access. They want full performance immediately after restore. What addresses this?",
+o:["Enable Fast Snapshot Restore (FSR) on the snapshots","Switch the volumes to st1","Increase the volume size after restore","Enable EBS Multi-Attach"],c:0,
+e:`<b>Fast Snapshot Restore</b> pre-initializes snapshots so restored volumes deliver full performance instantly, eliminating first-touch latency.<br>✗ st1 changes the type, not the warm-up behavior. ✗ Resizing doesn't pre-load blocks. ✗ Multi-Attach is about sharing a volume, not restore speed.`},
+
+{g:"s2-exam",id:"7.26",d:"exam",q:"An EFS file system stores documents that are read heavily for 30 days then rarely touched, and the team wants to cut storage cost automatically without changing the application's mount. What should they configure?",
+o:["EFS Lifecycle management to move infrequently-accessed files to EFS Standard-IA","Migrate the data to S3 Glacier","Switch the throughput mode to Provisioned","Mount the file system in a second Region"],c:0,
+e:`<b>EFS Lifecycle management</b> transparently moves files not accessed within a policy window to the cheaper <b>EFS Standard-IA</b> tier — no app change.<br>✗ Glacier means leaving the file system and rewriting access. ✗ Provisioned throughput raises cost, not lowers it. ✗ A second Region adds cost, not savings.`},
+
+{g:"s2-exam",id:"7.27",d:"exam",q:"A company is migrating an on-prem NetApp ONTAP environment and wants the same multi-protocol access (NFS and SMB), plus snapshots, cloning and deduplication, with minimal re-architecting. Which AWS file service?",
+o:["Amazon EFS","Amazon FSx for NetApp ONTAP","Amazon FSx for Lustre","Amazon S3 with File Gateway"],c:1,
+e:`A drop-in for ONTAP with NFS+SMB+iSCSI plus ONTAP features (snapshots, dedup, cloning) = <b>FSx for NetApp ONTAP</b> — the least re-architecting.<br>✗ EFS is NFS-only and lacks ONTAP features. ✗ FSx for Lustre targets HPC. ✗ S3 File Gateway is object-backed, not a NetApp-feature file system.`},
+
+{g:"s2-exam",id:"7.28",d:"exam",q:"A data-processing instance needs a temporary scratch volume for intermediate files that are regenerated every run; the team wants the highest possible I/O and the lowest cost, and does not care if the data is lost on stop. Best choice?",
+o:["io2 Block Express EBS volume","Instance store (local NVMe)","gp3 EBS volume with max IOPS","Amazon EFS"],c:1,
+e:`Throwaway scratch + highest I/O + cheapest (no extra storage charge) + loss-on-stop acceptable = <b>instance store</b> local NVMe.<br>✗ io2 Block Express is durable, persistent, and expensive — wasted on scratch. ✗ gp3 still costs per-GB and is slower than local NVMe. ✗ EFS is shared file storage, overkill for local scratch.<span class="flip"><span class="fl">flip it</span>If that scratch data had to survive a stop/start, you'd need <b>EBS</b>.</span>`},
+
+/* ====== MIX 2 ====== */
+{g:"mix-2",id:"M2.1",d:"mixed",tag:"win",q:"A serverless app (API Gateway + Lambda) needs to store session items with single-digit-ms latency that auto-expire after 24 hours, with the least operations. Best fit?",
+o:["A self-managed Redis cluster","DynamoDB with TTL set to 24 hours","An RDS table with a cron cleanup job","ElastiCache for Memcached"],c:1,
+e:`<b>DynamoDB with TTL</b> is serverless, fast, and auto-expires items — a natural pairing with Lambda.<br>✗ Redis/Memcached add a cluster to operate. ✗ RDS + cron is heavier and needs a server.`},
+
+{g:"mix-2",id:"M2.2",d:"mixed",tag:"win",q:"A company needs a multi-Region active-active relational database with low write latency in each Region. Which AWS option fits best?",
+o:["RDS Multi-AZ","Amazon Aurora Global Database","A single RDS instance with cross-Region read replicas only","DynamoDB Standard table"],c:1,
+e:`Multi-Region, low local write latency for a relational workload = <b>Aurora Global Database</b> (sub-second cross-Region replication, fast Region promotion).<br>✗ RDS Multi-AZ is single-Region HA. ✗ Plain cross-Region read replicas are read-only. ✗ DynamoDB isn't relational (global tables would be the NoSQL answer).`},
+
+{g:"mix-2",id:"M2.3",d:"mixed",q:"A regulated app needs a DR plan with the lowest RTO/RPO — a fully running, scaled copy in a second Region ready to take traffic instantly. Which DR strategy?",
+o:["Backup &amp; Restore","Pilot Light","Warm Standby","Multi-Site active/active"],c:3,
+e:`Instant failover with a fully scaled second Region = <b>Multi-Site active/active</b> — the lowest RTO/RPO (and highest cost).<br>✗ Backup &amp; Restore is slowest. ✗ Pilot Light keeps only core pieces warm. ✗ Warm Standby runs a scaled-down copy that must scale up on failover.`},
+
+{g:"mix-2",id:"M2.4",d:"mixed",q:"An event must trigger processing whenever a new object lands in an S3 bucket, with no servers to manage. What's the simplest wiring?",
+o:["Poll the bucket every minute from an EC2 cron job","Configure an S3 Event Notification to invoke a Lambda function","Enable S3 Transfer Acceleration","Use S3 Lifecycle rules to trigger compute"],c:1,
+e:`<b>S3 Event Notifications → Lambda</b> is the serverless, event-driven pattern for "do X when an object is created."<br>✗ Polling from EC2 is wasteful and server-bound. ✗ Transfer Acceleration is an upload speed feature. ✗ Lifecycle rules manage storage class/expiry, not compute triggers.`},
+
+/* ====== S3 DRILL ====== */
+{g:"s3-drill",id:"7.29",d:"drill",q:"On-prem applications need an NFS/SMB file share, but the files should actually be stored as objects in Amazon S3, with frequently-used files cached locally. Which service?",
+o:["AWS DataSync","Amazon S3 File Gateway","Volume Gateway (stored mode)","AWS Transfer Family"],c:1,
+e:`File protocol on-prem, objects in S3, local cache = <b>S3 File Gateway</b>.<br>✗ DataSync moves/copies data, it isn't an ongoing mount. ✗ Volume Gateway presents iSCSI block, not NFS/SMB files. ✗ Transfer Family is an SFTP/FTPS front door, not a local file share.`},
+
+{g:"s3-drill",id:"7.30",d:"drill",tag:"miss",q:"You need to move 200 TB from on-prem to S3 over a constrained internet link within two weeks, and the link is far too slow to make the deadline. Best option?",
+o:["AWS DataSync over the internet","An AWS Snowball Edge device","S3 Transfer Acceleration","A Site-to-Site VPN with multipart upload"],c:1,
+e:`Too much data for the wire in the time allowed = ship a <b>Snowball Edge</b> (offline bulk transfer).<br>✗ DataSync/Transfer Acceleration/VPN all still ride the slow link and miss the deadline.<span class="flip"><span class="fl">flip it</span>If bandwidth were ample and the transfer were ongoing, the answer flips to <b>DataSync</b>.</span>`},
+
+{g:"s3-drill",id:"7.31",d:"drill",q:"A company wants to replace its physical tape backup infrastructure with a cloud-backed virtual tape library that its existing backup software can write to. Which gateway?",
+o:["S3 File Gateway","Tape Gateway (VTL)","Volume Gateway (cached)","AWS Backup"],c:1,
+e:`Virtual tape library for legacy backup software, archived to Glacier = <b>Tape Gateway</b>.<br>✗ File Gateway is NFS/SMB. ✗ Volume Gateway is iSCSI block. ✗ AWS Backup is a native scheduler, not a VTL for existing tape software.`},
+
+{g:"s3-drill",id:"7.32",d:"drill",q:"Partners can only push files using SFTP. You want a fully managed endpoint that lands those files directly in S3 with no servers to run. Which service?",
+o:["AWS DataSync","AWS Transfer Family","S3 File Gateway","Amazon AppFlow"],c:1,
+e:`Managed <b>SFTP/FTPS/FTP</b> in front of S3/EFS = <b>AWS Transfer Family</b>.<br>✗ DataSync isn't a protocol endpoint partners log into. ✗ File Gateway is an on-prem appliance. ✗ AppFlow connects SaaS apps, not SFTP file transfers.`},
+
+{g:"s3-drill",id:"7.33",d:"drill",q:"You want a single managed service to schedule, run, and centrally govern backups across EBS, EFS, RDS, DynamoDB and FSx, with immutable backup copies. Which service?",
+o:["AWS Backup with Backup Vault Lock","Manual EBS snapshots via Lambda","S3 Lifecycle policies","AWS DataSync"],c:0,
+e:`Centralized, policy-driven backups across many services with WORM via <b>Backup Vault Lock</b> = <b>AWS Backup</b>.<br>✗ Hand-rolled snapshot Lambdas are the operational-effort distractor. ✗ Lifecycle policies are S3-only. ✗ DataSync moves data, it doesn't manage backup policies.`},
+
+{g:"s3-drill",id:"7.34",d:"drill",q:"On-prem apps need low-latency local block access to their primary data, with that data also backed up asynchronously to AWS. Which Storage Gateway mode?",
+o:["Volume Gateway — stored volumes","Volume Gateway — cached volumes","S3 File Gateway","Tape Gateway"],c:0,
+e:`Primary data kept <b>on-prem</b> for low-latency local reads, async backup to AWS = <b>stored volumes</b>.<br>✗ Cached volumes keep primary data in S3 with only hot data local (low local footprint, the inverse trade-off). ✗ File/Tape gateways aren't iSCSI primary-block stores.<span class="flip"><span class="fl">flip it</span>If you wanted to <i>minimize local storage</i> and keep the dataset in S3, that's <b>cached volumes</b>.</span>`},
+
+{g:"s3-drill",id:"7.35",d:"drill",q:"A company needs an ongoing, scheduled, validated copy of on-prem NFS data into Amazon EFS, with plenty of bandwidth available. Which service is purpose-built?",
+o:["AWS Snowball Edge","AWS DataSync","S3 Transfer Acceleration","AWS Transfer Family"],c:1,
+e:`Online, agent-based, scheduled, validated transfer to S3/EFS/FSx = <b>DataSync</b>.<br>✗ Snowball is offline bulk for when bandwidth is the bottleneck. ✗ Transfer Acceleration only speeds S3 uploads. ✗ Transfer Family is an SFTP endpoint, not a sync engine.`},
+
+/* ====== S3 EXAM ====== */
+{g:"s3-exam",id:"7.36",d:"exam",tag:"miss",q:"On-prem workloads must keep accessing a file share with local-feeling latency long-term, but the company wants the data to live durably in S3 and to reduce on-prem storage footprint, accessing it over NFS. Which is the best fit?",
+o:["Migrate everything with DataSync once, then point apps at S3 directly","Deploy an S3 File Gateway on-prem with an NFS file share backed by an S3 bucket","Order a Snowball Edge and keep it permanently on-site","Use AWS Transfer Family over SFTP for the apps"],c:1,
+e:`Ongoing local file access + data persisted as S3 objects + smaller on-prem footprint (local cache of hot files) = <b>S3 File Gateway</b>.<br>✗ DataSync is a one-time/scheduled <i>mover</i> — apps can't keep using a familiar file share, and most apps can't talk S3 natively. ✗ Snowball is a transfer device, not a permanent gateway. ✗ Transfer Family is for external SFTP partners, not local low-latency app access.<span class="flip"><span class="fl">flip it</span>If the goal were "migrate once and decommission the on-prem share," the answer flips to <b>DataSync</b>.</span>`},
+
+{g:"s3-exam",id:"7.37",d:"exam",q:"A research lab must move 600 TB of genomics data to S3 within 30 days. Their site has a 500 Mbps internet link shared with other workloads. What should they use?",
+o:["AWS DataSync over the public internet","Multiple AWS Snowball Edge Storage Optimized devices","S3 Transfer Acceleration with multipart uploads","Set up Direct Connect and transfer online"],c:1,
+e:`At 500 Mbps, 600 TB would take well over 100 days even at full saturation — the wire can't make the deadline, so ship <b>Snowball Edge</b> devices.<br>✗ DataSync/Transfer Acceleration still depend on that slow shared link. ✗ Provisioning Direct Connect takes weeks and the dedicated link still may not finish in time — far slower and costlier than shipping disks for a one-time bulk move.`},
+
+{g:"s3-exam",id:"7.38",d:"exam",q:"A company runs nightly EBS, RDS and DynamoDB backups via a tangle of custom Lambda scripts and cron jobs, and auditors want centralized policies, retention enforcement, and proof that backups cannot be deleted early. What reduces operational effort while meeting the audit?",
+o:["Keep the scripts but add CloudWatch alarms","Adopt AWS Backup with backup plans and Backup Vault Lock for immutable retention","Move all backups to manual S3 uploads","Enable Multi-AZ on every resource instead of backing up"],c:1,
+e:`Centralized backup plans across services + immutable, audit-proof retention = <b>AWS Backup with Vault Lock</b> — far less custom code.<br>✗ Alarms on scripts keep all the operational burden. ✗ Manual S3 uploads are more work and not WORM. ✗ Multi-AZ is HA, not backup/retention.`},
+
+{g:"s3-exam",id:"7.39",d:"exam",tag:"miss",q:"A factory in a remote location with intermittent, low-bandwidth connectivity must collect sensor data, run a small amount of local processing, and periodically ship the data to AWS. The device must be small and rugged. Which Snow device?",
+o:["AWS Snowmobile","AWS Snowball Edge Storage Optimized","AWS Snowcone","AWS Snowball Edge Compute Optimized with a full rack"],c:2,
+e:`Small, rugged, portable, edge-capable, low-bandwidth site = <b>AWS Snowcone</b> (it can even DataSync data online or be shipped back).<br>✗ Snowmobile is an exabyte truck. ✗ Snowball Edge devices are larger and heavier than the "small, rugged, portable" tell. ✗ A full rack contradicts the small/portable requirement.<span class="flip"><span class="fl">flip it</span>Move tens of TB with meaningful edge compute and the pick becomes <b>Snowball Edge Compute Optimized</b>.</span>`},
+
+{g:"s3-exam",id:"7.40",d:"exam",q:"A media company will run a recurring HPC rendering pipeline on EC2 that needs a high-throughput POSIX file system seeded from a large dataset stored in S3, and results written back to S3 after each run. Which storage layer?",
+o:["Amazon EFS with Max I/O mode","Amazon FSx for Lustre linked to the S3 bucket","Amazon S3 mounted via File Gateway","EBS io2 volumes per node"],c:1,
+e:`HPC throughput + POSIX + native S3 import/export = <b>FSx for Lustre</b> with an S3 data repository association (lazy-load in, export results back).<br>✗ EFS doesn't reach Lustre-class HPC throughput. ✗ File Gateway is a hybrid cache, not a parallel compute FS. ✗ Per-node EBS isn't a shared high-throughput file system.`},
+
+{g:"s3-exam",id:"7.41",d:"exam",q:"A bank needs encrypted, validated, scheduled transfer of large on-prem datasets into AWS over a private connection, with file integrity verification and minimal scripting. They already have AWS Direct Connect. Best approach?",
+o:["AWS DataSync running over Direct Connect","Manual rsync over a Site-to-Site VPN","Snowball Edge shipped monthly","AWS Transfer Family over the public internet"],c:0,
+e:`Scheduled, encrypted, integrity-checked, low-effort online transfer over the existing private link = <b>DataSync over Direct Connect</b>.<br>✗ Manual rsync is brittle DIY with no built-in validation. ✗ Monthly Snowball is offline bulk, not a streamlined recurring online sync when bandwidth exists. ✗ Transfer Family over the internet ignores the private DX link and is an SFTP endpoint, not a managed sync.`},
+
+{g:"s3-exam",id:"7.42",d:"exam",tag:"miss",q:"An e-commerce site lets customers upload large product videos directly to S3 from around the world; uploads from distant regions are slow and unreliable, and the team wants the simplest fix using the existing single bucket. What should they enable?",
+o:["Cross-Region Replication to a bucket near each user","S3 Transfer Acceleration on the bucket","An S3 File Gateway in each Region","A second bucket per Region with Route 53 latency routing"],c:1,
+e:`Faster, more reliable long-distance <b>uploads</b> to one existing bucket = <b>S3 Transfer Acceleration</b> (routes through the nearest edge over the AWS backbone).<br>✗ CRR copies data <i>after</i> upload, it doesn't speed the upload. ✗ File Gateways are on-prem appliances, not a browser-upload accelerator. ✗ Per-Region buckets add complexity the "single bucket, simplest fix" stem rules out.<span class="flip"><span class="fl">flip it</span>If the problem were slow <i>downloads</i> of cacheable content, the answer would be <b>CloudFront</b>.</span>`}
+
+];
+
+/* ---------------- RENDER ---------------- */
+const L=["A","B","C","D","E"];
+const state={}; // id -> {answered, correct}
+let total=BANK.length;
+
+/* ---------------- PERSISTENCE ----------------
+   One shared store for all files, keyed by FILE_KEY.
+   Shape: { "file-1": { answers:{ "1.01":[0], ... }, scroll:1234 }, "file-2": {...}, ... } */
+const STORE_KEY="saa_c03_progress";
+const FILE_KEY="file-7";
+function loadStore(){ try{return JSON.parse(localStorage.getItem(STORE_KEY))||{};}catch(e){return {};} }
+function saveStore(s){ try{localStorage.setItem(STORE_KEY,JSON.stringify(s));}catch(e){} }
+function fileData(){ const s=loadStore(); return s[FILE_KEY]||{answers:{},scroll:0}; }
+function writeFileData(fd){ const s=loadStore(); s[FILE_KEY]=fd; saveStore(s); }
+function saveAnswer(id,picks){ const fd=fileData(); fd.answers=fd.answers||{}; fd.answers[id]=picks; writeFileData(fd); }
+function saveScroll(y){ const fd=fileData(); fd.scroll=y; writeFileData(fd); }
+function clearFile(){ const s=loadStore(); delete s[FILE_KEY]; saveStore(s); }
+const SAVED=fileData();
+
+function tagChip(t){
+  if(t==="miss") return '<span class="chip miss">↻ your miss</span>';
+  if(t==="win")  return '<span class="chip win">✓ lock it in</span>';
+  return "";
+}
+function diffChip(d,multi){
+  let base = d==="exam"?'<span class="chip exam">exam</span>'
+           : d==="mixed"?'<span class="chip mixed">mixed</span>'
+           : '<span class="chip drill">drill</span>';
+  if(multi) base += ' <span class="chip two">select two</span>';
+  return base;
+}
+
+BANK.forEach(item=>{
+  const host=document.getElementById(item.g);
+  if(!host)return;
+  const card=document.createElement("div");
+  card.className="q";
+  card.tabIndex=0;
+  card.dataset.id=item.id;
+  const correctArr = Array.isArray(item.c)?item.c:[item.c];
+  const multi = item.multi===true || correctArr.length>1;
+
+  card.innerHTML =
+    '<div class="qtop"><span class="qid">Q '+item.id+'</span>'+diffChip(item.d,multi)+tagChip(item.tag)+'</div>'+
+    '<div class="stem">'+item.q+'</div>'+
+    '<ul class="opts">'+item.o.map((t,i)=>
+      '<button class="opt" data-i="'+i+'"><span class="ltr">'+L[i]+'</span><span class="otext">'+t+'</span><span class="mark"></span></button>'
+    ).join('')+'</ul>'+
+    (multi?'<button class="checkbtn" disabled>Check answer</button>':'')+
+    '<div class="reveal"><div class="rv-inner"></div></div>';
+
+  host.appendChild(card);
+
+  const opts=[...card.querySelectorAll(".opt")];
+  const checkBtn=card.querySelector(".checkbtn");
+  const reveal=card.querySelector(".reveal");
+  const rvInner=card.querySelector(".rv-inner");
+  let locked=false;
+  let sel=new Set();
+
+  function settle(){
+    locked=true;
+    const userArr=[...sel];
+    const ok = userArr.length===correctArr.length && userArr.every(i=>correctArr.includes(i));
+    opts.forEach((b,i)=>{
+      b.disabled=true; b.classList.remove("sel");
+      const mark=b.querySelector(".mark");
+      if(correctArr.includes(i)){b.classList.add("correct");mark.textContent="✓ correct";}
+      else if(sel.has(i)){b.classList.add("wrong");mark.textContent="✗ your pick";}
+    });
+    if(checkBtn)checkBtn.style.display="none";
+    rvInner.innerHTML='<div class="verdict '+(ok?'r-ok':'r-no')+'">'+(ok?'Correct':'Not quite')+'</div>'+item.e;
+    reveal.classList.add("show");
+    state[item.id]={answered:true,correct:ok};
+    if(!window.__saaRestoring) saveAnswer(item.id,userArr);
+    updateHUD();
+  }
+
+  opts.forEach(b=>{
+    b.addEventListener("click",()=>{
+      if(locked)return;
+      const i=+b.dataset.i;
+      if(multi){
+        if(sel.has(i)){sel.delete(i);b.classList.remove("sel");}
+        else{sel.add(i);b.classList.add("sel");}
+        if(checkBtn)checkBtn.disabled = sel.size===0;
+      } else {
+        sel=new Set([i]); settle();
+      }
+    });
+  });
+  if(checkBtn)checkBtn.addEventListener("click",()=>{if(!locked&&sel.size)settle();});
+
+  // keyboard: 1-5 / a-e select; Enter checks (multi)
+  card.addEventListener("keydown",e=>{
+    if(locked)return;
+    let idx=-1;
+    if(e.key>="1"&&e.key<="5")idx=+e.key-1;
+    const lk=e.key.toLowerCase();
+    if(lk>="a"&&lk<="e")idx=lk.charCodeAt(0)-97;
+    if(idx>=0&&idx<opts.length){e.preventDefault();opts[idx].click();}
+    else if(e.key==="Enter"&&multi&&sel.size){e.preventDefault();settle();}
+  });
+});
+
+/* ---------------- HUD + SUMMARY ---------------- */
+document.getElementById("h-tot").textContent=total;
+function updateHUD(){
+  const answered=Object.keys(state).length;
+  const correct=Object.values(state).filter(s=>s.correct).length;
+  const pct = answered? Math.round(100*correct/answered):0;
+  document.getElementById("h-ans").textContent=answered;
+  document.getElementById("h-pct").textContent= answered? pct+"%":"—";
+  document.getElementById("h-bar").style.width=(100*answered/total)+"%";
+
+  const scP=document.getElementById("sc-pct");
+  const scL=document.getElementById("sc-line");
+  const scM=document.getElementById("sc-miss");
+  if(answered===0){scP.textContent="—";scL.textContent="Answer some questions and your readiness score appears here.";scM.innerHTML="";return;}
+  scP.textContent=pct+"%";
+  let verdict;
+  if(answered<total) verdict=correct+" / "+answered+" so far — "+(total-answered)+" left. The bar at the very top tracks your run.";
+  else if(pct>=80) verdict="Strong. 80%+ on a weakness-targeted set means these concepts are sticking. Move to File 8.";
+  else if(pct>=70) verdict="On the pass line for this set. Re-take the ones below, then File 8.";
+  else verdict="Below your target. Re-read the section boxes, redo the misses below, and run it again before moving on.";
+  scL.textContent=verdict;
+
+  const missed=Object.entries(state).filter(([k,v])=>!v.correct).map(([k])=>k);
+  scM.innerHTML = missed.length
+    ? "review: "+missed.map(id=>'<a href="#" onclick="jump(\''+id+'\');return false;">Q'+id+'</a>').join("")
+    : (answered===total?"clean sweep — nothing flagged.":"");
+}
+function jump(id){
+  const el=[...document.querySelectorAll(".q")].find(q=>q.dataset.id===id);
+  if(el){el.scrollIntoView({behavior:"smooth",block:"center"});el.focus({preventScroll:true});}
+}
+document.getElementById("h-reset").addEventListener("click",()=>{clearFile();location.reload()});
+updateHUD();
+
+/* ---------------- SMOOTH VIM PAGE SCROLLING ---------------- */
+const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+let lastG=0, rafId=null, targetY=window.scrollY;
+const help=document.getElementById("help");
+function toggleHelp(){help.classList.toggle("show");}
+function maxY(){ return Math.max(0, document.documentElement.scrollHeight - window.innerHeight); }
+function tick(){
+  const cur=window.scrollY, diff=targetY-cur;
+  if(Math.abs(diff)<0.6){ window.scrollTo(0,Math.round(targetY)); rafId=null; return; }
+  window.scrollTo(0, cur + diff*0.16);   // eased glide toward target
+  rafId=requestAnimationFrame(tick);
+}
+function glide(dy){
+  if(reduce){ window.scrollBy(0,dy); return; }
+  if(rafId===null) targetY=window.scrollY;
+  targetY=Math.max(0,Math.min(maxY(),targetY+dy));
+  if(rafId===null) rafId=requestAnimationFrame(tick);
+}
+function glideTo(y){
+  if(reduce){ window.scrollTo(0,y); return; }
+  targetY=Math.max(0,Math.min(maxY(),y));
+  if(rafId===null) rafId=requestAnimationFrame(tick);
+}
+["wheel","touchmove"].forEach(ev=>window.addEventListener(ev,()=>{ if(rafId){cancelAnimationFrame(rafId);rafId=null;} },{passive:true}));
+document.addEventListener("keydown",e=>{
+  const tag=(e.target.tagName||"").toLowerCase();
+  if(tag==="input"||tag==="textarea")return;
+  if(e.metaKey||e.ctrlKey||e.altKey)return;
+  if(e.key==="Escape"){help.classList.remove("show");return;}
+  if(e.key==="?"){e.preventDefault();toggleHelp();return;}
+  if(help.classList.contains("show"))return;
+  // 1-5 / a-e are handled per-card (when a card is focused); let them through
+  if((e.key>="1"&&e.key<="5") || (e.key.length===1 && e.key.toLowerCase()>="a" && e.key.toLowerCase()<="e")) return;
+  const vh=window.innerHeight;
+  switch(e.key){
+    case"j":e.preventDefault();glide(80);break;
+    case"k":e.preventDefault();glide(-80);break;
+    case"d":e.preventDefault();glide(vh*0.5);break;
+    case"u":e.preventDefault();glide(-vh*0.5);break;
+    case"f":e.preventDefault();glide(vh*0.9);break;
+    case"b":e.preventDefault();glide(-vh*0.9);break;
+    case"G":e.preventDefault();glideTo(maxY());break;
+    case"g":{const now=Date.now();if(now-lastG<500){e.preventDefault();glideTo(0);lastG=0;}else lastG=now;break;}
+  }
+});
+document.getElementById("h-help").addEventListener("click",toggleHelp);
+
+/* ---------------- RESTORE SAVED ANSWERS ----------------
+   Replay each saved answer by simulating the same option clicks the user made.
+   The __saaRestoring flag stops settle() from re-saving during replay. */
+function restoreAnswers(){
+  const answers=SAVED.answers||{};
+  window.__saaRestoring=true;
+  document.querySelectorAll(".q").forEach(card=>{
+    const picks=answers[card.dataset.id];
+    if(!Array.isArray(picks)||!picks.length)return;
+    const opts=[...card.querySelectorAll(".opt")];
+    picks.forEach(i=>{ if(opts[i])opts[i].click(); });          // single-select settles on the click
+    const checkBtn=card.querySelector(".checkbtn");             // multi-select needs the explicit check
+    if(checkBtn&&checkBtn.style.display!=="none")checkBtn.click();
+  });
+  window.__saaRestoring=false;
+}
+restoreAnswers();
+
+/* ---------------- SCROLL POSITION ---------------- */
+// restore scroll after the DOM (and replayed answers) are laid out
+if(SAVED.scroll){
+  const y=SAVED.scroll;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>window.scrollTo(0,y)));
+}
+// save scroll position, throttled
+let scrollTimer=null;
+window.addEventListener("scroll",()=>{
+  if(scrollTimer)return;
+  scrollTimer=setTimeout(()=>{scrollTimer=null;saveScroll(window.scrollY||window.pageYOffset||0);},250);
+},{passive:true});
+</script>
+</body>
+</html>

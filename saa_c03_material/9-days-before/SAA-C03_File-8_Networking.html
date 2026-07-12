@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SAA-C03 · File 8 · Networking</title>
+<style>
+  :root{
+    /* dark theme — palette shared with File 5 */
+    --ink:#e7eef6; --ink-soft:#a3b5c7; --muted:#6f8298;
+    --paper:#0e1620; --panel:#15212e; --panel2:#1a2836; --panel3:#1f2f40; --line:#26384a; --line-strong:#36506a;
+    --accent:#f59e3c; --accent-2:#f7b260; --accent-deep:#f7b260; --accent-tint:rgba(245,158,60,.12);
+    --navy:#1a2836; --navy-tint:#1f2f40;
+    --ok:#3fcf8e; --ok-bg:rgba(63,207,142,.13); --ok-line:rgba(63,207,142,.45);
+    --no:#ff7062; --no-bg:rgba(255,112,98,.13); --no-line:rgba(255,112,98,.45);
+    --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+    line-height:1.62;font-size:17px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:860px;margin:0 auto;padding:0 22px}
+  ::selection{background:rgba(245,158,60,.3)}
+
+  /* ---------- HUD ---------- */
+  .hud{position:sticky;top:0;z-index:50;background:rgba(28,43,62,.97);color:#fff;
+    border-bottom:1px solid #0e1622;backdrop-filter:saturate(1.2) blur(6px)}
+  .hud-inner{max-width:860px;margin:0 auto;padding:9px 22px;display:flex;gap:16px;
+    align-items:center;font-family:var(--mono);font-size:12.5px;flex-wrap:wrap}
+  .hud .dot{color:var(--accent);font-weight:700;letter-spacing:.04em}
+  .hud .stat b{color:#fff;font-weight:700}
+  .hud .stat{color:#9fb0c4}
+  .bar{flex:1;min-width:120px;height:7px;background:#0f1b2a;border-radius:99px;overflow:hidden}
+  .bar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),#f0a850);
+    transition:width .35s ease}
+  .hud button{font-family:var(--mono);font-size:11.5px;color:#9fb0c4;background:transparent;
+    border:1px solid #33445a;border-radius:6px;padding:3px 9px;cursor:pointer}
+  .hud button:hover{color:#fff;border-color:var(--accent)}
+
+  /* ---------- header ---------- */
+  header.top{padding:54px 0 30px;border-bottom:1px solid var(--line)}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--accent-deep);margin:0 0 14px}
+  h1{font-size:40px;line-height:1.05;margin:0 0 12px;font-weight:800;letter-spacing:-.018em}
+  h1 .thin{font-weight:400;color:var(--ink-soft)}
+  .lede{font-size:18px;color:var(--ink-soft);margin:0;max-width:60ch}
+  .filechips{display:flex;gap:7px;flex-wrap:wrap;margin-top:22px;font-family:var(--mono);font-size:11.5px}
+  .fc{padding:4px 10px;border:1px solid var(--line-strong);border-radius:99px;color:var(--muted)}
+  .fc.here{background:var(--navy);color:#fff;border-color:var(--navy)}
+
+  .legend{margin:26px 0 0;padding:16px 18px;background:var(--panel);border:1px solid var(--line);
+    border-radius:12px;font-size:14px;color:var(--ink-soft)}
+  .legend b{color:var(--ink)}
+  .legend .row{display:flex;gap:10px;align-items:baseline;margin:7px 0}
+  .legend .tg{flex:none}
+
+  /* ---------- sections ---------- */
+  section{padding:46px 0;border-bottom:1px solid var(--line)}
+  .sec-tag{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--accent-deep);display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .sec-tag .n{background:var(--navy);color:#fff;border-radius:6px;padding:2px 8px;font-size:11px}
+  h2{font-size:28px;line-height:1.12;margin:0 0 6px;font-weight:800;letter-spacing:-.015em}
+  h3{font-size:18.5px;margin:30px 0 8px;font-weight:700;letter-spacing:-.01em}
+  p{margin:13px 0}
+  .sub{color:var(--ink-soft);font-size:16px;margin-top:2px}
+  code{font-family:var(--mono);font-size:.86em;background:var(--panel2,#1f2f40);padding:1.5px 6px;border-radius:5px;
+    color:#cfe0d6; white-space:nowrap}
+  strong{font-weight:700}
+  ul.tight{margin:12px 0;padding-left:20px}
+  ul.tight li{margin:7px 0}
+
+  /* ---------- callouts ---------- */
+  .box{margin:22px 0;border-radius:12px;padding:16px 18px 16px 20px;border:1px solid var(--line);
+    background:var(--panel);position:relative;overflow:hidden}
+  .box .lab{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+    margin:0 0 6px;font-weight:600}
+  .box.key{border-color:rgba(245,158,60,.4);background:var(--accent-tint)}
+  .box.key:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent)}
+  .box.key .lab{color:var(--accent-deep)}
+  .box.trap{border-color:var(--no-line);background:var(--no-bg)}
+  .box.trap:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--no)}
+  .box.trap .lab{color:var(--no)}
+  .box.field{background:var(--navy);color:#dfe7f0;border-color:var(--navy)}
+  .box.field .lab{color:var(--accent)}
+  .box.field b{color:#fff}
+  .box p:first-of-type{margin-top:0}.box p:last-child{margin-bottom:0}
+
+  /* ---------- table ---------- */
+  .tw{overflow-x:auto;margin:22px 0}
+  table{border-collapse:collapse;width:100%;font-size:14.5px}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;
+    color:var(--muted);font-weight:600;border-bottom:2px solid var(--line-strong)}
+  td b{color:var(--ink)}
+  tr:last-child td{border-bottom:none}
+
+  /* ---------- quiz ---------- */
+  .quizhead{display:flex;align-items:center;gap:10px;margin:34px 0 4px;flex-wrap:wrap}
+  .quizhead .ttl{font-family:var(--mono);font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--ink);font-weight:700}
+  .quizhead .meta{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  .quizhead .rule{flex:1;height:1px;background:var(--line)}
+
+  .q{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:18px 18px 6px;
+    margin:16px 0;transition:border-color .2s}
+  .q:focus-within{border-color:var(--line-strong)}
+  .q:focus{outline:2px solid var(--accent);outline-offset:2px}
+  .qtop{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:9px}
+  .qid{font-family:var(--mono);font-size:11.5px;color:var(--muted);font-weight:600}
+  .chip{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+    padding:2px 7px;border-radius:5px;font-weight:700}
+  .chip.drill{background:#22323f;color:#9fc0d8}
+  .chip.exam{background:#36506a;color:#eaf2fb}
+  .chip.mixed{background:var(--accent-tint);color:var(--accent-deep)}
+  .chip.two{background:rgba(154,118,224,.18);color:#bba6e8}
+  .chip.miss{background:var(--no-bg);color:var(--no);border:1px solid var(--no-line)}
+  .chip.win{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-line)}
+  .stem{font-size:16.5px;margin:2px 0 13px;line-height:1.5}
+  .opts{list-style:none;margin:0;padding:0}
+  .opt{display:flex;gap:11px;align-items:flex-start;width:100%;text-align:left;cursor:pointer;
+    border:1px solid var(--line);background:var(--navy-tint);border-radius:9px;padding:11px 13px;margin:7px 0;
+    font:inherit;font-size:15.5px;color:var(--ink);transition:border-color .12s,background .12s}
+  .opt:hover:not(:disabled){border-color:var(--line-strong);background:#243749}
+  .opt:disabled{cursor:default}
+  .opt .ltr{flex:none;font-family:var(--mono);font-weight:700;font-size:13px;color:var(--accent-deep);
+    width:18px;text-align:center;padding-top:1px}
+  .opt.sel{border-color:var(--accent);background:var(--accent-tint)}
+  .opt.sel .ltr{color:var(--accent-deep)}
+  .opt.correct{border-color:var(--ok-line);background:var(--ok-bg)}
+  .opt.correct .ltr{color:var(--ok)}
+  .opt.wrong{border-color:var(--no-line);background:var(--no-bg)}
+  .opt.wrong .ltr{color:var(--no)}
+  .opt .mark{margin-left:auto;font-family:var(--mono);font-weight:700;font-size:13px}
+  .opt.correct .mark{color:var(--ok)}.opt.wrong .mark{color:var(--no)}
+  .checkbtn{font-family:var(--mono);font-size:12.5px;font-weight:700;letter-spacing:.04em;
+    background:var(--navy);color:#fff;border:none;border-radius:8px;padding:9px 16px;cursor:pointer;
+    margin:6px 0 2px}
+  .checkbtn:hover{background:#0f1d2c}.checkbtn:disabled{opacity:.4;cursor:default}
+  .reveal{max-height:0;overflow:hidden;transition:max-height .3s ease}
+  .reveal.show{max-height:1600px}
+  .rv-inner{border-top:1px solid var(--line);margin-top:12px;padding:13px 2px 12px;font-size:15px;
+    color:var(--ink-soft);line-height:1.58}
+  .rv-inner .verdict{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;
+    font-weight:700;margin-bottom:6px}
+  .verdict.r-ok{color:var(--ok)}.verdict.r-no{color:var(--no)}
+  .rv-inner b{color:var(--ink)}
+  .flip{display:block;margin-top:10px;padding:9px 12px;background:var(--navy-tint);border-radius:8px;
+    font-size:14.5px}
+  .flip .fl{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--accent-deep);font-weight:700;margin-right:6px}
+
+  /* ---------- summary ---------- */
+  .summary{padding:46px 0 70px}
+  .scorecard{background:var(--navy);color:#fff;border-radius:16px;padding:26px 26px 22px;text-align:center}
+  .scorecard .big{font-size:54px;font-weight:800;letter-spacing:-.02em;line-height:1}
+  .scorecard .lab2{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--accent);margin-bottom:8px}
+  .scorecard .note{color:#b9c6d6;font-size:14.5px;margin-top:10px}
+  .misslist{margin-top:18px;font-family:var(--mono);font-size:13px}
+  .misslist a{color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent);
+    margin:0 4px;display:inline-block}
+  .foot{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:center;margin-top:30px}
+
+  /* ---------- vim help overlay ---------- */
+  #help{position:fixed;inset:0;z-index:90;background:rgba(6,11,17,.72);display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+  #help.show{display:flex}
+  .help-card{background:var(--panel2);border:1px solid var(--line-strong);border-radius:14px;padding:24px 26px;max-width:380px;width:calc(100% - 44px)}
+  .help-card h4{margin:0 0 4px;font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+  .help-card .hk{display:flex;justify-content:space-between;gap:14px;padding:6px 0;font-size:14.5px;border-bottom:1px solid var(--line)}
+  .help-card .hk:last-of-type{border-bottom:none}
+  .help-card kbd{font-family:var(--mono);background:var(--panel3);border:1px solid var(--line-strong);border-bottom-width:2px;border-radius:5px;padding:1px 8px;color:var(--accent-2);font-weight:600}
+  .help-card .close{margin-top:14px;font-family:var(--mono);font-size:12px;color:var(--muted);text-align:center}
+  .q.current{border-color:var(--accent)}
+
+  @media (max-width:560px){
+    body{font-size:16px} h1{font-size:31px} h2{font-size:23px}
+    .hud-inner{font-size:11px;gap:10px} .stem{font-size:15.5px}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<div class="hud">
+  <div class="hud-inner">
+    <span class="dot">▰ SAA-C03</span>
+    <span class="stat"><b id="h-ans">0</b>/<span id="h-tot">0</span> answered</span>
+    <span class="stat"><b id="h-pct">—</b> correct</span>
+    <div class="bar"><i id="h-bar"></i></div>
+    <button id="h-help">? keys</button>
+    <button id="h-reset">reset</button>
+  </div>
+</div>
+
+<div id="help"><div class="help-card">
+  <h4>Vim scrolling · smooth</h4>
+  <div class="hk"><span>Glide down / up (hold to flow)</span><span><kbd>j</kbd> <kbd>k</kbd></span></div>
+  <div class="hk"><span>Half page down / up</span><span><kbd>d</kbd> <kbd>u</kbd></span></div>
+  <div class="hk"><span>Full page down / up</span><span><kbd>f</kbd> <kbd>b</kbd></span></div>
+  <div class="hk"><span>Top of page</span><span><kbd>g</kbd><kbd>g</kbd></span></div>
+  <div class="hk"><span>Bottom of page</span><span><kbd>G</kbd></span></div>
+  <div class="hk"><span>Toggle this help</span><span><kbd>?</kbd></span></div>
+  <div class="close">Answer questions by clicking · esc closes help</div>
+</div></div>
+
+<div class="wrap">
+<header class="top">
+  <p class="eyebrow">Weakness-targeted drill · File 8 of 10</p>
+  <h1>Networking<br><span class="thin">VPC design · SG vs NACL · endpoints · peering, TGW &amp; hybrid</span></h1>
+  <p class="lede">The domain that quietly decides half the exam: which packets reach which subnet, who gets a public IP, and how two clouds — or a cloud and a data center — actually touch. We open with the VPC fundamentals you mostly nail, then walk into the misses: the stateful/stateless trap, the gateway-vs-interface endpoint coin flip, and the peering-doesn't-scale moment.</p>
+  <div class="filechips">
+    <span class="fc">1 · Compute &amp; Traffic</span>
+    <span class="fc">2 · Decoupling</span>
+    <span class="fc">3 · Databases</span>
+    <span class="fc">4 · Resilience &amp; DR</span>
+    <span class="fc">5 · Cost</span>
+    <span class="fc">6 · Security &amp; Identity</span>
+    <span class="fc">7 · Storage</span>
+    <span class="fc here">8 · Networking</span>
+    <span class="fc">9 · Management &amp; Migration</span>
+    <span class="fc">10 · Analytics &amp; App Integration</span>
+  </div>
+  <div class="legend">
+    <div class="row"><span class="tg chip drill">drill</span><span><b>Quick check.</b> Exam-real, but tests one fact at a time. Confidence fuel.</span></div>
+    <div class="row"><span class="tg chip exam">exam</span><span><b>Scenario.</b> Full SAA-C03 difficulty — multiple plausible services, one fatal flaw.</span></div>
+    <div class="row"><span class="tg chip mixed">mixed</span><span><b>All-topics review</b> dropped between sections so nothing goes stale.</span></div>
+    <div class="row"><span class="tg chip miss">↻ your miss</span><span>A networking concept the exam commonly punishes — drilled deliberately.</span></div>
+    <div class="row"><span class="tg chip win">✓ lock it in</span><span>Recall from Files 1–5 — proving prior knowledge still sticks.</span></div>
+    <p style="margin:12px 0 0;font-size:13.5px;color:var(--muted)">Click an option to answer (or focus a card and press <code>1–5</code>; <code>Enter</code> checks Select-TWO). Every answer reveals why the right one wins, why each distractor dies, and the <b>Flip it</b> — the small stem change that would make a wrong answer correct.</p>
+  </div>
+</header>
+</div>
+
+<div class="wrap">
+
+<!-- ===================== SECTION 1 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">01</span> VPC fundamentals — subnets, routing &amp; the two firewalls</div>
+  <h2>A VPC is a routing table and two firewalls in a trench coat</h2>
+  <p class="sub">Almost every VPC question reduces to three things: does this subnet have a route to the internet, does the security group allow the request, and does the NACL allow the reply. Get those three reflexes and most of the domain falls over.</p>
+
+  <h3>CIDR, subnets, and what "public" actually means</h3>
+  <p>You give a VPC a CIDR block (e.g. <code>10.0.0.0/16</code> = 65,536 addresses) and carve subnets from it. AWS reserves <strong>5 addresses per subnet</strong> (first four + last), so a <code>/24</code> gives you 251 usable, not 256. A subnet is <strong>public</strong> only if its route table sends <code>0.0.0.0/0</code> to an <strong>Internet Gateway (IGW)</strong> <em>and</em> the instance has a public/Elastic IP. Drop either and it's private. Subnets are <strong>AZ-scoped</strong> — one subnet lives in exactly one AZ, which is why HA designs need a subnet per AZ.</p>
+
+  <h3>Getting out without getting in: NAT</h3>
+  <p>Instances in a <strong>private</strong> subnet often need outbound internet (patches, API calls) but must accept no inbound from the internet. That's a <strong>NAT Gateway</strong>: it lives in a <em>public</em> subnet, and the private subnet's route table points <code>0.0.0.0/0</code> at it. For IPv6 the equivalent is an <strong>egress-only Internet Gateway</strong> (IPv6 addresses are public by default, so the EIGW gives outbound-only without the inbound).</p>
+
+  <div class="tw"><table>
+    <tr><th></th><th>NAT Gateway (managed)</th><th>NAT instance (self-run)</th></tr>
+    <tr><td><b>Management</b></td><td>AWS-managed, no patching</td><td>You patch, size, and babysit an EC2</td></tr>
+    <tr><td><b>HA</b></td><td>HA within its AZ; deploy one per AZ for zone resilience</td><td>Single instance = SPOF unless you script failover</td></tr>
+    <tr><td><b>Bandwidth</b></td><td>Scales automatically up to 100 Gbps</td><td>Capped by instance type</td></tr>
+    <tr><td><b>Security groups</b></td><td>Can't attach an SG (uses NACLs)</td><td>Has an SG; can act as a bastion / port-forward</td></tr>
+  </table></div>
+
+  <div class="box key"><p class="lab">Key fact — one NAT Gateway per AZ</p><p>A NAT Gateway is HA <em>inside its own AZ only</em>. If you run a single NAT Gateway and route all three AZs' private subnets through it, you've created a <b>cross-AZ dependency and a SPOF</b>: lose that AZ and every private subnet loses internet. The exam-correct HA pattern is <b>one NAT Gateway per AZ</b>, each AZ's private route table pointing at its own. (Bonus: it also kills the cross-AZ data-transfer charge.)</p></div>
+
+  <h3>The two firewalls — and why this is the #1 networking trap</h3>
+  <div class="tw"><table>
+    <tr><th></th><th>Security Group</th><th>Network ACL</th></tr>
+    <tr><td><b>Scope</b></td><td>Per-ENI / instance</td><td>Per-subnet</td></tr>
+    <tr><td><b>State</b></td><td><b>Stateful</b> — reply traffic auto-allowed</td><td><b>Stateless</b> — you must allow the return path too</td></tr>
+    <tr><td><b>Rules</b></td><td><b>Allow only</b> (no deny)</td><td>Allow <b>and</b> deny, evaluated <b>in numbered order</b>, first match wins</td></tr>
+    <tr><td><b>Default</b></td><td>Deny all inbound, allow all outbound</td><td>Default NACL allows all; custom NACL denies all until you add rules</td></tr>
+  </table></div>
+
+  <div class="box trap"><p class="lab">Classic trap — stateless means ephemeral ports</p><p>Because NACLs are <b>stateless</b>, allowing inbound HTTPS (443) is not enough — the server's reply leaves on a high <b>ephemeral port</b>, so the <b>outbound NACL must allow 1024–65535</b> (clients use ~32768–65535 on Linux). Symptom: requests arrive but responses never come back, and the SG looks fine. The other trap: "block a single malicious IP" — a <b>security group can't deny</b>, so the answer is always a <b>NACL deny rule</b>.</p></div>
+
+  <div class="box field"><p class="lab">// field note — the default that bites</p><p>When you create a brand-new <b>custom</b> NACL, it starts with an implicit deny on everything inbound and outbound — so attaching it to a working subnet instantly black-holes all traffic until you add explicit allow rules. The <b>default</b> NACL that ships with every new VPC is the opposite: it allows everything, which is why most people never think about NACLs at all… right up until a security team replaces the default with a locked-down custom one and the app mysteriously can't get its replies back. That single asymmetry — default NACL = allow-all, custom NACL = deny-all — accounts for a surprising share of "it worked yesterday" VPC tickets.</p></div>
+
+  <!-- DRILL -->
+  <div class="quizhead"><span class="ttl">Quick check</span><span class="rule"></span><span class="meta">8 questions · one fact each</span></div>
+  <div id="s1-drill"></div>
+
+  <!-- SCENARIO -->
+  <div class="quizhead"><span class="ttl">Scenario pressure</span><span class="rule"></span><span class="meta">7 questions · exam difficulty</span></div>
+  <div id="s1-exam"></div>
+</section>
+
+<!-- ===================== MIXED 1 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">↻</span> Mixed review — all domains</div>
+  <h2>Keep the rest warm</h2>
+  <p class="sub">Four pulled from across the blueprint — compute, decoupling, databases, cost — so the topics you've "finished" don't drift while you're deep in packets.</p>
+  <div id="mix-1"></div>
+</section>
+
+<!-- ===================== SECTION 2 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">02</span> Connecting VPCs &amp; reaching on-prem</div>
+  <h2>How two clouds — or a cloud and a data center — touch</h2>
+  <p class="sub">The exam loves the moment your two-VPC peering design hits its tenth VPC, or your "we have Direct Connect" answer forgets DX isn't encrypted. Match the connectivity to the scale and the requirement.</p>
+
+  <div class="tw"><table>
+    <tr><th>Need</th><th>Reach for</th><th>The catch</th></tr>
+    <tr><td>Two (or a few) VPCs talking privately</td><td><b>VPC peering</b></td><td><b>Non-transitive</b>; <b>no overlapping CIDR</b>; mesh explodes past a handful</td></tr>
+    <tr><td>Many VPCs + on-prem, hub-and-spoke</td><td><b>Transit Gateway</b></td><td>Transitive routing, scales to thousands; cross-Region via TGW peering</td></tr>
+    <tr><td>Encrypted tunnel over the internet to on-prem</td><td><b>Site-to-Site VPN</b></td><td>IPsec; quick to stand up; throughput/latency vary with the internet</td></tr>
+    <tr><td>Individual users connecting in</td><td><b>Client VPN</b></td><td>OpenVPN-based remote access for laptops, not networks</td></tr>
+    <tr><td>Dedicated, consistent, low-latency private line</td><td><b>Direct Connect</b></td><td>Weeks to provision; <b>not encrypted</b> by itself</td></tr>
+    <tr><td>Expose your service to other VPCs privately</td><td><b>PrivateLink (endpoint service)</b></td><td>One-way, no route/peering needed; per-ENI</td></tr>
+  </table></div>
+
+  <div class="box key"><p class="lab">Key fact — peering is non-transitive</p><p>If VPC A peers with B, and B peers with C, <b>A still cannot reach C</b> through B — peering carries no transit. Full any-to-any connectivity with peering needs a <b>full mesh</b> (n·(n−1)/2 connections), which is why "dozens/hundreds of VPCs" or "centrally managed connectivity" is the tell to switch to a <b>Transit Gateway</b> hub. Peering also forbids <b>overlapping CIDR blocks</b> on both ends.</p></div>
+
+  <h3>Direct Connect, deeper than File 1</h3>
+  <p>A DX connection is a physical cross-connect at an AWS Direct Connect location. It carries logical <strong>virtual interfaces (VIFs)</strong>: a <strong>private VIF</strong> reaches your VPC's private IPs (via a Virtual Private Gateway or Direct Connect Gateway), a <strong>public VIF</strong> reaches AWS public endpoints (S3, DynamoDB) over the dedicated line, and a <strong>transit VIF</strong> connects to a Transit Gateway. A <strong>Direct Connect Gateway</strong> lets one DX connection reach VPCs in <em>multiple Regions</em>. Connections come <strong>dedicated</strong> (a whole port from AWS, 1/10/100 Gbps) or <strong>hosted</strong> (a slice from a partner, finer sub-1G speeds).</p>
+
+  <div class="box trap"><p class="lab">Classic trap — Direct Connect is private, not encrypted</p><p>DX gives you a <em>private</em> dedicated line, but the data on it is <b>not encrypted</b>. When a stem adds "all data in transit must be encrypted," the answer is a <b>Site-to-Site VPN running over the Direct Connect link</b> (private VIF + IPsec) — private path <i>and</i> encryption, with consistent latency. There is no "encryption" checkbox on a DX connection.</p></div>
+
+  <div class="box field"><p class="lab">// field note — why Transit Gateway exists</p><p>Before TGW launched in late 2018, large AWS customers building 50+ VPCs faced a brutal choice: a full mesh of peering connections (which grows quadratically — 50 VPCs is 1,225 peerings to manage), or a self-built "transit VPC" running EC2 routers that you had to size, patch, and pay for around the clock. Transit Gateway collapsed all of it into a single managed hub: every VPC and every VPN/DX attachment connects once, routing is transitive, and route tables on the gateway control who can talk to whom. The quadratic-mesh pain is exactly the scenario the exam dramatizes when it says "hundreds of VPCs across many accounts."</p></div>
+
+  <div class="quizhead"><span class="ttl">Quick check</span><span class="rule"></span><span class="meta">7 questions · one fact each</span></div>
+  <div id="s2-drill"></div>
+
+  <div class="quizhead"><span class="ttl">Scenario pressure</span><span class="rule"></span><span class="meta">7 questions · exam difficulty</span></div>
+  <div id="s2-exam"></div>
+</section>
+
+<!-- ===================== MIXED 2 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">↻</span> Mixed review — all domains</div>
+  <h2>Keep the rest warm</h2>
+  <p class="sub">Four more across DR, security, storage and integration — the cross-topic jumps the real exam makes every other question.</p>
+  <div id="mix-2"></div>
+</section>
+
+<!-- ===================== SECTION 3 ===================== -->
+<section>
+  <div class="sec-tag"><span class="n">03</span> Endpoints, DNS &amp; flow visibility</div>
+  <h2>Reach AWS services without ever touching the internet</h2>
+  <p class="sub">The single most repeated networking distinction on the exam: gateway endpoint vs interface endpoint. Then hybrid DNS and flow logs — the two things that make a private design observable and resolvable.</p>
+
+  <h3>The endpoint coin-flip you must never lose</h3>
+  <div class="tw"><table>
+    <tr><th></th><th>Gateway endpoint</th><th>Interface endpoint (PrivateLink)</th></tr>
+    <tr><td><b>Works for</b></td><td><b>Only S3 and DynamoDB</b></td><td>Almost every other AWS service + your own/partner services</td></tr>
+    <tr><td><b>How</b></td><td>A <b>route-table entry</b> (prefix list) to the service</td><td>An <b>ENI with a private IP</b> in your subnet</td></tr>
+    <tr><td><b>Cost</b></td><td><b>Free</b></td><td>Hourly per-AZ charge + per-GB data</td></tr>
+    <tr><td><b>Cross-VPC / on-prem</b></td><td>No (route table only)</td><td>Yes — reachable over peering, VPN, DX</td></tr>
+  </table></div>
+
+  <div class="box key"><p class="lab">Key fact — "S3 or DynamoDB and free" → gateway</p><p>If a private-subnet instance must call <b>S3 or DynamoDB</b> with no internet path and no extra cost, the answer is a <b>gateway endpoint</b> — a route-table entry, nothing billed. For <b>any other service</b> (SQS, KMS, Secrets Manager, EC2 API, SSM…) or to reach the endpoint from on-prem/another VPC, you need an <b>interface endpoint (PrivateLink)</b>, which is an ENI and carries an hourly + data charge.</p></div>
+
+  <h3>Hybrid DNS — Route 53 Resolver endpoints</h3>
+  <p>By default a VPC resolves names via the Route 53 Resolver (the <code>.2</code> address). To bridge DNS with a data center you add Resolver <strong>endpoints</strong>:</p>
+  <ul class="tight">
+    <li><b>Outbound endpoint</b> + forwarding rules: VPC resolvers forward queries for on-prem domains (e.g. <code>corp.example.com</code>) <em>out</em> to your on-prem DNS servers.</li>
+    <li><b>Inbound endpoint</b>: on-prem DNS servers forward queries <em>in</em> to AWS so they can resolve private hosted zone records and AWS resources.</li>
+    <li><b>Private hosted zone</b>: a Route 53 zone resolvable only inside associated VPCs — internal names that never touch public DNS.</li>
+  </ul>
+
+  <div class="box trap"><p class="lab">Classic trap — Flow Logs don't capture payloads</p><p><b>VPC Flow Logs</b> record IP traffic <em>metadata</em> — source/dest IP, ports, protocol, bytes, ACCEPT/REJECT — to CloudWatch Logs or S3. They are the go-to for "who connected to what / why is this traffic being rejected." But they <b>do not capture packet contents</b>. If a stem needs payload inspection, that's <b>VPC Traffic Mirroring</b>, not Flow Logs. And a REJECT in a flow log is your cue to check the SG (allow missing) or the NACL (deny rule or missing ephemeral-port allow).</p></div>
+
+  <div class="box field"><p class="lab">// field note — the free endpoint that pays for itself</p><p>A gateway endpoint for S3 is free, but its real value shows up on the bill in a different column. Without it, a private-subnet fleet pulling terabytes from S3 routes every byte through a <b>NAT Gateway</b> — and NAT Gateway data-processing charges (per-GB) on heavy S3 traffic can dwarf almost everything else in a VPC's networking spend. Adding the gateway endpoint sends that S3 traffic straight out via the route table, bypassing NAT entirely. It's one of the few "more secure <i>and</i> cheaper" changes in AWS, which is exactly why the exam keeps offering it as the least-effort, lowest-cost answer.</p></div>
+
+  <div class="quizhead"><span class="ttl">Quick check</span><span class="rule"></span><span class="meta">6 questions · one fact each</span></div>
+  <div id="s3-drill"></div>
+
+  <div class="quizhead"><span class="ttl">Scenario pressure</span><span class="rule"></span><span class="meta">7 questions · exam difficulty</span></div>
+  <div id="s3-exam"></div>
+</section>
+
+<!-- ===================== SUMMARY ===================== -->
+<section class="summary">
+  <div class="scorecard">
+    <div class="lab2">Session readiness</div>
+    <div class="big"><span id="sc-pct">—</span></div>
+    <div class="note"><span id="sc-line">Answer some questions and your readiness score appears here.</span></div>
+    <div class="misslist" id="sc-miss"></div>
+  </div>
+  <p class="foot">File 8 / 10 · Networking · 50 questions · say the word and I'll build File 9 (Management &amp; Migration) next, or bolt 10 more scenarios onto any section here.</p>
+</section>
+
+</div><!-- /wrap -->
+
+<script>
+/* ---------------- QUESTION BANK ----------------
+   c = index (or array) of correct option(s), 0-based
+   multi:true => Select TWO; tag => "miss" | "win"          */
+const BANK = [
+
+/* ====== S1 DRILL ====== */
+{g:"s1-drill",id:"8.01",d:"drill",q:"What makes a subnet a 'public' subnet in a VPC?",
+o:["It has a larger CIDR block than the private subnets","Its route table sends 0.0.0.0/0 to an Internet Gateway","It has a NAT Gateway attached to it","It is the first subnet created in the VPC"],c:1,
+e:`A subnet is public only when its <b>route table routes 0.0.0.0/0 to an Internet Gateway</b> (and the instance has a public/Elastic IP). CIDR size, creation order, and NAT presence don't define public — NAT is for <i>private</i> subnets reaching out.`},
+
+{g:"s1-drill",id:"8.02",d:"drill",q:"Instances in a private subnet need to download OS patches from the internet but must accept no inbound connections from the internet. What provides this?",
+o:["An Internet Gateway on the private subnet","A NAT Gateway in a public subnet, with the private route table pointing 0.0.0.0/0 at it","An egress-only Internet Gateway","A VPC peering connection to a public VPC"],c:1,
+e:`A <b>NAT Gateway</b> (in a public subnet) lets private instances initiate outbound traffic while blocking unsolicited inbound — exactly the requirement. ✗ An IGW on the subnet would make it public. ✗ Egress-only IGW is the IPv6 equivalent. ✗ Peering doesn't provide internet egress.`},
+
+{g:"s1-drill",id:"8.03",d:"drill",q:"Which statement about security groups is correct?",
+o:["They are stateless and support deny rules","They are stateful and allow-only (no deny rules)","They operate at the subnet level","They evaluate rules in numbered order"],c:1,
+e:`Security groups are <b>stateful</b> (return traffic is auto-allowed) and <b>allow-only</b> — there are no deny rules. Stateless, ordered, deny-capable, subnet-level all describe a <b>NACL</b>, not an SG.`},
+
+{g:"s1-drill",id:"8.04",d:"drill",q:"You need to explicitly block all traffic from one specific malicious IP address at the subnet boundary. What do you use?",
+o:["A deny rule in the instance's security group","A deny rule in the subnet's Network ACL","A smaller subnet CIDR","A longer NAT Gateway timeout"],c:1,
+e:`Only a <b>NACL</b> can <b>deny</b> (security groups are allow-only), and the NACL is the subnet-level firewall. Add a deny rule for that source IP, ordered before the broad allow. The other options can't block a specific source.`},
+
+{g:"s1-drill",id:"8.05",d:"drill",q:"A subnet's NACL allows inbound HTTPS (443) but users report responses never come back. The security group is fine. What is the most likely fix?",
+o:["Allow outbound ephemeral ports (1024–65535) in the NACL","Switch the subnet to a public subnet","Increase the instance size","Enable cross-zone load balancing"],c:0,
+e:`NACLs are <b>stateless</b>, so the reply leaving on a high <b>ephemeral port</b> must be explicitly allowed <b>outbound</b> (1024–65535). Inbound 443 alone lets the request in but strands the response. Subnet type, instance size, and cross-zone are unrelated.`},
+
+{g:"s1-drill",id:"8.06",d:"drill",q:"For high availability across three AZs, how should NAT Gateways be deployed for private-subnet internet access?",
+o:["One NAT Gateway shared by all three AZs","One NAT Gateway per AZ, each AZ's private route table pointing to its own","A NAT instance in each AZ for lower cost","No NAT needed — use the Internet Gateway directly"],c:1,
+e:`A NAT Gateway is HA only <b>within its own AZ</b>, so the resilient pattern is <b>one per AZ</b>, each private route table using the NAT in its zone — no cross-AZ dependency or SPOF. ✗ A single shared NAT is a SPOF. ✗ NAT instances are self-managed SPOFs. ✗ Private subnets can't use an IGW directly.`},
+
+{g:"s1-drill",id:"8.07",d:"drill",q:"EC2 instances with only IPv6 addresses must make outbound calls to the internet but accept no inbound connections from it. What do you add?",
+o:["A NAT Gateway","An egress-only Internet Gateway","A second Internet Gateway","A VPC endpoint"],c:1,
+e:`For <b>IPv6</b>, the outbound-only equivalent of NAT is the <b>egress-only Internet Gateway</b> — it permits outbound and blocks unsolicited inbound. ✗ NAT Gateway is for IPv4. ✗ A VPC can have only one IGW and it's bidirectional. ✗ A VPC endpoint reaches AWS services, not the general internet.`},
+
+{g:"s1-drill",id:"8.08",d:"drill",q:"Which is true of a brand-new CUSTOM Network ACL before you add any rules?",
+o:["It allows all inbound and outbound traffic","It denies all inbound and outbound traffic until you add allow rules","It inherits the security group rules","It cannot be attached to a subnet"],c:1,
+e:`A <b>custom</b> NACL starts by <b>denying everything</b> until you add explicit allow rules — the opposite of the <i>default</i> NACL (which allows all). It doesn't inherit SG rules and can be attached to subnets immediately.`},
+
+/* ====== S1 EXAM ====== */
+{g:"s1-exam",id:"8.09",d:"exam",tag:"miss",q:"A solutions architect deploys a web tier across two private subnets behind an internet-facing ALB. A single NAT Gateway in AZ-a provides outbound internet for both subnets. During an AZ-a outage, the AZ-b instances stay up but can no longer reach external license servers, and patching fails fleet-wide. What is the correct redesign with the LEAST ongoing operational effort?",
+o:["Move both private subnets into AZ-a so they share the working NAT path","Deploy a NAT Gateway in each AZ and point each AZ's private route table at its local NAT Gateway","Replace the NAT Gateway with two NAT instances behind their own load balancer","Give the private instances Elastic IPs and route 0.0.0.0/0 to the Internet Gateway"],c:1,
+e:`The single NAT Gateway created a <b>cross-AZ dependency</b>: AZ-b's egress died with AZ-a. The managed, least-effort fix is a <b>NAT Gateway per AZ</b> with per-AZ routing — each zone is independent.<br>✗ Collapsing into one AZ destroys multi-AZ HA. ✗ NAT instances reintroduce patching, sizing, and failover scripting — more effort, not less. ✗ Public IPs + IGW turns private subnets public, breaking the security model.<span class="flip"><span class="fl">flip it</span>If those private instances only needed S3/DynamoDB (not the open internet), the better answer is a <b>gateway VPC endpoint</b> — no NAT at all.</span>`},
+
+{g:"s1-exam",id:"8.10",d:"exam",tag:"miss",q:"An EC2 instance uses the default security group and sits in a subnet whose security team just replaced the default NACL with a custom NACL that allows inbound HTTPS (443) only. Users now cannot complete HTTPS sessions to the instance — the TLS handshake starts but never finishes. Which TWO changes are needed to restore working HTTPS?",
+o:["Add an inbound allow for TCP 443 in the security group","Add an outbound allow for ephemeral ports (e.g. 1024–65535) in the NACL","Add an inbound deny for 0.0.0.0/0 in the security group","Attach an Internet Gateway to the instance's ENI","Disable the security group entirely"],c:[0,1],multi:true,
+e:`Two locks must both open. The <b>default SG denies all inbound</b>, so HTTPS needs an explicit <b>inbound 443 allow</b> on the SG. And because the custom NACL is <b>stateless</b>, the server's reply on a high port needs an <b>outbound ephemeral-port allow</b> — that's why the handshake stalls.<br>✗ SGs have no deny rules. ✗ IGWs attach to subnets/route tables, not ENIs. ✗ You can't 'disable' an SG.`},
+
+{g:"s1-exam",id:"8.11",d:"exam",q:"A company's image-processing fleet runs in private subnets across three AZs and reads/writes very large objects in Amazon S3. All S3 traffic currently flows through NAT Gateways, and the team is alarmed by the NAT data-processing charges. What is the most cost-effective fix that keeps traffic off the public internet?",
+o:["Create a gateway VPC endpoint for S3 and add it to the private route tables","Move the fleet to public subnets with Elastic IPs","Add more NAT Gateways to spread the load","Enable S3 Transfer Acceleration"],c:0,
+e:`A <b>gateway VPC endpoint for S3</b> routes S3 traffic via the route table — <b>free</b>, private, and it <b>bypasses the NAT Gateway</b>, eliminating those per-GB data-processing charges. ✗ Public subnets are less secure and still cost. ✗ More NAT Gateways multiply the very charge you're cutting. ✗ Transfer Acceleration speeds uploads but doesn't avoid NAT.`},
+
+{g:"s1-exam",id:"8.12",d:"exam",q:"A two-tier app has web servers in a public subnet and a database in a private subnet. Security policy requires the database to accept connections ONLY from the web tier, with no hardcoded IP ranges that break when instances are replaced. How should the database security group be configured?",
+o:["Allow the database port inbound from the web tier's security group as the source","Allow the database port inbound from 0.0.0.0/0","Allow the database port inbound from the VPC CIDR","Add a NACL deny rule for all IPs except the web servers"],c:0,
+e:`Referencing the <b>web tier's security group as the source</b> means any instance in that SG is allowed automatically — no IPs to maintain when instances scale or are replaced. ✗ 0.0.0.0/0 exposes the DB to everything. ✗ The whole VPC CIDR is broader than 'web tier only.' ✗ A NACL-based allowlist is brittle and not how SG referencing works.`},
+
+{g:"s1-exam",id:"8.13",d:"exam",q:"An architect is sizing a VPC for a three-AZ design and plans /24 subnets. A teammate insists each /24 gives 256 usable host addresses. What is the correct count, and why does it matter?",
+o:["256 usable — AWS reserves none","251 usable — AWS reserves 5 addresses in every subnet","254 usable — only network and broadcast are reserved","250 usable — AWS reserves 6 addresses"],c:1,
+e:`AWS <b>reserves 5 addresses per subnet</b> (the first four and the last), so a /24 yields <b>251 usable</b>. It matters because tight subnet sizing for large fleets or many ENIs (each takes an IP) can exhaust a subnet sooner than naive math suggests. The 254/256 figures ignore AWS's reservations.`},
+
+{g:"s1-exam",id:"8.14",d:"exam",q:"During an incident, a flow log shows REJECT entries for legitimate inbound traffic to an app subnet. The security groups clearly allow the traffic. Where is the rejection most likely happening, and what is the fix?",
+o:["The NACL — add the appropriate allow rule (and the return-path ephemeral ports)","The Internet Gateway — recreate it","The route table — add a route to the NAT Gateway","The ALB — enable cross-zone load balancing"],c:0,
+e:`A flow-log <b>REJECT</b> while the SG allows the traffic points to the <b>stateless NACL</b> denying it (a missing allow, an ordered deny, or a missing ephemeral-port return rule). Fix the NACL. ✗ IGW/route-table/ALB issues produce different symptoms, not subnet-level REJECTs on otherwise-allowed traffic.`},
+
+{g:"s1-exam",id:"8.15",d:"exam",tag:"miss",q:"A company wants to run a managed NAT solution but also occasionally needs the NAT device to perform port forwarding and act as a bastion host for one specific maintenance workflow. They value low operational overhead for the routine egress. What is the best approach?",
+o:["Use a NAT Gateway for routine egress; for the bastion/port-forward need, use a separate purpose-built solution (e.g. SSM Session Manager or a small bastion)","Use a single NAT instance for everything to keep it simple","Attach a security group to the NAT Gateway to allow port forwarding","Use an Internet Gateway as the bastion"],c:0,
+e:`A <b>NAT Gateway is managed (no patching)</b> but <b>cannot</b> do port forwarding or be a bastion and can't take a security group. So use it for routine egress and meet the bastion/forwarding need separately (Session Manager removes the bastion entirely). ✗ A NAT instance can do both but reintroduces all the ops overhead they want to avoid. ✗ NAT Gateways don't accept SGs. ✗ An IGW is not a host.`},
+
+/* ====== MIX 1 ====== */
+{g:"mix-1",id:"M1.1",d:"mixed",tag:"win",q:"A fault-tolerant batch fleet in an Auto Scaling group should run as cheaply as possible on Spot, but the team was once knocked out when a single Spot pool dried up. What configuration best protects capacity while keeping costs low?",
+o:["A mixed instances policy across several instance types and multiple AZs with the price-capacity-optimized allocation strategy","All Spot, one instance type, lowest-price allocation","Reserved Instances for the whole fleet","100% On-Demand to guarantee capacity"],c:0,
+e:`Diversifying across <b>many instance types and AZs</b> opens many Spot pools, and <b>price-capacity-optimized</b> picks the ones least likely to be reclaimed — resilient and cheap. ✗ Single type + lowest-price concentrates reclaim risk. ✗ RIs/On-Demand defeat the 'cheap Spot' goal.`},
+
+{g:"mix-1",id:"M1.2",d:"mixed",tag:"win",q:"Image uploads take 5–10 minutes each to process and are silently dropped at peak. The team wants every upload eventually processed and workers that scale to the backlog. What's the core design?",
+o:["Put an SQS queue between tiers; workers in an ASG scale on queue depth; set visibility timeout longer than the job","Increase the web instance size to process inline","Enable ALB sticky sessions","Add a longer ALB idle timeout"],c:0,
+e:`<b>SQS</b> buffers the spike; workers pull when ready and scale on queue depth; a <b>visibility timeout longer than the 5–10 min job</b> stops a second worker grabbing an in-flight message. ✗ Bigger web instances still couple upload to processing. ✗ Stickiness/idle-timeout add no durability or buffering.`},
+
+{g:"mix-1",id:"M1.3",d:"mixed",tag:"win",q:"A read-heavy reporting workload is overwhelming a single RDS MySQL instance; writes are light and must be unaffected. How do you scale the reads?",
+o:["Convert to a Multi-AZ deployment","Add one or more RDS read replicas and direct read traffic to them","Increase storage and IOPS only","Query nightly restored snapshots"],c:1,
+e:`<b>Read replicas</b> scale read throughput without touching writes. ✗ Multi-AZ is for failover/HA — the standby serves no reads. ✗ More IOPS doesn't add read capacity like replicas. ✗ Snapshot-restore is a batch hack, not live scaling.<span class="flip"><span class="fl">flip it</span>If the goal were 'survive an AZ failure with automatic failover,' the answer becomes <b>Multi-AZ</b>.</span>`},
+
+{g:"mix-1",id:"M1.4",d:"mixed",q:"A company needs the lowest-cost storage for archival data that is rarely accessed and can tolerate retrieval times of several hours. Which S3 storage class fits?",
+o:["S3 Standard","S3 Standard-IA","S3 Glacier Deep Archive","S3 Intelligent-Tiering"],c:2,
+e:`<b>Glacier Deep Archive</b> is the cheapest class for rarely-accessed archives that tolerate multi-hour retrieval. ✗ Standard/Standard-IA cost far more for cold data. ✗ Intelligent-Tiering helps unknown/changing access patterns but isn't the cheapest floor for known cold archives.`},
+
+/* ====== S2 DRILL ====== */
+{g:"s2-drill",id:"8.16",d:"drill",q:"VPC A is peered with VPC B, and VPC B is peered with VPC C. Can instances in VPC A reach instances in VPC C through B?",
+o:["Yes, peering is transitive","No — VPC peering is non-transitive; A needs its own peering (or a Transit Gateway) to reach C","Only if all three share the same CIDR","Only over the public internet"],c:1,
+e:`VPC peering is <b>non-transitive</b> — traffic does not hop through an intermediate VPC. A would need a direct peering to C, or you'd centralize on a <b>Transit Gateway</b>. Sharing a CIDR would actually break peering (no overlap allowed).`},
+
+{g:"s2-drill",id:"8.17",d:"drill",q:"A company must connect hundreds of VPCs across many accounts and on-premises networks with centrally managed, transitive routing. Which service is designed for this?",
+o:["VPC peering mesh","AWS Transit Gateway","Multiple Internet Gateways","Client VPN"],c:1,
+e:`<b>Transit Gateway</b> is the hub-and-spoke router for many VPCs + on-prem with transitive routing and central route tables. ✗ A peering mesh grows quadratically and isn't transitive. ✗ IGWs/Client VPN don't interconnect VPCs.`},
+
+{g:"s2-drill",id:"8.18",d:"drill",q:"Which is true about a Direct Connect connection's data in transit?",
+o:["It is encrypted automatically by AWS","It is private but NOT encrypted by default — add a VPN over it for encryption","It can only carry encrypted traffic","It uses TLS for all VIFs"],c:1,
+e:`Direct Connect is a <b>private</b> dedicated line but is <b>not encrypted</b>. For an encryption requirement, run an <b>IPsec Site-to-Site VPN over the DX link</b>. There is no automatic encryption and no TLS requirement on VIFs.`},
+
+{g:"s2-drill",id:"8.19",d:"drill",q:"What does a Direct Connect Gateway enable?",
+o:["Encryption of the Direct Connect link","One Direct Connect connection to reach VPCs in multiple Regions","Faster internet browsing from the VPC","Automatic NAT for private subnets"],c:1,
+e:`A <b>Direct Connect Gateway</b> lets a single DX connection associate with Virtual Private Gateways in <b>multiple Regions</b>, fanning out to VPCs globally. It doesn't add encryption, internet access, or NAT.`},
+
+{g:"s2-drill",id:"8.20",d:"drill",q:"A vendor wants to expose its application privately to many customer VPCs without VPC peering or exposing it to the internet. Which AWS technology fits?",
+o:["AWS PrivateLink (VPC endpoint service)","VPC peering with each customer","A public Application Load Balancer","An Internet Gateway with a NACL"],c:0,
+e:`<b>PrivateLink</b> lets a provider publish an <b>endpoint service</b>; consumers create interface endpoints (ENIs) into it — private, one-way, no peering or overlapping-CIDR worries. ✗ Peering with each customer doesn't scale and shares routes. ✗ A public ALB exposes it to the internet.`},
+
+{g:"s2-drill",id:"8.21",d:"drill",q:"Individual remote employees need secure access into VPC resources from their laptops. Which service is purpose-built?",
+o:["Site-to-Site VPN","AWS Client VPN","Direct Connect","VPC peering"],c:1,
+e:`<b>Client VPN</b> is managed OpenVPN-based <b>remote access for individual users/devices</b>. ✗ Site-to-Site VPN connects whole networks (a data center), not individual laptops. ✗ DX is a dedicated line. ✗ Peering connects VPCs.`},
+
+{g:"s2-drill",id:"8.22",d:"drill",q:"Which is a hard restriction of VPC peering?",
+o:["The two VPCs must be in the same account","The two VPCs must NOT have overlapping CIDR blocks","Peering only works within one AZ","Peering requires a Transit Gateway"],c:1,
+e:`Peered VPCs must have <b>non-overlapping CIDR blocks</b>. Peering works <b>across accounts and Regions</b>, isn't AZ-bound, and does not require a Transit Gateway (TGW is the alternative when peering won't scale).`},
+
+/* ====== S2 EXAM ====== */
+{g:"s2-exam",id:"8.23",d:"exam",tag:"win",q:"A company has a single Direct Connect connection terminating in us-east-1 and now needs that one connection to reach VPCs in us-east-1, us-west-2, and eu-west-1 without provisioning additional physical circuits. What enables this?",
+o:["VPC peering between all the VPCs across Regions","A Direct Connect Gateway associated with the Virtual Private Gateways in each Region","A separate Direct Connect connection in every Region","An Internet Gateway in each VPC"],c:1,
+e:`A <b>Direct Connect Gateway</b> lets one DX connection fan out to VPCs in <b>multiple Regions</b> via their VGWs — no extra circuits. ✗ Peering doesn't extend the DX link itself. ✗ A circuit per Region is the costly opposite of the requirement. ✗ IGWs add public internet, not private DX reach.`},
+
+{g:"s2-exam",id:"8.24",d:"exam",tag:"miss",q:"A company connected two VPCs with peering for an app-to-database flow. As the platform grew to 40+ VPCs across several accounts, managing the peering mesh became unmanageable and some teams couldn't reach shared services. They want centrally managed, transitive connectivity with the LEAST ongoing administration. What should they implement?",
+o:["A full mesh of VPC peering connections with documented route tables","A Transit Gateway in a central networking account, with each VPC attached and route tables controlling reachability","A transit VPC running self-managed EC2 routers","Client VPN between every pair of VPCs"],c:1,
+e:`A <b>Transit Gateway</b> hub gives <b>transitive</b>, centrally managed routing — each VPC attaches once, and TGW route tables decide who talks to whom. With 40+ VPCs the peering mesh is exactly the pain TGW solves. ✗ A documented mesh still scales quadratically and isn't transitive. ✗ A transit VPC reintroduces patching/sizing of EC2 routers. ✗ Client VPN is for users, not VPC interconnect.`},
+
+{g:"s2-exam",id:"8.25",d:"exam",q:"A new compliance rule requires all traffic between on-premises and AWS to be encrypted in transit. The company already has a Direct Connect link it wants to keep for its consistent low latency. What is the MOST operationally efficient way to meet the rule?",
+o:["Enable an 'encryption' setting on the Direct Connect connection","Run an IPsec Site-to-Site VPN over the existing Direct Connect link","Replace Direct Connect with an internet-based Site-to-Site VPN","Encrypt every payload in the application before sending"],c:1,
+e:`Direct Connect is private but <b>not encrypted</b>; layering a <b>Site-to-Site VPN over the DX link</b> gives private path <i>and</i> encryption while keeping the low-latency line. ✗ There is no DX 'encryption' toggle. ✗ Dropping DX for internet VPN loses the consistent latency they want to keep. ✗ App-level encryption is far more work and misses non-app traffic.<span class="flip"><span class="fl">flip it</span>If there were no encryption requirement and they only needed dedicated low latency, <b>Direct Connect alone</b> is enough.</span>`},
+
+{g:"s2-exam",id:"8.26",d:"exam",q:"A company needs a hybrid connection to AWS that must be highly available. They want a primary path with the most consistent performance and an automatic backup if the primary fails, accepting that the backup may be slower. What design fits best?",
+o:["A single Direct Connect connection only","A Direct Connect connection as primary with a Site-to-Site VPN as backup","Two internet-based Site-to-Site VPNs only","VPC peering to an on-prem network"],c:1,
+e:`The resilient, cost-aware hybrid pattern is <b>Direct Connect (primary, consistent) + Site-to-Site VPN (backup over the internet)</b> — if DX fails, traffic shifts to the VPN. ✗ A single DX has no backup path. ✗ Two VPNs lack DX's consistent performance. ✗ Peering doesn't connect on-prem.`},
+
+{g:"s2-exam",id:"8.27",d:"exam",q:"Two VPCs in the same Region must exchange roughly 500 GB of traffic per month between a handful of instances. The company wants the LOWEST-cost private connectivity and has no plans to add more VPCs. What should they use?",
+o:["A Transit Gateway connecting both VPCs","A VPC peering connection between the two VPCs","A Site-to-Site VPN between the VPCs","AWS PrivateLink endpoint services in both directions"],c:1,
+e:`For just <b>two</b> VPCs, <b>VPC peering</b> is the cheapest private path — no hourly attachment fee like a Transit Gateway, and same-Region peering data transfer is inexpensive. ✗ TGW adds per-attachment + per-GB processing cost, justified only at scale. ✗ A VPN is unnecessary overhead between VPCs. ✗ PrivateLink fits exposing a service, not general VPC-to-VPC traffic.<span class="flip"><span class="fl">flip it</span>Grow this to dozens of VPCs needing any-to-any and the answer flips to <b>Transit Gateway</b>.</span>`},
+
+{g:"s2-exam",id:"8.28",d:"exam",q:"An application in VPC A must make low-latency private calls to a database in VPC B in the same Region and account. There is no requirement to connect more VPCs. What is the simplest connectivity option?",
+o:["A VPC peering connection between A and B, with route tables and security groups updated","A NAT Gateway in each VPC","A public ALB in front of the database","An Internet Gateway in VPC B"],c:0,
+e:`For direct, low-latency, private traffic between <b>two</b> VPCs, a <b>peering connection</b> (plus route-table and SG updates) is the simplest fit. ✗ NAT/IGW/public-ALB all route via the internet or add public exposure — the opposite of private VPC-to-VPC.`},
+
+{g:"s2-exam",id:"8.29",d:"exam",q:"A company connects its corporate data center to AWS and also needs to grant a small set of roaming developers secure access to EC2 instances from anywhere. Which combination meets both needs?",
+o:["A Site-to-Site VPN for the data center network, and AWS Client VPN for the individual roaming developers","Two Site-to-Site VPNs","Two Client VPN endpoints","Direct Connect for both the data center and the developers"],c:0,
+e:`Two different shapes of access: a <b>Site-to-Site VPN</b> joins the <b>corporate network</b>, while <b>Client VPN</b> handles <b>individual roaming users</b>. ✗ Site-to-Site can't onboard individual laptops cleanly. ✗ Client VPN isn't meant to bond a whole site network. ✗ DX is a fixed physical line, not roaming access.`},
+
+/* ====== MIX 2 ====== */
+{g:"mix-2",id:"M2.1",d:"mixed",tag:"win",q:"A company needs an active-passive DR design where, on a Regional failure, traffic shifts to a second Region within minutes and the standby runs at minimal cost until needed. Which approach fits 'pilot light / warm standby' with managed DNS failover?",
+o:["Route 53 failover routing with health checks to a scaled-down standby stack in a second Region","Round-robin DNS across both Regions at all times","A single multi-AZ stack in one Region","Global Accelerator with caching enabled"],c:0,
+e:`<b>Route 53 failover routing + health checks</b> sends users to the standby Region when the primary's health check fails — pairs naturally with a scaled-down pilot-light/warm-standby stack. ✗ Round-robin always splits traffic (not active-passive). ✗ One Region can't survive a Regional failure. ✗ Global Accelerator has no caching mode.`},
+
+{g:"mix-2",id:"M2.2",d:"mixed",tag:"win",q:"A DynamoDB-backed app needs microsecond read latency for a read-intensive, eventually-consistent workload, with no application rewrite. What do you add?",
+o:["DynamoDB Accelerator (DAX)","A DynamoDB global table","A separate ElastiCache cluster the app must query directly","Provisioned capacity with Auto Scaling"],c:0,
+e:`<b>DAX</b> is the in-memory, microsecond cache built into the DynamoDB API path — drop-in, no rewrite. ✗ Global tables are for multi-Region active-active, not latency. ✗ Separate ElastiCache means rewriting the data path. ✗ Auto Scaling adjusts capacity, not latency.`},
+
+{g:"mix-2",id:"M2.3",d:"mixed",q:"Detect and alert whenever an SSH or RDP connection is established to instances in a VPC, with minimal custom code. What's the most direct approach?",
+o:["Publish VPC Flow Logs to CloudWatch Logs, add a metric filter for the ports, and alarm","Enable AWS Shield Advanced","Mirror all packets to a third-party IDS","Turn on S3 access logging"],c:0,
+e:`<b>VPC Flow Logs to CloudWatch Logs</b> + a <b>metric filter</b> for the SSH/RDP ports + a <b>CloudWatch alarm</b> is the low-code, AWS-native detection path. ✗ Shield is DDoS protection. ✗ Packet mirroring to an IDS is heavier than needed for a connection-establishment alert. ✗ S3 access logging is unrelated.`},
+
+{g:"mix-2",id:"M2.4",d:"mixed",q:"A serverless app (API Gateway + Lambda) keeps session data that should auto-expire after 24 hours with the least operations. What fits best?",
+o:["DynamoDB with a TTL attribute set to 24 hours","A self-managed Redis cluster","An RDS table with a cron cleanup job","Encrypted client-side cookies only"],c:0,
+e:`<b>DynamoDB with TTL</b> is serverless, fast, and auto-expires items — a natural pairing with Lambda. ✗ Redis adds a cluster to run. ✗ RDS + cron is heavier. ✗ Cookies hit size/security limits for real session data.`},
+
+/* ====== S3 DRILL ====== */
+{g:"s3-drill",id:"8.30",d:"drill",q:"Which AWS services can be reached through a GATEWAY VPC endpoint?",
+o:["Any AWS service","Only Amazon S3 and Amazon DynamoDB","Only EC2 and Lambda","Only services in the same AZ"],c:1,
+e:`Gateway endpoints exist for <b>only S3 and DynamoDB</b> — they're route-table entries and they're free. Every other service uses an <b>interface endpoint (PrivateLink)</b>.`},
+
+{g:"s3-drill",id:"8.31",d:"drill",q:"How is an INTERFACE VPC endpoint implemented in your VPC?",
+o:["As a route-table entry only","As an Elastic Network Interface (ENI) with a private IP in your subnet","As a NAT Gateway","As an Internet Gateway"],c:1,
+e:`An interface endpoint (PrivateLink) is an <b>ENI with a private IP</b> in your subnet — that's why it carries an hourly + data charge and can be reached over peering/VPN/DX. ✗ Route-table-only describes a gateway endpoint. ✗ NAT/IGW are internet egress, not endpoints.`},
+
+{g:"s3-drill",id:"8.32",d:"drill",q:"A private-subnet instance must call the Amazon SQS API with no internet path. Which endpoint type is required?",
+o:["A gateway endpoint","An interface endpoint (PrivateLink)","A NAT Gateway only","No endpoint — SQS is always private"],c:1,
+e:`SQS is not S3 or DynamoDB, so it needs an <b>interface endpoint (PrivateLink)</b> to be reached privately. ✗ Gateway endpoints only serve S3/DynamoDB. ✗ NAT would send traffic over the internet. ✗ SQS is a public-endpoint service unless you add PrivateLink.`},
+
+{g:"s3-drill",id:"8.33",d:"drill",q:"What do VPC Flow Logs capture?",
+o:["The full packet payload of every connection","IP traffic metadata (src/dst, ports, protocol, bytes, ACCEPT/REJECT)","Only DNS queries","Only traffic that is rejected"],c:1,
+e:`Flow Logs record <b>metadata</b> about IP traffic and both ACCEPT and REJECT decisions — not payloads (that's Traffic Mirroring) and not only rejected traffic.`},
+
+{g:"s3-drill",id:"8.34",d:"drill",q:"On-premises DNS servers must be able to resolve records in a Route 53 private hosted zone. Which Route 53 Resolver component do you create?",
+o:["An outbound Resolver endpoint","An inbound Resolver endpoint","A public hosted zone","A NAT Gateway"],c:1,
+e:`An <b>inbound endpoint</b> gives on-prem DNS a target IP to forward queries <em>into</em> AWS so they resolve private zones/resources. ✗ Outbound is for VPC→on-prem. ✗ A public hosted zone is internet-facing. ✗ NAT is unrelated to DNS.`},
+
+{g:"s3-drill",id:"8.35",d:"drill",q:"Instances in a VPC must resolve names hosted by on-premises DNS servers (e.g. corp.example.com). Which Route 53 Resolver component plus configuration is needed?",
+o:["An inbound endpoint","An outbound endpoint with forwarding rules to the on-prem DNS","A private hosted zone only","A gateway VPC endpoint"],c:1,
+e:`An <b>outbound endpoint</b> with <b>forwarding rules</b> sends VPC queries for on-prem domains <em>out</em> to your data-center DNS. ✗ Inbound is the reverse direction. ✗ A private hosted zone holds AWS-internal records, not on-prem domains. ✗ Gateway endpoints are for S3/DynamoDB, not DNS.`},
+
+/* ====== S3 EXAM ====== */
+{g:"s3-exam",id:"8.36",d:"exam",tag:"miss",q:"EC2 instances in private subnets store sensitive objects in Amazon S3. Security requires that S3 access take no internet path AND that the bucket be reachable only from this VPC. Which TWO actions together meet the requirement at no extra endpoint cost?",
+o:["Create a gateway VPC endpoint for S3 and add it to the private subnets' route tables","Add a bucket policy condition that allows access only via the VPC endpoint (aws:sourceVpce)","Create an interface VPC endpoint for S3 in each subnet","Route S3 traffic through a NAT Gateway per AZ","Make the bucket public and restrict by IP"],c:[0,1],multi:true,
+e:`Two moves: a <b>gateway endpoint for S3</b> keeps traffic on the AWS network with <b>no internet path and no endpoint charge</b>, and a <b>bucket policy scoped to <code>aws:sourceVpce</code></b> ensures only this VPC's endpoint can reach the bucket. ✗ An S3 interface endpoint works but adds hourly+data charges (it's for on-prem/cross-VPC reach). ✗ NAT incurs data-processing cost and uses the internet. ✗ A public bucket is the opposite of the requirement.<span class="flip"><span class="fl">flip it</span>If on-premises systems (over DX/VPN) needed private S3 access, you'd switch to an <b>interface endpoint</b>, since gateway endpoints aren't reachable from outside the VPC.</span>`},
+
+{g:"s3-exam",id:"8.37",d:"exam",tag:"miss",q:"A private-subnet application must call Amazon SQS, AWS KMS, and Secrets Manager entirely over the AWS network with no internet egress. The team also wants to remove the NAT Gateway these calls currently use. What is the correct approach?",
+o:["Create gateway endpoints for SQS, KMS, and Secrets Manager","Create interface endpoints (PrivateLink) for SQS, KMS, and Secrets Manager","Keep the NAT Gateway — these services require internet access","Use a single gateway endpoint that covers all three services"],c:1,
+e:`None of these are S3/DynamoDB, so each needs an <b>interface endpoint (PrivateLink)</b> — an ENI per service that keeps the API calls private and lets you drop the NAT Gateway for this traffic. ✗ Gateway endpoints don't exist for these services. ✗ They don't actually require the public internet once PrivateLink is in place. ✗ There's no multi-service gateway endpoint.`},
+
+{g:"s3-exam",id:"8.38",d:"exam",q:"A hybrid setup needs bidirectional DNS: VPC workloads must resolve on-premises private domains, AND on-premises hosts must resolve records in AWS private hosted zones. What should be configured?",
+o:["Only a public hosted zone","A Route 53 Resolver OUTBOUND endpoint with forwarding rules, plus an INBOUND endpoint","Only a Transit Gateway","Only a gateway VPC endpoint"],c:1,
+e:`Bidirectional hybrid DNS needs <b>both</b>: an <b>outbound endpoint + forwarding rules</b> (VPC→on-prem) and an <b>inbound endpoint</b> (on-prem→AWS). ✗ A public zone is internet DNS, not private hybrid. ✗ TGW/gateway endpoints don't resolve names.`},
+
+{g:"s3-exam",id:"8.39",d:"exam",q:"A security team wants to retain a record of all accepted and rejected IP traffic in several subnets for incident investigation and to store it cheaply for long-term analysis with Athena. Where should VPC Flow Logs be published?",
+o:["To Amazon S3 (then query with Athena)","To an EBS volume on a logging instance","To DynamoDB","To an SNS topic"],c:0,
+e:`Flow Logs can publish to <b>CloudWatch Logs or S3</b>; for cheap long-term retention and <b>Athena</b> querying, send them to <b>S3</b>. ✗ EBS-on-an-instance is self-managed and not a Flow Logs target. ✗ DynamoDB/SNS aren't Flow Logs destinations.`},
+
+{g:"s3-exam",id:"8.40",d:"exam",q:"An application owner needs to inspect the actual packet contents (payloads) of suspicious traffic flowing to a set of EC2 instances, feeding them to a third-party intrusion-detection appliance. Flow Logs aren't enough. What should they use?",
+o:["VPC Traffic Mirroring to the IDS appliance","VPC Flow Logs to CloudWatch","S3 access logging","CloudTrail data events"],c:0,
+e:`Payload-level inspection requires <b>VPC Traffic Mirroring</b>, which copies packets to a monitoring appliance. ✗ Flow Logs capture only metadata. ✗ S3 access logging and CloudTrail record API/object activity, not network packets.`},
+
+{g:"s3-exam",id:"8.41",d:"exam",tag:"win",q:"A global audience pulls large amounts of cacheable static HTTP content from an origin. The team wants both lower latency and fewer requests reaching the origin. What should they use?",
+o:["AWS Global Accelerator","Amazon CloudFront with the origin behind it","A gateway VPC endpoint","An interface VPC endpoint"],c:1,
+e:`Cacheable HTTP that should <b>offload the origin</b> = <b>CloudFront</b>, which caches at edge locations worldwide. ✗ Global Accelerator improves the network path but <b>does not cache</b>, so the origin still serves every request. ✗ VPC endpoints are for private AWS-service access, not global content delivery.<span class="flip"><span class="fl">flip it</span>Make the traffic non-HTTP (TCP/UDP) needing static anycast IPs and fast Regional failover, and the answer flips to <b>Global Accelerator</b>.</span>`},
+
+{g:"s3-exam",id:"8.42",d:"exam",tag:"win",q:"A latency-sensitive multiplayer game uses a custom UDP protocol with clients worldwide; they need the fastest network path to the nearest healthy Region and near-instant failover on fixed IPs. What should front the game servers?",
+o:["Amazon CloudFront","AWS Global Accelerator with endpoints in multiple Regions","Route 53 latency-based routing only","A single NLB in one Region"],c:1,
+e:`<b>Global Accelerator</b> routes TCP/UDP over the AWS backbone to the closest healthy Region with fast failover on <b>static anycast IPs</b> — ideal for real-time gaming. ✗ CloudFront is an HTTP cache, wrong for a custom UDP protocol. ✗ Route 53 latency routing fails over only as fast as DNS TTLs. ✗ One Region can't be 'nearest healthy' globally.`}
+
+];
+
+/* ---------------- RENDER ---------------- */
+const L=["A","B","C","D","E"];
+const state={}; // id -> {answered, correct}
+let total=BANK.length;
+
+/* ---------------- PERSISTENCE ----------------
+   One shared store for all 5 files, keyed by FILE_KEY.
+   Shape: { "file-1": { answers:{ "1.01":[0], ... }, scroll:1234 }, "file-2": {...}, ... } */
+const STORE_KEY="saa_c03_progress";
+const FILE_KEY="file-8";
+function loadStore(){ try{return JSON.parse(localStorage.getItem(STORE_KEY))||{};}catch(e){return {};} }
+function saveStore(s){ try{localStorage.setItem(STORE_KEY,JSON.stringify(s));}catch(e){} }
+function fileData(){ const s=loadStore(); return s[FILE_KEY]||{answers:{},scroll:0}; }
+function writeFileData(fd){ const s=loadStore(); s[FILE_KEY]=fd; saveStore(s); }
+function saveAnswer(id,picks){ const fd=fileData(); fd.answers=fd.answers||{}; fd.answers[id]=picks; writeFileData(fd); }
+function saveScroll(y){ const fd=fileData(); fd.scroll=y; writeFileData(fd); }
+function clearFile(){ const s=loadStore(); delete s[FILE_KEY]; saveStore(s); }
+const SAVED=fileData();
+
+function tagChip(t){
+  if(t==="miss") return '<span class="chip miss">↻ your miss</span>';
+  if(t==="win")  return '<span class="chip win">✓ lock it in</span>';
+  return "";
+}
+function diffChip(d,multi){
+  let base = d==="exam"?'<span class="chip exam">exam</span>'
+           : d==="mixed"?'<span class="chip mixed">mixed</span>'
+           : '<span class="chip drill">drill</span>';
+  if(multi) base += ' <span class="chip two">select two</span>';
+  return base;
+}
+
+BANK.forEach(item=>{
+  const host=document.getElementById(item.g);
+  if(!host)return;
+  const card=document.createElement("div");
+  card.className="q";
+  card.tabIndex=0;
+  card.dataset.id=item.id;
+  const correctArr = Array.isArray(item.c)?item.c:[item.c];
+  const multi = item.multi===true || correctArr.length>1;
+
+  card.innerHTML =
+    '<div class="qtop"><span class="qid">Q '+item.id+'</span>'+diffChip(item.d,multi)+tagChip(item.tag)+'</div>'+
+    '<div class="stem">'+item.q+'</div>'+
+    '<ul class="opts">'+item.o.map((t,i)=>
+      '<button class="opt" data-i="'+i+'"><span class="ltr">'+L[i]+'</span><span class="otext">'+t+'</span><span class="mark"></span></button>'
+    ).join('')+'</ul>'+
+    (multi?'<button class="checkbtn" disabled>Check answer</button>':'')+
+    '<div class="reveal"><div class="rv-inner"></div></div>';
+
+  host.appendChild(card);
+
+  const opts=[...card.querySelectorAll(".opt")];
+  const checkBtn=card.querySelector(".checkbtn");
+  const reveal=card.querySelector(".reveal");
+  const rvInner=card.querySelector(".rv-inner");
+  let locked=false;
+  let sel=new Set();
+
+  function settle(){
+    locked=true;
+    const userArr=[...sel];
+    const ok = userArr.length===correctArr.length && userArr.every(i=>correctArr.includes(i));
+    opts.forEach((b,i)=>{
+      b.disabled=true; b.classList.remove("sel");
+      const mark=b.querySelector(".mark");
+      if(correctArr.includes(i)){b.classList.add("correct");mark.textContent="✓ correct";}
+      else if(sel.has(i)){b.classList.add("wrong");mark.textContent="✗ your pick";}
+    });
+    if(checkBtn)checkBtn.style.display="none";
+    rvInner.innerHTML='<div class="verdict '+(ok?'r-ok':'r-no')+'">'+(ok?'Correct':'Not quite')+'</div>'+item.e;
+    reveal.classList.add("show");
+    state[item.id]={answered:true,correct:ok};
+    if(!window.__saaRestoring) saveAnswer(item.id,userArr);
+    updateHUD();
+  }
+
+  opts.forEach(b=>{
+    b.addEventListener("click",()=>{
+      if(locked)return;
+      const i=+b.dataset.i;
+      if(multi){
+        if(sel.has(i)){sel.delete(i);b.classList.remove("sel");}
+        else{sel.add(i);b.classList.add("sel");}
+        if(checkBtn)checkBtn.disabled = sel.size===0;
+      } else {
+        sel=new Set([i]); settle();
+      }
+    });
+  });
+  if(checkBtn)checkBtn.addEventListener("click",()=>{if(!locked&&sel.size)settle();});
+
+  // keyboard: 1-5 / a-e select; Enter checks (multi)
+  card.addEventListener("keydown",e=>{
+    if(locked)return;
+    let idx=-1;
+    if(e.key>="1"&&e.key<="5")idx=+e.key-1;
+    const lk=e.key.toLowerCase();
+    if(lk>="a"&&lk<="e")idx=lk.charCodeAt(0)-97;
+    if(idx>=0&&idx<opts.length){e.preventDefault();opts[idx].click();}
+    else if(e.key==="Enter"&&multi&&sel.size){e.preventDefault();settle();}
+  });
+});
+
+/* ---------------- HUD + SUMMARY ---------------- */
+document.getElementById("h-tot").textContent=total;
+function updateHUD(){
+  const answered=Object.keys(state).length;
+  const correct=Object.values(state).filter(s=>s.correct).length;
+  const pct = answered? Math.round(100*correct/answered):0;
+  document.getElementById("h-ans").textContent=answered;
+  document.getElementById("h-pct").textContent= answered? pct+"%":"—";
+  document.getElementById("h-bar").style.width=(100*answered/total)+"%";
+
+  const scP=document.getElementById("sc-pct");
+  const scL=document.getElementById("sc-line");
+  const scM=document.getElementById("sc-miss");
+  if(answered===0){scP.textContent="—";scL.textContent="Answer some questions and your readiness score appears here.";scM.innerHTML="";return;}
+  scP.textContent=pct+"%";
+  let verdict;
+  if(answered<total) verdict=correct+" / "+answered+" so far — "+(total-answered)+" left. The bar at the very top tracks your run.";
+  else if(pct>=80) verdict="Strong. 80%+ on a weakness-targeted set means these concepts are sticking. Move to File 9.";
+  else if(pct>=70) verdict="On the pass line for this set. Re-take the ones below, then File 9.";
+  else verdict="Below your target. Re-read the section boxes, redo the misses below, and run it again before moving on.";
+  scL.textContent=verdict;
+
+  const missed=Object.entries(state).filter(([k,v])=>!v.correct).map(([k])=>k);
+  scM.innerHTML = missed.length
+    ? "review: "+missed.map(id=>'<a href="#" onclick="jump(\''+id+'\');return false;">Q'+id+'</a>').join("")
+    : (answered===total?"clean sweep — nothing flagged.":"");
+}
+function jump(id){
+  const el=[...document.querySelectorAll(".q")].find(q=>q.dataset.id===id);
+  if(el){el.scrollIntoView({behavior:"smooth",block:"center"});el.focus({preventScroll:true});}
+}
+document.getElementById("h-reset").addEventListener("click",()=>{clearFile();location.reload()});
+updateHUD();
+
+/* ---------------- SMOOTH VIM PAGE SCROLLING ---------------- */
+const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+let lastG=0, rafId=null, targetY=window.scrollY;
+const help=document.getElementById("help");
+function toggleHelp(){help.classList.toggle("show");}
+function maxY(){ return Math.max(0, document.documentElement.scrollHeight - window.innerHeight); }
+function tick(){
+  const cur=window.scrollY, diff=targetY-cur;
+  if(Math.abs(diff)<0.6){ window.scrollTo(0,Math.round(targetY)); rafId=null; return; }
+  window.scrollTo(0, cur + diff*0.16);   // eased glide toward target
+  rafId=requestAnimationFrame(tick);
+}
+function glide(dy){
+  if(reduce){ window.scrollBy(0,dy); return; }
+  if(rafId===null) targetY=window.scrollY;
+  targetY=Math.max(0,Math.min(maxY(),targetY+dy));
+  if(rafId===null) rafId=requestAnimationFrame(tick);
+}
+function glideTo(y){
+  if(reduce){ window.scrollTo(0,y); return; }
+  targetY=Math.max(0,Math.min(maxY(),y));
+  if(rafId===null) rafId=requestAnimationFrame(tick);
+}
+["wheel","touchmove"].forEach(ev=>window.addEventListener(ev,()=>{ if(rafId){cancelAnimationFrame(rafId);rafId=null;} },{passive:true}));
+document.addEventListener("keydown",e=>{
+  const tag=(e.target.tagName||"").toLowerCase();
+  if(tag==="input"||tag==="textarea")return;
+  if(e.metaKey||e.ctrlKey||e.altKey)return;
+  if(e.key==="Escape"){help.classList.remove("show");return;}
+  if(e.key==="?"){e.preventDefault();toggleHelp();return;}
+  if(help.classList.contains("show"))return;
+  // 1-5 / a-e are handled per-card (when a card is focused); let them through
+  if((e.key>="1"&&e.key<="5") || (e.key.length===1 && e.key.toLowerCase()>="a" && e.key.toLowerCase()<="e")) return;
+  const vh=window.innerHeight;
+  switch(e.key){
+    case"j":e.preventDefault();glide(80);break;
+    case"k":e.preventDefault();glide(-80);break;
+    case"d":e.preventDefault();glide(vh*0.5);break;
+    case"u":e.preventDefault();glide(-vh*0.5);break;
+    case"f":e.preventDefault();glide(vh*0.9);break;
+    case"b":e.preventDefault();glide(-vh*0.9);break;
+    case"G":e.preventDefault();glideTo(maxY());break;
+    case"g":{const now=Date.now();if(now-lastG<500){e.preventDefault();glideTo(0);lastG=0;}else lastG=now;break;}
+  }
+});
+document.getElementById("h-help").addEventListener("click",toggleHelp);
+
+/* ---------------- RESTORE SAVED ANSWERS ----------------
+   Replay each saved answer by simulating the same option clicks the user made.
+   The __saaRestoring flag stops settle() from re-saving during replay. */
+function restoreAnswers(){
+  const answers=SAVED.answers||{};
+  window.__saaRestoring=true;
+  document.querySelectorAll(".q").forEach(card=>{
+    const picks=answers[card.dataset.id];
+    if(!Array.isArray(picks)||!picks.length)return;
+    const opts=[...card.querySelectorAll(".opt")];
+    picks.forEach(i=>{ if(opts[i])opts[i].click(); });          // single-select settles on the click
+    const checkBtn=card.querySelector(".checkbtn");             // multi-select needs the explicit check
+    if(checkBtn&&checkBtn.style.display!=="none")checkBtn.click();
+  });
+  window.__saaRestoring=false;
+}
+restoreAnswers();
+
+/* ---------------- SCROLL POSITION ---------------- */
+// restore scroll after the DOM (and replayed answers) are laid out
+if(SAVED.scroll){
+  const y=SAVED.scroll;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>window.scrollTo(0,y)));
+}
+// save scroll position, throttled
+let scrollTimer=null;
+window.addEventListener("scroll",()=>{
+  if(scrollTimer)return;
+  scrollTimer=setTimeout(()=>{scrollTimer=null;saveScroll(window.scrollY||window.pageYOffset||0);},250);
+},{passive:true});
+</script>
+</body>
+</html>
