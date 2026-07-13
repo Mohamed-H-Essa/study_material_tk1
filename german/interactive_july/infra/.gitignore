@@ -1,0 +1,10 @@
+# Secrets: real passwords / token secret live here, never committed.
+terraform.tfvars
+
+# Terraform working files
+.terraform/
+.terraform.lock.hcl
+lambda.zip
+
+# tfstate IS committed (per project decision), but not the backup churn:
+terraform.tfstate.backup

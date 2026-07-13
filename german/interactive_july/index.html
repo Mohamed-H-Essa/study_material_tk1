@@ -33,6 +33,11 @@ footer{margin-top:40px;color:#5a6070;font-size:13px}
 </head>
 <body>
 <div class="wrap">
+  <div style="float:right;font-size:13px;color:#8b93a7;text-align:right">
+    <span id="whoami"></span>
+    <span id="sync-pill" style="margin:0 8px;color:#6b7280" data-state="idle"></span>
+    <a href="#" id="logout" style="color:#8b93a7">log out</a>
+  </div>
   <h1>Deutsch lernen — Comprehensible Input</h1>
   <p class="sub">Watch the video, then train. Exercises repeat on purpose so you make the mistake a few times before it sticks. A short check-off quiz marks each one <span style="color:#16a34a">✓ done</span>.</p>
   <p class="legend">Legend: <span class="rainbow">rainbow words</span> = bonus vocab I added beyond the video · German text is tagged <code>lang="de"</code> so macOS right-click → Translate works.</p>
@@ -55,6 +60,14 @@ footer{margin-top:40px;color:#5a6070;font-size:13px}
   <footer>22 lessons + revision hub · fully offline (thumbnails need internet) · built for Mohamed</footer>
 </div>
 
+<script src="config.js"></script>
+<script>
+// ---- login gate: if not signed in, go to the login wrapper first ----
+if (!(localStorage.getItem('de.__user') && localStorage.getItem('de.__token'))) {
+  location.replace('login.html');
+}
+</script>
+<script src="sync.js"></script>
 <script>
 const VIDEOS = [
   {stage:1,n:1,file:"01_alphabet_pronunciation.html",id:"hAkxKMlYUI4",slug:"alphabet",title:"Alphabet & Pronunciation",de:"Das deutsche Alphabet",tag:"Letters · sounds · umlauts"},
@@ -105,6 +118,15 @@ for(const v of VIDEOS){
     </div>`;
   g.appendChild(a);
 }
+
+// ---- signed-in strip ----
+(function(){
+  var u = localStorage.getItem('de.__user');
+  var who = document.getElementById('whoami');
+  if (who && u) who.textContent = 'Signed in as ' + u.charAt(0).toUpperCase() + u.slice(1);
+  var out = document.getElementById('logout');
+  if (out) out.onclick = function(e){ e.preventDefault(); if(window.Sync){Sync.logout();} else {['de.__user','de.__token','de.__syncurl'].forEach(function(k){localStorage.removeItem(k);}); location.href='login.html';} };
+})();
 </script>
 </body>
 </html>

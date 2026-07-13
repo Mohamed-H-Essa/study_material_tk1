@@ -1,0 +1,7 @@
+{
+  "name": "german-study-sync",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Sync backend Lambda. @aws-sdk/client-s3 is provided by the Node.js 20 Lambda runtime, so no dependencies are bundled.",
+  "private": true
+}

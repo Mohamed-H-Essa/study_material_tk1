@@ -1,0 +1,10 @@
+# Copy to terraform.tfvars (gitignored) and fill in real values before `make apply`.
+# suffix makes S3 bucket names globally unique — use your AWS account id or initials.
+
+suffix       = "321209672840"
+region       = "eu-west-3"
+
+# Change these before real use.
+token_secret = "change-me-to-a-long-random-string"
+pw_mohamed   = "123"
+pw_mustafa   = "123"

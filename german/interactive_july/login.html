@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anmelden · Deutsch lernen</title>
+<link rel="stylesheet" href="_engine.css">
+<style>
+  body{display:flex;align-items:center;justify-content:center;min-height:100vh}
+  .login{max-width:360px;width:100%;padding:0 20px;text-align:center}
+  .login h1{font-size:26px;margin-bottom:4px}
+  .login .sub{color:#8b93a7;font-size:14px;margin-bottom:26px}
+  .who{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+  .who button{padding:14px;border-radius:10px;border:1px solid #2a2f3e;background:#0e1017;color:#dfe3ea;cursor:pointer;font-size:16px}
+  .who button.sel{border-color:#4a90d9;background:#141d2a;color:#7ec8e3}
+  .login input{width:100%;padding:13px 15px;background:#0e1017;border:1px solid #2a2f3e;border-radius:10px;color:#fff;font-size:16px;outline:none;margin-bottom:12px}
+  .login input:focus{border-color:#4a90d9}
+  .login .go{width:100%;padding:13px;border-radius:10px;border:1px solid #4a90d9;background:#4a90d9;color:#fff;font-size:16px;cursor:pointer}
+  .login .go:hover{background:#3a7bc8}
+  .login .go:disabled{opacity:.5;cursor:default}
+  .err{color:#f87171;font-size:14px;min-height:20px;margin-top:12px}
+  .note{color:#5a6070;font-size:12px;margin-top:22px;line-height:1.5}
+</style>
+</head>
+<body>
+<div class="login">
+  <h1>Deutsch lernen</h1>
+  <div class="sub">Comprehensible Input · sign in to sync your progress</div>
+
+  <div class="who" id="who">
+    <button data-user="mohamed">Mohamed</button>
+    <button data-user="mustafa">Mustafa</button>
+  </div>
+
+  <form id="form">
+    <input id="pass" type="password" placeholder="Password" autocomplete="current-password" inputmode="numeric">
+    <button class="go" id="go" type="submit" disabled>Sign in →</button>
+  </form>
+  <div class="err" id="err"></div>
+
+  <div class="note">
+    Two users only. Progress syncs across your devices.<br>
+    If sync is offline you can still study — it'll catch up later.
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script>
+(function(){
+  var SYNC_URL = (window.DE_CONFIG && window.DE_CONFIG.SYNC_URL) || '';
+  var chosen = null;
+  var whoEls = document.querySelectorAll('#who button');
+  var go = document.getElementById('go');
+  var err = document.getElementById('err');
+  var pass = document.getElementById('pass');
+
+  // If already logged in, skip straight to the hub.
+  if (localStorage.getItem('de.__user') && localStorage.getItem('de.__token')) {
+    location.replace('index.html');
+  }
+
+  whoEls.forEach(function(b){
+    b.addEventListener('click', function(){
+      whoEls.forEach(function(x){x.classList.remove('sel');});
+      b.classList.add('sel'); chosen = b.dataset.user; go.disabled = false; pass.focus();
+    });
+  });
+
+  function finish(user, token){
+    localStorage.setItem('de.__user', user);
+    localStorage.setItem('de.__token', token);
+    localStorage.setItem('de.__syncurl', SYNC_URL);
+    location.replace('index.html');
+  }
+
+  document.getElementById('form').addEventListener('submit', function(e){
+    e.preventDefault();
+    err.textContent = '';
+    if (!chosen) { err.textContent = 'Pick a user first.'; return; }
+
+    // No backend configured → local-only login (gate still separates the two profiles).
+    if (!SYNC_URL) {
+      // Accept the default password locally so the app is usable before/without deploy.
+      if (pass.value === '123') { finish(chosen, 'local'); }
+      else { err.textContent = 'Wrong password. (Local mode expects the default.)'; }
+      return;
+    }
+
+    go.disabled = true; go.textContent = 'Checking…';
+    fetch(SYNC_URL, {
+      method:'POST', headers:{'content-type':'application/json'},
+      body: JSON.stringify({action:'login', user:chosen, pass:pass.value})
+    })
+    .then(function(r){return r.json();})
+    .then(function(res){
+      if (res && res.ok) { finish(res.user, res.token); }
+      else { err.textContent = (res && res.error) || 'Login failed.'; go.disabled=false; go.textContent='Sign in →'; }
+    })
+    .catch(function(){ err.textContent = 'Network error — try again.'; go.disabled=false; go.textContent='Sign in →'; });
+  });
+})();
+</script>
+</body>
+</html>

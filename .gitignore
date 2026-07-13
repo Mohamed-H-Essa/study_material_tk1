@@ -1,3 +1,9 @@
 # macOS Finder metadata — ignored everywhere in the repo
 .DS_Store
 **/.DS_Store
+german/_aws_backup_20260713/
+german/interactive_july/infra/terraform.tfstate
+german/interactive_july/infra/terraform.tfstate.backup
+german/interactive_july/infra/terraform.tfvars
+german/interactive_july/infra/.terraform/
+german/interactive_july/infra/lambda.zip
