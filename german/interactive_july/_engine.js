@@ -225,5 +225,10 @@ const Engine = (() => {
       else if(e.key==='g'){ if(g){window.scrollTo({top:0,behavior:'smooth'});g=0;}else{g=1;setTimeout(()=>g=0,400);} }
     });
   }
-  return {init};
+  // Public helper so the Revision hub can bundle every deck into one Anki file.
+  function exportAll(deckName, cards){ exportTSV(deckName, cards); }
+  // Standalone trainer/checkoff mounts for pages that build their own config (e.g. revision.html)
+  function mountTrainer(mount, cfg){ trainer(mount, cfg); }
+
+  return {init, exportAll, mountTrainer};
 })();

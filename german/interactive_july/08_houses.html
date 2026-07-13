@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>8 · The Three Houses</title>
+<link rel="stylesheet" href="_engine.css">
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav">
+  <a href="index.html">☰ Hub</a>
+  <a href="07_photo_scene.html">← Photo</a>
+  <span class="spacer"></span>
+  <a href="09_child_dog.html">Child & Dog →</a>
+</div>
+
+<a class="videowrap" href="https://www.youtube.com/watch?v=zjSNHlrBOII" target="_blank" rel="noopener">
+  <img src="https://img.youtube.com/vi/zjSNHlrBOII/hqdefault.jpg" alt="Three coloured houses in German">
+  <span class="play"></span>
+</a>
+<div class="watchline">▶ Tap to watch · <span lang="de">Total Beginner German — Die Häuser</span></div>
+
+<h1>8 · <span class="de" lang="de">Die drei Häuser</span></h1>
+<p class="lead">Three coloured houses: roof, chimney, windows, sky — and the position word <span lang="de">zwischen … und …</span> (between). Lots of yes/no answers to train <span lang="de">ja / nein</span>.</p>
+<span class="rainbow-note"><span class="rainbow">rainbow</span> = bonus beyond the video</span>
+
+<h2><span class="step">🔁 Revision</span>From earlier lessons</h2>
+<div id="trainer-revision"></div>
+
+<h2><span class="step">Vocabulary</span>The houses</h2>
+<table class="vocab">
+<tr><td class="art">das</td><td class="w" lang="de">Haus · die Häuser</td><td class="m">house · houses</td></tr>
+<tr><td class="art">das</td><td class="w" lang="de">Dach · die Dächer</td><td class="m">roof · roofs</td></tr>
+<tr><td class="art">der</td><td class="w" lang="de">Schornstein</td><td class="m">chimney</td></tr>
+<tr><td class="art">der</td><td class="w" lang="de">Rauch</td><td class="m">smoke</td></tr>
+<tr><td class="art">das</td><td class="w" lang="de">Fenster · die Fenster</td><td class="m">window · windows (no plural change)</td></tr>
+<tr><td class="art">der</td><td class="w" lang="de">Himmel</td><td class="m">sky</td></tr>
+<tr><td class="art">—</td><td class="w" lang="de">rosa · gelb · blau</td><td class="m">pink · yellow · blue</td></tr>
+<tr><td class="art">—</td><td class="w" lang="de">oben / unten</td><td class="m">top / bottom · up / down</td></tr>
+<tr><td class="art">—</td><td class="w" lang="de">links / rechts</td><td class="m">left / right</td></tr>
+</table>
+<div class="tip"><b>Between — <span lang="de">zwischen … und …</span></b> takes the dative: <span lang="de">Das gelbe Haus steht <b>zwischen dem</b> rosa Haus <b>und dem</b> blauen Haus.</span> In one word: <span lang="de">es steht <b>dazwischen</b></span> (in between).</div>
+<div class="tip"><b>Where on the roof:</b> <span lang="de">Das Dach ist <b>oben</b> auf dem Haus.</span> = The roof is on top of the house. <span lang="de">Aus dem Schornstein kommt Rauch.</span> = Smoke comes out of the chimney.</div>
+
+<h2><span class="step">Anki</span>House vocab</h2>
+<div id="anki-mount"></div>
+
+<h2><span class="step">Training · long</span>Which article? (mind the plurals)</h2>
+<div id="trainer-artikel"></div>
+
+<h2><span class="step">Training · long</span>Position: zwischen · oben · links/rechts</h2>
+<div id="trainer-position"></div>
+
+<h2><span class="step">Training</span>Name it in German</h2>
+<div id="trainer-produce"></div>
+
+<div id="checkoff-mount"></div>
+
+<div class="topnav" style="margin-top:40px">
+  <a href="index.html">☰ Hub</a>
+  <a href="07_photo_scene.html">← Photo</a>
+  <span class="spacer"></span>
+  <a href="09_child_dog.html">Next: Child & Dog →</a>
+</div>
+</div>
+
+<script src="_engine.js"></script>
+<script>
+window.PAGE = {
+  slug:"houses",
+  ankiDeck:"DE · Die Häuser",
+  anki:[
+    {f:"das Haus → die Häuser", b:"house → houses"},
+    {f:"das Dach → die Dächer", b:"roof → roofs", ex:"Jedes Haus hat ein Dach."},
+    {f:"der Schornstein", b:"the chimney", ex:"Aus dem Schornstein kommt Rauch."},
+    {f:"der Rauch", b:"the smoke"},
+    {f:"das Fenster → die Fenster", b:"window → windows (no change)"},
+    {f:"der Himmel", b:"the sky", ex:"Der Himmel ist blau."},
+    {f:"oben ⇄ unten", b:"top ⇄ bottom / up ⇄ down"},
+    {f:"links ⇄ rechts", b:"left ⇄ right"},
+    {f:"zwischen … und …", b:"between … and … (+ dative)"},
+    {f:"dazwischen", b:"in between (the two)"},
+    {f:"rosa", b:"pink"},
+    {f:"gelb", b:"yellow"},
+    {f:"blau", b:"blue"}
+  ],
+  trainers:[
+    {id:"revision", title:"Warm-up from earlier lessons", kind:"Revision", repeat:1, items:[
+      {type:"mc", q:"___ <b lang='de'>Katze</b> (from the cat video)", opts:["die","der","das"], answer:"die", why:"die Katze."},
+      {type:"mc", q:"'made of wood' =", opts:["aus Holz","von Holz","mit Holz"], answer:"aus Holz", why:"aus + material. From the cat/table video."},
+      {type:"mc", q:"opposite of <b lang='de'>dick</b> (thick):", opts:["dünn","hart","eckig"], answer:"dünn", why:"dick ⇄ dünn. From the photo video."},
+      {type:"type", q:"Type the German for <b>the table</b> (with article).", answer:["der Tisch"], why:"der Tisch."}
+    ]},
+    {id:"artikel", title:"der, die or das?", kind:"Gender & plural drill", repeat:2, items:[
+      {type:"mc", q:"___ <b lang='de'>Haus</b>", opts:["das","der","die"], answer:"das", why:"das Haus. Plural: die Häuser."},
+      {type:"mc", q:"___ <b lang='de'>Dach</b>", opts:["das","der","die"], answer:"das", why:"das Dach. Plural: die Dächer."},
+      {type:"mc", q:"___ <b lang='de'>Schornstein</b>", opts:["der","die","das"], answer:"der", why:"der Stein → der Schornstein."},
+      {type:"mc", q:"___ <b lang='de'>Fenster</b>", opts:["das","der","die"], answer:"das", why:"das Fenster — neuter -er. Plural unchanged."},
+      {type:"mc", q:"___ <b lang='de'>Himmel</b>", opts:["der","die","das"], answer:"der", why:"der Himmel — masculine -el."},
+      {type:"mc", q:"___ <b lang='de'>Rauch</b>", opts:["der","die","das"], answer:"der", why:"der Rauch — masculine."},
+      {type:"mc", q:"plural of <b lang='de'>das Haus</b>:", opts:["die Häuser","die Hause","die Häusen"], answer:"die Häuser", why:"das Haus → die Häuser (umlaut + -er)."},
+      {type:"mc", q:"plural of <b lang='de'>das Dach</b>:", opts:["die Dächer","die Dache","die Dächen"], answer:"die Dächer", why:"das Dach → die Dächer."}
+    ]},
+    {id:"position", title:"Where is it?", kind:"Position words", repeat:2, items:[
+      {type:"mc", q:"The yellow house is ___ the pink and the blue one: <b lang='de'>___ dem rosa Haus und dem blauen Haus</b>", opts:["zwischen","neben","über","unter"], answer:"zwischen", why:"zwischen … und … = between … and …"},
+      {type:"mc", q:"In one word — it stands in between: <b lang='de'>Es steht ___.</b>", opts:["dazwischen","daneben","darüber","darunter"], answer:"dazwischen", why:"dazwischen = in between (the two)."},
+      {type:"mc", q:"The roof is ___ the house: <b lang='de'>Das Dach ist ___ auf dem Haus.</b>", opts:["oben","unten","links","rechts"], answer:"oben", why:"oben = on top. unten = bottom."},
+      {type:"mc", q:"The pink house is on the ___ side: <b lang='de'>auf der ___ Seite</b>", opts:["linken","rechten","oberen","unteren"], answer:"linken", why:"links → auf der linken Seite (on the left side)."},
+      {type:"mc", q:"Smoke comes ___ the chimney: <b lang='de'>___ dem Schornstein kommt Rauch.</b>", opts:["Aus","In","Auf","Über"], answer:"Aus", why:"aus = out of. aus dem Schornstein."},
+      {type:"mc", q:"Is the sky at the top or bottom? <b lang='de'>Der Himmel ist ___.</b>", opts:["oben","unten"], answer:"oben", why:"Der Himmel ist oben im Bild."}
+    ]},
+    {id:"produce", title:"Say it in German", kind:"Production (type it)", repeat:1, items:[
+      {type:"type", q:"Type the German for <b>the roof</b> (with article).", answer:["das Dach"], why:"das Dach."},
+      {type:"type", q:"Type the German for <b>the chimney</b> (with article).", answer:["der Schornstein"], why:"der Schornstein."},
+      {type:"type", q:"Type the German for <b>the window</b> (with article).", answer:["das Fenster"], why:"das Fenster."},
+      {type:"type", q:"Type the German for <b>the sky</b> (with article).", answer:["der Himmel"], why:"der Himmel."},
+      {type:"type", q:"'between … and …' →", answer:["zwischen und","zwischen … und …","zwischen ... und ..."], why:"zwischen … und …"},
+      {type:"type", q:"plural: <b>the houses</b> →", answer:["die Häuser"], why:"die Häuser."}
+    ]}
+  ],
+  checkoff:{ title:"Houses check", pass:0.8, intro:"7 quick ones, mixed. Pass to mark ✓ on the hub.", items:[
+    {type:"mc", q:"___ <b lang='de'>Haus</b>", opts:["das","der","die"], answer:"das", why:"das Haus."},
+    {type:"mc", q:"___ <b lang='de'>Dach</b>", opts:["das","der","die"], answer:"das", why:"das Dach."},
+    {type:"mc", q:"___ <b lang='de'>Schornstein</b>", opts:["der","die","das"], answer:"der", why:"der Schornstein."},
+    {type:"mc", q:"between … and … =", opts:["zwischen … und …","neben … und …","über … und …"], answer:"zwischen … und …", why:"zwischen … und …"},
+    {type:"type", q:"Type: <b>the sky</b> (with article)", answer:["der Himmel"], why:"der Himmel."},
+    {type:"mc", q:"plural of <b lang='de'>das Dach</b>:", opts:["die Dächer","die Dache"], answer:"die Dächer", why:"die Dächer."},
+    {type:"mc", q:"Smoke = <b lang='de'>der ___</b>", opts:["Rauch","Himmel","Schornstein"], answer:"Rauch", why:"der Rauch."}
+  ]}
+};
+Engine.init();
+</script>
+</body>
+</html>

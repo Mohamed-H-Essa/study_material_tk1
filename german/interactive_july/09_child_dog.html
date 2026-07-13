@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>9 · Child, Dog & Flower</title>
+<link rel="stylesheet" href="_engine.css">
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav">
+  <a href="index.html">☰ Hub</a>
+  <a href="08_houses.html">← Houses</a>
+  <span class="spacer"></span>
+  <a href="10_living_room.html">Living room →</a>
+</div>
+
+<a class="videowrap" href="https://www.youtube.com/watch?v=pew42Zq8y1E" target="_blank" rel="noopener">
+  <img src="https://img.youtube.com/vi/pew42Zq8y1E/hqdefault.jpg" alt="A child, a dog and a flower in German">
+  <span class="play"></span>
+</a>
+<div class="watchline">▶ Tap to watch · <span lang="de">Learn GERMAN super easy — Das Kind und der Hund</span></div>
+
+<h1>9 · <span class="de" lang="de">Das Kind und der Hund</span></h1>
+<p class="lead">A child, a dog with a hat, a flower in a glass, a cloud raining down. This is the <b>über / unter</b> scene — the whole point is saying what is <i>above</i> and <i>below</i> what.</p>
+<span class="rainbow-note"><span class="rainbow">rainbow</span> = bonus beyond the video</span>
+
+<h2><span class="step">🔁 Revision</span>From earlier lessons</h2>
+<div id="trainer-revision"></div>
+
+<h2><span class="step">Vocabulary</span>The scene</h2>
+<table class="vocab">
+<tr><td class="art">das</td><td class="w" lang="de">Kind</td><td class="m">child</td></tr>
+<tr><td class="art">der</td><td class="w" lang="de">Hund</td><td class="m">dog</td></tr>
+<tr><td class="art">der</td><td class="w" lang="de">Hut</td><td class="m">hat</td></tr>
+<tr><td class="art">das</td><td class="w" lang="de">Glas</td><td class="m">glass</td></tr>
+<tr><td class="art">das</td><td class="w" lang="de">Wasser</td><td class="m">water</td></tr>
+<tr><td class="art">die</td><td class="w" lang="de">Blume</td><td class="m">flower</td></tr>
+<tr><td class="art">das</td><td class="w" lang="de">Blatt · die Blätter</td><td class="m">leaf · leaves</td></tr>
+<tr><td class="art">die</td><td class="w" lang="de">Wolke</td><td class="m">cloud</td></tr>
+<tr><td class="art">der</td><td class="w" lang="de">Regen</td><td class="m">rain</td></tr>
+</table>
+<div class="tip"><b>über / unter</b> — above &amp; below. With position (<span lang="de">wo?</span>) both take the <b>dative</b>: <span lang="de">Die Wolke ist <b>über der</b> Blume.</span> (above the flower) · <span lang="de">Die Blume ist <b>unter der</b> Wolke.</span> (below the cloud).</div>
+<div class="tip"><b>Verbs:</b> <span lang="de">anschauen</span> (look at — <span lang="de">das Kind schaut die Blume an</span>), <span lang="de">schweben</span> (float/hover — <span lang="de">die Wolke schwebt</span>), <span lang="de">fallen</span> (fall — <span lang="de">Regen fällt auf die Blume</span>). <span class="rainbow"><span lang="de">beantworten</span> = to answer (a question).</span></div>
+
+<h2><span class="step">Anki</span>Scene vocab</h2>
+<div id="anki-mount"></div>
+
+<h2><span class="step">Training · long</span>Which article? der / die / das</h2>
+<div id="trainer-artikel"></div>
+
+<h2><span class="step">Training · long</span>über / unter — above &amp; below</h2>
+<div id="trainer-position"></div>
+
+<h2><span class="step">Training</span>Name it in German</h2>
+<div id="trainer-produce"></div>
+
+<div id="checkoff-mount"></div>
+
+<div class="topnav" style="margin-top:40px">
+  <a href="index.html">☰ Hub</a>
+  <a href="08_houses.html">← Houses</a>
+  <span class="spacer"></span>
+  <a href="10_living_room.html">Next: Living room →</a>
+</div>
+</div>
+
+<script src="_engine.js"></script>
+<script>
+window.PAGE = {
+  slug:"childdog",
+  ankiDeck:"DE · Kind, Hund & Blume",
+  anki:[
+    {f:"das Kind", b:"the child"},
+    {f:"der Hund", b:"the dog", ex:"Der Hund hat einen Hut auf."},
+    {f:"der Hut", b:"the hat"},
+    {f:"das Glas", b:"the glass", ex:"In dem Glas ist Wasser."},
+    {f:"die Blume", b:"the flower", ex:"Die Blume steht im Glas."},
+    {f:"das Blatt → die Blätter", b:"leaf → leaves", ex:"Die Blume hat zwei Blätter."},
+    {f:"die Wolke", b:"the cloud", ex:"Die Wolke schwebt über der Blume."},
+    {f:"der Regen", b:"the rain", ex:"Aus der Wolke fällt Regen."},
+    {f:"über (+ Dativ)", b:"above / over", ex:"über der Blume"},
+    {f:"unter (+ Dativ)", b:"below / under", ex:"unter der Wolke"},
+    {f:"anschauen", b:"to look at", ex:"Das Kind schaut die Blume an."},
+    {f:"schweben", b:"to float / hover"},
+    {f:"fallen", b:"to fall"}
+  ],
+  trainers:[
+    {id:"revision", title:"Warm-up from earlier lessons", kind:"Revision", repeat:1, items:[
+      {type:"mc", q:"The yellow house stands ___ the others (between):", opts:["zwischen","über","unter"], answer:"zwischen", why:"zwischen … und … From the houses video."},
+      {type:"mc", q:"___ <b lang='de'>Fenster</b> (window)", opts:["das","der","die"], answer:"das", why:"das Fenster."},
+      {type:"mc", q:"opposite of <b lang='de'>oben</b>:", opts:["unten","links","rechts"], answer:"unten", why:"oben ⇄ unten."},
+      {type:"type", q:"Type the German for <b>the roof</b> (with article).", answer:["das Dach"], why:"das Dach."}
+    ]},
+    {id:"artikel", title:"der, die or das?", kind:"Gender drill", repeat:2, items:[
+      {type:"mc", q:"___ <b lang='de'>Kind</b>", opts:["das","der","die"], answer:"das", why:"das Kind — neuter."},
+      {type:"mc", q:"___ <b lang='de'>Hund</b>", opts:["der","die","das"], answer:"der", why:"der Hund — masculine."},
+      {type:"mc", q:"___ <b lang='de'>Hut</b>", opts:["der","die","das"], answer:"der", why:"der Hut — masculine."},
+      {type:"mc", q:"___ <b lang='de'>Glas</b>", opts:["das","der","die"], answer:"das", why:"das Glas — neuter."},
+      {type:"mc", q:"___ <b lang='de'>Blume</b>", opts:["die","der","das"], answer:"die", why:"die Blume — feminine -e."},
+      {type:"mc", q:"___ <b lang='de'>Wolke</b>", opts:["die","der","das"], answer:"die", why:"die Wolke — feminine -e."},
+      {type:"mc", q:"___ <b lang='de'>Blatt</b>", opts:["das","der","die"], answer:"das", why:"das Blatt — neuter. Plural: die Blätter."},
+      {type:"mc", q:"___ <b lang='de'>Regen</b>", opts:["der","die","das"], answer:"der", why:"der Regen — masculine."}
+    ]},
+    {id:"position", title:"Above & below", kind:"über / unter (+ Dativ)", repeat:2, items:[
+      {type:"mc", q:"The cloud is ___ the flower: <b lang='de'>Die Wolke ist ___ der Blume.</b>", opts:["über","unter","neben","zwischen"], answer:"über", why:"über = above."},
+      {type:"mc", q:"The flower is ___ the cloud: <b lang='de'>Die Blume ist ___ der Wolke.</b>", opts:["unter","über","auf","in"], answer:"unter", why:"unter = below/under."},
+      {type:"mc", q:"über + the flower (feminine, dative): <b lang='de'>über ___ Blume</b>", opts:["der","die","dem","das"], answer:"der", why:"über + Dativ; feminine dative = der. über der Blume."},
+      {type:"mc", q:"The rain falls ___ the flower: <b lang='de'>Der Regen fällt ___ die Blume.</b>", opts:["auf","über","unter","aus"], answer:"auf", why:"auf = onto (motion). fällt auf die Blume."},
+      {type:"mc", q:"The water is ___ the glass: <b lang='de'>In dem Glas ___ Wasser.</b>", opts:["ist","hat","steht","liegt"], answer:"ist", why:"In dem Glas ist Wasser."},
+      {type:"mc", q:"The dog sits ___ the child: <b lang='de'>Der Hund sitzt ___ dem Kind.</b>", opts:["neben","über","unter","in"], answer:"neben", why:"neben = next to."},
+      {type:"mc", q:"What is on the dog's head?", opts:["ein Hut","eine Wolke","eine Blume"], answer:"ein Hut", why:"Der Hund hat einen Hut auf."}
+    ]},
+    {id:"produce", title:"Say it in German", kind:"Production (type it)", repeat:1, items:[
+      {type:"type", q:"Type the German for <b>the child</b> (with article).", answer:["das Kind"], why:"das Kind."},
+      {type:"type", q:"Type the German for <b>the dog</b> (with article).", answer:["der Hund"], why:"der Hund."},
+      {type:"type", q:"Type the German for <b>the cloud</b> (with article).", answer:["die Wolke"], why:"die Wolke."},
+      {type:"type", q:"'above the flower' → <b lang='de'>___ der Blume</b>", answer:["über"], why:"über der Blume."},
+      {type:"type", q:"'below the cloud' → <b lang='de'>___ der Wolke</b>", answer:["unter"], why:"unter der Wolke."},
+      {type:"type", q:"plural: <b>the leaves</b> →", answer:["die Blätter"], why:"das Blatt → die Blätter."}
+    ]}
+  ],
+  checkoff:{ title:"Child & dog check", pass:0.8, intro:"7 quick ones, mixed. Pass to mark ✓ on the hub.", items:[
+    {type:"mc", q:"___ <b lang='de'>Kind</b>", opts:["das","der","die"], answer:"das", why:"das Kind."},
+    {type:"mc", q:"___ <b lang='de'>Hund</b>", opts:["der","die","das"], answer:"der", why:"der Hund."},
+    {type:"mc", q:"The cloud is ___ the flower.", opts:["über","unter","neben"], answer:"über", why:"über = above."},
+    {type:"mc", q:"The flower is ___ the cloud.", opts:["unter","über","auf"], answer:"unter", why:"unter = below."},
+    {type:"type", q:"Type: <b>the cloud</b> (with article)", answer:["die Wolke"], why:"die Wolke."},
+    {type:"mc", q:"rain = <b lang='de'>der ___</b>", opts:["Regen","Wolke","Himmel"], answer:"Regen", why:"der Regen."},
+    {type:"mc", q:"plural of <b lang='de'>das Blatt</b>:", opts:["die Blätter","die Blatte"], answer:"die Blätter", why:"die Blätter."}
+  ]}
+};
+Engine.init();
+</script>
+</body>
+</html>
