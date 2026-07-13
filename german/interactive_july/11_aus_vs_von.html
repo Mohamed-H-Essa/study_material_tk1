@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>11 · aus vs. von</title>
+<link rel="stylesheet" href="_engine.css">
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav">
+  <a href="index.html">☰ Hub</a>
+  <a href="10_prepositions_an_auf_in.html">← Prepositions</a>
+  <span class="spacer"></span>
+  <a href="12_introduce_yourself.html">Introduce yourself →</a>
+</div>
+
+<a class="videowrap" href="https://www.youtube.com/watch?v=iog_s5I6idA" target="_blank" rel="noopener">
+  <img src="https://img.youtube.com/vi/iog_s5I6idA/hqdefault.jpg" alt="When to use aus vs von">
+  <span class="play"></span>
+</a>
+<div class="watchline">▶ Tap to watch · <span lang="de">When to Use 'aus' vs. 'von' — Super Easy German 204</span></div>
+
+<h1>11 · <span class="de" lang="de">aus oder von?</span></h1>
+<p class="lead">Both answer "where from?" and both take the Dativ — but they emphasise different things. Here's the decision tree.</p>
+<span class="rainbow-note"><span class="rainbow">rainbow</span> = bonus beyond the video</span>
+
+<h2><span class="step">Decision tree</span></h2>
+<div class="tip"><b>aus</b> = leaving an <b>enclosed space</b> or a <b>country/city</b>.
+<br><span lang="de">Ich komme <b>aus</b> dem Supermarkt.</span> · <span lang="de">Ich komme <b>aus</b> Polen.</span> · <span lang="de">aus dem Wald / aus der Dusche</span></div>
+<div class="tip"><b>von</b> = coming from a <b>point without walls</b>, or from a <b>person / institution / event</b>.
+<br><span lang="de">Ich komme <b>von</b> der Bushaltestelle.</span> · <span lang="de">Ich komme <b>vom</b> Arzt.</span> · <span lang="de">vom Konzert / vom Dach / vom Strand</span></div>
+<div class="warn"><b>Countries & cities: always <span lang="de">aus</span>, never <span lang="de">von</span>.</b> <span lang="de">Ich komme aus Berlin / aus den USA / aus Kairo.</span></div>
+<div class="warn"><b>People / institutions / events: always <span lang="de">von</span>.</b> <span lang="de">Ich komme vom Arzt / von der Physiotherapie / von Manuel.</span></div>
+<div class="tip"><b>Sometimes both work</b>, with different emphasis: <span lang="de">aus dem Supermarkt</span> (the building I left) vs <span lang="de">vom Supermarkt</span> (the shop/errand). · Contraction: <span lang="de">von + dem = vom</span>.</div>
+
+<h2><span class="step">Anki</span>aus / von rules</h2>
+<div id="anki-mount"></div>
+
+<h2><span class="step">Training · long</span>aus or von?</h2>
+<p class="lead">Many cases, repeated. Wrong answers give the rule.</p>
+<div id="trainer-choose"></div>
+
+<h2><span class="step">Training</span>Fill the gap (with contractions)</h2>
+<div id="trainer-fill"></div>
+
+<div id="checkoff-mount"></div>
+
+<div class="topnav" style="margin-top:40px">
+  <a href="index.html">☰ Hub</a>
+  <a href="10_prepositions_an_auf_in.html">← Prepositions</a>
+  <span class="spacer"></span>
+  <a href="12_introduce_yourself.html">Next: Introduce yourself →</a>
+</div>
+</div>
+
+<script src="_engine.js"></script>
+<script>
+window.PAGE = {
+  slug:"ausvon",
+  ankiDeck:"DE · aus vs von",
+  anki:[
+    {f:"aus (rule)", b:"leaving an enclosed space", ex:"aus dem Supermarkt, aus dem Wald"},
+    {f:"von (rule)", b:"from an open point OR a person/institution/event", ex:"von der Bushaltestelle, vom Arzt"},
+    {f:"countries & cities →", b:"always aus", ex:"aus Berlin, aus den USA"},
+    {f:"people / institutions / events →", b:"always von", ex:"vom Arzt, vom Konzert"},
+    {f:"aus dem Park", b:"from the park (enclosed) → aus"},
+    {f:"von der Bushaltestelle", b:"from the bus stop (open point) → von"},
+    {f:"vom Dach / vom Strand", b:"from the roof / beach (open) → von"},
+    {f:"von + dem =", b:"vom"},
+    {f:"both aus & von take…", b:"the Dativ", ex:"aus dem…, von der…"},
+    {f:"aus dem Supermarkt vs vom Supermarkt", b:"the building I left vs the shop/errand (both OK, different emphasis)"}
+  ],
+  trainers:[
+    {id:"choose", title:"aus or von?", kind:"Preposition choice", repeat:2, items:[
+      {type:"mc", q:"Ich komme ___ dem Wald.", opts:["aus","von"], answer:"aus", why:"A forest is an enclosed space → aus."},
+      {type:"mc", q:"Ich komme ___ der Bushaltestelle.", opts:["von","aus"], answer:"von", why:"A bus stop has no walls (open point) → von."},
+      {type:"mc", q:"Ich komme ___ Polen.", opts:["aus","von"], answer:"aus", why:"Countries always take aus."},
+      {type:"mc", q:"Ich komme ___ Arzt. (vom)", opts:["vom (von)","aus dem"], answer:"vom (von)", why:"A person/professional → von (vom = von dem)."},
+      {type:"mc", q:"Ich komme ___ der Dusche.", opts:["aus","von"], answer:"aus", why:"A shower is an enclosed space → aus."},
+      {type:"mc", q:"Ich komme ___ Konzert. (vom)", opts:["vom (von)","aus dem"], answer:"vom (von)", why:"An event → von."},
+      {type:"mc", q:"Ich komme ___ Berlin.", opts:["aus","von"], answer:"aus", why:"Cities always take aus."},
+      {type:"mc", q:"Ich komme ___ Dach. (vom)", opts:["vom (von)","aus dem"], answer:"vom (von)", why:"A roof has no enclosure → von."},
+      {type:"mc", q:"Ich komme ___ den USA.", opts:["aus","von"], answer:"aus", why:"Country (with article) still → aus."},
+      {type:"mc", q:"Ich komme ___ der Physiotherapie.", opts:["von","aus"], answer:"von", why:"An institution/appointment → von."}
+    ]},
+    {id:"fill", title:"Fill the gap", kind:"Production", repeat:1, items:[
+      {type:"type", q:"'I come from the supermarket (the building).' <b lang='de'>Ich komme ___ dem Supermarkt.</b>", answer:["aus"], why:"Enclosed building → aus."},
+      {type:"type", q:"'I come from the doctor.' <b lang='de'>Ich komme ___ Arzt.</b> (one word, contracted)", answer:["vom"], why:"von dem = vom; a person → von."},
+      {type:"type", q:"'I come from Egypt.' <b lang='de'>Ich komme ___ Ägypten.</b>", answer:["aus"], why:"Country → aus."},
+      {type:"type", q:"'I come from the bus stop.' <b lang='de'>Ich komme ___ der Bushaltestelle.</b>", answer:["von"], why:"Open point → von."},
+      {type:"type", q:"von + dem contracts to…", answer:["vom"], why:"vom."}
+    ]}
+  ],
+  checkoff:{ title:"aus/von check", pass:0.8, intro:"Mixed & repeated. Pass to mark ✓ on the hub.", items:[
+    {type:"mc", q:"Ich komme ___ dem Park.", opts:["aus","von"], answer:"aus", why:"Enclosed → aus."},
+    {type:"mc", q:"Ich komme ___ der Bushaltestelle.", opts:["von","aus"], answer:"von", why:"Open point → von."},
+    {type:"mc", q:"Ich komme ___ Berlin.", opts:["aus","von"], answer:"aus", why:"City → aus."},
+    {type:"mc", q:"Ich komme ___ Arzt.", opts:["vom","aus dem"], answer:"vom", why:"Person → von/vom."},
+    {type:"type", q:"von + dem = (one word)", answer:["vom"], why:"vom."}
+  ]}
+};
+Engine.init();
+</script>
+</body>
+</html>

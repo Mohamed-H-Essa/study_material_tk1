@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1 · Alphabet & Pronunciation</title>
+<link rel="stylesheet" href="_engine.css">
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav">
+  <a href="index.html">☰ Hub</a>
+  <span class="spacer"></span>
+  <a href="02_tea_kitchen.html">Making Tea →</a>
+</div>
+
+<a class="videowrap" href="https://www.youtube.com/watch?v=hAkxKMlYUI4" target="_blank" rel="noopener">
+  <img src="https://img.youtube.com/vi/hAkxKMlYUI4/hqdefault.jpg" alt="German Alphabet & Pronunciation">
+  <span class="play"></span>
+</a>
+<div class="watchline">▶ Tap the thumbnail to watch on YouTube · <span lang="de">German Alphabet &amp; Pronunciation — Super Easy German 253</span></div>
+
+<h1>1 · Alphabet & <span class="de" lang="de">Aussprache</span></h1>
+<p class="lead">The letters plus the sounds that trip up English speakers: the umlauts, the two <span class="de" lang="de">ch</span> sounds, the vanishing <span class="de" lang="de">r</span>, and the diphthongs.</p>
+<span class="rainbow-note"><span class="rainbow">rainbow</span> = bonus I added beyond the video</span>
+
+<h2><span class="step">Sound rules from the video</span>The stuff that isn't obvious</h2>
+<table class="vocab">
+<tr><td class="w" lang="de">ä / ö / ü</td><td class="m">the Umlaute. Short <span lang="de">ä</span> ≈ a short English "e". <span lang="de">ü</span> = say "ee" with rounded lips.</td></tr>
+<tr><td class="w" lang="de">ch</td><td class="m">two versions: soft (<span lang="de">ich</span>, after e/i) and hard/throaty (<span lang="de">machen</span>, after a/o/u).</td></tr>
+<tr><td class="w" lang="de">-ig</td><td class="m">at the end of a word sounds like <span lang="de">-ich</span> → <span lang="de">Honig</span> = "Honich".</td></tr>
+<tr><td class="w" lang="de">h after a vowel</td><td class="m">is silent and makes the vowel <b>long</b>: <span lang="de">Sahne</span>, <span lang="de">Bahn</span>.</td></tr>
+<tr><td class="w" lang="de">ie</td><td class="m">= one long "ee": <span lang="de">liegen</span>. (But <span lang="de">ei</span> = "eye": <span lang="de">mein</span>.)</td></tr>
+<tr><td class="w" lang="de">final r</td><td class="m">vocalised / barely spoken: <span lang="de">Vater</span>, <span lang="de">Mutter</span> — you hear "Vata", "Mutta".</td></tr>
+<tr><td class="w" lang="de">v / w</td><td class="m"><span lang="de">v</span> = English "f" (<span lang="de">vier</span>); <span lang="de">w</span> = English "v" (<span lang="de">Wasser</span>). <span class="rainbow">easy to swap by mistake!</span></td></tr>
+<tr><td class="w" lang="de">ß</td><td class="m">"scharfes S" = sharp/voiceless s, and makes the vowel before it long: <span lang="de">Straße</span>, <span lang="de">Spaß</span>.</td></tr>
+<tr><td class="w" lang="de">sch</td><td class="m">= English "sh". <span lang="de">z</span> = English "ts" (<span lang="de">Zebra</span> = "tsebra").</td></tr>
+</table>
+<div class="tip"><b>Diphthongs:</b> <span lang="de">ei</span> → "eye", <span lang="de">au</span> → "ow", <span lang="de">eu / äu</span> → "oy". So <span lang="de">Häuser</span> = "HOY-za".</div>
+
+<h2><span class="step">Anki</span>Sound → rule</h2>
+<div id="anki-mount"></div>
+
+<h2><span class="step">Training · long</span>Which sound?</h2>
+<p class="lead">Repeats on purpose. Every wrong answer explains the rule.</p>
+<div id="trainer-sounds"></div>
+
+<h2><span class="step">Training · long</span>Long or short vowel?</h2>
+<div id="trainer-length"></div>
+
+<div id="checkoff-mount" class="checkoff-holder"></div>
+
+<div class="topnav" style="margin-top:40px">
+  <a href="index.html">☰ Hub</a>
+  <span class="spacer"></span>
+  <a href="02_tea_kitchen.html">Next: Making Tea →</a>
+</div>
+</div>
+
+<script src="_engine.js"></script>
+<script>
+window.PAGE = {
+  slug:"alphabet",
+  ankiDeck:"DE · Alphabet & Aussprache",
+  anki:[
+    {f:"ä (kurz)", b:"sounds like a short English 'e'", ex:"Männer, Hände"},
+    {f:"ü", b:"say 'ee' with rounded lips", ex:"über, Tür, grün"},
+    {f:"ö", b:"say 'e' with rounded lips", ex:"schön, Öl, Köpfe"},
+    {f:"ch (nach e/i)", b:"soft, hissed at front of mouth", ex:"ich, manchmal"},
+    {f:"ch (nach a/o/u)", b:"hard, throaty (back of throat)", ex:"machen, Dach, Loch"},
+    {f:"-ig (Wortende)", b:"pronounced like -ich", ex:"Honig, König"},
+    {f:"ie", b:"one long 'ee'", ex:"liegen, Biene"},
+    {f:"ei", b:"'eye'", ex:"mein, Stein, Weise"},
+    {f:"eu / äu", b:"'oy'", ex:"Zeug, Häuser, Mäuse"},
+    {f:"au", b:"'ow'", ex:"Stau, Mauer, bauen"},
+    {f:"v", b:"like English 'f'", ex:"Vater, vier, Vase"},
+    {f:"w", b:"like English 'v'", ex:"Wasser, Wald"},
+    {f:"z", b:"like 'ts'", ex:"Zebra, Zunge"},
+    {f:"ß", b:"sharp s; makes vowel before it long", ex:"Straße, Fuß, Spaß"},
+    {f:"h nach Vokal", b:"silent — lengthens the vowel", ex:"Sahne, Bahn"},
+    {f:"r am Wortende", b:"barely spoken (vocalised)", ex:"Vater→'Vata', Mutter"},
+    {f:"sch", b:"like English 'sh'", ex:"schön, waschen"},
+    {f:"Doppelkonsonant (nn, ff…)", b:"makes the vowel BEFORE it short", ex:"Kaffee, Sonne"}
+  ],
+  trainers:[
+    {id:"sounds", title:"Pick the right sound", kind:"Sound recognition", repeat:2, items:[
+      {type:"mc", q:"How is <b lang='de'>v</b> pronounced in <b lang='de'>Vater</b>?", opts:["like English 'f'","like English 'v'"], answer:"like English 'f'", why:"German v = English f. The English-'v' sound is spelled w in German."},
+      {type:"mc", q:"How is <b lang='de'>w</b> pronounced in <b lang='de'>Wasser</b>?", opts:["like English 'v'","like English 'w'"], answer:"like English 'v'", why:"German w = English v. There's no English-'w' sound in standard German."},
+      {type:"mc", q:"The <b lang='de'>ch</b> in <b lang='de'>machen</b> is…", opts:["soft (front)","hard/throaty (back)"], answer:"hard/throaty (back)", why:"After a/o/u the ch is the throaty one. After e/i (ich) it's soft."},
+      {type:"mc", q:"The <b lang='de'>ch</b> in <b lang='de'>ich</b> is…", opts:["soft (front)","hard/throaty (back)"], answer:"soft (front)", why:"After e/i → soft ch. After a/o/u (machen) → hard ch."},
+      {type:"mc", q:"<b lang='de'>Honig</b> ends in <b lang='de'>-ig</b>. It sounds like…", opts:["'Honich'","'Honig' (hard g)"], answer:"'Honich'", why:"Standard German: final -ig → -ich. (Southern dialects keep the hard g.)"},
+      {type:"mc", q:"<b lang='de'>z</b> in <b lang='de'>Zebra</b> sounds like…", opts:["'ts'","'z' (buzzy)"], answer:"'ts'", why:"z is always 'ts' in German → 'Tsebra'."},
+      {type:"mc", q:"<b lang='de'>ei</b> in <b lang='de'>mein</b> sounds like…", opts:["'eye'","'ay'"], answer:"'eye'", why:"ei = 'eye'. Don't confuse with ie = 'ee'."},
+      {type:"mc", q:"<b lang='de'>ie</b> in <b lang='de'>liegen</b> sounds like…", opts:["one long 'ee'","'eye'"], answer:"one long 'ee'", why:"ie = long ee. ei = 'eye'. Order of letters flips the sound."},
+      {type:"mc", q:"<b lang='de'>eu</b> in <b lang='de'>Zeug</b> sounds like…", opts:["'oy'","'you'"], answer:"'oy'", why:"eu and äu both = 'oy'."},
+      {type:"mc", q:"The <b lang='de'>h</b> in <b lang='de'>Sahne</b> is…", opts:["silent, lengthens the vowel","a breathy h"], answer:"silent, lengthens the vowel", why:"An h after a vowel isn't spoken; it just makes the vowel long."}
+    ]},
+    {id:"length", title:"Long vowel or short vowel?", kind:"Vowel length", repeat:1, items:[
+      {type:"mc", q:"<b lang='de'>Bahn</b> — the a is…", opts:["long","short"], answer:"long", why:"h after the vowel = long. Also 'aa'/single vowel before one consonant tends long."},
+      {type:"mc", q:"<b lang='de'>Mann</b> — the a is…", opts:["long","short"], answer:"short", why:"Double consonant (nn) after the vowel → short vowel."},
+      {type:"mc", q:"<b lang='de'>Boot</b> — the o is…", opts:["long","short"], answer:"long", why:"Doubling the vowel (oo) makes it long."},
+      {type:"mc", q:"<b lang='de'>Sonne</b> — the o is…", opts:["long","short"], answer:"short", why:"Double consonant nn → short vowel."},
+      {type:"mc", q:"<b lang='de'>Spaß</b> — the a is…", opts:["long","short"], answer:"long", why:"ß lengthens the vowel before it."},
+      {type:"mc", q:"<b lang='de'>Kaffee</b> — the first a is…", opts:["long","short"], answer:"short", why:"The double f (Doppelkonsonant) shortens the vowel before it."}
+    ]}
+  ],
+  checkoff:{ title:"Do I hear it?", pass:0.8, intro:"5 quick ones. Pass to mark this video ✓ on the hub.", items:[
+    {type:"mc", q:"<b lang='de'>vier</b> starts with a sound like…", opts:["English 'f'","English 'v'","English 'w'"], answer:"English 'f'", why:"v = f."},
+    {type:"mc", q:"<b lang='de'>Wald</b> starts with a sound like…", opts:["English 'v'","English 'w'","English 'f'"], answer:"English 'v'", why:"w = v."},
+    {type:"mc", q:"Which pair rhymes-ish in sound? <b lang='de'>ei</b> = ?", opts:["'eye'","'ee'"], answer:"'eye'", why:"ei = eye, ie = ee."},
+    {type:"mc", q:"<b lang='de'>Häuser</b> — the äu is…", opts:["'oy'","'ow'"], answer:"'oy'", why:"äu and eu = 'oy'."},
+    {type:"mc", q:"A double consonant (e.g. <b lang='de'>nn</b>) makes the vowel before it…", opts:["short","long"], answer:"short", why:"Double consonant → short vowel; doubled vowel or ß/h → long."}
+  ]}
+};
+Engine.init();
+</script>
+</body>
+</html>

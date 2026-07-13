@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4 · On the Tram</title>
+<link rel="stylesheet" href="_engine.css">
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav">
+  <a href="index.html">☰ Hub</a>
+  <a href="03_hands_fingers.html">← Hands</a>
+  <span class="spacer"></span>
+  <a href="05_photo_scene.html">Photo →</a>
+</div>
+
+<a class="videowrap" href="https://www.youtube.com/watch?v=HiiF1kDnYt4" target="_blank" rel="noopener">
+  <img src="https://img.youtube.com/vi/HiiF1kDnYt4/hqdefault.jpg" alt="Learn German on the tram">
+  <span class="play"></span>
+</a>
+<div class="watchline">▶ Tap to watch · <span lang="de">Learn German on the Tram — In der Straßenbahn</span></div>
+
+<h1>4 · <span class="de" lang="de">In der Straßenbahn</span></h1>
+<p class="lead">Public-transport vocab and the get-on / get-off verbs. Longer sentences here — good bridge into real German.</p>
+<span class="rainbow-note"><span class="rainbow">rainbow</span> = bonus beyond the video</span>
+
+<h2><span class="step">Vocabulary</span>The tram</h2>
+<table class="vocab">
+<tr><td class="art">die</td><td class="w" lang="de">Straßenbahn</td><td class="m">tram (also die Bahn, die Linie 12)</td></tr>
+<tr><td class="art">die</td><td class="w" lang="de">Haltestelle</td><td class="m">stop</td></tr>
+<tr><td class="art">der</td><td class="w" lang="de">Fahrgast · die Fahrgäste</td><td class="m">passenger · passengers</td></tr>
+<tr><td class="art">die</td><td class="w" lang="de">Fahrkarte</td><td class="m">ticket</td></tr>
+<tr><td class="art">der</td><td class="w" lang="de">Fahrkartenautomat</td><td class="m">ticket machine</td></tr>
+<tr><td class="art">der</td><td class="w" lang="de">Bildschirm</td><td class="m">screen</td></tr>
+<tr><td class="art">die</td><td class="w" lang="de">Anzeigetafel</td><td class="m">display board</td></tr>
+<tr><td class="art">die</td><td class="w" lang="de">Ansage</td><td class="m">announcement</td></tr>
+<tr><td class="art">der</td><td class="w" lang="de">Sitz · die Sitze</td><td class="m">seat · seats</td></tr>
+<tr><td class="art">die</td><td class="w" lang="de">Tür</td><td class="m">door</td></tr>
+<tr><td class="art">der</td><td class="w" lang="de">Knopf</td><td class="m">button</td></tr>
+<tr><td class="art">die</td><td class="w" lang="de">Endstation</td><td class="m">final stop / terminus</td></tr>
+</table>
+<div class="tip"><b>Separable verbs (the key skill here):</b> <span lang="de">ein·steigen</span> get on, <span lang="de">aus·steigen</span> get off, <span lang="de">ab·fahren</span> depart, <span lang="de">an·halten</span> stop. → <span lang="de">Ich <b>steige</b> an der nächsten Haltestelle <b>aus</b>.</span></div>
+<div class="tip"><b>Price:</b> <span lang="de">Die Fahrkarte kostet 3,40 €</span> — "drei Euro vierzig". Germans use a comma for decimals.</div>
+
+<h2><span class="step">Anki</span>Tram vocab & verbs</h2>
+<div id="anki-mount"></div>
+
+<h2><span class="step">Training · long</span>Get on / get off / depart / stop</h2>
+<p class="lead">Separable-verb drill — the prefix jumps to the end. Repeats twice.</p>
+<div id="trainer-verbs"></div>
+
+<h2><span class="step">Training · long</span>Which word?</h2>
+<div id="trainer-vocab"></div>
+
+<div id="checkoff-mount"></div>
+
+<div class="topnav" style="margin-top:40px">
+  <a href="index.html">☰ Hub</a>
+  <a href="03_hands_fingers.html">← Hands</a>
+  <span class="spacer"></span>
+  <a href="05_photo_scene.html">Next: Photo →</a>
+</div>
+</div>
+
+<script src="_engine.js"></script>
+<script>
+window.PAGE = {
+  slug:"tram",
+  ankiDeck:"DE · Straßenbahn",
+  anki:[
+    {f:"die Straßenbahn", b:"the tram"},
+    {f:"die Haltestelle", b:"the stop"},
+    {f:"der Fahrgast → die Fahrgäste", b:"passenger → passengers"},
+    {f:"die Fahrkarte", b:"the ticket"},
+    {f:"der Fahrkartenautomat", b:"the ticket machine"},
+    {f:"die Anzeigetafel", b:"the display board"},
+    {f:"die Ansage", b:"the announcement", ex:"Nächste Haltestelle…"},
+    {f:"der Sitz → die Sitze", b:"seat → seats"},
+    {f:"die Tür", b:"the door"},
+    {f:"der Knopf", b:"the button", ex:"Ich drücke den Knopf."},
+    {f:"einsteigen", b:"to get on (separable)", ex:"Ich steige ein."},
+    {f:"aussteigen", b:"to get off (separable)", ex:"Ich steige aus."},
+    {f:"abfahren", b:"to depart (separable)", ex:"Die Bahn fährt ab."},
+    {f:"anhalten", b:"to stop (separable)", ex:"Die Bahn hält an."},
+    {f:"einfahren", b:"to pull in (separable)", ex:"Die Bahn fährt ein."},
+    {f:"kosten", b:"to cost", ex:"Die Fahrkarte kostet 3,40 €."}
+  ],
+  trainers:[
+    {id:"verbs", title:"Separable verbs — where does the prefix go?", kind:"Grammar drill", repeat:2, items:[
+      {type:"mc", q:"'I get off at the next stop.' <b lang='de'>Ich ___ an der nächsten Haltestelle ___.</b>", opts:["steige … aus","aussteige … —","aus … steige","steige aus … —"], answer:"steige … aus", why:"aussteigen splits: conjugated 'steige' in position 2, prefix 'aus' at the very end."},
+      {type:"mc", q:"'The tram departs.' <b lang='de'>Die Straßenbahn ___ ___.</b>", opts:["fährt … ab","abfährt … —","ab … fährt"], answer:"fährt … ab", why:"abfahren → fährt … ab."},
+      {type:"mc", q:"'I get on.' <b lang='de'>Ich ___ ___.</b>", opts:["steige … ein","einsteige … —","ein … steige"], answer:"steige … ein", why:"einsteigen → steige … ein."},
+      {type:"mc", q:"'The tram stops.' <b lang='de'>Die Bahn ___ ___.</b>", opts:["hält … an","anhält … —","an … hält"], answer:"hält … an", why:"anhalten → hält … an."},
+      {type:"type", q:"Complete: 'The tram pulls in.' <b lang='de'>Die Bahn fährt ___.</b>", answer:["ein"], why:"einfahren → fährt ein."},
+      {type:"type", q:"Complete: 'I get off.' <b lang='de'>Ich steige ___.</b>", answer:["aus"], why:"aussteigen → steige aus."}
+    ]},
+    {id:"vocab", title:"Which word?", kind:"Vocabulary", repeat:2, items:[
+      {type:"mc", q:"Where you wait for the tram:", opts:["die Haltestelle","die Endstation","der Sitz"], answer:"die Haltestelle", why:"Haltestelle = stop; Endstation = terminus."},
+      {type:"mc", q:"You buy your ticket at the…", opts:["Fahrkartenautomat","Anzeigetafel","Bildschirm"], answer:"Fahrkartenautomat", why:"Automat = machine."},
+      {type:"mc", q:"You press it to get off:", opts:["der Knopf","die Tür","der Sitz"], answer:"der Knopf", why:"den Knopf drücken = press the button."},
+      {type:"mc", q:"passengers =", opts:["die Fahrgäste","die Fahrkarten","die Sitze"], answer:"die Fahrgäste", why:"der Fahrgast → die Fahrgäste."},
+      {type:"type", q:"Type the German for <b>the ticket</b> (with article).", answer:["die Fahrkarte"], why:"die Fahrkarte."},
+      {type:"mc", q:"<b lang='de'>3,40 €</b> is spoken…", opts:["drei Euro vierzig","dreißig vierzig","drei Komma vier Euro"], answer:"drei Euro vierzig", why:"Say the euros, then the cents."}
+    ]}
+  ],
+  checkoff:{ title:"Tram check", pass:0.8, intro:"Mixed & repeated. Pass to mark ✓ on the hub.", items:[
+    {type:"mc", q:"'I get off' → <b lang='de'>Ich steige ___.</b>", opts:["aus","ein","ab","an"], answer:"aus", why:"aussteigen."},
+    {type:"mc", q:"'The tram departs' → <b lang='de'>Die Bahn fährt ___.</b>", opts:["ab","aus","ein","an"], answer:"ab", why:"abfahren."},
+    {type:"mc", q:"the stop =", opts:["die Haltestelle","die Endstation"], answer:"die Haltestelle", why:"Haltestelle."},
+    {type:"type", q:"Type: <b>the ticket</b> (with article)", answer:["die Fahrkarte"], why:"die Fahrkarte."},
+    {type:"mc", q:"You press the ___ to get off.", opts:["Knopf","Sitz","Tür"], answer:"Knopf", why:"der Knopf."}
+  ]}
+};
+Engine.init();
+</script>
+</body>
+</html>

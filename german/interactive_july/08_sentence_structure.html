@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>8 · Sentence Structure</title>
+<link rel="stylesheet" href="_engine.css">
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav">
+  <a href="index.html">☰ Hub</a>
+  <a href="07_word_gender.html">← Gender</a>
+  <span class="spacer"></span>
+  <a href="09_questions.html">Questions →</a>
+</div>
+
+<a class="videowrap" href="https://www.youtube.com/watch?v=qDrgJz9V2Yk" target="_blank" rel="noopener">
+  <img src="https://img.youtube.com/vi/qDrgJz9V2Yk/hqdefault.jpg" alt="German sentence structure">
+  <span class="play"></span>
+</a>
+<div class="watchline">▶ Tap to watch · <span lang="de">German Sentence Structure Explained in 10 Minutes</span></div>
+
+<h1>8 · <span class="de" lang="de">Der Satzbau</span></h1>
+<p class="lead">The one rule that matters most, plus TMP order and what changes in a <span lang="de">Nebensatz</span>. Everything else is flexible.</p>
+<span class="rainbow-note"><span class="rainbow">rainbow</span> = bonus beyond the video</span>
+
+<h2><span class="step">The 3 rules</span>Only #1 is unbreakable</h2>
+<div class="tip"><b>Rule 1 (iron law):</b> in a main clause the conjugated verb is always in <b>position 2</b>. Everything else can move around it to change emphasis.
+<br><span lang="de">Janosch hat immer ein Gurkenglas im Kühlschrank.</span>
+<br><span lang="de">Im Kühlschrank hat Janosch immer ein Gurkenglas.</span> ← same meaning, verb still 2nd.</div>
+<div class="tip"><b>Rule 2:</b> dative (indirect) usually before accusative (direct object).</div>
+<div class="tip"><b>Rule 3 — TMP:</b> Time → Manner → Place. <span lang="de">Ich will <b>heute</b> (T) <b>mit dem Bus</b> (M) <b>nach Hause</b> (P) fahren.</span></div>
+<div class="warn"><b>"Position 2" ≠ "second word."</b> A whole chunk can fill position 1: <span lang="de"><b>An diesem Sonntagmorgen</b> gefällt mir das Wetter nicht.</span> — three words, then the verb.</div>
+
+<h3>Nebensatz (subordinate clause)</h3>
+<div class="tip"><b>After a subordinating conjunction (weil, dass, wenn…), the verb goes to the END.</b>
+<br><span lang="de">Er hat immer Gurken, <b>weil</b> er Gurken <b>liebt</b>.</span>
+<br>Compare <span lang="de"><b>denn</b></span> (coordinating) → normal order: <span lang="de">…, <b>denn</b> er <b>liebt</b> Gurken.</span></div>
+
+<h2><span class="step">Anki</span>The rules & key conjunctions</h2>
+<div id="anki-mount"></div>
+
+<h2><span class="step">Training · long</span>Verb in position 2?</h2>
+<p class="lead">Pick the correctly-ordered main clause. Repeats twice.</p>
+<div id="trainer-v2"></div>
+
+<h2><span class="step">Training · long</span>weil / denn — where's the verb?</h2>
+<div id="trainer-neben"></div>
+
+<h2><span class="step">Training</span>TMP order</h2>
+<div id="trainer-tmp"></div>
+
+<div id="checkoff-mount"></div>
+
+<div class="topnav" style="margin-top:40px">
+  <a href="index.html">☰ Hub</a>
+  <a href="07_word_gender.html">← Gender</a>
+  <span class="spacer"></span>
+  <a href="09_questions.html">Next: Questions →</a>
+</div>
+</div>
+
+<script src="_engine.js"></script>
+<script>
+window.PAGE = {
+  slug:"satzbau",
+  ankiDeck:"DE · Satzbau",
+  anki:[
+    {f:"Rule 1 (main clause)", b:"conjugated verb = position 2", ex:"Heute gehe ich nach Hause."},
+    {f:"position 2 means…", b:"second SLOT, not second word", ex:"An diesem Morgen | gefällt | mir…"},
+    {f:"Rule 2 (objects)", b:"dative before accusative", ex:"Ich gebe dem Mann das Buch."},
+    {f:"Rule 3 (adverbs)", b:"Time → Manner → Place (TMP)", ex:"heute · mit dem Bus · nach Hause"},
+    {f:"Nebensatz rule", b:"verb goes to the END", ex:"…, weil er Gurken liebt."},
+    {f:"weil", b:"because — SUBordinating → verb last", ex:"…, weil er müde ist."},
+    {f:"dass", b:"that — subordinating → verb last", ex:"…, dass er kommt."},
+    {f:"wenn", b:"if/when — subordinating → verb last", ex:"…, wenn es regnet."},
+    {f:"denn", b:"because — COordinating → normal order", ex:"…, denn er liebt Gurken."},
+    {f:"und / aber / oder / denn", b:"coordinating → normal word order after them"}
+  ],
+  trainers:[
+    {id:"v2", title:"Verb in position 2?", kind:"Word order", repeat:2, items:[
+      {type:"mc", q:"Which is a correct main clause?", opts:["Heute gehe ich ins Kino.","Heute ich gehe ins Kino.","Ich heute gehe ins Kino."], answer:"Heute gehe ich ins Kino.", why:"'Heute' fills slot 1, so the verb 'gehe' must be slot 2, THEN the subject."},
+      {type:"mc", q:"Which is correct?", opts:["Morgen fahre ich nach Berlin.","Morgen ich fahre nach Berlin."], answer:"Morgen fahre ich nach Berlin.", why:"After a fronted time word, verb comes before the subject."},
+      {type:"mc", q:"Which is correct?", opts:["Im Kühlschrank hat er Gurken.","Im Kühlschrank er hat Gurken."], answer:"Im Kühlschrank hat er Gurken.", why:"Fronted place phrase = slot 1 → verb next."},
+      {type:"mc", q:"'An diesem Sonntagmorgen ___ mir das Wetter nicht.' The verb slot holds…", opts:["gefällt (it's still position 2)","nothing special"], answer:"gefällt (it's still position 2)", why:"The whole phrase 'An diesem Sonntagmorgen' is one slot; the verb is the 2nd slot."},
+      {type:"mc", q:"Which is correct?", opts:["Ich trinke jeden Morgen Kaffee.","Ich jeden Morgen trinke Kaffee."], answer:"Ich trinke jeden Morgen Kaffee.", why:"Subject slot 1 → verb slot 2, adverb after."}
+    ]},
+    {id:"neben", title:"weil vs denn — verb position", kind:"Nebensatz", repeat:2, items:[
+      {type:"mc", q:"'…, weil er Gurken ___.' (lieben)", opts:["liebt (at the end)","liebt (right after weil)"], answer:"liebt (at the end)", why:"weil is subordinating → verb goes to the very end."},
+      {type:"mc", q:"'…, denn er ___ Gurken.' (lieben)", opts:["liebt (normal, 2nd)","liebt (at the end)"], answer:"liebt (normal, 2nd)", why:"denn is coordinating → normal main-clause order, verb 2nd."},
+      {type:"mc", q:"'Ich bleibe zu Hause, ___ es regnet.' (because → coordinating)", opts:["denn","weil"], answer:"denn", why:"Both mean 'because', but denn keeps normal order; here verb 'regnet' is already 2nd → denn fits the 'normal order' version."},
+      {type:"mc", q:"'Ich bleibe zu Hause, weil es ___.' (regnen)", opts:["regnet (at end)","regnet (2nd)"], answer:"regnet (at end)", why:"weil → verb to the end."},
+      {type:"mc", q:"Which conjunction sends the verb to the end?", opts:["dass","und","aber","oder"], answer:"dass", why:"dass/weil/wenn are subordinating (verb last). und/aber/oder/denn are coordinating."}
+    ]},
+    {id:"tmp", title:"Time–Manner–Place", kind:"Adverb order", repeat:1, items:[
+      {type:"mc", q:"Standard order of these three: <b lang='de'>mit dem Bus · heute · nach Hause</b>", opts:["heute · mit dem Bus · nach Hause","mit dem Bus · heute · nach Hause","nach Hause · heute · mit dem Bus"], answer:"heute · mit dem Bus · nach Hause", why:"TMP: Time (heute) → Manner (mit dem Bus) → Place (nach Hause)."},
+      {type:"mc", q:"In TMP, 'nach Hause' is the…", opts:["Place","Time","Manner"], answer:"Place", why:"Place comes last."},
+      {type:"mc", q:"In TMP, 'heute' is the…", opts:["Time","Manner","Place"], answer:"Time", why:"Time comes first."}
+    ]}
+  ],
+  checkoff:{ title:"Satzbau check", pass:0.8, intro:"Mixed & repeated. Pass to mark ✓ on the hub.", items:[
+    {type:"mc", q:"Correct main clause?", opts:["Morgen fahre ich nach Berlin.","Morgen ich fahre nach Berlin."], answer:"Morgen fahre ich nach Berlin.", why:"Verb in position 2."},
+    {type:"mc", q:"'…, weil er müde ___.' (sein)", opts:["ist (at the end)","ist (2nd)"], answer:"ist (at the end)", why:"weil → verb last."},
+    {type:"mc", q:"Which sends the verb to the end?", opts:["weil","denn","und"], answer:"weil", why:"weil = subordinating."},
+    {type:"mc", q:"TMP order:", opts:["Time–Manner–Place","Place–Manner–Time"], answer:"Time–Manner–Place", why:"T→M→P."},
+    {type:"mc", q:"'Position 2' means…", opts:["the second slot","the second word exactly"], answer:"the second slot", why:"A phrase can fill slot 1."}
+  ]}
+};
+Engine.init();
+</script>
+</body>
+</html>

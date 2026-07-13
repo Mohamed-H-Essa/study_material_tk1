@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>10 · an / auf / in (Dativ & Akkusativ)</title>
+<link rel="stylesheet" href="_engine.css">
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav">
+  <a href="index.html">☰ Hub</a>
+  <a href="09_questions.html">← Questions</a>
+  <span class="spacer"></span>
+  <a href="11_aus_vs_von.html">aus vs von →</a>
+</div>
+
+<a class="videowrap" href="https://www.youtube.com/watch?v=2ooxcrMJXjI" target="_blank" rel="noopener">
+  <img src="https://img.youtube.com/vi/2ooxcrMJXjI/hqdefault.jpg" alt="Local prepositions in dative and accusative">
+  <span class="play"></span>
+</a>
+<div class="watchline">▶ Tap to watch · <span lang="de">Local Prepositions in Dative and Accusative — Super Easy German 181</span></div>
+
+<h1>10 · <span class="de" lang="de">an / auf / in</span></h1>
+<p class="lead">The two-way prepositions. The whole game is one question: <b><span lang="de">wo?</span></b> (location → Dativ) or <b><span lang="de">wohin?</span></b> (movement → Akkusativ)?</p>
+<span class="rainbow-note"><span class="rainbow">rainbow</span> = bonus beyond the video</span>
+
+<h2><span class="step">The core switch</span>wo? → Dativ · wohin? → Akkusativ</h2>
+<div class="tip"><b>wo? (where — no movement) → Dativ:</b> <span lang="de">Ich sitze <b>am</b> Strand.</span> · <span lang="de">Ich bin <b>im</b> Wald.</span></div>
+<div class="tip"><b>wohin? (movement to) → Akkusativ:</b> <span lang="de">Ich fahre <b>ans</b> Meer.</span> · <span lang="de">Ich fahre <b>ins</b> Gebirge.</span></div>
+<div class="warn"><b>Contractions to memorise:</b> an+dem = <b>am</b>, an+das = <b>ans</b>, in+dem = <b>im</b>, in+das = <b>ins</b>, auf+das = <b>aufs</b>.</div>
+
+<h3>Which preposition with which place?</h3>
+<table class="vocab">
+<tr><td class="w" lang="de">an</td><td class="m">next to / at the edge: <span lang="de">an der Küste, am See, am Strand</span> (idiom!)</td></tr>
+<tr><td class="w" lang="de">auf</td><td class="m">physically on top: <span lang="de">auf dem Land, auf der Insel</span></td></tr>
+<tr><td class="w" lang="de">in</td><td class="m">inside an enclosed area: <span lang="de">im Wald, im Gebirge, in Berlin</span></td></tr>
+</table>
+<div class="warn"><b>Countries/cities use <span lang="de">nach</span> for movement</b> — not in: <span lang="de">Ich fahre <b>nach</b> Deutschland.</span> But countries WITH an article: <span lang="de">in die Schweiz, in die USA</span>. <span class="rainbow">(bonus link to the aus/von file next)</span></div>
+
+<h2><span class="step">Anki</span>Prepositions & contractions</h2>
+<div id="anki-mount"></div>
+
+<h2><span class="step">Training · long</span>wo? or wohin? → Dativ or Akkusativ</h2>
+<p class="lead">The core drill. Repeats twice.</p>
+<div id="trainer-case"></div>
+
+<h2><span class="step">Training · long</span>Contractions & the right preposition</h2>
+<div id="trainer-prep"></div>
+
+<div id="checkoff-mount"></div>
+
+<div class="topnav" style="margin-top:40px">
+  <a href="index.html">☰ Hub</a>
+  <a href="09_questions.html">← Questions</a>
+  <span class="spacer"></span>
+  <a href="11_aus_vs_von.html">Next: aus vs von →</a>
+</div>
+</div>
+
+<script src="_engine.js"></script>
+<script>
+window.PAGE = {
+  slug:"prep",
+  ankiDeck:"DE · an/auf/in",
+  anki:[
+    {f:"wo? →", b:"Dativ (location, no movement)", ex:"Ich bin im Wald."},
+    {f:"wohin? →", b:"Akkusativ (movement toward)", ex:"Ich fahre ins Gebirge."},
+    {f:"an + dem", b:"= am", ex:"am See, am Strand"},
+    {f:"an + das", b:"= ans", ex:"ans Meer"},
+    {f:"in + dem", b:"= im", ex:"im Wald"},
+    {f:"in + das", b:"= ins", ex:"ins Gebirge"},
+    {f:"auf + das", b:"= aufs", ex:"aufs Land"},
+    {f:"an (usage)", b:"next to / at an edge", ex:"an der Küste, am Strand (idiom)"},
+    {f:"auf (usage)", b:"physically on top of", ex:"auf dem Land, auf der Insel"},
+    {f:"in (usage)", b:"inside an enclosed area", ex:"im Wald, in Berlin"},
+    {f:"movement to a country/city", b:"use nach (no article)", ex:"nach Deutschland, nach Berlin"},
+    {f:"country WITH article", b:"use in + article", ex:"in die Schweiz, in die USA"}
+  ],
+  trainers:[
+    {id:"case", title:"Dativ or Akkusativ?", kind:"wo? vs wohin?", repeat:2, items:[
+      {type:"mc", q:"<b lang='de'>Ich sitze am Strand.</b> — this is…", opts:["Dativ (wo?)","Akkusativ (wohin?)"], answer:"Dativ (wo?)", why:"'sitze' = a location, no movement → wo? → Dativ (am = an dem)."},
+      {type:"mc", q:"<b lang='de'>Ich fahre ans Meer.</b> — this is…", opts:["Akkusativ (wohin?)","Dativ (wo?)"], answer:"Akkusativ (wohin?)", why:"'fahre … ans' = movement toward → wohin? → Akkusativ (ans = an das)."},
+      {type:"mc", q:"<b lang='de'>Wir wandern im Wald.</b> — this is…", opts:["Dativ (wo?)","Akkusativ (wohin?)"], answer:"Dativ (wo?)", why:"Wandering around inside = location → Dativ (im)."},
+      {type:"mc", q:"<b lang='de'>Wir fahren ins Gebirge.</b> — this is…", opts:["Akkusativ (wohin?)","Dativ (wo?)"], answer:"Akkusativ (wohin?)", why:"Movement to → Akkusativ (ins = in das)."},
+      {type:"mc", q:"<b lang='de'>Urlaub auf dem Land ist entspannend.</b> —", opts:["Dativ (wo?)","Akkusativ (wohin?)"], answer:"Dativ (wo?)", why:"Being on the land, no movement → Dativ (auf dem)."},
+      {type:"mc", q:"<b lang='de'>Wir fahren aufs Land.</b> —", opts:["Akkusativ (wohin?)","Dativ (wo?)"], answer:"Akkusativ (wohin?)", why:"aufs = auf das → movement → Akkusativ."}
+    ]},
+    {id:"prep", title:"Right preposition & contraction", kind:"an/auf/in", repeat:2, items:[
+      {type:"mc", q:"'to the sea' (movement) = <b lang='de'>___ Meer</b>", opts:["ans","am","ins","aufs"], answer:"ans", why:"an das = ans; sea uses an."},
+      {type:"mc", q:"'in the forest' (location) = <b lang='de'>___ Wald</b>", opts:["im","ins","am","auf dem"], answer:"im", why:"in dem = im; forest is enclosed → in."},
+      {type:"mc", q:"'on the island' (location) = <b lang='de'>auf ___ Insel</b>", opts:["der","die","dem"], answer:"der", why:"auf der Insel — Insel is feminine, Dativ 'der'; island uses auf."},
+      {type:"mc", q:"'to the mountains' (movement) = <b lang='de'>___ Gebirge</b>", opts:["ins","im","ans","aufs"], answer:"ins", why:"in das = ins; movement → Akkusativ."},
+      {type:"mc", q:"'to Germany' =", opts:["nach Deutschland","in Deutschland","ins Deutschland"], answer:"nach Deutschland", why:"Countries without an article use nach for movement."},
+      {type:"mc", q:"'to Switzerland' (die Schweiz) =", opts:["in die Schweiz","nach Schweiz","nach die Schweiz"], answer:"in die Schweiz", why:"Countries WITH an article use in + article."},
+      {type:"mc", q:"'at the beach' (location) =", opts:["am Strand","im Strand","auf dem Strand"], answer:"am Strand", why:"Idiom: you say am Strand even though you're physically on it."}
+    ]}
+  ],
+  checkoff:{ title:"Prepositions check", pass:0.8, intro:"Mixed & repeated. Pass to mark ✓ on the hub.", items:[
+    {type:"mc", q:"<b lang='de'>Ich bin im Wald.</b> = ", opts:["Dativ (wo?)","Akkusativ (wohin?)"], answer:"Dativ (wo?)", why:"Location → Dativ."},
+    {type:"mc", q:"<b lang='de'>Ich fahre ins Gebirge.</b> = ", opts:["Akkusativ (wohin?)","Dativ (wo?)"], answer:"Akkusativ (wohin?)", why:"Movement → Akkusativ."},
+    {type:"mc", q:"in + das = ", opts:["ins","im","ans"], answer:"ins", why:"in das = ins."},
+    {type:"mc", q:"'to Germany' =", opts:["nach Deutschland","in Deutschland"], answer:"nach Deutschland", why:"nach for article-less countries."},
+    {type:"mc", q:"'at the beach' =", opts:["am Strand","auf dem Strand"], answer:"am Strand", why:"Fixed idiom: am Strand."}
+  ]}
+};
+Engine.init();
+</script>
+</body>
+</html>

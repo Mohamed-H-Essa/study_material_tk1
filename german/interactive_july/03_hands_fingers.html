@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3 · Hands & Fingers</title>
+<link rel="stylesheet" href="_engine.css">
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav">
+  <a href="index.html">☰ Hub</a>
+  <a href="02_tea_kitchen.html">← Tea</a>
+  <span class="spacer"></span>
+  <a href="04_tram.html">Tram →</a>
+</div>
+
+<a class="videowrap" href="https://www.youtube.com/watch?v=awscSvqsS9U" target="_blank" rel="noopener">
+  <img src="https://img.youtube.com/vi/awscSvqsS9U/hqdefault.jpg" alt="Hands and fingers in German">
+  <span class="play"></span>
+</a>
+<div class="watchline">▶ Tap to watch · <span lang="de">Easy Beginner German — Die Hände und Finger</span> (the hands section)</div>
+
+<h1>3 · <span class="de" lang="de">Die Hände und die Finger</span></h1>
+<p class="lead">Body vocab plus <b>left vs right</b> and adjective endings (<span lang="de">mein linker / rechter Finger</span>). Also a batch of action verbs.</p>
+<span class="rainbow-note"><span class="rainbow">rainbow</span> = bonus beyond the video</span>
+
+<h2><span class="step">Vocabulary</span>Hand & fingers</h2>
+<table class="vocab">
+<tr><td class="art">die</td><td class="w" lang="de">Hand · die Hände</td><td class="m">hand · hands (plural!)</td></tr>
+<tr><td class="art">der</td><td class="w" lang="de">Finger</td><td class="m">finger</td></tr>
+<tr><td class="art">der</td><td class="w" lang="de">Fingernagel</td><td class="m">fingernail</td></tr>
+<tr><td class="art">der</td><td class="w" lang="de">Daumen</td><td class="m">thumb</td></tr>
+<tr><td class="art">der</td><td class="w" lang="de">Zeigefinger</td><td class="m">index finger (the "pointing" finger)</td></tr>
+<tr><td class="art">der</td><td class="w" lang="de">Mittelfinger</td><td class="m">middle finger</td></tr>
+<tr><td class="art">der</td><td class="w" lang="de">Ringfinger</td><td class="m">ring finger</td></tr>
+<tr><td class="art">der</td><td class="w" lang="de">kleine Finger</td><td class="m">little finger / pinky</td></tr>
+<tr><td class="art">die</td><td class="w" lang="de">Faust · die Fäuste</td><td class="m">fist · fists</td></tr>
+<tr><td class="art">—</td><td class="w" lang="de">links / rechts</td><td class="m">left / right · <span lang="de">linke Hand / rechte Hand</span></td></tr>
+<tr><td class="art">—</td><td class="w" lang="de">groß / klein</td><td class="m">big / small</td></tr>
+</table>
+<div class="tip"><b>Verbs:</b> <span lang="de">zeigen</span> (point), <span lang="de">anfassen</span> (touch), <span lang="de">klatschen</span> (clap), <span lang="de">winken</span> (wave), <span lang="de">eine Faust machen</span> (make a fist).</div>
+<div class="warn"><b>Watch the ending:</b> <span lang="de">mein <b>linker</b> Ringfinger</span> (masc.) but <span lang="de">meine <b>linke</b> Hand</span> (fem.). The adjective ending follows the noun's gender.</div>
+
+<h2><span class="step">Anki</span>Fingers & actions</h2>
+<div id="anki-mount"></div>
+
+<h2><span class="step">Training · long</span>Which finger?</h2>
+<p class="lead">The same five fingers, asked many ways.</p>
+<div id="trainer-fingers"></div>
+
+<h2><span class="step">Training · long</span>links or rechts + endings</h2>
+<div id="trainer-side"></div>
+
+<h2><span class="step">Training</span>What am I doing? (verbs)</h2>
+<div id="trainer-verbs"></div>
+
+<div id="checkoff-mount"></div>
+
+<div class="topnav" style="margin-top:40px">
+  <a href="index.html">☰ Hub</a>
+  <a href="02_tea_kitchen.html">← Tea</a>
+  <span class="spacer"></span>
+  <a href="04_tram.html">Next: Tram →</a>
+</div>
+</div>
+
+<script src="_engine.js"></script>
+<script>
+window.PAGE = {
+  slug:"hands",
+  ankiDeck:"DE · Hände & Finger",
+  anki:[
+    {f:"die Hand → die Hände", b:"hand → hands"},
+    {f:"der Finger", b:"finger"},
+    {f:"der Daumen", b:"thumb", ex:"einen Daumen nach oben geben = thumbs up"},
+    {f:"der Zeigefinger", b:"index finger", ex:"Mit dem Zeigefinger kann man zeigen."},
+    {f:"der Mittelfinger", b:"middle finger"},
+    {f:"der Ringfinger", b:"ring finger", ex:"Ich trage einen Ring am Ringfinger."},
+    {f:"der kleine Finger", b:"little finger / pinky"},
+    {f:"der Fingernagel", b:"fingernail"},
+    {f:"die Faust → die Fäuste", b:"fist → fists"},
+    {f:"links / rechts", b:"left / right"},
+    {f:"zeigen (auf)", b:"to point (at)", ex:"Ich zeige auf den Tisch."},
+    {f:"anfassen", b:"to touch", ex:"Ich fasse den Ring an."},
+    {f:"klatschen", b:"to clap"},
+    {f:"winken", b:"to wave"},
+    {f:"eine Faust machen", b:"to make a fist"}
+  ],
+  trainers:[
+    {id:"fingers", title:"Name the finger", kind:"Vocabulary", repeat:2, items:[
+      {type:"mc", q:"The finger you point with:", opts:["der Zeigefinger","der Daumen","der Ringfinger","der Mittelfinger"], answer:"der Zeigefinger", why:"zeigen = to point → Zeigefinger."},
+      {type:"mc", q:"You wear a ring on:", opts:["dem Ringfinger","dem Daumen","dem Zeigefinger","dem kleinen Finger"], answer:"dem Ringfinger", why:"Ring → Ringfinger."},
+      {type:"mc", q:"'Thumbs up' uses:", opts:["der Daumen","der Zeigefinger","die Faust"], answer:"der Daumen", why:"einen Daumen nach oben geben."},
+      {type:"mc", q:"The smallest finger:", opts:["der kleine Finger","der Daumen","der Mittelfinger"], answer:"der kleine Finger", why:"klein = small."},
+      {type:"mc", q:"In the middle of the hand:", opts:["der Mittelfinger","der Ringfinger","der Zeigefinger"], answer:"der Mittelfinger", why:"die Mitte = the middle."},
+      {type:"type", q:"Type the German for <b>the thumb</b> (with article).", answer:["der Daumen"], why:"der Daumen."},
+      {type:"type", q:"Type the German for <b>hands</b> (plural, with article).", answer:["die Hände"], why:"die Hand → die Hände."}
+    ]},
+    {id:"side", title:"Left / right & the ending", kind:"Adjective endings", repeat:2, items:[
+      {type:"mc", q:"my LEFT hand → <b lang='de'>meine ___ Hand</b>", opts:["linke","linker","links","rechte"], answer:"linke", why:"Hand is feminine → linke (‑e ending)."},
+      {type:"mc", q:"my RIGHT ring finger → <b lang='de'>mein ___ Ringfinger</b>", opts:["rechter","rechte","rechts","linker"], answer:"rechter", why:"Ringfinger is masculine → rechter (‑er ending)."},
+      {type:"mc", q:"my LEFT thumb → <b lang='de'>mein ___ Daumen</b>", opts:["linker","linke","links"], answer:"linker", why:"Daumen masculine → linker."},
+      {type:"mc", q:"'to the right' as a direction word is…", opts:["rechts","rechte","rechter"], answer:"rechts", why:"rechts/links = the plain adverb; add endings only before a noun."},
+      {type:"mc", q:"my RIGHT hand → <b lang='de'>meine ___ Hand</b>", opts:["rechte","rechter","rechts"], answer:"rechte", why:"Hand feminine → rechte."}
+    ]},
+    {id:"verbs", title:"What am I doing?", kind:"Verbs", repeat:1, items:[
+      {type:"mc", q:"I bring my palms together repeatedly →", opts:["ich klatsche","ich winke","ich zeige","ich fasse an"], answer:"ich klatsche", why:"klatschen = to clap."},
+      {type:"mc", q:"I move my hand to say hi/bye →", opts:["ich winke","ich klatsche","ich zeige"], answer:"ich winke", why:"winken = to wave."},
+      {type:"mc", q:"I point at the table →", opts:["ich zeige auf den Tisch","ich fasse den Tisch an","ich winke"], answer:"ich zeige auf den Tisch", why:"zeigen auf = point at."},
+      {type:"mc", q:"I touch the ring →", opts:["ich fasse den Ring an","ich zeige auf den Ring","ich winke"], answer:"ich fasse den Ring an", why:"anfassen = to touch (separable: fasse … an)."},
+      {type:"type", q:"'I make a fist.' → <b lang='de'>Ich mache eine ___.</b>", answer:["Faust"], why:"die Faust."}
+    ]}
+  ],
+  checkoff:{ title:"Hands check", pass:0.8, intro:"Quick mixed set. Pass to mark ✓ on the hub.", items:[
+    {type:"mc", q:"index finger =", opts:["der Zeigefinger","der Mittelfinger","der Daumen"], answer:"der Zeigefinger", why:"zeigen → Zeigefinger."},
+    {type:"type", q:"Type: <b>hands</b> (plural, with article)", answer:["die Hände"], why:"die Hände."},
+    {type:"mc", q:"my left hand → <b lang='de'>meine ___ Hand</b>", opts:["linke","linker","links"], answer:"linke", why:"feminine → linke."},
+    {type:"mc", q:"my right ring finger → <b lang='de'>mein ___ Ringfinger</b>", opts:["rechter","rechte","rechts"], answer:"rechter", why:"masculine → rechter."},
+    {type:"mc", q:"<b lang='de'>winken</b> means…", opts:["to wave","to clap","to point"], answer:"to wave", why:"winken = wave."}
+  ]}
+};
+Engine.init();
+</script>
+</body>
+</html>

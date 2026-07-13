@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5 · Describing a Photo</title>
+<link rel="stylesheet" href="_engine.css">
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav">
+  <a href="index.html">☰ Hub</a>
+  <a href="04_tram.html">← Tram</a>
+  <span class="spacer"></span>
+  <a href="06_articles_intro.html">Articles →</a>
+</div>
+
+<a class="videowrap" href="https://www.youtube.com/watch?v=Qk8nNN7Volg" target="_blank" rel="noopener">
+  <img src="https://img.youtube.com/vi/Qk8nNN7Volg/hqdefault.jpg" alt="Describing a photo in German">
+  <span class="play"></span>
+</a>
+<div class="watchline">▶ Tap to watch · <span lang="de">If You Are A Beginner Watch This — Wir schauen ein Bild an</span></div>
+
+<h1>5 · <span class="de" lang="de">Wir schauen ein Bild an</span></h1>
+<p class="lead">Describing a scene: objects, opposites (thick/thin), and telling the time. Reviews <span lang="de">zeigen</span> and the <span lang="de">Zeiger</span> of a clock.</p>
+<span class="rainbow-note"><span class="rainbow">rainbow</span> = bonus beyond the video</span>
+
+<h2><span class="step">Vocabulary</span>In the picture</h2>
+<table class="vocab">
+<tr><td class="art">das</td><td class="w" lang="de">Bild · das Foto</td><td class="m">picture · photo</td></tr>
+<tr><td class="art">die</td><td class="w" lang="de">Sonnenbrille</td><td class="m">sunglasses</td></tr>
+<tr><td class="art">das</td><td class="w" lang="de">Etui</td><td class="m">case (e.g. for glasses)</td></tr>
+<tr><td class="art">die</td><td class="w" lang="de">Kappe · der Hut</td><td class="m">cap · hat</td></tr>
+<tr><td class="art">das</td><td class="w" lang="de">Sofa · die Couch</td><td class="m">sofa · couch</td></tr>
+<tr><td class="art">die</td><td class="w" lang="de">Katze</td><td class="m">cat</td></tr>
+<tr><td class="art">das</td><td class="w" lang="de">Buch · die Bücher</td><td class="m">book · books</td></tr>
+<tr><td class="art">die</td><td class="w" lang="de">Wanduhr</td><td class="m">wall clock (die Wand = wall)</td></tr>
+<tr><td class="art">der</td><td class="w" lang="de">Zeiger</td><td class="m">clock hand / pointer</td></tr>
+<tr><td class="art">—</td><td class="w" lang="de">dick / dünn</td><td class="m">thick / thin</td></tr>
+<tr><td class="art">—</td><td class="w" lang="de">öffnen / schließen</td><td class="m">to open / to close</td></tr>
+<tr><td class="art">—</td><td class="w" lang="de">aufziehen / abziehen</td><td class="m">to put on / take off (glasses, cap)</td></tr>
+</table>
+<div class="tip"><b>Comparison <span class="rainbow">(bonus)</span>:</b> <span lang="de">Dieses Buch hat viel <b>mehr</b> Seiten <b>als</b> dieses.</span> — <span lang="de">mehr … als</span> = more … than; <span lang="de">weniger … als</span> = fewer … than.</div>
+<div class="tip"><b>Telling time:</b> <span lang="de">Es ist kurz vor drei.</span> = It's shortly before three. <span lang="de">10 Minuten vor 12</span> = 10 to 12. <span class="rainbow"><span lang="de">Wie viel Uhr ist es?</span></span> = What time is it?</div>
+
+<h2><span class="step">Anki</span>Scene vocab</h2>
+<div id="anki-mount"></div>
+
+<h2><span class="step">Training · long</span>Article & opposites</h2>
+<div id="trainer-vocab"></div>
+
+<h2><span class="step">Training</span>Telling the time</h2>
+<div id="trainer-time"></div>
+
+<div id="checkoff-mount"></div>
+
+<div class="topnav" style="margin-top:40px">
+  <a href="index.html">☰ Hub</a>
+  <a href="04_tram.html">← Tram</a>
+  <span class="spacer"></span>
+  <a href="06_articles_intro.html">Next: Articles →</a>
+</div>
+</div>
+
+<script src="_engine.js"></script>
+<script>
+window.PAGE = {
+  slug:"photo",
+  ankiDeck:"DE · Foto beschreiben",
+  anki:[
+    {f:"das Bild / das Foto", b:"the picture / the photo"},
+    {f:"die Sonnenbrille", b:"the sunglasses"},
+    {f:"das Etui", b:"the case (for glasses)"},
+    {f:"die Kappe", b:"the cap"},
+    {f:"der Hut", b:"the hat"},
+    {f:"das Sofa / die Couch", b:"the sofa / couch"},
+    {f:"die Katze", b:"the cat"},
+    {f:"das Buch → die Bücher", b:"book → books"},
+    {f:"die Wanduhr", b:"the wall clock"},
+    {f:"der Zeiger", b:"the clock hand / pointer", ex:"Die Uhr hat zwei Zeiger."},
+    {f:"dick ⇄ dünn", b:"thick ⇄ thin"},
+    {f:"öffnen ⇄ schließen", b:"to open ⇄ to close"},
+    {f:"aufziehen ⇄ abziehen", b:"put on ⇄ take off (glasses/cap)"},
+    {f:"mehr … als", b:"more … than"},
+    {f:"weniger … als", b:"fewer/less … than"},
+    {f:"Wie viel Uhr ist es?", b:"What time is it?"}
+  ],
+  trainers:[
+    {id:"vocab", title:"Article & opposites", kind:"Vocabulary", repeat:2, items:[
+      {type:"mc", q:"___ <b lang='de'>Sonnenbrille</b>", opts:["die","der","das"], answer:"die", why:"die Brille → die Sonnenbrille."},
+      {type:"mc", q:"___ <b lang='de'>Buch</b>", opts:["das","der","die"], answer:"das", why:"das Buch (plural die Bücher)."},
+      {type:"mc", q:"___ <b lang='de'>Katze</b>", opts:["die","der","das"], answer:"die", why:"die Katze — feminine -e."},
+      {type:"mc", q:"opposite of <b lang='de'>dick</b>:", opts:["dünn","dünner","klein","groß"], answer:"dünn", why:"dick ⇄ dünn (thick ⇄ thin)."},
+      {type:"mc", q:"'This book has more pages than that one.' <b lang='de'>…hat mehr Seiten ___ dieses.</b>", opts:["als","als wie","wie","dann"], answer:"als", why:"mehr … als = more … than. (Never 'als wie'.)"},
+      {type:"mc", q:"To take off your sunglasses:", opts:["abziehen","aufziehen","öffnen"], answer:"abziehen", why:"aufziehen = put on, abziehen = take off."},
+      {type:"type", q:"Type the German for <b>the wall clock</b> (with article).", answer:["die Wanduhr"], why:"die Wanduhr."}
+    ]},
+    {id:"time", title:"What time is it?", kind:"Telling time", repeat:1, items:[
+      {type:"mc", q:"<b lang='de'>Es ist kurz vor drei.</b> means…", opts:["shortly before 3","shortly after 3","exactly 3"], answer:"shortly before 3", why:"vor = before, nach = after."},
+      {type:"mc", q:"'10 to 12' →", opts:["zehn (Minuten) vor zwölf","zehn nach zwölf","zwölf vor zehn"], answer:"zehn (Minuten) vor zwölf", why:"vor = to/before the hour."},
+      {type:"mc", q:"'What time is it?' →", opts:["Wie viel Uhr ist es?","Was ist die Uhr?","Wie ist die Zeit?"], answer:"Wie viel Uhr ist es?", why:"Also: Wie spät ist es?"},
+      {type:"mc", q:"A clock has two <b lang='de'>Zeiger</b>. What are they?", opts:["hands / pointers","numbers","batteries"], answer:"hands / pointers", why:"der Zeiger = pointer; zeigen = to point/show."}
+    ]}
+  ],
+  checkoff:{ title:"Photo check", pass:0.8, intro:"Mixed & repeated. Pass to mark ✓ on the hub.", items:[
+    {type:"mc", q:"___ <b lang='de'>Buch</b>", opts:["das","der","die"], answer:"das", why:"das Buch."},
+    {type:"mc", q:"thick ⇄ ?", opts:["dünn","groß","klein"], answer:"dünn", why:"dick ⇄ dünn."},
+    {type:"mc", q:"'more … than' =", opts:["mehr … als","mehr … wie","mehr … dann"], answer:"mehr … als", why:"… als."},
+    {type:"type", q:"Type: <b>the sunglasses</b> (with article)", answer:["die Sonnenbrille"], why:"die Sonnenbrille."},
+    {type:"mc", q:"'What time is it?' =", opts:["Wie viel Uhr ist es?","Was Uhr ist?"], answer:"Wie viel Uhr ist es?", why:"Wie viel Uhr / Wie spät."}
+  ]}
+};
+Engine.init();
+</script>
+</body>
+</html>

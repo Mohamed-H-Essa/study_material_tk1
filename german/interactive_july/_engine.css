@@ -1,0 +1,114 @@
+/* Shared styles for all German CI study files */
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#12141c;color:#dfe3ea;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;line-height:1.7;font-size:17px}
+.wrap{max-width:760px;margin:0 auto;padding:24px 20px 100px}
+a{color:#7ec8e3}
+
+/* ---- top nav ---- */
+.topnav{display:flex;gap:14px;align-items:center;font-size:14px;margin-bottom:18px;color:#8b93a7}
+.topnav a{text-decoration:none;color:#8b93a7}
+.topnav a:hover{color:#7ec8e3}
+.topnav .spacer{margin-left:auto}
+
+/* ---- thumbnail ---- */
+.videowrap{display:block;position:relative;border-radius:12px;overflow:hidden;border:1px solid #262a38;margin-bottom:8px}
+.videowrap img{width:100%;display:block;aspect-ratio:16/9;object-fit:cover;background:#0d0f15}
+.videowrap .play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.12);transition:background .15s}
+.videowrap:hover .play{background:rgba(0,0,0,.32)}
+.videowrap .play::after{content:"";width:0;height:0;border-left:34px solid #fff;border-top:22px solid transparent;border-bottom:22px solid transparent;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5));margin-left:6px}
+.videowrap.dual{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:#262a38}
+.videowrap.dual .half{position:relative}
+.videowrap.dual img{border-radius:0}
+.watchline{font-size:13px;color:#6b7280;margin-bottom:24px}
+
+/* ---- headings ---- */
+h1{font-size:27px;font-weight:700;color:#fff;margin:14px 0 4px}
+h1 .de{color:#7ec8e3}
+.lead{color:#8b93a7;font-size:15px;margin-bottom:22px}
+h2{font-size:20px;font-weight:600;color:#fff;margin:38px 0 14px;padding-bottom:6px;border-bottom:1px solid #262a38}
+h2 .step{color:#c9a96e;font-size:13px;font-weight:400;letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:2px}
+h3{font-size:16px;font-weight:600;color:#9db8d4;margin:22px 0 8px}
+p{margin-bottom:12px}
+.de{color:#7ec8e3}
+.en{color:#8b93a7}
+.rainbow{background:linear-gradient(90deg,#ff5f6d,#ffc371,#47e891,#4a90d9,#a06cff);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:700}
+.rainbow-note{font-size:12px;color:#6b7280;border:1px dashed #3a3f52;border-radius:6px;padding:6px 10px;display:inline-block;margin:4px 0 14px}
+.tip{background:#141d2a;border-left:3px solid #4a90d9;padding:11px 15px;margin:14px 0;border-radius:0 6px 6px 0;font-size:15px}
+.warn{background:#241518;border-left:3px solid #d9534a;padding:11px 15px;margin:14px 0;border-radius:0 6px 6px 0;font-size:15px}
+
+/* ---- vocab table ---- */
+.vocab{width:100%;border-collapse:collapse;margin:12px 0 6px;font-size:15px}
+.vocab td{padding:7px 10px;border-bottom:1px solid #22262f;vertical-align:top}
+.vocab tr:hover td{background:#171a24}
+.vocab .art{color:#c9a96e;font-weight:700}
+.vocab .w{color:#7ec8e3;font-weight:600}
+.vocab .m{color:#8b93a7}
+
+/* ---- Anki flashcards ---- */
+.anki{background:#171a24;border:1px solid #262a38;border-radius:12px;padding:20px;margin:16px 0}
+.anki-top{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:#8b93a7;margin-bottom:14px}
+.anki-card{min-height:150px;background:#0e1017;border:1px solid #2a2f3e;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;cursor:pointer;user-select:none}
+.anki-front{font-size:24px;color:#fff}
+.anki-hint{font-size:13px;color:#5a6070;margin-top:10px}
+.anki-back{font-size:19px;color:#7ec8e3;margin-top:14px;border-top:1px solid #2a2f3e;padding-top:14px;width:100%}
+.anki-back .ex{font-size:14px;color:#8b93a7;margin-top:8px}
+.anki-rate{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:14px}
+.anki-rate button{padding:10px;border-radius:8px;border:1px solid #2a2f3e;background:#0e1017;color:#dfe3ea;cursor:pointer;font-size:14px}
+.anki-rate .again:hover{border-color:#ef4444;color:#f87171}
+.anki-rate .hard:hover{border-color:#eab308;color:#facc15}
+.anki-rate .good:hover{border-color:#22c55e;color:#4ade80}
+.anki-controls{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.anki-controls button{font-size:13px;padding:7px 12px;border-radius:6px;border:1px solid #2a2f3e;background:#0e1017;color:#8b93a7;cursor:pointer}
+.anki-controls button:hover{color:#7ec8e3;border-color:#4a90d9}
+.anki-done{text-align:center;color:#4ade80;font-size:16px;padding:30px 0}
+
+/* ---- exercises ---- */
+.ex-block{background:#171a24;border:1px solid #262a38;border-radius:12px;padding:20px;margin:16px 0}
+.ex-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px}
+.ex-title{font-size:16px;font-weight:600;color:#fff}
+.ex-kind{font-size:12px;color:#8b93a7}
+.ex-prog{font-size:13px;color:#6b7280}
+.progbar{height:5px;background:#262a38;border-radius:3px;margin:8px 0 16px;overflow:hidden}
+.progfill{height:100%;background:#4a90d9;width:0;transition:width .3s}
+.q{font-size:18px;color:#f0f2f6;margin-bottom:6px;line-height:1.5}
+.q .blank{color:#c9a96e;border-bottom:2px solid #c9a96e;padding:0 20px}
+.qsub{font-size:13px;color:#6b7280;margin-bottom:14px}
+.opts{display:grid;gap:9px;margin-bottom:8px}
+.opts.two{grid-template-columns:1fr 1fr}
+.opt{padding:12px 15px;background:#0e1017;border:1px solid #2a2f3e;border-radius:8px;cursor:pointer;font-size:16px;color:#dfe3ea;text-align:left;transition:border-color .12s;display:flex;align-items:center;gap:8px}
+.opt:hover{border-color:#4a4f66}
+.opt .k{font-size:12px;color:#5a6070;border:1px solid #2a2f3e;border-radius:4px;padding:0 5px;min-width:18px;text-align:center}
+.opt.right{border-color:#22c55e;background:#0f2419;color:#4ade80}
+.opt.wrong{border-color:#ef4444;background:#241014;color:#f87171}
+.opt.disabled{cursor:default;opacity:.75}
+.typed{display:flex;gap:8px;margin-bottom:8px}
+.typed input{flex:1;padding:12px 15px;background:#0e1017;border:1px solid #2a2f3e;border-radius:8px;color:#fff;font-size:16px;font-family:inherit;outline:none}
+.typed input:focus{border-color:#4a90d9}
+.typed input.right{border-color:#22c55e}
+.typed input.wrong{border-color:#ef4444}
+.fb{font-size:14px;margin:10px 0;min-height:20px;line-height:1.5}
+.fb.ok{color:#4ade80}
+.fb.no{color:#f87171}
+.fb .why{color:#b9c0cf;display:block;margin-top:4px}
+.ex-nav{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+.btn{padding:9px 18px;border:1px solid #2a2f3e;border-radius:8px;background:#0e1017;color:#dfe3ea;cursor:pointer;font-size:14px}
+.btn:hover{border-color:#4a4f66}
+.btn:disabled{opacity:.35;cursor:default}
+.btn.primary{background:#4a90d9;border-color:#4a90d9;color:#fff}
+.btn.primary:hover{background:#3a7bc8}
+
+/* ---- exercise results ---- */
+.ex-result{text-align:center;padding:16px 0}
+.ex-score{font-size:42px;font-weight:700;color:#fff}
+.ex-score .of{font-size:20px;color:#6b7280}
+.ex-msg{color:#8b93a7;margin:6px 0 16px}
+
+/* ---- check-off ---- */
+.checkoff{background:#141d2a;border:1px solid #29405c;border-radius:12px;padding:20px;margin:24px 0}
+.checkoff h2{border:none;margin:0 0 6px;color:#7ec8e3}
+.checkoff .co-sub{font-size:14px;color:#8b93a7;margin-bottom:14px}
+.co-badge{display:inline-flex;align-items:center;gap:8px;background:#16a34a;color:#fff;font-weight:700;padding:8px 16px;border-radius:24px;font-size:15px}
+.co-retry{margin-left:12px;font-size:13px;color:#8b93a7;background:none;border:none;cursor:pointer;text-decoration:underline}
+
+.hidden{display:none}
+kbd{background:#262a38;padding:1px 6px;border-radius:4px;color:#aeb4c2;font-size:12px;font-family:ui-monospace,monospace}

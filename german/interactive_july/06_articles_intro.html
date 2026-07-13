@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>6 · der / die / das — Intro</title>
+<link rel="stylesheet" href="_engine.css">
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav">
+  <a href="index.html">☰ Hub</a>
+  <a href="05_photo_scene.html">← Photo</a>
+  <span class="spacer"></span>
+  <a href="07_word_gender.html">Gender rules →</a>
+</div>
+
+<a class="videowrap" href="https://www.youtube.com/watch?v=oeWqRNO02k4" target="_blank" rel="noopener">
+  <img src="https://img.youtube.com/vi/oeWqRNO02k4/hqdefault.jpg" alt="German articles der die das">
+  <span class="play"></span>
+</a>
+<div class="watchline">▶ Tap to watch · <span lang="de">German articles — Easy introduction</span></div>
+
+<h1>6 · <span class="de" lang="de">der / die / das</span></h1>
+<p class="lead">The gentle intro: every noun has a gender, and the adjective changes shape too (<span lang="de">ein <b>roter</b> Stift</span>, <span lang="de">eine <b>rote</b> Schere</span>, <span lang="de">ein <b>rotes</b> Buch</span>).</p>
+<span class="rainbow-note"><span class="rainbow">rainbow</span> = bonus beyond the video</span>
+
+<h2><span class="step">The core idea</span>ein → der/die/das, and the adjective agrees</h2>
+<table class="vocab">
+<tr><td class="art">der</td><td class="w" lang="de">der Stift</td><td class="m"><span lang="de">ein rot<b>er</b> Stift</span> — masculine, adjective ends ‑er</td></tr>
+<tr><td class="art">die</td><td class="w" lang="de">die Schere</td><td class="m"><span lang="de">eine rot<b>e</b> Schere</span> — feminine, adjective ends ‑e</td></tr>
+<tr><td class="art">das</td><td class="w" lang="de">das Buch</td><td class="m"><span lang="de">ein rot<b>es</b> Buch</span> — neuter, adjective ends ‑es</td></tr>
+</table>
+<div class="tip"><b>Words from the video:</b> <span lang="de">der Löffel</span> (spoon), <span lang="de">die Tasse</span> (cup), <span lang="de">das Messer</span> (knife), <span lang="de">das Handy</span> (phone), <span lang="de">die Hand</span>, <span lang="de">der Tisch</span> (table). Opposites: <span lang="de">groß/klein, alt/neu, schmutzig/sauber, rund/eckig</span>.</div>
+<div class="warn"><b>Why bother?</b> Getting the gender right is what lets you form the rest of the sentence later (Dativ/Akkusativ). Learn the article <i>with</i> every noun, never alone.</div>
+
+<h2><span class="step">Anki</span>Noun + article, and the adjective ending</h2>
+<div id="anki-mount"></div>
+
+<h2><span class="step">Training · long</span>der / die / das</h2>
+<p class="lead">All the video's nouns, drilled twice.</p>
+<div id="trainer-artikel"></div>
+
+<h2><span class="step">Training · long</span>The adjective ending</h2>
+<div id="trainer-adj"></div>
+
+<div id="checkoff-mount"></div>
+
+<div class="topnav" style="margin-top:40px">
+  <a href="index.html">☰ Hub</a>
+  <a href="05_photo_scene.html">← Photo</a>
+  <span class="spacer"></span>
+  <a href="07_word_gender.html">Next: Gender rules →</a>
+</div>
+</div>
+
+<script src="_engine.js"></script>
+<script>
+window.PAGE = {
+  slug:"articles",
+  ankiDeck:"DE · der/die/das (Basis)",
+  anki:[
+    {f:"___ Stift", b:"der Stift (m.)", ex:"ein roter Stift"},
+    {f:"___ Schere", b:"die Schere (f.)", ex:"eine rote Schere"},
+    {f:"___ Buch", b:"das Buch (n.)", ex:"ein rotes Buch"},
+    {f:"___ Löffel", b:"der Löffel (m.)", ex:"ein kleiner Löffel"},
+    {f:"___ Tasse", b:"die Tasse (f.)", ex:"eine große Tasse"},
+    {f:"___ Messer", b:"das Messer (n.)", ex:"ein großes Messer"},
+    {f:"___ Handy", b:"das Handy (n.)", ex:"ein altes Handy"},
+    {f:"___ Hand", b:"die Hand (f.)", ex:"eine saubere Hand"},
+    {f:"___ Tisch", b:"der Tisch (m.)", ex:"ein runder Tisch"},
+    {f:"ein ___ Stift (rot, m.)", b:"ein roter Stift", ex:"masculine → ‑er"},
+    {f:"eine ___ Schere (rot, f.)", b:"eine rote Schere", ex:"feminine → ‑e"},
+    {f:"ein ___ Buch (rot, n.)", b:"ein rotes Buch", ex:"neuter → ‑es"},
+    {f:"groß ⇄ klein", b:"big ⇄ small"},
+    {f:"alt ⇄ neu", b:"old ⇄ new"},
+    {f:"schmutzig ⇄ sauber", b:"dirty ⇄ clean"},
+    {f:"rund ⇄ eckig", b:"round ⇄ angular/square"}
+  ],
+  trainers:[
+    {id:"artikel", title:"der / die / das?", kind:"Gender drill", repeat:2, items:[
+      {type:"mc", q:"___ <b lang='de'>Stift</b>", opts:["der","die","das"], answer:"der", why:"der Stift."},
+      {type:"mc", q:"___ <b lang='de'>Schere</b>", opts:["die","der","das"], answer:"die", why:"die Schere."},
+      {type:"mc", q:"___ <b lang='de'>Buch</b>", opts:["das","der","die"], answer:"das", why:"das Buch."},
+      {type:"mc", q:"___ <b lang='de'>Löffel</b>", opts:["der","die","das"], answer:"der", why:"der Löffel."},
+      {type:"mc", q:"___ <b lang='de'>Messer</b>", opts:["das","der","die"], answer:"das", why:"das Messer."},
+      {type:"mc", q:"___ <b lang='de'>Tasse</b>", opts:["die","der","das"], answer:"die", why:"die Tasse."},
+      {type:"mc", q:"___ <b lang='de'>Handy</b>", opts:["das","der","die"], answer:"das", why:"das Handy."},
+      {type:"mc", q:"___ <b lang='de'>Tisch</b>", opts:["der","die","das"], answer:"der", why:"der Tisch."},
+      {type:"mc", q:"___ <b lang='de'>Hand</b>", opts:["die","der","das"], answer:"die", why:"die Hand."}
+    ]},
+    {id:"adj", title:"Adjective ending (ein-word + rot)", kind:"Agreement", repeat:2, items:[
+      {type:"mc", q:"<b lang='de'>ein ___ Stift</b> (a red pen, m.)", opts:["roter","rote","rotes"], answer:"roter", why:"Masculine ein-word → ‑er: ein roter Stift."},
+      {type:"mc", q:"<b lang='de'>eine ___ Schere</b> (a red scissors, f.)", opts:["rote","roter","rotes"], answer:"rote", why:"Feminine → ‑e: eine rote Schere."},
+      {type:"mc", q:"<b lang='de'>ein ___ Buch</b> (a red book, n.)", opts:["rotes","roter","rote"], answer:"rotes", why:"Neuter → ‑es: ein rotes Buch."},
+      {type:"mc", q:"<b lang='de'>ein ___ Löffel</b> (a small spoon, m.)", opts:["kleiner","kleine","kleines"], answer:"kleiner", why:"Masculine → ‑er: ein kleiner Löffel."},
+      {type:"mc", q:"<b lang='de'>eine ___ Tasse</b> (a big cup, f.)", opts:["große","großer","großes"], answer:"große", why:"Feminine → ‑e: eine große Tasse."},
+      {type:"mc", q:"<b lang='de'>ein ___ Messer</b> (a big knife, n.)", opts:["großes","großer","große"], answer:"großes", why:"Neuter → ‑es: ein großes Messer."}
+    ]}
+  ],
+  checkoff:{ title:"Articles check", pass:0.8, intro:"Mixed & repeated. Pass to mark ✓ on the hub.", items:[
+    {type:"mc", q:"___ <b lang='de'>Tisch</b>", opts:["der","die","das"], answer:"der", why:"der Tisch."},
+    {type:"mc", q:"___ <b lang='de'>Schere</b>", opts:["die","der","das"], answer:"die", why:"die Schere."},
+    {type:"mc", q:"___ <b lang='de'>Buch</b>", opts:["das","der","die"], answer:"das", why:"das Buch."},
+    {type:"mc", q:"<b lang='de'>ein ___ Stift</b> (red, m.)", opts:["roter","rote","rotes"], answer:"roter", why:"m. → ‑er."},
+    {type:"mc", q:"<b lang='de'>ein ___ Buch</b> (red, n.)", opts:["rotes","roter","rote"], answer:"rotes", why:"n. → ‑es."}
+  ]}
+};
+Engine.init();
+</script>
+</body>
+</html>

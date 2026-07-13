@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>7 · Guessing a Word's Gender</title>
+<link rel="stylesheet" href="_engine.css">
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav">
+  <a href="index.html">☰ Hub</a>
+  <a href="06_articles_intro.html">← Articles</a>
+  <span class="spacer"></span>
+  <a href="08_sentence_structure.html">Satzbau →</a>
+</div>
+
+<a class="videowrap" href="https://www.youtube.com/watch?v=cyRDSqopIyA" target="_blank" rel="noopener">
+  <img src="https://img.youtube.com/vi/cyRDSqopIyA/hqdefault.jpg" alt="How to know a word's gender">
+  <span class="play"></span>
+</a>
+<div class="watchline">▶ Tap to watch · <span lang="de">How to know a word's gender — Super Easy German 70</span></div>
+
+<h1>7 · <span class="de" lang="de">Das Geschlecht der Nomen</span></h1>
+<p class="lead">No rule covers 100%, but endings get you most of the way. Learn the ending → know the article. This is the single highest-leverage grammar file.</p>
+<span class="rainbow-note"><span class="rainbow">rainbow</span> = bonus beyond the video</span>
+
+<h2><span class="step">The ending rules</span>Feminine · Masculine · Neuter</h2>
+<h3 style="color:#f5a9c0">die — feminine (~46% of words)</h3>
+<table class="vocab">
+<tr><td class="w" lang="de">-ei</td><td class="m">die Datei, die Bäckerei, die Polizei</td></tr>
+<tr><td class="w" lang="de">-heit / -keit</td><td class="m">die Freiheit, die Krankheit, die Sicherheit</td></tr>
+<tr><td class="w" lang="de">-ung</td><td class="m">die Bewegung, die Endung, die Verpackung</td></tr>
+<tr><td class="w" lang="de">-ion</td><td class="m">die Aktion, die Religion, die Information</td></tr>
+<tr><td class="w" lang="de">-tät</td><td class="m">die Identität, die Stabilität</td></tr>
+<tr><td class="w" lang="de">-schaft</td><td class="m">die Freundschaft, die Mannschaft</td></tr>
+<tr><td class="w" lang="de">-ie / -ik / -ur / -in</td><td class="m">die Energie, die Musik, die Natur, die Ärzt<b>in</b></td></tr>
+</table>
+<h3 style="color:#9db8d4">der — masculine (~34%)</h3>
+<table class="vocab">
+<tr><td class="w" lang="de">-ant / -ent</td><td class="m">der Migrant, der Student, der Präsident</td></tr>
+<tr><td class="w" lang="de">-ich / -ling</td><td class="m">der Teppich, der Schmetterling, der Zwilling</td></tr>
+<tr><td class="w" lang="de">-er</td><td class="m">der Lehrer, der Fahrer (mostly — but die Butter!)</td></tr>
+<tr><td class="w" lang="de">-ismus / -ist / -or</td><td class="m">der Tourismus, der Journalist, der Motor</td></tr>
+<tr><td class="w" lang="de">days, months, weather, directions, alcohol</td><td class="m">der Montag, der April, der Regen, der Norden, der Wein</td></tr>
+</table>
+<h3 style="color:#8fd6b4">das — neuter (~20%)</h3>
+<table class="vocab">
+<tr><td class="w" lang="de">-chen / -lein</td><td class="m">das Mädchen, das Häuschen, das Tischlein (diminutives)</td></tr>
+<tr><td class="w" lang="de">-ment</td><td class="m">das Dokument, das Instrument, das Medikament</td></tr>
+<tr><td class="w" lang="de">-um / -tum / -ma</td><td class="m">das Datum, das Publikum, das Eigentum, das Thema</td></tr>
+<tr><td class="w" lang="de">Ge-</td><td class="m">das Gebäude, das Gebirge, das Geschrei</td></tr>
+<tr><td class="w" lang="de">verbs used as nouns · metals</td><td class="m">das Leben, das Schwimmen · das Gold, das Silber</td></tr>
+</table>
+<div class="warn"><b>Famous exception <span class="rainbow">(bonus)</span>:</b> <span lang="de">das Mädchen</span> is neuter — not because girls are neuter, but because <b>-chen</b> always wins. The ending beats the meaning.</div>
+
+<h2><span class="step">Anki</span>Ending → article</h2>
+<div id="anki-mount"></div>
+
+<h2><span class="step">Training · long</span>Guess the article from the ending</h2>
+<p class="lead">Lots of words, repeated. Wrong answers name the rule.</p>
+<div id="trainer-guess"></div>
+
+<h2><span class="step">Training · long</span>Which ending is which gender?</h2>
+<div id="trainer-rule"></div>
+
+<div id="checkoff-mount"></div>
+
+<div class="topnav" style="margin-top:40px">
+  <a href="index.html">☰ Hub</a>
+  <a href="06_articles_intro.html">← Articles</a>
+  <span class="spacer"></span>
+  <a href="08_sentence_structure.html">Next: Satzbau →</a>
+</div>
+</div>
+
+<script src="_engine.js"></script>
+<script>
+window.PAGE = {
+  slug:"gender",
+  ankiDeck:"DE · Genus-Regeln",
+  anki:[
+    {f:"-ung", b:"die (feminine)", ex:"die Bewegung, die Endung"},
+    {f:"-heit / -keit", b:"die", ex:"die Freiheit, die Sicherheit"},
+    {f:"-ei", b:"die", ex:"die Bäckerei, die Polizei"},
+    {f:"-ion", b:"die", ex:"die Aktion, die Religion"},
+    {f:"-tät", b:"die", ex:"die Identität"},
+    {f:"-schaft", b:"die", ex:"die Freundschaft"},
+    {f:"-ie / -ik / -ur", b:"die", ex:"die Energie, die Musik, die Natur"},
+    {f:"-in (person)", b:"die", ex:"die Ärztin, die Studentin"},
+    {f:"-ant / -ent", b:"der (masculine)", ex:"der Student, der Präsident"},
+    {f:"-ling", b:"der", ex:"der Schmetterling, der Zwilling"},
+    {f:"-ismus / -ist / -or", b:"der", ex:"der Tourismus, der Motor"},
+    {f:"-er (mostly)", b:"der", ex:"der Lehrer (but die Butter!)"},
+    {f:"days / months / weather / directions", b:"der", ex:"der Montag, der April, der Regen, der Norden"},
+    {f:"-chen / -lein", b:"das (neuter)", ex:"das Mädchen, das Häuschen"},
+    {f:"-ment", b:"das", ex:"das Dokument, das Medikament"},
+    {f:"-um / -ma", b:"das", ex:"das Datum, das Thema"},
+    {f:"Ge-…", b:"das", ex:"das Gebäude, das Gebirge"},
+    {f:"verb-as-noun", b:"das", ex:"das Leben, das Schwimmen"}
+  ],
+  trainers:[
+    {id:"guess", title:"Which article? (use the ending)", kind:"Gender rules", repeat:2, items:[
+      {type:"mc", q:"___ <b lang='de'>Freiheit</b>", opts:["die","der","das"], answer:"die", why:"-heit → die."},
+      {type:"mc", q:"___ <b lang='de'>Bewegung</b>", opts:["die","der","das"], answer:"die", why:"-ung → die."},
+      {type:"mc", q:"___ <b lang='de'>Student</b>", opts:["der","die","das"], answer:"der", why:"-ent → der."},
+      {type:"mc", q:"___ <b lang='de'>Mädchen</b>", opts:["das","die","der"], answer:"das", why:"-chen → das (ending beats meaning!)."},
+      {type:"mc", q:"___ <b lang='de'>Religion</b>", opts:["die","der","das"], answer:"die", why:"-ion → die."},
+      {type:"mc", q:"___ <b lang='de'>Tourismus</b>", opts:["der","die","das"], answer:"der", why:"-ismus → der."},
+      {type:"mc", q:"___ <b lang='de'>Dokument</b>", opts:["das","die","der"], answer:"das", why:"-ment → das."},
+      {type:"mc", q:"___ <b lang='de'>Freundschaft</b>", opts:["die","der","das"], answer:"die", why:"-schaft → die."},
+      {type:"mc", q:"___ <b lang='de'>Gebäude</b>", opts:["das","die","der"], answer:"das", why:"Ge- → das."},
+      {type:"mc", q:"___ <b lang='de'>Motor</b>", opts:["der","die","das"], answer:"der", why:"-or → der."},
+      {type:"mc", q:"___ <b lang='de'>Identität</b>", opts:["die","der","das"], answer:"die", why:"-tät → die."},
+      {type:"mc", q:"___ <b lang='de'>Schmetterling</b>", opts:["der","die","das"], answer:"der", why:"-ling → der."},
+      {type:"mc", q:"___ <b lang='de'>Datum</b>", opts:["das","die","der"], answer:"das", why:"-um → das."},
+      {type:"mc", q:"___ <b lang='de'>Ärztin</b>", opts:["die","der","das"], answer:"die", why:"-in (female person) → die."},
+      {type:"mc", q:"___ <b lang='de'>Montag</b>", opts:["der","die","das"], answer:"der", why:"days of the week → der."}
+    ]},
+    {id:"rule", title:"Ending → gender", kind:"Rule recall", repeat:1, items:[
+      {type:"mc", q:"Words ending <b lang='de'>-ung</b> are…", opts:["die","der","das"], answer:"die", why:"Always feminine."},
+      {type:"mc", q:"Words ending <b lang='de'>-chen</b> are…", opts:["das","die","der"], answer:"das", why:"Diminutive → neuter, always."},
+      {type:"mc", q:"Words ending <b lang='de'>-ismus</b> are…", opts:["der","die","das"], answer:"der", why:"Masculine."},
+      {type:"mc", q:"Words ending <b lang='de'>-keit</b> are…", opts:["die","der","das"], answer:"die", why:"Feminine."},
+      {type:"mc", q:"Words ending <b lang='de'>-ment</b> are…", opts:["das","der","die"], answer:"das", why:"Neuter."},
+      {type:"mc", q:"Words starting <b lang='de'>Ge-</b> are usually…", opts:["das","der","die"], answer:"das", why:"Mostly neuter."}
+    ]}
+  ],
+  checkoff:{ title:"Gender check", pass:0.8, intro:"Mixed & repeated. Pass to mark ✓ on the hub.", items:[
+    {type:"mc", q:"___ <b lang='de'>Krankheit</b>", opts:["die","der","das"], answer:"die", why:"-heit → die."},
+    {type:"mc", q:"___ <b lang='de'>Präsident</b>", opts:["der","die","das"], answer:"der", why:"-ent → der."},
+    {type:"mc", q:"___ <b lang='de'>Häuschen</b>", opts:["das","die","der"], answer:"das", why:"-chen → das."},
+    {type:"mc", q:"___ <b lang='de'>Information</b>", opts:["die","der","das"], answer:"die", why:"-ion → die."},
+    {type:"mc", q:"___ <b lang='de'>Thema</b>", opts:["das","die","der"], answer:"das", why:"-ma → das."}
+  ]}
+};
+Engine.init();
+</script>
+</body>
+</html>

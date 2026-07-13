@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>9 · Asking Questions</title>
+<link rel="stylesheet" href="_engine.css">
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav">
+  <a href="index.html">☰ Hub</a>
+  <a href="08_sentence_structure.html">← Satzbau</a>
+  <span class="spacer"></span>
+  <a href="10_prepositions_an_auf_in.html">Prepositions →</a>
+</div>
+
+<a class="videowrap" href="https://www.youtube.com/watch?v=1WT_cuee12Y" target="_blank" rel="noopener">
+  <img src="https://img.youtube.com/vi/1WT_cuee12Y/hqdefault.jpg" alt="How to ask questions in German">
+  <span class="play"></span>
+</a>
+<div class="watchline">▶ Tap to watch · <span lang="de">How to ask questions in German — Easy German 345</span></div>
+
+<h1>9 · <span class="de" lang="de">Fragen stellen</span></h1>
+<p class="lead">Two ways: flip the verb to the front (yes/no), or start with a W-word. Builds directly on the position-2 rule.</p>
+<span class="rainbow-note"><span class="rainbow">rainbow</span> = bonus beyond the video</span>
+
+<h2><span class="step">The two patterns</span></h2>
+<div class="tip"><b>Yes/no question:</b> put the conjugated verb <b>first</b>.
+<br><span lang="de">Du kochst selber.</span> → <span lang="de"><b>Kochst</b> du selber?</span></div>
+<div class="tip"><b>W-question:</b> W-word first, then verb (position 2), then the rest.
+<br><span lang="de"><b>Was</b> kochst du? · <b>Wann</b> kommst du nach Hause?</span></div>
+<div class="warn"><b>Object questions:</b> with <span lang="de">welche</span> / <span lang="de">wie viele</span>, the object rides along right after the W-word:
+<br><span lang="de"><b>Wie viele Bier</b> hat Janosch noch im Kühlschrank?</span></div>
+
+<h3>W-words</h3>
+<table class="vocab">
+<tr><td class="w" lang="de">wer</td><td class="m">who</td><td class="w" lang="de">was</td><td class="m">what</td></tr>
+<tr><td class="w" lang="de">wo</td><td class="m">where</td><td class="w" lang="de">wann</td><td class="m">when</td></tr>
+<tr><td class="w" lang="de">wie</td><td class="m">how</td><td class="w" lang="de">warum</td><td class="m">why</td></tr>
+<tr><td class="w" lang="de">woher</td><td class="m">from where (toward me)</td><td class="w" lang="de">wohin</td><td class="m">to where (away from me)</td></tr>
+<tr><td class="w" lang="de">welche</td><td class="m">which</td><td class="w" lang="de">wie viele</td><td class="m">how many</td></tr>
+</table>
+<div class="tip"><b>woher vs wohin</b> (bonus depth): <span lang="de"><b>Wohin</b> gehst du?</span> = movement away. <span lang="de"><b>Woher</b> kommst du?</span> = movement toward the speaker.</div>
+
+<h2><span class="step">Anki</span>W-words & question patterns</h2>
+<div id="anki-mount"></div>
+
+<h2><span class="step">Training · long</span>Turn statements into yes/no questions</h2>
+<div id="trainer-yesno"></div>
+
+<h2><span class="step">Training · long</span>Pick the right W-word</h2>
+<div id="trainer-wword"></div>
+
+<div id="checkoff-mount"></div>
+
+<div class="topnav" style="margin-top:40px">
+  <a href="index.html">☰ Hub</a>
+  <a href="08_sentence_structure.html">← Satzbau</a>
+  <span class="spacer"></span>
+  <a href="10_prepositions_an_auf_in.html">Next: Prepositions →</a>
+</div>
+</div>
+
+<script src="_engine.js"></script>
+<script>
+window.PAGE = {
+  slug:"fragen",
+  ankiDeck:"DE · Fragen",
+  anki:[
+    {f:"wer", b:"who"},
+    {f:"was", b:"what"},
+    {f:"wo", b:"where"},
+    {f:"wann", b:"when"},
+    {f:"wie", b:"how"},
+    {f:"warum", b:"why"},
+    {f:"woher", b:"from where (movement toward me)", ex:"Woher kommst du?"},
+    {f:"wohin", b:"to where (movement away)", ex:"Wohin gehst du?"},
+    {f:"welche", b:"which", ex:"Welche Farbe magst du?"},
+    {f:"wie viele", b:"how many", ex:"Wie viele Bier hast du?"},
+    {f:"Yes/no question pattern", b:"verb goes FIRST", ex:"Kochst du selber?"},
+    {f:"W-question pattern", b:"W-word, then verb (pos. 2), then rest", ex:"Was kochst du?"}
+  ],
+  trainers:[
+    {id:"yesno", title:"Make it a yes/no question", kind:"Verb-first", repeat:2, items:[
+      {type:"mc", q:"Statement: <b lang='de'>Du kochst selber.</b> → question?", opts:["Kochst du selber?","Du kochst selber?","Selber kochst du?"], answer:"Kochst du selber?", why:"Yes/no question = verb first, then subject."},
+      {type:"mc", q:"<b lang='de'>Janosch hat gute Laune.</b> →", opts:["Hat Janosch gute Laune?","Janosch hat gute Laune?"], answer:"Hat Janosch gute Laune?", why:"Move the verb 'hat' to the front."},
+      {type:"mc", q:"<b lang='de'>Sie kommt aus Berlin.</b> →", opts:["Kommt sie aus Berlin?","Sie kommt aus Berlin?"], answer:"Kommt sie aus Berlin?", why:"Verb first."},
+      {type:"type", q:"Turn into a yes/no question: <b lang='de'>Du wohnst in Berlin.</b>", answer:["Wohnst du in Berlin?","Wohnst du in Berlin"], why:"Wohnst du in Berlin? — verb to the front."},
+      {type:"type", q:"Turn into a yes/no question: <b lang='de'>Er spielt Fußball.</b>", answer:["Spielt er Fußball?","Spielt er Fußball"], why:"Spielt er Fußball?"}
+    ]},
+    {id:"wword", title:"Which W-word?", kind:"Question words", repeat:2, items:[
+      {type:"mc", q:"___ heißt du? (asking a name)", opts:["Wie","Was","Wer","Wo"], answer:"Wie", why:"'Wie heißt du?' = literally 'How are you called?'"},
+      {type:"mc", q:"___ kommst du? (asking origin, toward me)", opts:["Woher","Wohin","Wo","Wann"], answer:"Woher", why:"woher = from where (movement toward the speaker)."},
+      {type:"mc", q:"___ gehst du? (asking destination)", opts:["Wohin","Woher","Wo","Wer"], answer:"Wohin", why:"wohin = to where (movement away)."},
+      {type:"mc", q:"___ wohnst du? (asking a location, no movement)", opts:["Wo","Wohin","Woher"], answer:"Wo", why:"wo = static location."},
+      {type:"mc", q:"___ kommst du nach Hause? (asking a time)", opts:["Wann","Wo","Wie","Wer"], answer:"Wann", why:"wann = when."},
+      {type:"mc", q:"___ Bier hat er? (asking a number)", opts:["Wie viele","Welche","Warum"], answer:"Wie viele", why:"wie viele = how many (object follows right after)."},
+      {type:"mc", q:"___ ist das Wetter heute? (asking manner)", opts:["Wie","Was","Wo"], answer:"Wie", why:"Wie ist das Wetter? = How is the weather?"}
+    ]}
+  ],
+  checkoff:{ title:"Fragen check", pass:0.8, intro:"Mixed & repeated. Pass to mark ✓ on the hub.", items:[
+    {type:"mc", q:"Yes/no question of <b lang='de'>Du kochst.</b>", opts:["Kochst du?","Du kochst?"], answer:"Kochst du?", why:"Verb first."},
+    {type:"mc", q:"___ heißt du?", opts:["Wie","Was","Wo"], answer:"Wie", why:"Wie heißt du?"},
+    {type:"mc", q:"___ kommst du? (origin)", opts:["Woher","Wohin"], answer:"Woher", why:"woher = from where."},
+    {type:"mc", q:"___ gehst du? (destination)", opts:["Wohin","Woher"], answer:"Wohin", why:"wohin = to where."},
+    {type:"type", q:"Make a yes/no question: <b lang='de'>Sie wohnt hier.</b>", answer:["Wohnt sie hier?","Wohnt sie hier"], why:"Wohnt sie hier?"}
+  ]}
+};
+Engine.init();
+</script>
+</body>
+</html>
