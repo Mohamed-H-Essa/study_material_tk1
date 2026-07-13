@@ -69,7 +69,12 @@ const VIDEOS = [
   {stage:4,n:12,file:"12_introduce_yourself.html",id:"huwi-cjPPXU",id2:"Yaelm87PTvg",slug:"vorstellen",title:"Introduce Yourself",de:"Sich vorstellen",tag:"Name · age · home · hobbies"}
 ];
 
-function isDone(slug){return localStorage.getItem('de.'+slug+'.done')==='1'}
+function isDone(slug){
+  // The lecture engine saves done-state with JSON.stringify, so the raw value
+  // is the string "1" *with quotes*. Parse it back the same way before comparing.
+  try{const v=JSON.parse(localStorage.getItem('de.'+slug+'.done'));return v==='1'||v===1;}
+  catch(e){return false;}
+}
 
 for(const v of VIDEOS){
   const g=document.getElementById('g'+v.stage);
