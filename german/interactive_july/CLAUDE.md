@@ -39,6 +39,29 @@ infra/lambda/index.mjs     The sync backend (login/pull/push, per-key newest-win
 - If you ever must rename a concept, keep the old slug. Picking a fresh slug silently orphans
   a user's prior progress for that lesson.
 
+## Content rule: EVERY noun shows its plural (not just the article)
+
+German nouns are only half-learned without their plural, and the plural is unpredictable, so
+we always teach it. This applies to **every lesson, current and future, whether or not the
+video says the plural** — if the video omits it, supply the correct standard plural yourself
+(you are the German teacher here; get it right — Duden/DWDS forms, not guesses).
+
+**Canonical format:**
+- **Vocab table** (`.w` cell): `Word · die Plural` — e.g. `<td class="w" lang="de">Schrank · die Schränke</td>`.
+  The `.art` cell still holds the singular article (`der`/`die`/`das`). The `· die …` shows the
+  plural *with its always-`die` article* so learners see the article flip.
+- **Anki front**: `der Schrank → die Schränke` (singular w/ article → plural w/ article).
+- **Uncountable / singular-only** nouns (e.g. *das Besteck*, *das Salz*, *die Milch*, mass nouns,
+  most abstract nouns): write `(kein Plural)` in the table and Anki, don't invent one.
+- **Plural-only** nouns (e.g. *die Eltern*, *die Ferien*): mark `(nur Plural)`.
+- Non-nouns (verbs, adjectives, phrases) are unaffected — no plural.
+
+**Backward-compatibility:** this is a *display-only* change to the German text inside `.w` cells
+and Anki fronts. It never touches a `slug`, a trainer `answer`, `id`, `checkoff` logic, or any
+`de.<slug>.*` storage key, so already-done lessons keep syncing and stay marked ✓ done. When
+retrofitting, do not change trainer/checkoff `answer` strings (they gate the ✓) — only the
+vocab-table and Anki *display* text.
+
 ## Adding or reordering a lesson (progress-safe procedure)
 
 1. **Dedupe by YouTube ID** first (`grep youtube.com/watch *.html` + the VIDEOS array). Same
@@ -50,9 +73,9 @@ infra/lambda/index.mjs     The sync backend (login/pull/push, per-key newest-win
    `<title>`/`<h1>`; fix the prev/next seams on the two neighbours.
 4. **Build the file** from the template of a recent lesson: topnav, video thumb
    (`img.youtube.com/vi/<ID>/hqdefault.jpg`), a `🔁 Revision` block drilling earlier lessons,
-   vocab tables (correct der/die/das), tips, per-file Anki deck (~15-25 cards w/ examples &
-   ⇄ opposites), 2-3 repeating trainers, checkoff (pass 0.8). **Include the two sync lines**
-   before `_engine.js`:
+   vocab tables (correct der/die/das **+ plural — see the plural rule below**), tips, per-file
+   Anki deck (~15-25 cards w/ examples & ⇄ opposites), 2-3 repeating trainers, checkoff
+   (pass 0.8). **Include the two sync lines** before `_engine.js`:
    `<script src="config.js"></script><script src="sync.js"></script>`
 5. **Update** `index.html` VIDEOS (stage/n/file/id/slug/title/de/tag), renumber shifted `n:`,
    footer count. Add representative items to `revision.html` banks + core cards to `ALL_CARDS`.

@@ -180,6 +180,14 @@ lesson (never reuse an old one), place/reorder by editing numbers + `index.html`
 verification checks, `aws s3 sync` to redeploy the site. No backend change needed — new slugs
 sync automatically. Existing progress is untouched because slugs are stable.
 
+**Content standard — every noun shows its plural.** See CLAUDE.md → "Content rule: EVERY noun
+shows its plural." Vocab tables use `Word · die Plural` in the `.w` cell and Anki fronts use
+`der Singular → die Plural`; supply the correct plural even when the video omits it, and mark
+`(kein Plural)` / `(nur Plural)` for uncountable / plural-only nouns. This is display-only text
+inside `.w` cells and Anki fronts — it never touches a slug, a trainer/checkoff `answer`, or a
+`de.<slug>.*` sync key, so it is fully backward-compatible: already-done lessons keep syncing
+and stay marked ✓ done.
+
 ## 10. Rejected alternatives
 
 - **Per-device localStorage only** — rejected: user switches devices often, wants sync.
