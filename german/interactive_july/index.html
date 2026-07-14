@@ -101,23 +101,31 @@ function isDone(slug){
   catch(e){return false;}
 }
 
-for(const v of VIDEOS){
-  const g=document.getElementById('g'+v.stage);
-  const a=document.createElement('a');
-  a.href=v.file;a.className='card'+(isDone(v.slug)?' done':'');
-  a.innerHTML=`
-    <div class="thumb">
-      <img src="https://img.youtube.com/vi/${v.id}/hqdefault.jpg" alt="${v.title}" loading="lazy">
-      <span class="num">${v.n}</span>
-      <span class="done-badge">✓ done</span>
-    </div>
-    <div class="body">
-      <h3>${v.title}</h3>
-      <div class="de" lang="de">${v.de}</div>
-      <div class="tag">${v.tag}</div>
-    </div>`;
-  g.appendChild(a);
+// Build the cards once. Called after the initial sync so ✓ done-marks reflect cloud state
+// rather than stale local state that would never repaint (the sync race).
+function renderCards(){
+  for(const v of VIDEOS){
+    const g=document.getElementById('g'+v.stage);
+    const a=document.createElement('a');
+    a.href=v.file;a.className='card'+(isDone(v.slug)?' done':'');
+    a.innerHTML=`
+      <div class="thumb">
+        <img src="https://img.youtube.com/vi/${v.id}/hqdefault.jpg" alt="${v.title}" loading="lazy">
+        <span class="num">${v.n}</span>
+        <span class="done-badge">✓ done</span>
+      </div>
+      <div class="body">
+        <h3>${v.title}</h3>
+        <div class="de" lang="de">${v.de}</div>
+        <div class="tag">${v.tag}</div>
+      </div>`;
+    g.appendChild(a);
+  }
 }
+// Gate on the initial pull (falls back to local state on offline/timeout). If sync.js is
+// absent (raw files opened directly), render immediately.
+if (window.Sync && typeof window.Sync.ready === 'function') window.Sync.ready(renderCards);
+else renderCards();
 
 // ---- signed-in strip ----
 (function(){

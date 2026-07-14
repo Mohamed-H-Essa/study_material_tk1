@@ -67,6 +67,14 @@
   });
 
   function finish(user, token){
+    // If a DIFFERENT user's data is still cached on this device (e.g. previous session
+    // wasn't logged out), clear all local de.* progress first so this user starts from
+    // their own cloud state and nothing bleeds across users on a shared browser.
+    var prev = localStorage.getItem('de.__user');
+    if (prev && prev !== user) {
+      Object.keys(localStorage).filter(function(k){return k.indexOf('de.')===0;})
+        .forEach(function(k){ localStorage.removeItem(k); });
+    }
     localStorage.setItem('de.__user', user);
     localStorage.setItem('de.__token', token);
     localStorage.setItem('de.__syncurl', SYNC_URL);

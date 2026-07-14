@@ -26,8 +26,14 @@
     enabled: !!(USER && TOKEN && URL),
     user: USER,
     status: 'idle',
+    // Set true once the initial pull has finished (or timed out / been skipped).
+    // Consumers use Sync.ready(cb) below rather than reading this directly.
+    initialized: false,
     logout: function () {
-      ['de.__user', 'de.__token', 'de.__syncurl'].forEach(function (k) { LS.removeItem(k); });
+      // Wipe ALL local progress + auth so the next user on this device does not inherit it.
+      // (Progress is safe in the cloud under this user's blob; the next login pulls fresh.)
+      Object.keys(LS).filter(function (k) { return k.indexOf('de.') === 0; })
+        .forEach(function (k) { LS.removeItem(k); });
       location.href = 'login.html';
     },
   });
@@ -139,10 +145,34 @@
       });
   };
 
+  // ---- readiness gate ----
+  // Pages must not render done-state / decks until the initial pull has merged, or they
+  // paint stale local state and never repaint (the sync race). Sync.ready(cb) runs cb once
+  // the initial pull has settled — succeeded, failed, timed out, or (if sync is disabled)
+  // right away. Callers registered after readiness fire immediately.
+  var readyCbs = [];
+  function markReady() {
+    if (Sync.initialized) return;
+    Sync.initialized = true;
+    var cbs = readyCbs; readyCbs = [];
+    cbs.forEach(function (cb) { try { cb(); } catch (e) {} });
+  }
+  Sync.ready = function (cb) {
+    if (typeof cb !== 'function') return;
+    if (Sync.initialized) cb();
+    else readyCbs.push(cb);
+  };
+
   // Flush pending writes when leaving the page.
   window.addEventListener('beforeunload', function () { if (Object.keys(dirty).length) pushNow(); });
 
-  // Kick off the pull immediately (engine init runs after this script; the merge lands first
-  // in the common case, and any late-arriving server data still updates localStorage).
-  Sync.pullThen();
+  // Kick off the pull immediately. When it settles (merge done, or offline/timeout), release
+  // any renders waiting on Sync.ready(). If sync is disabled, we're ready at once with local
+  // state. A hard 5s backstop guarantees the page never hangs even if pullThen misbehaves.
+  if (!Sync.enabled) {
+    markReady();
+  } else {
+    setTimeout(markReady, 5000); // backstop; pullThen's own 4s timeout normally fires first
+    Sync.pullThen(markReady);
+  }
 })();

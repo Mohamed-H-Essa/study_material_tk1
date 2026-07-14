@@ -211,6 +211,13 @@ const Engine = (() => {
 
   /* ---------- init ---------- */
   function init(){
+    // Gate the first render on the initial cross-device sync so we don't paint stale local
+    // state (e.g. an un-mastered Anki deck or an un-done check-off) that never repaints once
+    // the server data lands. If sync.js isn't present, render immediately.
+    if (window.Sync && typeof window.Sync.ready === 'function') window.Sync.ready(render);
+    else render();
+  }
+  function render(){
     const P = window.PAGE; SLUG = P.slug;
     if(P.anki && P.anki.length){ const m=$('#anki-mount'); if(m) anki(m, P.ankiDeck||'Deck', P.anki); }
     if(P.trainers){ P.trainers.forEach(t=>{ const m = document.getElementById('trainer-'+t.id); if(m) trainer(m,t); }); }
