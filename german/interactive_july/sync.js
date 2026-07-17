@@ -73,10 +73,13 @@
     pushTimer = setTimeout(pushNow, 2000);
   }
 
-  function post(action, extra) {
+  function post(action, extra, keepalive) {
     return fetch(URL, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
+      // keepalive lets a push outlive the page. Without it the browser cancels the request
+      // when you navigate away, silently losing a just-earned ✓ (see pushNow/flush below).
+      keepalive: !!keepalive,
       body: JSON.stringify(Object.assign({ action: action, user: USER, token: TOKEN }, extra)),
     }).then(function (r) { return r.json(); });
   }
@@ -98,6 +101,26 @@
     return changed;
   }
 
+  // Self-heal: queue any local progress the server doesn't have (or has an older copy of).
+  //
+  // Historically a push could die with the page (see the flush notes below), leaving a lesson
+  // ✓ done in this browser but absent from the server — invisible on every other device. The
+  // pull merge alone never repairs that: it only copies server→local, never local→server.
+  // So after the first pull we walk local data keys and re-queue anything newer than (or
+  // missing from) the server's copy. Same newest-wins rule as everywhere else, so this can
+  // never clobber fresher progress made on another device.
+  function queueUnsyncedLocal(serverState) {
+    var state = serverState || {};
+    Object.keys(LS).forEach(function (k) {
+      if (!isDataKey(k)) return;
+      var localT = Number(LS.getItem(tsKey(k))) || 0;
+      if (!localT) return;                 // never written through the wrapper; nothing to date it by
+      var remote = state[k];
+      if (!remote || localT > Number(remote.t)) dirty[k] = true;
+    });
+    if (Object.keys(dirty).length) schedulePush();
+  }
+
   function setStatus(s) {
     Sync.status = s;
     var pill = document.getElementById('sync-pill');
@@ -108,17 +131,18 @@
     }
   }
 
-  function pushNow() {
+  function pushNow(keepalive) {
     if (!Sync.enabled) return;
+    if (pushTimer) { clearTimeout(pushTimer); pushTimer = null; }
     var keys = Object.keys(dirty);
     if (!keys.length) return;
     dirty = {};
     setStatus('syncing');
-    post('push', { changes: collectChanges(keys) })
+    post('push', { changes: collectChanges(keys) }, keepalive)
       .then(function (res) {
         if (res && res.ok) { applyServerState(res.state); setStatus('synced'); }
         else if (res && /token/.test(res.error || '')) Sync.logout();
-        else setStatus('offline');
+        else { keys.forEach(function (k) { dirty[k] = true; }); setStatus('offline'); }
       })
       .catch(function () { keys.forEach(function (k) { dirty[k] = true; }); setStatus('offline'); });
   }
@@ -134,7 +158,11 @@
       .then(function (res) {
         if (finished) return;
         finished = true; clearTimeout(t);
-        if (res && res.ok) { applyServerState(res.state); setStatus('synced'); }
+        if (res && res.ok) {
+          applyServerState(res.state);
+          queueUnsyncedLocal(res.state);   // repair anything a lost push stranded locally
+          setStatus('synced');
+        }
         else if (res && /token/.test(res.error || '')) return Sync.logout();
         else setStatus('offline');
         done && done();
@@ -164,7 +192,23 @@
   };
 
   // Flush pending writes when leaving the page.
-  window.addEventListener('beforeunload', function () { if (Object.keys(dirty).length) pushNow(); });
+  //
+  // This is the moment progress used to get lost: passing a check-off queues a debounced push,
+  // and clicking straight back to the hub unloaded the page before the 2s timer fired. The old
+  // beforeunload flush issued a normal fetch, which the browser cancels on unload — so the ✓
+  // lived in localStorage but never reached the server, and other devices never saw it.
+  //
+  // Two things make the flush actually land:
+  //  - keepalive:true, so the request survives the page being torn down;
+  //  - visibilitychange (hidden), which — unlike beforeunload — reliably fires on mobile and
+  //    on tab close/switch. pagehide covers bfcache navigations.
+  // pushNow() clears `dirty` up front, so overlapping triggers can't double-send.
+  function flush() { if (Object.keys(dirty).length) pushNow(true); }
+  window.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'hidden') flush();
+  });
+  window.addEventListener('pagehide', flush);
+  window.addEventListener('beforeunload', flush);
 
   // Kick off the pull immediately. When it settles (merge done, or offline/timeout), release
   // any renders waiting on Sync.ready(). If sync is disabled, we're ready at once with local
