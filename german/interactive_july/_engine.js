@@ -201,7 +201,10 @@ const Engine = (() => {
       const d=el('div'); d.style.textAlign='center'; d.style.padding='12px 0';
       d.innerHTML=`<span class="co-badge">✓ Marked done</span>`+
         (justNow?'<div class="ex-msg" style="margin-top:12px">Nice — this shows ✓ on the hub now.</div>':'');
-      const retry=el('button','co-retry','clear & redo'); retry.onclick=()=>{ save('done','0'); pos=0;correct=0;answered=false; render(); };
+      // Un-done a lesson only through the explicit clear intent, so cross-device sync treats it
+      // as a deliberate reset (the `done` flag is otherwise monotonic — a stale write can't undo
+      // a ✓). Falls back to a plain local write when sync.js isn't present.
+      const retry=el('button','co-retry','clear & redo'); retry.onclick=()=>{ if(window.Sync&&Sync.clearDone){Sync.clearDone(SLUG);}else{save('done','0');} pos=0;correct=0;answered=false; render(); };
       d.appendChild(retry); box.appendChild(d);
     }
     render(); mount.appendChild(box);

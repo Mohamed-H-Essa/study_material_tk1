@@ -5,8 +5,9 @@ HTML/JS lessons, deployed to AWS S3, with cross-device progress sync via one Lam
 project, **not enterprise** — keep it minimal, resilient, and cheap. Linguistic correctness and
 backwards-compatibility matter more than design polish.
 
-Full rationale: `docs/2026-07-13-deployment-and-sync-design.md`. Content pipeline & teaching
-stance also live in Claude's long-term memory (project: german-ci-*).
+Full rationale: `docs/2026-07-13-deployment-and-sync-design.md` (architecture) and
+`docs/superpowers/specs/2026-07-18-reliable-sync-design.md` (the current sync-merge model).
+Content pipeline & teaching stance also live in Claude's long-term memory (project: german-ci-*).
 
 ## Layout
 
@@ -22,8 +23,10 @@ index.html                 The hub. Redirects to login.html if not signed in. VI
 NN_slug.html               One lesson per file, numbered by display order.
 revision.html              Cumulative revision quizzes + "Export ALL cards".
 docs/                      Design docs.
-infra/                     Terraform (S3 site + state buckets, Lambda, Function URL) + Makefile.
-infra/lambda/index.mjs     The sync backend (login/pull/push, per-key newest-wins merge).
+infra/                     Terraform (S3 site + state buckets, Lambda, API Gateway) + Makefile.
+infra/lambda/index.mjs     The sync backend (login/pull/push). Server-assigned sequence numbers
+                           order writes; merge is per-key by KIND (done=monotonic,
+                           anki=per-card max, other=higher seq). nodejs22.x.
 ```
 
 ## The ONE rule that keeps everything backwards-compatible
@@ -31,13 +34,35 @@ infra/lambda/index.mjs     The sync backend (login/pull/push, per-key newest-win
 **A lesson's `slug` is its permanent identity. Never change or reuse a slug.**
 
 - Progress is stored in localStorage as `de.<slug>.done`, `de.<slug>.anki`, etc., and synced
-  under those same keys. The sync blob is a flat map `{ "de.<slug>.<what>": {v,t} }`.
+  under those same keys. The sync blob is a flat map `{ "__seq": <n>,
+  "de.<slug>.<what>": {v, seq, kind} }`.
 - Therefore **reordering or renumbering lessons cannot affect progress** — it only touches
   display numbers (`<title>`, `<h1>`, `num`) and filenames/nav links, never slugs.
 - **Adding** a lesson introduces a NEW slug; sync merges it in additively and never rewrites
-  existing keys. Merge rule everywhere is newest-timestamp-wins per key.
+  existing keys.
 - If you ever must rename a concept, keep the old slug. Picking a fresh slug silently orphans
   a user's prior progress for that lesson.
+
+## How sync merges (server-authoritative, not clock-based)
+
+Ordering is a **server-assigned monotonic sequence** (`__seq`), never a client wall-clock —
+client clocks disagree and the old timestamp merge let a skewed device silently overwrite good
+progress. The client keeps a `de.__seq` cursor and only receives entries newer than it. The
+Lambda merges each pushed key by its **kind** (derived from the suffix):
+
+- **`.done` → monotonic.** `"1"` always sticks; it is un-done ONLY by an explicit clear intent
+  (`{clear:true}`, sent by the lesson's "clear & redo" button via `Sync.clearDone(slug)`). A
+  stale write can never un-✓ a lesson. **This is why `done` is safe.**
+- **`.anki` → per-card forward-only union.** `max(existing, incoming)` per card; a deck reset
+  (`Sync.resetAnki(slug, map)`) sends `{reset:true}`.
+- **other → higher server seq wins.**
+
+Backward-compatible: old `{v,t}` entries read as `seq:0` and upgrade lazily on next touch; keys
+are unchanged. Full rationale: `docs/superpowers/specs/2026-07-18-reliable-sync-design.md`.
+
+**When adding an engine write path that may legitimately CLEAR progress, route it through
+`Sync.clearDone`/`Sync.resetAnki`** (with a plain-`save` fallback when `window.Sync` is absent) —
+a bare local write to `de.<slug>.done = "0"` will be ignored by the server on purpose.
 
 ## Content rule: EVERY noun shows its plural (not just the article)
 
@@ -126,8 +151,8 @@ CloudFront-based Terraform is in git history. See design doc §11.
 
 This is a light gate for two family members, not hardened auth. Passwords live only in the
 Lambda env (never in the downloadable files). Tokens are HMAC-signed with 30-day expiry. The
-sync Function URL is public (`authorization_type = NONE`) but every pull/push requires a valid
-token. Good enough on purpose — don't over-invest.
+API Gateway route is public (no authorizer) but every pull/push requires a valid token. Good
+enough on purpose — don't over-invest.
 
 ## Cost
 

@@ -91,27 +91,42 @@ which is not free. "Access from anywhere with a link" only needs a stable URL.
 
 ## 4. State model (the sync blob)
 
+> **Current model (2026-07-18): server-assigned sequence + kind-based merge.** The
+> timestamp-based merge originally described here was replaced — client wall-clocks disagree, so
+> "larger `t` wins" let a skewed device silently overwrite good progress (even on the same device
+> after a pull). See `docs/superpowers/specs/2026-07-18-reliable-sync-design.md` for the full
+> rationale. Summary below reflects what is implemented now.
+
 Per user, one JSON object stored at `s3://<state-bucket>/users/<user>.json`:
 
 ```json
 {
-  "de.tea.done":    { "v": "1",        "t": 1736800000000 },
-  "de.tea.anki":    { "v": {"...": 3}, "t": 1736800100000 },
-  "de.kitchen.done":{ "v": "1",        "t": 1736800200000 },
-  ...
+  "__seq": 42,
+  "de.tea.done":     { "v": "1",        "seq": 12, "kind": "done" },
+  "de.tea.anki":     { "v": {"...": 3}, "seq": 13, "kind": "anki" },
+  "de.kitchen.done": { "v": "1",        "seq": 20, "kind": "done" }
 }
 ```
 
 - Keys are the **exact localStorage keys** the engine already uses: `de.<slug>.<what>`
   (`done`, `anki`, plus anything future lessons add). No schema per lesson — it's a flat map.
 - `v` = the value (already JSON, matching what `localStorage` holds after `JSON.parse`).
-- `t` = epoch ms of last write on the writing device.
+- `__seq` = the per-user monotonic counter the Lambda owns; `seq` = the server-assigned order of
+  that write; `kind` = `done` | `anki` | `other` (derived from the key suffix).
 
-**Merge (both directions, in Lambda and client):** for each key, keep the entry with the
-larger `t`. Union of keys from both sides. This makes it:
+**Merge (server-authoritative, by kind):**
+- **`done`** — monotonic: `"1"` always sticks; un-done only with an explicit `{clear:true}`.
+- **`anki`** — per-card forward-only union: `max(existing, incoming)` per card.
+- **`other`** — higher server `seq` wins.
+
+The client keeps a `de.__seq` cursor and receives only entries newer than it. This is:
 - **reorder-safe** (keys are slug-based, untouched by reordering),
 - **add-safe** (new slugs = new keys, merged in additively),
-- **collision-safe** (two devices editing different lessons both survive; same lesson → newest wins).
+- **collision-safe** (different lessons on two devices both survive; a `done` can never regress),
+- **clock-safe** (ordering is server-assigned, so device clock skew is irrelevant).
+
+Backward-compatible: pre-existing `{v,t}` entries read as `seq:0`, `kind` recomposed from the
+suffix, re-stamped with a real seq on next touch. No migration; upgrade is lazy and per-key.
 
 ## 5. Client integration (`sync.js`)
 
@@ -120,12 +135,16 @@ Included by every page via a single `<script src="sync.js"></script>` line place
 
 1. Reads `{user, token, syncUrl}` from `localStorage` (set by login.html). If none → no-op
    (pure local mode, nothing breaks).
-2. Wraps `localStorage.setItem` for keys starting `de.` to also stamp a `de.__ts.<key>` = now,
-   and schedule a debounced `push` (2s) of all changed `de.*` keys.
-3. On page load, does one `pull`, merges newest-wins into `localStorage`, and if anything
-   changed, reloads engine state (simplest: it merges before `_engine.init()` runs, so the
-   engine reads already-merged values).
-4. Exposes a tiny status pill (synced ✓ / syncing ⏳ / offline ⚠) and honours "log out".
+2. Wraps `localStorage.setItem` for `de.<slug>.*` keys to mark them dirty (with their `kind`) and
+   schedule a debounced `push` (2s) of the changed keys, carrying the `de.__seq` cursor. No
+   client timestamp is recorded — ordering is server-assigned.
+3. On page load, does one `pull` (sending the cursor), applies the returned delta into
+   `localStorage` before `_engine.init()` runs, and advances the cursor. A pull never overwrites
+   a local write still pending in `dirty`.
+4. Flushes pending pushes on `visibilitychange`(hidden)/`pagehide`/`beforeunload` with
+   `keepalive:true`, so a just-earned ✓ can't die when the page unloads.
+5. Exposes `Sync.clearDone(slug)` / `Sync.resetAnki(slug,map)` for the only paths allowed to move
+   progress backwards, a status pill (synced ✓ / syncing ⏳ / offline ⚠), and "log out".
 
 The engine's `save()/load()` are **not changed** — they already go through `localStorage`,
 so wrapping `localStorage` catches everything, including future lesson types.
@@ -211,6 +230,13 @@ These are all the same account-verification hold. **Resolution:** the owner must
 account-verification case in the AWS Console Support Center (the Support *API* needs a paid
 plan, but filing a verification request from the console is free). Until then we deliberately
 use **API Gateway + public S3 website hosting**, which are not affected.
+
+**Re-probed 2026-07-18 — hold still active.** Lambda concurrency is still capped at 10. A public
+Function URL *config* can now be created, but invoking it returns **403 Forbidden**, so Function
+URLs remain unusable; API Gateway stays the transport. The Lambda runtime was bumped
+**nodejs20.x → nodejs22.x** (AWS Health EOL notice; Node 20 support ended 2026-04-30). A custom
+domain was considered and **deferred**: it does not affect sync, and the clean version (custom
+domain + HTTPS) needs CloudFront, which this hold still blocks — revisit after verification.
 
 **Migrating to CloudFront after verification (optional, no client change):** make the site
 bucket private with an OAC, add a CloudFront distribution with the S3 site as default origin
