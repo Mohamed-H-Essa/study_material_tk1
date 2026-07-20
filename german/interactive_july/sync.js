@@ -129,6 +129,18 @@
   // key that still has an unacknowledged local write pending (it's in `dirty`) — that write will
   // be (re)pushed and the server decides the merge. Everything else is applied verbatim, because
   // the server already resolved ordering by seq. Advances the cursor.
+  // A localStorage value that means "done" (the engine writes "1"; JSON-parsed it may be 1).
+  function localIsDone(k) {
+    var raw = LS.getItem(k);
+    if (raw == null) return false;
+    var v; try { v = JSON.parse(raw); } catch (e) { v = raw; }
+    return v === '1' || v === 1 || v === true;
+  }
+  function entryIsDone(entry) {
+    var v = entry && entry.v;
+    return v === '1' || v === 1 || v === true;
+  }
+
   function applyServerState(state, serverSeq) {
     if (state) {
       Object.keys(state).forEach(function (k) {
@@ -136,6 +148,11 @@
         if (dirty[k]) return; // local write not yet acked — don't stomp it
         var entry = state[k];
         if (!entry || typeof entry !== 'object') return;
+        // DONE IS PERMANENT. Never let an incoming value revert a locally-done lesson back to
+        // not-done — not on refresh, not from any device. Once ✓, it stays ✓. (The server is
+        // also monotonic, but this client guard makes the guarantee hold even against a stale
+        // delta, an old "0" left in the blob, or a legacy entry.)
+        if (/\.done$/.test(k) && localIsDone(k) && !entryIsDone(entry)) return;
         rawSet(k, typeof entry.v === 'string' ? entry.v : JSON.stringify(entry.v));
       });
     }

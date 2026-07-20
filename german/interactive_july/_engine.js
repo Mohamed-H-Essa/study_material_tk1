@@ -198,14 +198,14 @@ const Engine = (() => {
       const again=el('button','btn primary','↻ Retry'); again.onclick=()=>{pos=0;correct=0;answered=false;render();}; r.appendChild(again); box.appendChild(r);
     }
     function renderDone(justNow){
+      // DONE IS PERMANENT by design — there is deliberately no un-done / reset control. Once a
+      // lesson is ✓ it stays ✓ forever, on every device, across refreshes. (See the matching
+      // client guard in sync.js and the server's monotonic `done` rule.) You can still re-watch
+      // the video and re-run the drills above; this only fixes the ✓ so it can never be lost.
       const d=el('div'); d.style.textAlign='center'; d.style.padding='12px 0';
       d.innerHTML=`<span class="co-badge">✓ Marked done</span>`+
-        (justNow?'<div class="ex-msg" style="margin-top:12px">Nice — this shows ✓ on the hub now.</div>':'');
-      // Un-done a lesson only through the explicit clear intent, so cross-device sync treats it
-      // as a deliberate reset (the `done` flag is otherwise monotonic — a stale write can't undo
-      // a ✓). Falls back to a plain local write when sync.js isn't present.
-      const retry=el('button','co-retry','clear & redo'); retry.onclick=()=>{ if(window.Sync&&Sync.clearDone){Sync.clearDone(SLUG);}else{save('done','0');} pos=0;correct=0;answered=false; render(); };
-      d.appendChild(retry); box.appendChild(d);
+        (justNow?'<div class="ex-msg" style="margin-top:12px">Nice — this shows ✓ on the hub, for good.</div>':'');
+      box.appendChild(d);
     }
     render(); mount.appendChild(box);
   }

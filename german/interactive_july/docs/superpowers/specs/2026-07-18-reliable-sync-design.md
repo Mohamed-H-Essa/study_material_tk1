@@ -38,11 +38,15 @@ semantic merge rules.
 `kind` is derived from the key suffix: `de.<slug>.done` → `done`, `de.<slug>.anki` → `anki`,
 anything else → `other`.
 
-1. **`done` — monotonic.**
+1. **`done` — permanent (updated 2026-07-20).**
    - incoming `"1"` → always accepted (set/keep ✓, assign new seq).
-   - incoming `"0"` / cleared → accepted **only** with an explicit `{clear:true}` intent
-     (the lesson's "clear & redo" button). Without it, ignored.
-   - Consequence: a stale pull can never silently un-done a lesson. Kills the reported bug.
+   - The server still technically honours an explicit `{clear:true}`, but **nothing sends it**:
+     the engine's "clear & redo" button was removed by product decision, so `done` is now
+     effectively write-once. In addition `sync.js`'s `applyServerState` refuses to overwrite a
+     locally-done key with a not-done value, so a stale delta / old "0" / legacy entry can never
+     revert a ✓ on refresh either.
+   - Consequence: once a lesson is done it stays done, on every device, across refreshes.
+     This kills both the original cross-device bug and the later refresh-reverts-done bug.
 
 2. **`anki` — per-card forward-only union.**
    - `result[card] = max(server_ease[card], incoming_ease[card])` over the union of cards.

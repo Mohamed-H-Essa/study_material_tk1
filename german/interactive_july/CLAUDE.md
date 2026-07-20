@@ -50,9 +50,12 @@ client clocks disagree and the old timestamp merge let a skewed device silently 
 progress. The client keeps a `de.__seq` cursor and only receives entries newer than it. The
 Lambda merges each pushed key by its **kind** (derived from the suffix):
 
-- **`.done` → monotonic.** `"1"` always sticks; it is un-done ONLY by an explicit clear intent
-  (`{clear:true}`, sent by the lesson's "clear & redo" button via `Sync.clearDone(slug)`). A
-  stale write can never un-✓ a lesson. **This is why `done` is safe.**
+- **`.done` → permanent.** Once ✓, a lesson stays ✓ forever — on every device, across
+  refreshes. Three layers enforce this: the server's `done` merge is monotonic; `sync.js`'s
+  `applyServerState` refuses to overwrite a locally-done key with a not-done value; and the
+  engine has **no un-done UI** (the old "clear & redo" button was removed by explicit decision).
+  `Sync.clearDone(slug)` still exists in `sync.js` but is intentionally unwired — nothing calls
+  it, so nothing can revert a completion.
 - **`.anki` → per-card forward-only union.** `max(existing, incoming)` per card; a deck reset
   (`Sync.resetAnki(slug, map)`) sends `{reset:true}`.
 - **other → higher server seq wins.**
@@ -60,9 +63,10 @@ Lambda merges each pushed key by its **kind** (derived from the suffix):
 Backward-compatible: old `{v,t}` entries read as `seq:0` and upgrade lazily on next touch; keys
 are unchanged. Full rationale: `docs/superpowers/specs/2026-07-18-reliable-sync-design.md`.
 
-**When adding an engine write path that may legitimately CLEAR progress, route it through
-`Sync.clearDone`/`Sync.resetAnki`** (with a plain-`save` fallback when `window.Sync` is absent) —
-a bare local write to `de.<slug>.done = "0"` will be ignored by the server on purpose.
+**Done is permanent by product decision — do not add any UI or code path that un-dones a
+lesson.** A bare local write to `de.<slug>.done = "0"` is ignored by the server AND blocked by
+the client apply guard, so it would not work anyway. (`Sync.resetAnki` for deck resets is still
+available; only `done` is locked.)
 
 ## Content rule: EVERY noun shows its plural (not just the article)
 
