@@ -110,5 +110,16 @@ p{margin-bottom:12px}
 .co-badge{display:inline-flex;align-items:center;gap:8px;background:#16a34a;color:#fff;font-weight:700;padding:8px 16px;border-radius:24px;font-size:15px}
 .co-retry{margin-left:12px;font-size:13px;color:#8b93a7;background:none;border:none;cursor:pointer;text-decoration:underline}
 
+/* ---- standalone "download this lesson's Anki deck" button (top & bottom of a lesson) ---- */
+.anki-export{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:16px 0}
+.anki-export-btn{display:inline-flex;align-items:center;gap:9px;padding:11px 18px;border-radius:9px;
+  border:1px solid #29405c;background:#141d2a;color:#7ec8e3;font-size:15px;font-weight:600;
+  cursor:pointer;font-family:inherit;transition:border-color .15s,background .15s,color .15s}
+.anki-export-btn:hover{border-color:#4a90d9;background:#18263a;color:#9ad4ea}
+.anki-export-btn .n{font-size:12px;font-weight:400;color:#6b7280;border-left:1px solid #2a3a4f;padding-left:9px}
+.anki-export-btn.done{border-color:#16a34a;background:#0f2419;color:#4ade80}
+.anki-export-btn.done .n{border-left-color:#1f6b3d}
+.anki-export-note{font-size:12.5px;color:#5a6070}
+
 .hidden{display:none}
 kbd{background:#262a38;padding:1px 6px;border-radius:4px;color:#aeb4c2;font-size:12px;font-family:ui-monospace,monospace}

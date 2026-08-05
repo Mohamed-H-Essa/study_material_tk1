@@ -61,16 +61,72 @@ const Engine = (() => {
     mount.appendChild(box);
   }
 
-  function exportTSV(deckName, cards){
-    const rows = cards.map(c=>{
-      const back = c.b + (c.ex? '<br><i>'+c.ex+'</i>' : '');
-      return c.f.replace(/\t/g,' ') + '\t' + back.replace(/\t/g,' ');
-    });
-    const blob = new Blob([rows.join('\n')], {type:'text/tab-separated-values'});
+  /* ---------- Anki export ----------
+     Output is a tab-separated file with Anki's import header directives (2.1.54+):
+       #separator:Tab   the delimiter
+       #html:true       so the <br>/<i> we put in the back render as HTML, not literal text
+       #deck column:3   column 3 names the destination deck  ("A::B" nests as a subdeck)
+     Front and back are columns 1-2. When `deckName` is a plain string every row gets that
+     same deck; the multi-deck export instead passes a per-card deck (see exportDecks). */
+
+  // A field must never contain a tab or newline or it would break the column layout.
+  const field = s => String(s == null ? '' : s).replace(/[\t\r\n]+/g, ' ').trim();
+  const back = c => c.b + (c.ex ? '<br><i>' + c.ex + '</i>' : '');
+  // Anki reads "::" as deck nesting ("Deutsch::16 · Body" = subdeck "16 · Body" of "Deutsch").
+  // We DO want that, so split on it, clean each segment, and rejoin — a stray "::" inside a
+  // lesson title becomes an em dash instead of silently creating an extra nesting level.
+  const deckPath = s => String(s || 'Deck')
+    .split('::')
+    .map(part => part.replace(/:+/g, '—').replace(/[\t\r\n]+/g, ' ').trim())
+    .filter(Boolean)
+    .join('::') || 'Deck';
+
+  function download(filename, text){
+    const blob = new Blob([text], {type:'text/tab-separated-values;charset=utf-8'});
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = (deckName||'deck').replace(/[^\w]+/g,'_') + '.txt';
+    a.download = filename;
     document.body.appendChild(a); a.click(); a.remove();
+    // Chrome needs the object URL to outlive the click; release it on the next tick.
+    setTimeout(()=>URL.revokeObjectURL(a.href), 0);
+  }
+
+  function tsvHeader(){
+    return ['#separator:Tab', '#html:true', '#deck column:3'].join('\n') + '\n';
+  }
+
+  // groups: [{deck:"<name>", cards:[{f,b,ex}]}, ...] -> one file, one deck per row.
+  // Cards with a front already seen are skipped: the same word is deliberately taught in
+  // more than one lesson, but importing it twice would create duplicate notes in Anki.
+  function buildTSV(groups){
+    const seen = new Set();
+    const rows = [];
+    for (const g of groups){
+      const deck = deckPath(g.deck);
+      for (const c of (g.cards||[])){
+        const f = field(c.f);
+        if (!f || seen.has(f)) continue;
+        seen.add(f);
+        rows.push(f + '\t' + field(back(c)) + '\t' + deck);
+      }
+    }
+    return { text: tsvHeader() + rows.join('\n') + '\n', count: rows.length };
+  }
+
+  const safeName = s => (s||'deck').replace(/[^\wÀ-ɏ]+/g,'_').replace(/^_+|_+$/g,'') || 'deck';
+
+  // One lesson's deck.
+  function exportTSV(deckName, cards){
+    const { text } = buildTSV([{deck: deckName, cards}]);
+    download(safeName(deckName) + '.txt', text);
+  }
+
+  // Many decks in a single file, each row carrying its own deck name.
+  // Returns how many unique cards were written, so callers can report it.
+  function exportDecks(filename, groups){
+    const { text, count } = buildTSV(groups);
+    download(safeName(filename) + '.txt', text);
+    return count;
   }
 
   /* ---------- TRAINER (long, repeating, explains wrongs) ---------- */
@@ -220,8 +276,34 @@ const Engine = (() => {
     if (window.Sync && typeof window.Sync.ready === 'function') window.Sync.ready(render);
     else render();
   }
+  // Standalone "download this lesson's deck" buttons. A lesson page puts
+  // <div class="anki-export-mount"></div> wherever it wants one (we use top and bottom);
+  // every mount gets the same button, so the deck is always one click away.
+  function exportButtons(P){
+    const mounts = document.querySelectorAll('.anki-export-mount');
+    if(!mounts.length || !P.anki || !P.anki.length) return;
+    const deck = P.ankiDeck || 'Deck';
+    mounts.forEach(m=>{
+      m.innerHTML = '';
+      const wrap = el('div','anki-export');
+      const b = el('button','anki-export-btn', '⬇ Anki-Deck herunterladen <span class="n">'+P.anki.length+' Karten</span>');
+      b.title = 'Download this lesson’s flashcards as an Anki-ready file';
+      b.onclick = ()=>{
+        exportTSV(deck, P.anki);
+        const old = b.innerHTML;
+        b.innerHTML = '✓ Heruntergeladen';
+        b.classList.add('done');
+        setTimeout(()=>{ b.innerHTML = old; b.classList.remove('done'); }, 2200);
+      };
+      wrap.appendChild(b);
+      wrap.appendChild(el('span','anki-export-note','Import into Anki — it lands in its own deck.'));
+      m.appendChild(wrap);
+    });
+  }
+
   function render(){
     const P = window.PAGE; SLUG = P.slug;
+    exportButtons(P);
     if(P.anki && P.anki.length){ const m=$('#anki-mount'); if(m) anki(m, P.ankiDeck||'Deck', P.anki); }
     if(P.trainers){ P.trainers.forEach(t=>{ const m = document.getElementById('trainer-'+t.id); if(m) trainer(m,t); }); }
     if(P.checkoff){ const m=$('#checkoff-mount'); if(m) checkoff(m,P.checkoff); }
@@ -237,8 +319,10 @@ const Engine = (() => {
   }
   // Public helper so the Revision hub can bundle every deck into one Anki file.
   function exportAll(deckName, cards){ exportTSV(deckName, cards); }
+  // Public: one file containing many decks (used by the hub and the revision page).
+  function exportMany(filename, groups){ return exportDecks(filename, groups); }
   // Standalone trainer/checkoff mounts for pages that build their own config (e.g. revision.html)
   function mountTrainer(mount, cfg){ trainer(mount, cfg); }
 
-  return {init, exportAll, mountTrainer};
+  return {init, exportAll, exportMany, mountTrainer};
 })();

@@ -32,7 +32,7 @@
 
 <div class="exportall">
   <button id="exportAll">⬇ Export ALL cards for Anki (one TSV)</button>
-  <div class="note">Bundles every video's flashcards into a single tab-separated file you can import into Anki (front ⇥ back).</div>
+  <div class="note">Bundles every lesson's flashcards into one file. Anki imports it as a tidy subdeck per lesson.</div>
 </div>
 
 <h2><span class="step">Stufe 2 · Review</span>Concrete nouns &amp; scenes</h2>
@@ -64,6 +64,8 @@
 
 <script src="config.js"></script>
 <script src="sync.js"></script>
+<script src="lessons.js"></script>
+<script src="decks.js"></script>
 <script src="_engine.js"></script>
 <script>
 /* ---- cumulative review question banks (curated across all lessons) ---- */
@@ -121,159 +123,20 @@ const S3 = {id:"s3", title:"Stufe 3-4 — grammar & speaking", kind:"Cumulative 
   {type:"type", q:"'I am … years old.' → <b lang='de'>Ich ___ … Jahre alt.</b>", answer:["bin"], why:"Ich bin … Jahre alt."}
 ]};
 
-/* ---- combined Anki deck: every card from every lesson ---- */
-const ALL_CARDS = [
-  // Foundations / tea / kitchen
-  ["das Wasser","water"],["der Wasserhahn","the tap / faucet"],["der Wasserkocher","the kettle"],
-  ["die Tasse","the cup"],["der Henkel","the handle (of a cup)"],["der Tee","the tea"],["der Teebeutel","the tea bag"],
-  ["die Küche","the kitchen"],["der Schrank → die Schränke","cupboard → cupboards"],["die Schublade","drawer"],
-  ["der Backofen","the oven"],["der Herd","the stove"],["der Topf","the pot"],["die Pfanne","the pan"],
-  ["das Schneidebrett","the cutting board"],["das Spülbecken","the sink"],["das Besteck","the cutlery"],
-  ["der Löffel","the spoon"],["die Gabel","the fork"],["das Messer","the knife"],["der Teller","the plate"],
-  // hands
-  ["die Hand → die Hände","hand → hands"],["der Finger","the finger"],["der Daumen","the thumb"],
-  ["der Zeigefinger","the index finger"],["der Ring","the ring"],["zeigen","to point / show"],["anfassen","to touch"],
-  // tram
-  ["die Straßenbahn","the tram"],["die Haltestelle","the (tram) stop"],["die Fahrkarte","the ticket"],
-  ["der Fahrgast → die Fahrgäste","passenger → passengers"],["einsteigen ⇄ aussteigen","to get on ⇄ to get off"],
-  // cat & table
-  ["die Katze","the cat"],["das Fell","the fur (of an animal)"],["der Tisch","the table"],["der Stuhl","the chair"],
-  ["weich ⇄ hart","soft ⇄ hard"],["rund ⇄ eckig","round ⇄ angular"],["aus Holz","(made) of wood"],["aus Metall","(made) of metal"],["bunt","colourful"],
-  // photo / ghost
-  ["die Sonnenbrille","the sunglasses"],["die Kappe","the cap"],["der Hut","the hat"],["das Buch → die Bücher","book → books"],
-  ["dick ⇄ dünn","thick ⇄ thin"],["die Wanduhr","the wall clock"],["der Zeiger","the clock hand / pointer"],
-  // houses
-  ["das Haus → die Häuser","house → houses"],["das Dach → die Dächer","roof → roofs"],["der Schornstein","the chimney"],
-  ["das Fenster","the window"],["der Himmel","the sky"],["zwischen … und …","between … and …"],["dazwischen","in between"],
-  // child & dog
-  ["das Kind","the child"],["der Hund","the dog"],["das Glas","the glass"],["die Blume","the flower"],
-  ["die Wolke","the cloud"],["der Regen","the rain"],["über (+ Dativ)","above / over"],["unter (+ Dativ)","below / under"],
-  // living room
-  ["das Wohnzimmer","the living room"],["das Sofa","the sofa"],["das Kissen","the cushion"],["die Lampe","the lamp"],
-  ["die Glühbirne","the light bulb"],["die Vase","the vase"],["der Bilderrahmen","the picture frame"],
-  ["der Boden","the floor"],["die Wand","the wall"],["die Decke","the ceiling"],["neben","next to"],["die Mitte","the middle"],
-  // beach
-  ["die Frau → die Frauen","woman → women"],["das Handtuch","the towel"],["der Badeanzug → die Badeanzüge","swimsuit → swimsuits"],
-  ["der Strand","the beach"],["ein roter Badeanzug","a red swimsuit"],["auf der linken Seite","on the left side"],
-  // apple
-  ["der Apfel → die Äpfel","apple → apples"],["die Schale","the peel / skin"],["der Kern → die Kerne","seed → seeds"],
-  ["das Kerngehäuse","the core"],["die Schüssel","the bowl"],["schneiden ... schneiden","to cut"],["schälen","to peel"],["halbieren","to halve"],
-  // pencil case
-  ["das Mäppchen","the pencil case"],["der Bleistift","the pencil"],["der Buntstift","the coloured pencil"],
-  ["der Füller","the fountain pen"],["der Textmarker","the highlighter"],["die Kappe (Stift)","the cap (of a pen)"],
-  ["das Lineal","the ruler"],["das Papier","the paper"],["gleich ⇄ unterschiedlich","the same ⇄ different"],["die Form","the shape"],
-  // weather & week
-  ["der Montag","Monday"],["der Dienstag","Tuesday"],["der Mittwoch","Wednesday"],["der Donnerstag","Thursday"],
-  ["der Freitag","Friday"],["der Samstag","Saturday"],["der Sonntag","Sunday"],
-  ["die Sonne — sonnig","sun — sunny"],["die Wolke — wolkig","cloud — cloudy"],["der Regen — es regnet","rain — it rains"],
-  ["der Wind — windig","wind — windy"],["das Gewitter — es gewittert","thunderstorm — it storms"],["der Schnee — es schneit","snow — it snows"],
-  ["gestern / heute / morgen","yesterday / today / tomorrow"],["es war / es ist / es wird","it was / it is / it will be"],
-  // winter girl
-  ["das Mädchen","the girl"],["die Wange → die Wangen","cheek → cheeks"],["der Mantel","the coat"],["der Schal","the scarf"],
-  ["der Knopf → die Knöpfe","button → buttons"],["tragen","to wear (also to carry)"],["etwas Rotes","something red"],["kalt","cold"]
-,
-  // ---- body, face, people, family (16-19) ----
-  ["der Kopf → die Köpfe","the head"],["der Hals → die Hälse","neck / throat"],
-  ["die Schulter → die Schultern","the shoulder"],["der Bauch → die Bäuche","the belly"],
-  ["der Rücken → die Rücken","the back"],["das Knie → die Knie","the knee"],
-  ["der Fuß → die Füße","foot → feet"],["der Zeh → die Zehen","toe → toes"],
-  ["greifen","to grip"],["winken","to wave"],["klatschen","to clap"],["rennen","to run (fast)"],
-  ["Ich habe Hunger.","I am hungry (German HAS hunger)"],
-  ["das Gesicht → die Gesichter","the face"],["das Augenlid → die Augenlider","the eyelid"],
-  ["die Augenbraue → die Augenbrauen","the eyebrow"],["der Mund → die Münder","mouth (person)"],
-  ["das Maul → die Mäuler","mouth (animal)"],["die Lippe → die Lippen","the lip"],
-  ["die Zunge → die Zungen","the tongue"],["die Stirn → die Stirnen","the forehead"],
-  ["sehen / hören / riechen / schmecken","see / hear / smell / taste"],["blinzeln","to blink"],
-  ["Wie sieht sie aus?","What does she LOOK like?"],["Wie ist sie?","What is she LIKE?"],
-  ["schlank ⇄ dick","slim ⇄ fat"],["schüchtern","shy"],["schlau","clever"],["ruhig","quiet / calm"],
-  ["Sie ist Buchautorin.","She is an author (NO article with jobs)"],
-  ["die Eltern (nur Plural)","the parents"],["die Geschwister (nur Plural)","siblings"],
-  ["der Bruder → die Brüder","brother → brothers"],["die Schwester → die Schwestern","sister → sisters"],
-  ["der Neffe → die Neffen","the nephew"],["die Nichte → die Nichten","the niece"],
-  ["der Onkel → die Onkel","the uncle"],["die Tante → die Tanten","the aunt"],
-  ["verheiratet ⇄ geschieden","married ⇄ divorced"],
-  // ---- counting, home, daily life, the week (20-23) ----
-  ["einundzwanzig","21 — one-and-twenty"],["sechzehn","16 (NOT sechszehn)"],["dreißig","30 (with ß)"],
-  ["Wie viele …? / Wie viel …?","how many? (countable) / how much?"],
-  ["das Schlafzimmer → die Schlafzimmer","the bedroom"],["das Badezimmer → die Badezimmer","the bathroom"],
-  ["das Gästezimmer → die Gästezimmer","the guest room"],["das Büro → die Büros","the office"],
-  ["der Kleiderschrank → die Kleiderschränke","the wardrobe"],["der Garten → die Gärten","the garden"],
-  ["wohnen ⇄ leben","reside at an address ⇄ live / be alive"],
-  ["aufstehen","to get up (separable)"],["aufwachen","to wake up (separable)"],
-  ["Ich stehe um sieben Uhr auf.","Separable prefix goes LAST"],
-  ["jeden Tag / jede Nacht","every day / every night"],
-  ["am Montag","on Monday (an dem → am)"],["morgens / abends","in the mornings / evenings"],
-  ["Am Montag macht Emma Yoga.","Verb stays SECOND after a fronted time phrase"],
-  ["putzen","to clean"],["die Kneipe → die Kneipen","the pub"],
-  // ---- bag, animals, opinions (24-28) ----
-  ["die Sonnenbrille → die Sonnenbrillen","the sunglasses"],["der Geldbeutel → die Geldbeutel","the wallet"],
-  ["das Taschentuch → die Taschentücher","tissue → tissues"],["der Schlüssel → die Schlüssel","the key"],
-  ["das Nashorn → die Nashörner","the rhino (Nase + Horn)"],["der Waschbär → die Waschbären","the raccoon"],
-  ["das Faultier → die Faultiere","the sloth (faul + Tier)"],["die Nacktschnecke → die Nacktschnecken","the slug"],
-  ["der Schwanz → die Schwänze","tail → tails"],["das Fell → die Felle","fur (of an animal)"],
-  ["die Schildkröte → die Schildkröten","the turtle"],["das Krokodil → die Krokodile","the crocodile"],
-  ["der Frosch → die Frösche","frog → frogs"],["die Schlange → die Schlangen","the snake"],
-  ["der Zahn → die Zähne","tooth → teeth"],["das Ei → die Eier","egg → eggs"],
-  ["der See → die Seen","the LAKE (die See = the sea)"],["giftig","poisonous"],
-  ["lieben / mögen / hassen","to love / like / hate (+ Akkusativ)"],
-  ["Das gefällt mir.","I like that (Dativ!)"],["Ich wandere gern.","I like hiking"],
-  ["Ich finde Puppen gruselig.","I find dolls creepy (finden + Akk + bare adjective)"],
-  ["das Loch → die Löcher","hole → holes"],["der Wald → die Wälder","forest → forests"],
-  ["aus Plastik / aus Porzellan","made of plastic / porcelain"],["die Leute (nur Plural)","people"],
-  // ---- snow & Christmas (29-30) ----
-  ["Man kann einen Schneemann bauen.","MODAL: infinitive goes LAST"],
-  ["der Schneemann → die Schneemänner","snowman → snowmen"],["der Schlitten → die Schlitten","the sledge"],
-  ["werfen","to throw"],["das Türchen → die Türchen","little door (-chen → das)"],
-  ["das Plätzchen → die Plätzchen","biscuit (-chen → das)"],["schmücken","to decorate"],
-  ["das Geschenk → die Geschenke","present → presents"],["der Weihnachtsbaum → die Weihnachtsbäume","the Christmas tree"],
-  // ---- stories (38-47) ----
-  ["sich setzen ⇄ sitzen","to sit DOWN ⇄ to be sitting"],
-  ["Du sollst nicht klettern!","sollen + infinitive last"],
-  ["…, weil die Sonne scheint.","weil → verb LAST"],
-  ["die Brücke → die Brücken","the bridge"],["nass ⇄ trocken","wet ⇄ dry"],
-  ["der Hase → die Hasen","hare / rabbit"],["der Zaun → die Zäune","fence → fences"],
-  ["sich verstecken","to hide"],["erschöpft","exhausted"],
-  ["schöner als","more beautiful than"],["die Schönste im ganzen Land","the fairest of them all"],
-  ["Die Königin will Schneewittchen töten.","wollen + infinitive LAST"],
-  ["Es war einmal …","Once upon a time…"],["der Zwerg → die Zwerge","dwarf → dwarfs"],
-  ["Es geht dem Hund gut.","The dog is doing well (es geht + DATIV)"],
-  ["Er hasst seinen Nachbarn.","n-noun takes -n in the accusative"],
-  ["um … zu retten","in order to rescue"],["sich streiten / sich verlieben","to argue / to fall in love"],
-  ["lieber","rather (gern → lieber → am liebsten)"],["das Museum → die Museen","museum → museums"],
-  ["Das stimmt nicht.","That's not right."],["um 8 Uhr","at 8 o'clock"],
-  ["halb acht","7:30 — German counts TOWARDS the hour"],
-  ["warten auf (+ Akk)","to wait FOR"],["überrascht","surprised"],["höflich ⇄ unhöflich","polite ⇄ rude"],
-  ["lebte / war / hatte / sagte","SIMPLE PAST — used in written narrative"],
-  ["so gut wie","as well as (equality)"],
-  // ---- culture (48-57) ----
-  ["meine Lieblingsfrucht","my favourite fruit (Lieblings- + noun)"],
-  ["die meisten Leute","most people"],["die Spülmaschine → die Spülmaschinen","the dishwasher"],
-  ["Es gibt …","There is / are (+ AKKUSATIV)"],["in der Schweiz / in den USA","countries that DO take an article"],
-  ["die Landschaft → die Landschaften","the landscape (-schaft → die)"],
-  ["Guten Appetit! — Danke, gleichfalls!","Enjoy your meal! — Thanks, you too!"],
-  ["Es ist höflich, die Schuhe auszuziehen.","zu goes INSIDE a separable verb"],
-  ["der Ruhetag → die Ruhetage","day of rest — Sunday in Germany"],
-  ["am 11. November","on the 11th of November"],
-  ["Der Martinstag wird gefeiert.","PASSIVE: werden + participle"],
-  ["die Laterne → die Laternen","the lantern"],["die Gans → die Gänse","goose → geese"],
-  ["eine Hose","ONE pair of trousers — singular in German"],
-  ["dunkelblau ⇄ hellblau","dark blue ⇄ light blue"],["damals ⇄ heute","back then ⇄ today"],
-  ["…, dass der Bauch nicht bedeckt ist.","dass → verb LAST"],
-  ["das Gespenst → die Gespenster","ghost → ghosts"],["gehören (+ Dativ)","to belong TO"],
-  ["sich erinnern an (+ Akk)","to remember"],["die Ferien (nur Plural)","school holidays"],
-  ["10,3 Millionen","comma is the DECIMAL point in German"],
-  ["die zweitgrößte Fläche","the second-largest area"],["bekannt für (+ Akk)","famous FOR"],
-  ["die Wüste → die Wüsten","the desert"],["die Insel → die Inseln","the island"],
-  ["Deutsch wird gesprochen.","German is spoken (passive)"],["auf Platz elf","in eleventh place"],
-  ["2962 Meter hoch","2962 m high — unit stays SINGULAR"],
-  ["der längste Fluss / der höchste Berg","the longest river / the highest mountain"],
-  ["die Küste → die Küsten","the coast"],["das Grundgesetz","Germany's constitution"],
-  ["die Rettungsgasse → die Rettungsgassen","the emergency corridor"],
-  ["der Unfall → die Unfälle","accident → accidents"],["der Stau → die Staus","the traffic jam"],
-  ["gerade ⇄ ungerade","even ⇄ odd (numbers)"],["trotzdem","nevertheless"],["wahrscheinlich","probably"]
-].map(([f,b])=>({f,b}));
+/* ---- combined Anki export ----
+   Cards come from decks.js (generated from the lessons themselves), so this page can never
+   drift out of sync with what the lessons actually teach — the old hand-copied ALL_CARDS
+   list did exactly that. Every row carries its own deck name, so the single file imports
+   as one tidy subdeck per lesson under "Deutsch". */
 
-document.getElementById('exportAll').onclick = ()=> Engine.exportAll('DE · Alle Karten (Comprehensible Input)', ALL_CARDS);
+document.getElementById('exportAll').onclick = function(){
+  const groups = LESSONS.filter(v => DECKS[v.slug])
+    .map(v => ({ deck: 'Deutsch::' + v.n + ' · ' + v.title, cards: DECKS[v.slug].cards }));
+  const n = Engine.exportMany('Deutsch_alle_Karten', groups);
+  const b = this, old = b.textContent;
+  b.textContent = '✓ ' + n + ' cards exported';
+  setTimeout(()=>{ b.textContent = old; }, 2600);
+};
 
 
 const S2B = {id:"s2b", title:"Stufe 2 — person, home & everyday", kind:"Cumulative review", repeat:2, items:[

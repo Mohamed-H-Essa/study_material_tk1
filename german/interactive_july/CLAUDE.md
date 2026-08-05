@@ -20,6 +20,8 @@ sync.js                    Cross-device sync shim. Wraps localStorage, offline-f
 login.html                 The login gate/wrapper (shown first). 2 fixed users, static passwords.
 lessons.js                 THE lesson catalogue (one entry per lesson). Shared by the hub and the
                            admin panel so the two can never drift. Edit lessons HERE.
+decks.js                   Every lesson's Anki cards, keyed by slug. AUTO-GENERATED from the
+                           lesson files by `node tools/gen_decks.js` — never hand-edit.
 index.html                 The hub. Redirects to login.html if not signed in. Renders from
                            LESSONS, filtered by the caller's hidden list; signed-in strip.
 admin.html                 Admin panel (mohamed only). Per-user visibility + done overrides.
@@ -89,6 +91,32 @@ are unchanged. Full rationale: `docs/superpowers/specs/2026-07-18-reliable-sync-
 lesson.** A bare local write to `de.<slug>.done = "0"` is ignored by the server AND blocked by
 the client apply guard, so it would not work anyway. (`Sync.resetAnki` for deck resets is still
 available; only `done` is locked.)
+
+## Anki export
+
+Three ways out, all producing ONE tab-separated file that Anki imports directly:
+
+- **Per lesson** — a button at the **top and bottom** of every lesson page, plus the one inside
+  the flashcard widget. Mounted by the engine into any `<div class="anki-export-mount"></div>`.
+- **Per lesson from the hub** — hover a card and a `⬇ Anki` button appears over the thumbnail.
+  The card is an `<a>`, so that button *must* `preventDefault()` + `stopPropagation()` or the
+  click navigates instead of downloading.
+- **Everything you've finished** — the bar at the top of the hub exports every lesson that is
+  both ✓ done and visible to that user. `revision.html` does the same for all 57.
+
+The file carries Anki's import directives (2.1.54+): `#separator:Tab`, `#html:true` and
+`#deck column:3`. Columns are `front / back / deck`. Because the deck travels per row, a
+collective export lands as one tidy subdeck per lesson (`Deutsch::16 · Parts of the Body`)
+rather than one undifferentiated pile — which is why this beats emitting N separate files.
+
+Two invariants the exporter enforces, both covered by tests:
+- **Dedup by front.** Some words are deliberately taught in two lessons (e.g. `der Wasserhahn`
+  in both *tea* and *kitchen*); exporting both would create duplicate Anki notes.
+- **`::` is nesting, a single `:` is not.** `deckPath()` splits on `::`, cleans each segment,
+  and rejoins, so a colon inside a lesson title can't invent an extra deck level.
+
+**When you change a lesson's `anki:[]`, re-run `node tools/gen_decks.js`** — `decks.js` is what
+the hub and revision page read, and `verify.py` fails if it drifts.
 
 ## Content rule: EVERY noun shows its plural (not just the article)
 

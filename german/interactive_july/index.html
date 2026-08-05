@@ -29,6 +29,30 @@ h1{font-size:30px;font-weight:700;color:#fff;margin-bottom:4px}
 .reset{margin-top:40px;font-size:13px;color:#5a6070;background:none;border:1px solid #262a38;padding:6px 12px;border-radius:6px;cursor:pointer}
 .reset:hover{color:#f87171;border-color:#f87171}
 footer{margin-top:40px;color:#5a6070;font-size:13px}
+
+/* ---- per-card Anki download, revealed on hover ----
+   The card is an <a>, so this button must stopPropagation/preventDefault (see the JS) or
+   clicking it would navigate to the lesson instead of downloading. It stays visible while
+   focused so it is reachable by keyboard, and on touch screens (no hover) it is always shown. */
+.dl{position:absolute;left:8px;bottom:8px;right:8px;display:flex;align-items:center;justify-content:center;gap:7px;
+  padding:7px 10px;border-radius:7px;border:1px solid #4a90d9;background:rgba(10,14,22,.92);color:#9ad4ea;
+  font-size:12.5px;font-weight:600;font-family:inherit;cursor:pointer;
+  opacity:0;transform:translateY(4px);transition:opacity .15s,transform .15s,background .15s,color .15s}
+.card:hover .dl,.dl:focus-visible{opacity:1;transform:translateY(0)}
+.dl:hover{background:#16233a;color:#bfe6f5}
+.dl.done{border-color:#16a34a;background:#0f2419;color:#4ade80;opacity:1;transform:translateY(0)}
+@media (hover:none){.dl{opacity:1;transform:translateY(0)}}
+
+/* ---- the collective "export everything I've finished" bar ---- */
+.bulk{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:#141d2a;border:1px solid #29405c;
+  border-radius:10px;padding:14px 18px;margin:0 0 22px}
+.bulk button{display:inline-flex;align-items:center;gap:9px;padding:10px 17px;border-radius:8px;border:1px solid #4a90d9;
+  background:#4a90d9;color:#fff;font-size:14.5px;font-weight:600;font-family:inherit;cursor:pointer}
+.bulk button:hover{background:#3a7bc8}
+.bulk button:disabled{opacity:.45;cursor:default;background:#1b2740;border-color:#29405c;color:#8b93a7}
+.bulk .what{font-size:13px;color:#8b93a7;flex:1;min-width:220px}
+.bulk .what b{color:#7ec8e3}
+.bulk.ok button{background:#16a34a;border-color:#16a34a}
 </style>
 </head>
 <body>
@@ -45,6 +69,11 @@ footer{margin-top:40px;color:#5a6070;font-size:13px}
 
   <a href="revision.html" style="display:block;background:#141d2a;border:1px solid #29405c;border-radius:10px;padding:14px 18px;margin:0 0 8px;text-decoration:none;color:#7ec8e3;font-weight:600">🔁 Revision — cumulative quizzes across every lesson &amp; “Export ALL cards” for Anki <span style="color:#8b93a7;font-weight:400">→</span></a>
 
+  <div class="bulk" id="bulk">
+    <button id="bulkBtn" disabled>⬇ Export my finished lessons</button>
+    <span class="what" id="bulkWhat">Checking your progress…</span>
+  </div>
+
   <div id="stages"></div>
 
   <button class="reset" onclick="if(confirm('Clear ALL saved progress across every file?')){Object.keys(localStorage).filter(k=>k.startsWith('de.')).forEach(k=>localStorage.removeItem(k));location.reload()}">Reset all progress</button>
@@ -60,6 +89,10 @@ if (!(localStorage.getItem('de.__user') && localStorage.getItem('de.__token'))) 
 </script>
 <script src="sync.js"></script>
 <script src="lessons.js"></script>
+<!-- decks.js carries every lesson's flashcards; _engine.js supplies the Anki export helpers.
+     The engine only does anything when a page calls Engine.init(), which the hub never does. -->
+<script src="decks.js"></script>
+<script src="_engine.js"></script>
 <script>
 const STAGE_NAMES = {
   1:"Stufe 1 · Foundations",
@@ -106,23 +139,41 @@ function renderCards(){
       const a = document.createElement('a');
       a.href = v.file;
       a.className = 'card' + (isDone(v.slug) ? ' done' : '');
+      const nCards = (window.DECKS && DECKS[v.slug]) ? DECKS[v.slug].cards.length : 0;
       a.innerHTML = `
         <div class="thumb">
           <img src="https://img.youtube.com/vi/${v.id}/hqdefault.jpg" alt="${v.title}" loading="lazy">
           <span class="num">${v.n}</span>
           <span class="done-badge">✓ done</span>
+          ${nCards ? `<button class="dl" type="button" title="Download this lesson's Anki deck">⬇ Anki <span style="opacity:.7;font-weight:400">${nCards}</span></button>` : ''}
         </div>
         <div class="body">
           <h3>${v.title}</h3>
           <div class="de" lang="de">${v.de}</div>
           <div class="tag">${v.tag}</div>
         </div>`;
+      const dl = a.querySelector('.dl');
+      if (dl) dl.addEventListener('click', function(e){
+        // The card is an <a>; without these the click would follow the link instead.
+        e.preventDefault(); e.stopPropagation();
+        const d = DECKS[v.slug];
+        Engine.exportAll(d.deck, d.cards);
+        dl.classList.add('done'); dl.textContent = '✓ Saved';
+        setTimeout(()=>{ dl.classList.remove('done');
+          dl.innerHTML = '⬇ Anki <span style="opacity:.7;font-weight:400">'+d.cards.length+'</span>'; }, 2000);
+      });
       g.appendChild(a);
     }
   });
 
   const c = document.getElementById('count');
   if (c) c.textContent = shown + ' lessons + revision hub';
+
+  // ---- collective export of every lesson the user has finished ----
+  // One file, but each row carries its own deck name, so Anki imports it as 57 tidy
+  // subdecks under "Deutsch" rather than one undifferentiated pile. Duplicate fronts
+  // (a word deliberately taught in two lessons) are written once — see buildTSV.
+  updateBulk(visible);
 
   // The admin panel link only appears for the admin account.
   if (window.Sync && Sync.isAdmin) {
@@ -134,6 +185,37 @@ function renderCards(){
 // absent (raw files opened directly), render immediately.
 if (window.Sync && typeof window.Sync.ready === 'function') window.Sync.ready(renderCards);
 else renderCards();
+
+// Refresh the "export my finished lessons" bar. Only lessons that are BOTH visible to this
+// user and marked ✓ done are included, in hub order.
+function updateBulk(visible){
+  const btn  = document.getElementById('bulkBtn');
+  const what = document.getElementById('bulkWhat');
+  const bar  = document.getElementById('bulk');
+  if (!btn || !what || !window.DECKS) return;
+
+  const done = visible.filter(v => isDone(v.slug) && DECKS[v.slug]);
+  const cards = done.reduce((n,v) => n + DECKS[v.slug].cards.length, 0);
+
+  if (!done.length){
+    btn.disabled = true;
+    what.innerHTML = 'Finish a lesson\u2019s check-off and it appears here, ready to export to Anki.';
+    return;
+  }
+  btn.disabled = false;
+  what.innerHTML = '<b>' + done.length + '</b> finished lesson' + (done.length>1?'s':'') +
+    ' \u00b7 <b>' + cards + '</b> cards \u2014 one file, one Anki subdeck per lesson.';
+
+  btn.onclick = function(){
+    const groups = done.map(v => ({ deck: 'Deutsch::' + v.n + ' \u00b7 ' + v.title,
+                                    cards: DECKS[v.slug].cards }));
+    const written = Engine.exportMany('Deutsch_meine_Lektionen', groups);
+    bar.classList.add('ok');
+    const old = btn.textContent;
+    btn.textContent = '\u2713 ' + written + ' cards exported';
+    setTimeout(()=>{ btn.textContent = old; bar.classList.remove('ok'); }, 2600);
+  };
+}
 
 // ---- signed-in strip ----
 (function(){
