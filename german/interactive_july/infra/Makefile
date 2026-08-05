@@ -38,6 +38,14 @@ site:
 	  --exclude "*.md" --exclude ".gitignore" --exclude ".DS_Store"; \
 	echo "site uploaded to s3://$$BUCKET"
 
+# Seed the admin visibility config (admin-seed.json) into the state bucket. ONE-OFF: this
+# OVERWRITES whatever visibility the admin panel has since set, so only run it deliberately.
+# Everyday visibility changes belong in admin.html, not here.
+admin-seed:
+	@BUCKET=$$($(TF) output -raw state_bucket); \
+	$(AWS) s3 cp admin-seed.json s3://$$BUCKET/admin/config.json --content-type application/json; \
+	echo "seeded admin config -> s3://$$BUCKET/admin/config.json"
+
 deploy: apply config site
 	@echo ""; echo "=== deployed ==="; $(TF) output
 

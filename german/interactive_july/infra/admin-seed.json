@@ -1,0 +1,42 @@
+{
+  "hidden": {
+    "mohamed": {},
+    "mustafa": {
+      "koerper": true,
+      "gesicht": true,
+      "personen": true,
+      "familie": true,
+      "zaehlen": true,
+      "zuhause": true,
+      "jedentag": true,
+      "woche": true,
+      "tasche": true,
+      "tiernamen": true,
+      "gruenetiere": true,
+      "liebehasse": true,
+      "gruselig": true,
+      "schnee": true,
+      "weihnachten": true,
+      "felixpark": true,
+      "peterhase": true,
+      "schneewittchen": true,
+      "friedrich": true,
+      "figuren": true,
+      "filme": true,
+      "tennisspiel": true,
+      "felixschule": true,
+      "keksdieb": true,
+      "wuerttemberg": true,
+      "ichmag": true,
+      "grossbritannien": true,
+      "hoeflich": true,
+      "martinstag": true,
+      "mode": true,
+      "kassetten": true,
+      "laender": true,
+      "deutschzahlen": true,
+      "deutschlandfakten": true,
+      "autobahn": true
+    }
+  }
+}

@@ -43,9 +43,17 @@
 <p class="lead">stehen / hängen / liegen · auf / an / in / über / unter / neben / zwischen.</p>
 <div id="trainer-pos"></div>
 
+<h2><span class="step">Stufe 2 · Review</span>The person, the home &amp; the everyday</h2>
+<p class="lead">Body, face, family, numbers, rooms, the week — the second half of Stufe 2.</p>
+<div id="trainer-s2b"></div>
+
 <h2><span class="step">Stufe 3-4 · Review</span>Grammar &amp; speaking</h2>
 <p class="lead">Articles, gender rules, sentence order, questions, prepositions, introducing yourself.</p>
 <div id="trainer-s3"></div>
+
+<h2><span class="step">Stufe 5-6 · Review</span>Stories, culture &amp; the harder grammar</h2>
+<p class="lead">Modals, weil/dass, the passive, comparatives, cases in motion — everything the stories and culture videos threw at you.</p>
+<div id="trainer-s56"></div>
 
 <div class="topnav" style="margin-top:40px">
   <a href="index.html">☰ Hub</a>
@@ -163,13 +171,183 @@ const ALL_CARDS = [
   // winter girl
   ["das Mädchen","the girl"],["die Wange → die Wangen","cheek → cheeks"],["der Mantel","the coat"],["der Schal","the scarf"],
   ["der Knopf → die Knöpfe","button → buttons"],["tragen","to wear (also to carry)"],["etwas Rotes","something red"],["kalt","cold"]
+,
+  // ---- body, face, people, family (16-19) ----
+  ["der Kopf → die Köpfe","the head"],["der Hals → die Hälse","neck / throat"],
+  ["die Schulter → die Schultern","the shoulder"],["der Bauch → die Bäuche","the belly"],
+  ["der Rücken → die Rücken","the back"],["das Knie → die Knie","the knee"],
+  ["der Fuß → die Füße","foot → feet"],["der Zeh → die Zehen","toe → toes"],
+  ["greifen","to grip"],["winken","to wave"],["klatschen","to clap"],["rennen","to run (fast)"],
+  ["Ich habe Hunger.","I am hungry (German HAS hunger)"],
+  ["das Gesicht → die Gesichter","the face"],["das Augenlid → die Augenlider","the eyelid"],
+  ["die Augenbraue → die Augenbrauen","the eyebrow"],["der Mund → die Münder","mouth (person)"],
+  ["das Maul → die Mäuler","mouth (animal)"],["die Lippe → die Lippen","the lip"],
+  ["die Zunge → die Zungen","the tongue"],["die Stirn → die Stirnen","the forehead"],
+  ["sehen / hören / riechen / schmecken","see / hear / smell / taste"],["blinzeln","to blink"],
+  ["Wie sieht sie aus?","What does she LOOK like?"],["Wie ist sie?","What is she LIKE?"],
+  ["schlank ⇄ dick","slim ⇄ fat"],["schüchtern","shy"],["schlau","clever"],["ruhig","quiet / calm"],
+  ["Sie ist Buchautorin.","She is an author (NO article with jobs)"],
+  ["die Eltern (nur Plural)","the parents"],["die Geschwister (nur Plural)","siblings"],
+  ["der Bruder → die Brüder","brother → brothers"],["die Schwester → die Schwestern","sister → sisters"],
+  ["der Neffe → die Neffen","the nephew"],["die Nichte → die Nichten","the niece"],
+  ["der Onkel → die Onkel","the uncle"],["die Tante → die Tanten","the aunt"],
+  ["verheiratet ⇄ geschieden","married ⇄ divorced"],
+  // ---- counting, home, daily life, the week (20-23) ----
+  ["einundzwanzig","21 — one-and-twenty"],["sechzehn","16 (NOT sechszehn)"],["dreißig","30 (with ß)"],
+  ["Wie viele …? / Wie viel …?","how many? (countable) / how much?"],
+  ["das Schlafzimmer → die Schlafzimmer","the bedroom"],["das Badezimmer → die Badezimmer","the bathroom"],
+  ["das Gästezimmer → die Gästezimmer","the guest room"],["das Büro → die Büros","the office"],
+  ["der Kleiderschrank → die Kleiderschränke","the wardrobe"],["der Garten → die Gärten","the garden"],
+  ["wohnen ⇄ leben","reside at an address ⇄ live / be alive"],
+  ["aufstehen","to get up (separable)"],["aufwachen","to wake up (separable)"],
+  ["Ich stehe um sieben Uhr auf.","Separable prefix goes LAST"],
+  ["jeden Tag / jede Nacht","every day / every night"],
+  ["am Montag","on Monday (an dem → am)"],["morgens / abends","in the mornings / evenings"],
+  ["Am Montag macht Emma Yoga.","Verb stays SECOND after a fronted time phrase"],
+  ["putzen","to clean"],["die Kneipe → die Kneipen","the pub"],
+  // ---- bag, animals, opinions (24-28) ----
+  ["die Sonnenbrille → die Sonnenbrillen","the sunglasses"],["der Geldbeutel → die Geldbeutel","the wallet"],
+  ["das Taschentuch → die Taschentücher","tissue → tissues"],["der Schlüssel → die Schlüssel","the key"],
+  ["das Nashorn → die Nashörner","the rhino (Nase + Horn)"],["der Waschbär → die Waschbären","the raccoon"],
+  ["das Faultier → die Faultiere","the sloth (faul + Tier)"],["die Nacktschnecke → die Nacktschnecken","the slug"],
+  ["der Schwanz → die Schwänze","tail → tails"],["das Fell → die Felle","fur (of an animal)"],
+  ["die Schildkröte → die Schildkröten","the turtle"],["das Krokodil → die Krokodile","the crocodile"],
+  ["der Frosch → die Frösche","frog → frogs"],["die Schlange → die Schlangen","the snake"],
+  ["der Zahn → die Zähne","tooth → teeth"],["das Ei → die Eier","egg → eggs"],
+  ["der See → die Seen","the LAKE (die See = the sea)"],["giftig","poisonous"],
+  ["lieben / mögen / hassen","to love / like / hate (+ Akkusativ)"],
+  ["Das gefällt mir.","I like that (Dativ!)"],["Ich wandere gern.","I like hiking"],
+  ["Ich finde Puppen gruselig.","I find dolls creepy (finden + Akk + bare adjective)"],
+  ["das Loch → die Löcher","hole → holes"],["der Wald → die Wälder","forest → forests"],
+  ["aus Plastik / aus Porzellan","made of plastic / porcelain"],["die Leute (nur Plural)","people"],
+  // ---- snow & Christmas (29-30) ----
+  ["Man kann einen Schneemann bauen.","MODAL: infinitive goes LAST"],
+  ["der Schneemann → die Schneemänner","snowman → snowmen"],["der Schlitten → die Schlitten","the sledge"],
+  ["werfen","to throw"],["das Türchen → die Türchen","little door (-chen → das)"],
+  ["das Plätzchen → die Plätzchen","biscuit (-chen → das)"],["schmücken","to decorate"],
+  ["das Geschenk → die Geschenke","present → presents"],["der Weihnachtsbaum → die Weihnachtsbäume","the Christmas tree"],
+  // ---- stories (38-47) ----
+  ["sich setzen ⇄ sitzen","to sit DOWN ⇄ to be sitting"],
+  ["Du sollst nicht klettern!","sollen + infinitive last"],
+  ["…, weil die Sonne scheint.","weil → verb LAST"],
+  ["die Brücke → die Brücken","the bridge"],["nass ⇄ trocken","wet ⇄ dry"],
+  ["der Hase → die Hasen","hare / rabbit"],["der Zaun → die Zäune","fence → fences"],
+  ["sich verstecken","to hide"],["erschöpft","exhausted"],
+  ["schöner als","more beautiful than"],["die Schönste im ganzen Land","the fairest of them all"],
+  ["Die Königin will Schneewittchen töten.","wollen + infinitive LAST"],
+  ["Es war einmal …","Once upon a time…"],["der Zwerg → die Zwerge","dwarf → dwarfs"],
+  ["Es geht dem Hund gut.","The dog is doing well (es geht + DATIV)"],
+  ["Er hasst seinen Nachbarn.","n-noun takes -n in the accusative"],
+  ["um … zu retten","in order to rescue"],["sich streiten / sich verlieben","to argue / to fall in love"],
+  ["lieber","rather (gern → lieber → am liebsten)"],["das Museum → die Museen","museum → museums"],
+  ["Das stimmt nicht.","That's not right."],["um 8 Uhr","at 8 o'clock"],
+  ["halb acht","7:30 — German counts TOWARDS the hour"],
+  ["warten auf (+ Akk)","to wait FOR"],["überrascht","surprised"],["höflich ⇄ unhöflich","polite ⇄ rude"],
+  ["lebte / war / hatte / sagte","SIMPLE PAST — used in written narrative"],
+  ["so gut wie","as well as (equality)"],
+  // ---- culture (48-57) ----
+  ["meine Lieblingsfrucht","my favourite fruit (Lieblings- + noun)"],
+  ["die meisten Leute","most people"],["die Spülmaschine → die Spülmaschinen","the dishwasher"],
+  ["Es gibt …","There is / are (+ AKKUSATIV)"],["in der Schweiz / in den USA","countries that DO take an article"],
+  ["die Landschaft → die Landschaften","the landscape (-schaft → die)"],
+  ["Guten Appetit! — Danke, gleichfalls!","Enjoy your meal! — Thanks, you too!"],
+  ["Es ist höflich, die Schuhe auszuziehen.","zu goes INSIDE a separable verb"],
+  ["der Ruhetag → die Ruhetage","day of rest — Sunday in Germany"],
+  ["am 11. November","on the 11th of November"],
+  ["Der Martinstag wird gefeiert.","PASSIVE: werden + participle"],
+  ["die Laterne → die Laternen","the lantern"],["die Gans → die Gänse","goose → geese"],
+  ["eine Hose","ONE pair of trousers — singular in German"],
+  ["dunkelblau ⇄ hellblau","dark blue ⇄ light blue"],["damals ⇄ heute","back then ⇄ today"],
+  ["…, dass der Bauch nicht bedeckt ist.","dass → verb LAST"],
+  ["das Gespenst → die Gespenster","ghost → ghosts"],["gehören (+ Dativ)","to belong TO"],
+  ["sich erinnern an (+ Akk)","to remember"],["die Ferien (nur Plural)","school holidays"],
+  ["10,3 Millionen","comma is the DECIMAL point in German"],
+  ["die zweitgrößte Fläche","the second-largest area"],["bekannt für (+ Akk)","famous FOR"],
+  ["die Wüste → die Wüsten","the desert"],["die Insel → die Inseln","the island"],
+  ["Deutsch wird gesprochen.","German is spoken (passive)"],["auf Platz elf","in eleventh place"],
+  ["2962 Meter hoch","2962 m high — unit stays SINGULAR"],
+  ["der längste Fluss / der höchste Berg","the longest river / the highest mountain"],
+  ["die Küste → die Küsten","the coast"],["das Grundgesetz","Germany's constitution"],
+  ["die Rettungsgasse → die Rettungsgassen","the emergency corridor"],
+  ["der Unfall → die Unfälle","accident → accidents"],["der Stau → die Staus","the traffic jam"],
+  ["gerade ⇄ ungerade","even ⇄ odd (numbers)"],["trotzdem","nevertheless"],["wahrscheinlich","probably"]
 ].map(([f,b])=>({f,b}));
 
 document.getElementById('exportAll').onclick = ()=> Engine.exportAll('DE · Alle Karten (Comprehensible Input)', ALL_CARDS);
 
+
+const S2B = {id:"s2b", title:"Stufe 2 — person, home & everyday", kind:"Cumulative review", repeat:2, items:[
+  {type:"mc", q:"___ <b lang='de'>Kopf</b>", opts:["der","die","das"], answer:"der", why:"der Kopf → die Köpfe."},
+  {type:"mc", q:"plural of <b lang='de'>der Fuß</b>:", opts:["die Füße","die Fuße","die Füßen"], answer:"die Füße", why:"die Füße."},
+  {type:"mc", q:"plural of <b lang='de'>die Hand</b>:", opts:["die Hände","die Handen"], answer:"die Hände", why:"die Hände."},
+  {type:"mc", q:"<b lang='de'>Mit den Ohren ___ man.</b>", opts:["hört","sieht","riecht"], answer:"hört", why:"hören."},
+  {type:"mc", q:"An animal's mouth is <span lang='de'>das ___</span>:", opts:["Maul","Mund"], answer:"Maul", why:"Bei Tieren: das Maul."},
+  {type:"mc", q:"'I am hungry' = <b lang='de'>Ich ___ Hunger.</b>", opts:["habe","bin"], answer:"habe", why:"German HAS hunger."},
+  {type:"mc", q:"Asking about appearance:", opts:["Wie sieht sie aus?","Wie ist sie?"], answer:"Wie sieht sie aus?", why:"aussehen."},
+  {type:"mc", q:"'He is an architect': <b lang='de'>Er ist ___.</b>", opts:["Architekt","ein Architekt"], answer:"Architekt", why:"No article with professions."},
+  {type:"mc", q:"plural of <b lang='de'>der Bruder</b>:", opts:["die Brüder","die Bruders"], answer:"die Brüder", why:"die Brüder."},
+  {type:"mc", q:"plural of <b lang='de'>die Schwester</b>:", opts:["die Schwestern","die Schwöster"], answer:"die Schwestern", why:"No umlaut."},
+  {type:"mc", q:"<b lang='de'>die Eltern</b> is…", opts:["nur Plural","nur Singular"], answer:"nur Plural", why:"Plural only."},
+  {type:"mc", q:"Your uncle's daughter is your ___:", opts:["Cousine","Nichte"], answer:"Cousine", why:"die Cousine."},
+  {type:"mc", q:"<b lang='de'>einundzwanzig</b> =", opts:["21","12"], answer:"21", why:"one-and-twenty."},
+  {type:"mc", q:"How do you write <b>16</b>?", opts:["sechzehn","sechszehn"], answer:"sechzehn", why:"sechzehn."},
+  {type:"mc", q:"___ <b lang='de'>Bücher hast du?</b>", opts:["Wie viele","Wie viel"], answer:"Wie viele", why:"Countable."},
+  {type:"mc", q:"Every <b lang='de'>-zimmer</b> word is…", opts:["das","die","der"], answer:"das", why:"The LAST part decides."},
+  {type:"mc", q:"'in the kitchen' = <b lang='de'>___ Küche</b>", opts:["in der","im"], answer:"in der", why:"die Küche."},
+  {type:"mc", q:"'I get up': <b lang='de'>Ich ___ auf.</b>", opts:["stehe","aufstehe"], answer:"stehe", why:"Prefix LAST."},
+  {type:"mc", q:"'on Monday' =", opts:["am Montag","an Montag"], answer:"am Montag", why:"an dem → am."},
+  {type:"mc", q:"'On Monday Emma does yoga':", opts:["Am Montag macht Emma Yoga.","Am Montag Emma macht Yoga."], answer:"Am Montag macht Emma Yoga.", why:"Verb second."},
+  {type:"mc", q:"In a compound the gender comes from…", opts:["the LAST word","the FIRST word"], answer:"the LAST word", why:"Always the last."},
+  {type:"mc", q:"'no arms' = <b lang='de'>___ Arme</b>", opts:["keine","nicht"], answer:"keine", why:"kein negates a noun."},
+  {type:"mc", q:"'I find dolls creepy': <b lang='de'>Ich ___ Puppen gruselig.</b>", opts:["finde","gefalle"], answer:"finde", why:"finden + Akk."},
+  {type:"mc", q:"'I like the video':", opts:["Das Video gefällt mir.","Das Video gefällt mich."], answer:"Das Video gefällt mir.", why:"Dativ."},
+  {type:"mc", q:"'You can build a snowman':", opts:["Man kann einen Schneemann bauen.","Man kann bauen einen Schneemann."], answer:"Man kann einen Schneemann bauen.", why:"Infinitive LAST."},
+  {type:"mc", q:"___ <b lang='de'>Plätzchen</b>", opts:["das","die"], answer:"das", why:"-chen → das."},
+  {type:"type", q:"Type: <b>the face</b> (with article)", answer:["das Gesicht"], why:"das Gesicht."},
+  {type:"type", q:"Type: <b>the garden</b> (with article)", answer:["der Garten"], why:"der Garten."},
+  {type:"type", q:"plural: <b>the teeth</b> →", answer:["die Zähne","die Zaehne"], why:"die Zähne."}
+]};
+
+const S56 = {id:"s56", title:"Stufe 5-6 — stories, culture & harder grammar", kind:"Cumulative review", repeat:2, items:[
+  {type:"mc", q:"After <b lang='de'>weil</b>, the verb goes…", opts:["last","second","first"], answer:"last", why:"Subordinate clause → verb final."},
+  {type:"mc", q:"<b lang='de'>dass</b> behaves like…", opts:["weil","und"], answer:"weil", why:"Both send the verb to the end."},
+  {type:"mc", q:"'You shouldn't climb': <b lang='de'>Du sollst nicht ___.</b>", opts:["klettern","kletterst"], answer:"klettern", why:"Modal → plain infinitive."},
+  {type:"mc", q:"'The queen wants to kill her':", opts:["Die Königin will sie töten.","Die Königin will töten sie."], answer:"Die Königin will sie töten.", why:"Infinitive last."},
+  {type:"mc", q:"'more beautiful than' = <b lang='de'>schöner ___</b>", opts:["als","wie"], answer:"als", why:"Difference → als."},
+  {type:"mc", q:"'as well as' =", opts:["so gut wie","so gut als"], answer:"so gut wie", why:"Equality → so … wie."},
+  {type:"mc", q:"'He is the youngest': <b lang='de'>Er ist der ___.</b>", opts:["jüngste","jünger"], answer:"jüngste", why:"Superlative."},
+  {type:"mc", q:"'in order to rescue the princess':", opts:["um die Prinzessin zu retten","um zu retten die Prinzessin"], answer:"um die Prinzessin zu retten", why:"um … zu + infinitive last."},
+  {type:"mc", q:"'It is polite to take your shoes off': <b lang='de'>…, die Schuhe ___.</b>", opts:["auszuziehen","zu ausziehen"], answer:"auszuziehen", why:"zu goes INSIDE a separable verb."},
+  {type:"mc", q:"'He jumps into the water': <b lang='de'>Er springt ___ Wasser.</b>", opts:["ins","im"], answer:"ins", why:"Movement → Akkusativ."},
+  {type:"mc", q:"'He is sitting in the grass': <b lang='de'>Er sitzt ___ Gras.</b>", opts:["im","ins"], answer:"im", why:"Position → Dativ."},
+  {type:"mc", q:"'The dog is doing well': <b lang='de'>Es geht ___ Hund gut.</b>", opts:["dem","den"], answer:"dem", why:"es geht + Dativ."},
+  {type:"mc", q:"'The castle belongs to me': <b lang='de'>Das Schloss gehört ___.</b>", opts:["mir","mich"], answer:"mir", why:"gehören + Dativ."},
+  {type:"mc", q:"'He hates his neighbour': <b lang='de'>Er hasst seinen ___.</b>", opts:["Nachbarn","Nachbar"], answer:"Nachbarn", why:"n-noun takes -n."},
+  {type:"mc", q:"'She waits for her flight': <b lang='de'>Sie wartet ___ ihren Flug.</b>", opts:["auf","für"], answer:"auf", why:"warten AUF."},
+  {type:"mc", q:"'to remember' = <b lang='de'>sich erinnern ___</b>", opts:["an","auf"], answer:"an", why:"sich erinnern AN."},
+  {type:"mc", q:"'famous for' = <b lang='de'>bekannt ___</b>", opts:["für","von"], answer:"für", why:"bekannt für."},
+  {type:"mc", q:"The passive is formed with…", opts:["werden + Partizip","haben + Partizip"], answer:"werden + Partizip", why:"wird gefeiert, wird gesprochen."},
+  {type:"mc", q:"'he WAS buried' = <b lang='de'>Er ___ beerdigt.</b>", opts:["wurde","wird"], answer:"wurde", why:"Past passive."},
+  {type:"mc", q:"simple past of <b lang='de'>sein</b> (er):", opts:["war","ist"], answer:"war", why:"er war."},
+  {type:"mc", q:"simple past of <b lang='de'>leben</b>:", opts:["lebte","gelebt"], answer:"lebte", why:"Regular -te."},
+  {type:"mc", q:"German tells stories mainly in the…", opts:["present tense","simple past"], answer:"present tense", why:"Spoken narration uses the present."},
+  {type:"mc", q:"'There are many accents': <b lang='de'>___ viele Akzente.</b>", opts:["Es gibt","Es sind"], answer:"Es gibt", why:"es gibt + Akkusativ."},
+  {type:"mc", q:"'in Switzerland' =", opts:["in der Schweiz","in Schweiz"], answer:"in der Schweiz", why:"die Schweiz takes an article."},
+  {type:"mc", q:"In German, <b lang='de'>10,3</b> is read as:", opts:["zehn Komma drei","zehn Punkt drei"], answer:"zehn Komma drei", why:"Comma = decimal point."},
+  {type:"mc", q:"'2962 metres high' =", opts:["2962 Meter hoch","2962 Metern hoch"], answer:"2962 Meter hoch", why:"Unit stays singular."},
+  {type:"mc", q:"'a pair of trousers' =", opts:["eine Hose","eine Hosen"], answer:"eine Hose", why:"die Hose is singular."},
+  {type:"mc", q:"<b lang='de'>halb acht</b> means:", opts:["7:30","8:30"], answer:"7:30", why:"German counts TOWARDS the hour."},
+  {type:"mc", q:"'She'd rather…': <b lang='de'>Sie will ___ zum See.</b>", opts:["lieber","gerner"], answer:"lieber", why:"gern → lieber → am liebsten."},
+  {type:"type", q:"'Once upon a time' →", answer:["es war einmal"], why:"Es war einmal."},
+  {type:"type", q:"'nevertheless' →", answer:["trotzdem"], why:"trotzdem."},
+  {type:"type", q:"plural: <b>the accidents</b> →", answer:["die Unfälle","die Unfaelle"], why:"die Unfälle."}
+]};
+
 Engine.mountTrainer(document.getElementById('trainer-s2'), S2);
+Engine.mountTrainer(document.getElementById('trainer-s2b'), S2B);
 Engine.mountTrainer(document.getElementById('trainer-pos'), POS);
 Engine.mountTrainer(document.getElementById('trainer-s3'), S3);
+Engine.mountTrainer(document.getElementById('trainer-s56'), S56);
 </script>
 </body>
 </html>

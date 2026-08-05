@@ -18,16 +18,38 @@ config.js                  Runtime config (SYNC_URL). AUTO-GENERATED at deploy (
 sync.js                    Cross-device sync shim. Wraps localStorage, offline-first. Included
                            on every page BEFORE _engine.js.
 login.html                 The login gate/wrapper (shown first). 2 fixed users, static passwords.
-index.html                 The hub. Redirects to login.html if not signed in. VIDEOS = [...] array
-                           drives the cards. Also renders the signed-in strip.
+lessons.js                 THE lesson catalogue (one entry per lesson). Shared by the hub and the
+                           admin panel so the two can never drift. Edit lessons HERE.
+index.html                 The hub. Redirects to login.html if not signed in. Renders from
+                           LESSONS, filtered by the caller's hidden list; signed-in strip.
+admin.html                 Admin panel (mohamed only). Per-user visibility + done overrides.
 NN_slug.html               One lesson per file, numbered by display order.
 revision.html              Cumulative revision quizzes + "Export ALL cards".
 docs/                      Design docs.
 infra/                     Terraform (S3 site + state buckets, Lambda, API Gateway) + Makefile.
-infra/lambda/index.mjs     The sync backend (login/pull/push). Server-assigned sequence numbers
-                           order writes; merge is per-key by KIND (done=monotonic,
+infra/lambda/index.mjs     The sync backend (login/pull/push + adminGet/adminSet). Server-assigned
+                           sequence numbers order writes; merge is per-key by KIND (done=monotonic,
                            anki=per-card max, other=higher seq). nodejs22.x.
 ```
+
+## Admin & per-user visibility (added 2026-08)
+
+One admin (`mohamed`, the `ADMIN` constant in the Lambda) can, from `admin.html`:
+
+- **Hide/show any lesson per user.** Stored in a SEPARATE blob `s3://STATE/admin/config.json`
+  as `{hidden:{<user>:{<slug>:true}}}`. It is an **opt-out list**: a slug that is absent (or a
+  missing blob entirely) means visible, so an older backend or a fresh deploy behaves exactly
+  as before the feature existed. Visibility never touches a `de.<slug>.*` key, so hiding a
+  lesson **keeps** that user's progress — flip it back on and the ✓ is still there.
+- **Force a lesson done / not-done for a user.** This is the one sanctioned exception to
+  "done is permanent". It reuses the ordinary `applyChange`/`mergeAll` pipeline rather than a
+  parallel path: un-doning sends the `{clear:true}` intent, and the resulting entry is stamped
+  `cleared:true` so `sync.js`'s client-side guard knows to apply this particular revert. A bare
+  `"0"` from a stale device still cannot un-done anything.
+- The admin is never hideable from himself — enforced server-side, not just in the UI.
+
+`pull`/`push` responses also carry `{admin, hidden}` so the hub needs no extra round-trip; older
+clients ignore the extra fields. Auth is enforced in the Lambda (403 for non-admins), not the UI.
 
 ## The ONE rule that keeps everything backwards-compatible
 
