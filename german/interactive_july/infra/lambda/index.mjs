@@ -40,6 +40,11 @@ const USERS = {
   mustafa: process.env.PW_MUSTAFA || '123',
 };
 
+// The single admin. Only this user may read other users' state, hide lessons from them, or
+// override their done-flags. Enforced here, not just in the UI.
+const ADMIN = 'mohamed';
+const isAdmin = (u) => u === ADMIN;
+
 const json = (code, obj) => ({
   statusCode: code,
   headers: {
@@ -87,6 +92,46 @@ async function writeState(user, state) {
     Bucket: BUCKET,
     Key: `users/${user}.json`,
     Body: JSON.stringify(state),
+    ContentType: 'application/json',
+  }));
+}
+
+// ---- admin config -----------------------------------------------------------
+// One extra blob, separate from any user's progress:
+//   s3://STATE_BUCKET/admin/config.json  ->  { hidden: { "<user>": { "<slug>": true } } }
+//
+// `hidden` is an OPT-OUT list, which is what keeps this backwards-compatible: a slug that is
+// absent (or a missing blob entirely) means "visible", exactly the behaviour before the feature
+// existed. Visibility deliberately lives OUTSIDE the progress blob — hiding a lesson must never
+// touch a de.<slug>.* key, so a user's progress survives being hidden and comes back untouched.
+const ADMIN_KEY = 'admin/config.json';
+
+async function readAdminConfig() {
+  let raw = {};
+  try {
+    const out = await s3.send(new GetObjectCommand({ Bucket: BUCKET, Key: ADMIN_KEY }));
+    const parsed = JSON.parse(await out.Body.transformToString());
+    if (parsed && typeof parsed === 'object') raw = parsed;
+  } catch (e) {
+    if (!(e.name === 'NoSuchKey' || e.$metadata?.httpStatusCode === 404)) throw e;
+  }
+  const hidden = {};
+  for (const u of Object.keys(USERS)) {
+    hidden[u] = {};
+    const h = raw.hidden && raw.hidden[u];
+    if (h && typeof h === 'object') {
+      for (const [slug, v] of Object.entries(h)) if (v === true) hidden[u][slug] = true;
+    }
+  }
+  hidden[ADMIN] = {}; // the admin is never hidden from his own hub
+  return { hidden };
+}
+
+async function writeAdminConfig(cfg) {
+  await s3.send(new PutObjectCommand({
+    Bucket: BUCKET,
+    Key: ADMIN_KEY,
+    Body: JSON.stringify(cfg),
     ContentType: 'application/json',
   }));
 }
@@ -181,7 +226,12 @@ function delta(state, cursor) {
   for (const [k, e] of Object.entries(state)) {
     if (!isDataKey(k) || !e || typeof e !== 'object') continue;
     const seq = Number(e.seq) || 0;
-    if (cold || seq > c) out[k] = { v: e.v, seq, kind: e.kind || kindOf(k) };
+    if (cold || seq > c) {
+      out[k] = { v: e.v, seq, kind: e.kind || kindOf(k) };
+      // Carry the admin-clear marker through: sync.js needs it to know this particular
+      // not-done value may override a locally-done key (see its applyServerState guard).
+      if (e.cleared === true) out[k].cleared = true;
+    }
   }
   return out;
 }
@@ -208,7 +258,7 @@ export const handler = async (event) => {
       if (!USERS[user] || USERS[user] !== pass) {
         return json(401, { ok: false, error: 'wrong user or password' });
       }
-      return json(200, { ok: true, user, token: makeToken(user) });
+      return json(200, { ok: true, user, token: makeToken(user), admin: isAdmin(user) });
     }
 
     if (action === 'pull' || action === 'push') {
@@ -221,7 +271,81 @@ export const handler = async (event) => {
         await writeState(user, state);
       }
       const seq = currentSeq(state);
-      return json(200, { ok: true, seq, state: delta(state, body.cursor) });
+      // Both responses also carry this caller's own visibility list, so the hub needs no second
+      // round-trip. Older clients ignore the extra fields.
+      const cfg = await readAdminConfig();
+      return json(200, {
+        ok: true,
+        seq,
+        state: delta(state, body.cursor),
+        admin: isAdmin(user),
+        hidden: Object.keys(cfg.hidden[user] || {}),
+      });
+    }
+
+    // ---- adminGet: the config plus every user's full progress, for the admin panel ----
+    if (action === 'adminGet') {
+      if (!USERS[user]) return json(401, { ok: false, error: 'unknown user' });
+      if (!verifyToken(body.token, user)) return json(401, { ok: false, error: 'bad or expired token' });
+      if (!isAdmin(user)) return json(403, { ok: false, error: 'not an admin' });
+
+      const cfg = await readAdminConfig();
+      const users = {};
+      for (const u of Object.keys(USERS)) users[u] = await readState(u);
+      return json(200, { ok: true, admin: true, config: cfg, users });
+    }
+
+    // ---- adminSet: change visibility and/or force a user's done-flag ----
+    // body.config   = {hidden:{<user>:{<slug>:true}}}          replaces the visibility config
+    // body.progress = {<user>:{ "de.<slug>.done": "1"|"0" }}   merged into that user's blob
+    if (action === 'adminSet') {
+      if (!USERS[user]) return json(401, { ok: false, error: 'unknown user' });
+      if (!verifyToken(body.token, user)) return json(401, { ok: false, error: 'bad or expired token' });
+      if (!isAdmin(user)) return json(403, { ok: false, error: 'not an admin' });
+
+      if (body.config && typeof body.config === 'object') {
+        const hidden = {};
+        for (const u of Object.keys(USERS)) {
+          hidden[u] = {};
+          const h = body.config.hidden && body.config.hidden[u];
+          if (h && typeof h === 'object') {
+            for (const [slug, v] of Object.entries(h)) {
+              if (v === true && /^[A-Za-z0-9_-]{1,64}$/.test(slug)) hidden[u][slug] = true;
+            }
+          }
+        }
+        hidden[ADMIN] = {}; // never hide anything from the admin
+        await writeAdminConfig({ hidden });
+      }
+
+      // Done-overrides are NOT a parallel storage path: they go through the very same
+      // applyChange/mergeAll pipeline as a normal client push, so the seq stamping and the
+      // monotonic `done` rule stay in one place. Un-doning uses the sanctioned {clear:true}
+      // intent — the only thing allowed to move a done flag backwards. We additionally stamp
+      // `cleared:true` on the resulting entry so sync.js's client-side "done is permanent"
+      // guard knows this particular revert is a deliberate admin action and applies it.
+      if (body.progress && typeof body.progress === 'object') {
+        for (const [u, keys] of Object.entries(body.progress)) {
+          if (!USERS[u] || !keys || typeof keys !== 'object') continue;
+          const changes = {};
+          const clearedKeys = [];
+          for (const [k, v] of Object.entries(keys)) {
+            if (!/^de\.[A-Za-z0-9_-]{1,64}\.done$/.test(k)) continue;
+            const on = v === '1' || v === 1 || v === true;
+            changes[k] = on ? { v: '1', kind: 'done' } : { v: '0', kind: 'done', clear: true };
+            if (!on) clearedKeys.push(k);
+          }
+          if (!Object.keys(changes).length) continue;
+          const st = mergeAll(await readState(u), changes);
+          for (const k of clearedKeys) {
+            if (st[k] && !isDoneValue(st[k].v)) st[k].cleared = true;
+            // A re-done later drops the flag again (applyChange rewrites the entry without it).
+          }
+          await writeState(u, st);
+        }
+      }
+
+      return json(200, { ok: true, config: await readAdminConfig() });
     }
 
     return json(400, { ok: false, error: 'unknown action' });

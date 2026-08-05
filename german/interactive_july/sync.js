@@ -39,6 +39,19 @@
     // Set true once the initial pull has finished (or timed out / been skipped).
     // Consumers use Sync.ready(cb) below rather than reading this directly.
     initialized: false,
+    // ---- admin / visibility (filled in by the pull response) ----
+    // isAdmin: the server says this user may open admin.html.
+    // hidden:  slugs the admin has hidden FROM THIS USER. Empty means show everything, which is
+    //          exactly how the hub behaved before this feature existed — so a missing or older
+    //          backend degrades to "all lessons visible" rather than a blank hub.
+    isAdmin: false,
+    hidden: [],
+    isHidden: function (slug) { return Sync.hidden.indexOf(slug) !== -1; },
+    // Authenticated POST for the admin panel (adminGet / adminSet). Rejects when sync is off.
+    call: function (action, extra) {
+      if (!Sync.enabled) return Promise.reject(new Error('sync disabled'));
+      return post(action, extra);
+    },
     logout: function () {
       // Wipe ALL local progress + auth so the next user on this device does not inherit it.
       // (Progress is safe in the cloud under this user's blob; the next login pulls fresh.)
@@ -152,13 +165,42 @@
         // not-done — not on refresh, not from any device. Once ✓, it stays ✓. (The server is
         // also monotonic, but this client guard makes the guarantee hold even against a stale
         // delta, an old "0" left in the blob, or a legacy entry.)
-        if (/\.done$/.test(k) && localIsDone(k) && !entryIsDone(entry)) return;
+        //
+        // The ONE sanctioned exception is an explicit admin clear. The server marks such an
+        // entry `cleared:true` — it only ever sets that on an `adminSet` un-done, which is a
+        // deliberate human action by the admin, not a stale or racing write. Without this the
+        // admin's override would apply on every device EXCEPT the ones that already show ✓,
+        // i.e. exactly the devices the override is meant to fix.
+        if (/\.done$/.test(k) && localIsDone(k) && !entryIsDone(entry) && entry.cleared !== true) return;
         rawSet(k, typeof entry.v === 'string' ? entry.v : JSON.stringify(entry.v));
       });
     }
     if (serverSeq != null) setCursor(serverSeq);
     return true;
   }
+
+  // Absorb the admin/visibility fields that pull & push responses carry alongside `state`. Both
+  // are optional: an older Lambda omits them and we keep the permissive defaults. They are cached
+  // under de.__* keys — NOT de.<slug>.* — so they never enter the synced progress blob, and a
+  // cold offline load still paints the same hub the user saw last time.
+  function applyAdminFields(res) {
+    if (!res) return;
+    if (typeof res.admin === 'boolean') {
+      Sync.isAdmin = res.admin;
+      try { rawSet('de.__admin', res.admin ? '1' : '0'); } catch (e) {}
+    }
+    if (Array.isArray(res.hidden)) {
+      Sync.hidden = res.hidden.slice();
+      try { rawSet('de.__hidden', JSON.stringify(Sync.hidden)); } catch (e) {}
+    }
+  }
+
+  // Seed from the last known values so an offline load doesn't flash the wrong set of cards.
+  try {
+    Sync.isAdmin = LS.getItem('de.__admin') === '1';
+    var cachedHidden = JSON.parse(LS.getItem('de.__hidden') || '[]');
+    if (Array.isArray(cachedHidden)) Sync.hidden = cachedHidden;
+  } catch (e) {}
 
   function setStatus(s) {
     Sync.status = s;
@@ -180,7 +222,7 @@
     setStatus('syncing');
     post('push', { changes: sent }, keepalive)
       .then(function (res) {
-        if (res && res.ok) { applyServerState(res.state, res.seq); setStatus('synced'); }
+        if (res && res.ok) { applyServerState(res.state, res.seq); applyAdminFields(res); setStatus('synced'); }
         else if (res && /token/.test(res.error || '')) Sync.logout();
         else { requeue(sent); setStatus('offline'); }
       })
@@ -204,7 +246,7 @@
       .then(function (res) {
         if (finished) return;
         finished = true; clearTimeout(t);
-        if (res && res.ok) { applyServerState(res.state, res.seq); setStatus('synced'); }
+        if (res && res.ok) { applyServerState(res.state, res.seq); applyAdminFields(res); setStatus('synced'); }
         else if (res && /token/.test(res.error || '')) return Sync.logout();
         else setStatus('offline');
         done && done();

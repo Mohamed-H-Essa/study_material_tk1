@@ -36,6 +36,7 @@ footer{margin-top:40px;color:#5a6070;font-size:13px}
   <div style="float:right;font-size:13px;color:#8b93a7;text-align:right">
     <span id="whoami"></span>
     <span id="sync-pill" style="margin:0 8px;color:#6b7280" data-state="idle"></span>
+    <a href="admin.html" id="adminlink" style="color:#c9a96e;margin-right:8px;display:none">⚙ admin</a>
     <a href="#" id="logout" style="color:#8b93a7">log out</a>
   </div>
   <h1>Deutsch lernen — Comprehensible Input</h1>
@@ -44,20 +45,10 @@ footer{margin-top:40px;color:#5a6070;font-size:13px}
 
   <a href="revision.html" style="display:block;background:#141d2a;border:1px solid #29405c;border-radius:10px;padding:14px 18px;margin:0 0 8px;text-decoration:none;color:#7ec8e3;font-weight:600">🔁 Revision — cumulative quizzes across every lesson &amp; “Export ALL cards” for Anki <span style="color:#8b93a7;font-weight:400">→</span></a>
 
-  <div class="stage">Stufe 1 · Foundations</div>
-  <div class="grid" id="g1"></div>
-
-  <div class="stage">Stufe 2 · Vocabulary (concrete nouns & scenes)</div>
-  <div class="grid" id="g2"></div>
-
-  <div class="stage">Stufe 3 · Grammar</div>
-  <div class="grid" id="g3"></div>
-
-  <div class="stage">Stufe 4 · Speaking about yourself</div>
-  <div class="grid" id="g4"></div>
+  <div id="stages"></div>
 
   <button class="reset" onclick="if(confirm('Clear ALL saved progress across every file?')){Object.keys(localStorage).filter(k=>k.startsWith('de.')).forEach(k=>localStorage.removeItem(k));location.reload()}">Reset all progress</button>
-  <footer>22 lessons + revision hub · fully offline (thumbnails need internet) · built for Mohamed</footer>
+  <footer><span id="count"></span> · fully offline (thumbnails need internet) · built for Mohamed</footer>
 </div>
 
 <script src="config.js"></script>
@@ -68,31 +59,16 @@ if (!(localStorage.getItem('de.__user') && localStorage.getItem('de.__token'))) 
 }
 </script>
 <script src="sync.js"></script>
+<script src="lessons.js"></script>
 <script>
-const VIDEOS = [
-  {stage:1,n:1,file:"01_alphabet_pronunciation.html",id:"hAkxKMlYUI4",slug:"alphabet",title:"Alphabet & Pronunciation",de:"Das deutsche Alphabet",tag:"Letters · sounds · umlauts"},
-  {stage:2,n:2,file:"02_tea_kitchen.html",id:"WBtiAYV-Dfw",slug:"tea",title:"Making Tea",de:"Ich mache mir einen Tee",tag:"Kitchen nouns · der/die/das"},
-  {stage:2,n:3,file:"03_kitchen.html",id:"XETfpbtc2rY",slug:"kitchen",title:"In the Kitchen",de:"Die Küche",tag:"Kitchen tour · stehen/hängen/liegen"},
-  {stage:2,n:4,file:"04_hands_fingers.html",id:"awscSvqsS9U",slug:"hands",title:"Hands & Fingers",de:"Die Hände und die Finger",tag:"Body · left/right · verbs"},
-  {stage:2,n:5,file:"05_tram.html",id:"HiiF1kDnYt4",slug:"tram",title:"On the Tram",de:"In der Straßenbahn",tag:"Transport · getting on/off"},
-  {stage:2,n:6,file:"06_cat_table.html",id:"dnmT-utNxDs",slug:"cattable",title:"The Cat on the Table",de:"Die Katze schläft",tag:"Fur · soft/hard · aus Holz/Metall"},
-  {stage:2,n:7,file:"07_photo_scene.html",id:"Qk8nNN7Volg",slug:"photo",title:"Describing a Photo",de:"Wir schauen ein Bild an",tag:"Objects · thick/thin · clock"},
-  {stage:2,n:8,file:"08_houses.html",id:"zjSNHlrBOII",slug:"houses",title:"The Three Houses",de:"Die drei Häuser",tag:"Roof/chimney · zwischen · plurals"},
-  {stage:2,n:9,file:"09_child_dog.html",id:"pew42Zq8y1E",slug:"childdog",title:"Child, Dog & Flower",de:"Das Kind und der Hund",tag:"über/unter · scene"},
-  {stage:2,n:10,file:"10_living_room.html",id:"rkF5r9vAeoQ",slug:"livingroom",title:"The Living Room",de:"Das Wohnzimmer",tag:"Furniture · neben/auf/an · ja/nein"},
-  {stage:2,n:11,file:"11_beach.html",id:"F_mGqap-_t4",slug:"beach",title:"Three Women at the Beach",de:"Drei Frauen am Strand",tag:"Colours as adjectives · links/rechts"},
-  {stage:2,n:12,file:"12_apple.html",id:"zO4k4n9fL44",slug:"apple",title:"Cutting an Apple",de:"Ich schneide einen Apfel",tag:"Knife · peel/core · whole/half"},
-  {stage:2,n:13,file:"13_pencil_case.html",id:"ycogsUe24FM",slug:"pencilcase",title:"The Pencil Case",de:"Mein Mäppchen",tag:"Pens · same/different · caps"},
-  {stage:2,n:14,file:"14_weather_week.html",id:"nLq5hdGQuHw",slug:"weatherweek",title:"Weather & the Week",de:"Das Wetter & die Woche",tag:"Days · weather · gestern/heute/morgen"},
-  {stage:2,n:15,file:"15_winter_girl.html",id:"tzJqBfvTlQI",slug:"wintergirl",title:"The Girl in Winter",de:"Das Mädchen im Winter",tag:"Clothing · tragen · colours"},
-  {stage:3,n:16,file:"16_articles_intro.html",id:"oeWqRNO02k4",slug:"articles",title:"der / die / das — Intro",de:"Die Artikel",tag:"Gender basics · adjectives"},
-  {stage:3,n:17,file:"17_word_gender.html",id:"cyRDSqopIyA",slug:"gender",title:"Guessing a Word's Gender",de:"Das Geschlecht der Nomen",tag:"Ending rules · -ung -chen -ismus"},
-  {stage:3,n:18,file:"18_sentence_structure.html",id:"qDrgJz9V2Yk",slug:"satzbau",title:"Sentence Structure",de:"Der Satzbau",tag:"Verb-second · TMP · Nebensatz"},
-  {stage:3,n:19,file:"19_questions.html",id:"1WT_cuee12Y",slug:"fragen",title:"Asking Questions",de:"Fragen stellen",tag:"W-words · yes/no · word order"},
-  {stage:3,n:20,file:"20_prepositions_an_auf_in.html",id:"2ooxcrMJXjI",slug:"prep",title:"an / auf / in (Dativ & Akkusativ)",de:"Lokale Präpositionen",tag:"wo? vs wohin? · contractions"},
-  {stage:3,n:21,file:"21_aus_vs_von.html",id:"iog_s5I6idA",slug:"ausvon",title:"aus vs. von",de:"aus oder von?",tag:"Where you came from · dative"},
-  {stage:4,n:22,file:"22_introduce_yourself.html",id:"huwi-cjPPXU",id2:"Yaelm87PTvg",slug:"vorstellen",title:"Introduce Yourself",de:"Sich vorstellen",tag:"Name · age · home · hobbies"}
-];
+const STAGE_NAMES = {
+  1:"Stufe 1 · Foundations",
+  2:"Stufe 2 · Vocabulary (concrete nouns &amp; scenes)",
+  3:"Stufe 3 · Grammar",
+  4:"Stufe 4 · Speaking about yourself",
+  5:"Stufe 5 · Stories &amp; longer input",
+  6:"Stufe 6 · Culture, opinions &amp; real-world German"
+};
 
 function isDone(slug){
   // The lecture engine saves done-state with JSON.stringify, so the raw value
@@ -102,24 +78,56 @@ function isDone(slug){
 }
 
 // Build the cards once. Called after the initial sync so ✓ done-marks reflect cloud state
-// rather than stale local state that would never repaint (the sync race).
+// rather than stale local state that would never repaint (the sync race), and so the
+// admin's per-user visibility list has arrived before we decide what to show.
 function renderCards(){
-  for(const v of VIDEOS){
-    const g=document.getElementById('g'+v.stage);
-    const a=document.createElement('a');
-    a.href=v.file;a.className='card'+(isDone(v.slug)?' done':'');
-    a.innerHTML=`
-      <div class="thumb">
-        <img src="https://img.youtube.com/vi/${v.id}/hqdefault.jpg" alt="${v.title}" loading="lazy">
-        <span class="num">${v.n}</span>
-        <span class="done-badge">✓ done</span>
-      </div>
-      <div class="body">
-        <h3>${v.title}</h3>
-        <div class="de" lang="de">${v.de}</div>
-        <div class="tag">${v.tag}</div>
-      </div>`;
-    g.appendChild(a);
+  // Hide anything the admin has hidden from THIS user. With no backend (or an older one)
+  // Sync.hidden is empty, so every lesson shows — same as before this feature existed.
+  const hidden = (window.Sync && Sync.hidden) || [];
+  const visible = LESSONS.filter(v => hidden.indexOf(v.slug) === -1);
+
+  const host = document.getElementById('stages');
+  host.innerHTML = '';
+  let shown = 0;
+
+  Object.keys(STAGE_NAMES).map(Number).sort((a,b)=>a-b).forEach(stage=>{
+    const items = visible.filter(v => v.stage === stage);
+    if (!items.length) return;                 // skip a stage that is empty for this user
+    const h = document.createElement('div');
+    h.className = 'stage';
+    h.innerHTML = STAGE_NAMES[stage];
+    host.appendChild(h);
+    const g = document.createElement('div');
+    g.className = 'grid';
+    host.appendChild(g);
+
+    for (const v of items){
+      shown++;
+      const a = document.createElement('a');
+      a.href = v.file;
+      a.className = 'card' + (isDone(v.slug) ? ' done' : '');
+      a.innerHTML = `
+        <div class="thumb">
+          <img src="https://img.youtube.com/vi/${v.id}/hqdefault.jpg" alt="${v.title}" loading="lazy">
+          <span class="num">${v.n}</span>
+          <span class="done-badge">✓ done</span>
+        </div>
+        <div class="body">
+          <h3>${v.title}</h3>
+          <div class="de" lang="de">${v.de}</div>
+          <div class="tag">${v.tag}</div>
+        </div>`;
+      g.appendChild(a);
+    }
+  });
+
+  const c = document.getElementById('count');
+  if (c) c.textContent = shown + ' lessons + revision hub';
+
+  // The admin panel link only appears for the admin account.
+  if (window.Sync && Sync.isAdmin) {
+    const nav = document.getElementById('adminlink');
+    if (nav) nav.style.display = '';
   }
 }
 // Gate on the initial pull (falls back to local state on offline/timeout). If sync.js is

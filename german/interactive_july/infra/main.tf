@@ -102,9 +102,14 @@ resource "aws_iam_role_policy" "lambda" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect   = "Allow"
-        Action   = ["s3:GetObject", "s3:PutObject"]
-        Resource = "${aws_s3_bucket.state.arn}/users/*"
+        # users/*  = per-user progress blobs.
+        # admin/*  = the single visibility/override config the admin panel writes.
+        Effect = "Allow"
+        Action = ["s3:GetObject", "s3:PutObject"]
+        Resource = [
+          "${aws_s3_bucket.state.arn}/users/*",
+          "${aws_s3_bucket.state.arn}/admin/*",
+        ]
       },
       {
         # GetObject on a missing key does a ListBucket check to return 404 vs 403.
