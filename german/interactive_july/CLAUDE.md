@@ -145,6 +145,17 @@ conflated: a `push` reply is a DELTA (authoritative, not complete), a `refresh`/
 is the whole blob (both). Pruning happens only when `complete` — pruning on a delta would delete
 every key that merely had not changed.
 
+## Hub: "jump to my next lesson"
+
+A button in the hub's top bar scrolls to the first lesson that is **visible to this user and
+not yet done**, in hub order, and rings it briefly so it is obvious which card it meant. It
+**scrolls, never navigates** — the point is to show you where you are, not to open anything.
+When everything is finished it disables itself and reads "✓ All caught up".
+
+It is refreshed by `updateJump()` alongside `updateBulk()` on every render, so it stays correct
+as you toggle lessons done. Cards carry `data-slug` purely so it can find its target again after
+a re-render. Covered by `tools/test_done.js`.
+
 ## Celebration on completion
 
 Passing a check-off for the first time fires a short celebration: confetti, a wave through the

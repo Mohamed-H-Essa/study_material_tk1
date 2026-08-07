@@ -95,6 +95,19 @@ footer{margin-top:40px;color:#5a6070;font-size:13px}
 .bulk .what{font-size:13px;color:#8b93a7;flex:1;min-width:220px}
 .bulk .what b{color:#7ec8e3}
 .bulk.ok button{background:#16a34a;border-color:#16a34a}
+
+/* "jump to my next lesson" — scrolls, never navigates */
+.jump{display:inline-flex;align-items:center;gap:9px;padding:10px 17px;border-radius:8px;
+  border:1px solid #2f6b46;background:#0f2419;color:#7dd6a0;font-size:14.5px;font-weight:600;
+  font-family:inherit;cursor:pointer;transition:background .15s,color .15s,border-color .15s}
+.jump:hover{background:#14311f;color:#a6e9c0;border-color:#16a34a}
+.jump:disabled{opacity:.45;cursor:default;background:#1b2740;border-color:#29405c;color:#8b93a7}
+/* brief ring on the card we land on, so it is obvious which one is "next" */
+@keyframes de-spot{0%,100%{box-shadow:0 0 0 0 rgba(74,144,217,0)}
+  15%{box-shadow:0 0 0 3px rgba(74,144,217,.85)}
+  70%{box-shadow:0 0 0 3px rgba(74,144,217,.55)}}
+.card.spot{animation:de-spot 1.6s ease-out 1 both}
+@media (prefers-reduced-motion: reduce){.card.spot{animation:none}}
 </style>
 </head>
 <body>
@@ -112,6 +125,7 @@ footer{margin-top:40px;color:#5a6070;font-size:13px}
   <a href="revision.html" style="display:block;background:#141d2a;border:1px solid #29405c;border-radius:10px;padding:14px 18px;margin:0 0 8px;text-decoration:none;color:#7ec8e3;font-weight:600">🔁 Revision — cumulative quizzes across every lesson &amp; “Export ALL cards” for Anki <span style="color:#8b93a7;font-weight:400">→</span></a>
 
   <div class="bulk" id="bulk">
+    <button class="jump" id="jumpBtn" disabled>↓ Jump to my next lesson</button>
     <button id="bulkBtn" disabled>⬇ Export my finished lessons</button>
     <span class="what" id="bulkWhat">Checking your progress…</span>
   </div>
@@ -194,6 +208,7 @@ function renderCards(){
       shown++;
       const a = document.createElement('a');
       a.href = v.file;
+      a.dataset.slug = v.slug;
       const done = isDone(v.slug);
       a.className = 'card' + (done ? ' done' : '');
       const nCards = (window.DECKS && DECKS[v.slug]) ? DECKS[v.slug].cards.length : 0;
@@ -241,6 +256,7 @@ function renderCards(){
             if (!ok) throw new Error((res && res.error) || 'rejected');
             paintCard(a, tg, isDone(v.slug));
             updateBulk(visible);
+  updateJump(visible);
           })
           .catch(function(){
             tg.classList.remove('busy');
@@ -272,6 +288,7 @@ function renderCards(){
   // subdecks under "Deutsch" rather than one undifferentiated pile. Duplicate fronts
   // (a word deliberately taught in two lessons) are written once — see buildTSV.
   updateBulk(visible);
+  updateJump(visible);
 
   // The admin panel link only appears for the admin account.
   if (window.Sync && Sync.isAdmin) {
@@ -306,6 +323,36 @@ document.addEventListener('visibilitychange', function(){
     Sync.refresh(function(){ renderCards(); });
   }
 });
+
+// "Jump to my next lesson" — scrolls the hub to the first VISIBLE lesson that is not yet
+// done, in hub order. Deliberately a scroll and not a navigation: it just moves you to the
+// card so you can see where you are, and briefly rings it so it is obvious which one it means.
+function updateJump(visible){
+  const btn = document.getElementById('jumpBtn');
+  if (!btn) return;
+  const next = visible.find(v => !isDone(v.slug));
+
+  if (!next){
+    btn.disabled = true;
+    btn.textContent = '✓ All caught up';
+    btn.onclick = null;
+    return;
+  }
+  btn.disabled = false;
+  btn.textContent = '↓ Jump to lesson ' + next.n;
+  btn.title = next.title;
+  btn.onclick = function(){
+    const card = document.querySelector('.card[data-slug="' + next.slug + '"]');
+    if (!card) return;
+    // scrollIntoView with block:center puts it comfortably in view rather than jammed
+    // under the sticky-ish header area. 'smooth' is ignored under reduced-motion by the UA.
+    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    card.classList.remove('spot');
+    void card.offsetWidth;              // restart the animation if it is already applied
+    card.classList.add('spot');
+    setTimeout(function(){ card.classList.remove('spot'); }, 1800);
+  };
+}
 
 // Refresh the "export my finished lessons" bar. Only lessons that are BOTH visible to this
 // user and marked ✓ done are included, in hub order.

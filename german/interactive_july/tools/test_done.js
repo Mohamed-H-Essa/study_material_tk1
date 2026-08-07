@@ -219,6 +219,49 @@ const settle = ms => new Promise(r => setTimeout(r, ms));
     }
   }
 
+  // ---------- 3d. "jump to my next lesson" ----------
+  {
+    // First three lessons done -> the next one is #4 (hands), in hub order.
+    const { w } = boot({ localDone: ['alphabet','tea','kitchen'],
+                         serverDone: ['alphabet','tea','kitchen'] });
+    await settle(300);
+    const btn = w.document.getElementById('jumpBtn');
+    check(!!btn, 'jump: button missing');
+    check(!btn.disabled, 'jump: should be enabled when something is unfinished');
+    check(/lesson 4\b/.test(btn.textContent),
+      'jump: should target lesson 4, label reads ' + JSON.stringify(btn.textContent));
+
+    // it must SCROLL, not navigate
+    let scrolled = null;
+    const target = w.document.querySelector('.card[data-slug="hands"]');
+    check(!!target, 'jump: target card has no data-slug hook');
+    target.scrollIntoView = function(o){ scrolled = o; };
+    const before = w.location.href;
+    btn.click();
+    await settle(60);
+    check(!!scrolled, 'jump: did not scroll to the card');
+    check(scrolled && scrolled.behavior === 'smooth' && scrolled.block === 'center',
+      'jump: unexpected scroll options ' + JSON.stringify(scrolled));
+    check(w.location.href === before, 'jump: navigated instead of scrolling');
+    check(target.classList.contains('spot'), 'jump: target card was not highlighted');
+    console.log('  jump: scrolls to lesson 4, highlights it, no navigation');
+  }
+
+  // ---------- 3e. jump when everything is finished ----------
+  {
+    const { w } = boot({ localDone: [], serverDone: [] });
+    await settle(300);
+    // mark every visible lesson done directly in the store, then re-render
+    const slugs = w.LESSONS.map(v => v.slug);
+    slugs.forEach(sg => w.localStorage.setItem('de.' + sg + '.done', JSON.stringify('1')));
+    w.renderCards();
+    const btn = w.document.getElementById('jumpBtn');
+    check(btn.disabled, 'jump: should be disabled when nothing is left');
+    check(/caught up/i.test(btn.textContent),
+      'jump: expected an all-done label, got ' + JSON.stringify(btn.textContent));
+    console.log('  jump: reads "✓ All caught up" when nothing is left');
+  }
+
   // ---------- 4. the Anki button still works and does not navigate ----------
   {
     const { w } = boot({ localDone: [], serverDone: [] });
