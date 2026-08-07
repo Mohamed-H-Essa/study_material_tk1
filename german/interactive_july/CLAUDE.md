@@ -145,6 +145,28 @@ conflated: a `push` reply is a DELTA (authoritative, not complete), a `refresh`/
 is the whole blob (both). Pruning happens only when `complete` — pruning on a delta would delete
 every key that merely had not changed.
 
+## Celebration on completion
+
+Passing a check-off for the first time fires a short celebration: confetti, a wave through the
+title's letters, and a small tilt of the page. It is deliberately a gimmick — motivation only,
+and it must never get in the way:
+
+- **Once only.** It hangs off `renderDone(justNow)`; `justNow` is false when the page merely
+  re-renders an already-done lesson, so reloading never re-triggers it.
+- **Never blocking.** The confetti is a `position:fixed` canvas at `z-index:9999` with
+  `pointer-events:none`, and it removes itself once the pieces settle. It is wrapped in a
+  try/catch — a broken party must not break a lesson.
+- **Respects `prefers-reduced-motion`.** The engine checks it and returns early; the CSS also
+  opts out. Nothing animates for users who asked for that.
+
+**The tilt goes on `.wrap`, never `<body>`.** A CSS transform on an ancestor makes
+`position:fixed` descendants resolve against *that ancestor* instead of the viewport — tilting
+`<body>` would drag the confetti canvas along and rotate it with the page. The canvas is a
+direct child of `<body>`, which stays untransformed. jsdom cannot catch this (it does no
+layout), so there is an explicit assertion that the class lands on `.wrap` and not on `<body>`.
+
+Covered by `tools/test_celebrate.js`, which drives a real lesson's check-off to an actual pass.
+
 ## Anki export
 
 Three ways out, all producing ONE tab-separated file that Anki imports directly:

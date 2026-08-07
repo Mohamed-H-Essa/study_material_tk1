@@ -110,6 +110,31 @@ p{margin-bottom:12px}
 .co-badge{display:inline-flex;align-items:center;gap:8px;background:#16a34a;color:#fff;font-weight:700;padding:8px 16px;border-radius:24px;font-size:15px}
 .co-retry{margin-left:12px;font-size:13px;color:#8b93a7;background:none;border:none;cursor:pointer;text-decoration:underline}
 
+/* ---- celebration when a check-off is passed for the first time ----
+   Deliberately short and small: a quick letter wave on the title plus a barely-there tilt of
+   the page. The confetti itself is a canvas the engine creates and removes. All of it is
+   suppressed under prefers-reduced-motion (the engine checks, and the rules below opt out too),
+   and none of it affects layout — transforms only, so nothing reflows or shifts the text. */
+.de-letter{display:inline-block;will-change:transform;animation:de-wave .62s ease-in-out 1 both}
+@keyframes de-wave{
+  0%   {transform:translateY(0)   rotate(0)     scale(1)}
+  25%  {transform:translateY(-9px) rotate(-6deg) scale(1.12)}
+  55%  {transform:translateY(3px)  rotate(4deg)  scale(.97)}
+  100% {transform:translateY(0)   rotate(0)     scale(1)}
+}
+.de-party{animation:de-tilt 1.35s cubic-bezier(.36,.07,.19,.97) 1 both}
+@keyframes de-tilt{
+  0%,100%{transform:none}
+  12% {transform:rotate(.45deg) translateY(-3px)}
+  28% {transform:rotate(-.4deg) translateY(2px)}
+  46% {transform:rotate(.28deg)}
+  64% {transform:rotate(-.2deg)}
+  82% {transform:rotate(.1deg)}
+}
+@media (prefers-reduced-motion: reduce){
+  .de-letter,.de-party{animation:none !important}
+}
+
 /* ---- standalone "download this lesson's Anki deck" button (top & bottom of a lesson) ---- */
 .anki-export{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:16px 0}
 .anki-export-btn{display:inline-flex;align-items:center;gap:9px;padding:11px 18px;border-radius:9px;

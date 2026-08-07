@@ -61,6 +61,113 @@ const Engine = (() => {
     mount.appendChild(box);
   }
 
+  /* ---------- CELEBRATION ----------
+     Fired once, only when a check-off is passed for the first time (renderDone(justNow)),
+     never on a reload of an already-done lesson. Three things happen together:
+       1. confetti — one <canvas> on top of everything, self-removing when it settles
+       2. the lesson title's letters do a short wave
+       3. a brief, very small page tilt
+     Everything is decorative and non-blocking: it never touches progress, never awaits
+     anything, and is skipped entirely for users who ask for reduced motion. */
+
+  const reducedMotion = () => {
+    try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
+    catch (e) { return false; }
+  };
+
+  function confetti(ms) {
+    const cv = el('canvas', 'de-confetti');
+    // Fixed, full-viewport, above everything, and click-through so it can never trap a tap.
+    cv.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9999';
+    document.body.appendChild(cv);
+    const ctx = cv.getContext('2d');
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    function size(){ cv.width = innerWidth * dpr; cv.height = innerHeight * dpr; ctx.setTransform(dpr,0,0,dpr,0,0); }
+    size();
+    window.addEventListener('resize', size);
+
+    // Palette lifted from the app's own accents so it feels part of the design.
+    const COLOURS = ['#4ade80','#7ec8e3','#c9a96e','#a06cff','#ffc371','#ff5f6d','#ffffff'];
+    const N = 140;
+    const bits = [];
+    for (let i=0;i<N;i++){
+      bits.push({
+        x: innerWidth * (0.15 + Math.random()*0.7),
+        y: -20 - Math.random()*innerHeight*0.35,
+        vx: (Math.random()-0.5)*3.2,
+        vy: 2 + Math.random()*3.4,
+        w: 5 + Math.random()*7,
+        h: 8 + Math.random()*9,
+        rot: Math.random()*Math.PI,
+        vr: (Math.random()-0.5)*0.28,
+        c: COLOURS[(Math.random()*COLOURS.length)|0],
+        sway: 0.6 + Math.random()*1.5,
+        phase: Math.random()*Math.PI*2,
+      });
+    }
+    const t0 = performance.now();
+    let raf;
+    function frame(now){
+      const t = now - t0;
+      ctx.clearRect(0,0,innerWidth,innerHeight);
+      let alive = 0;
+      for (const b of bits){
+        b.vy += 0.045;                                  // gravity
+        b.x += b.vx + Math.sin((t/300)+b.phase)*b.sway; // drift/flutter
+        b.y += b.vy;
+        b.rot += b.vr;
+        if (b.y < innerHeight + 40) alive++;
+        // fade out over the last third so it doesn't vanish abruptly
+        const k = Math.max(0, Math.min(1, 1 - (t - ms*0.66) / (ms*0.34)));
+        ctx.globalAlpha = k;
+        ctx.save();
+        ctx.translate(b.x, b.y);
+        ctx.rotate(b.rot);
+        ctx.fillStyle = b.c;
+        ctx.fillRect(-b.w/2, -b.h/2, b.w, b.h);
+        ctx.restore();
+      }
+      if (t < ms && alive) raf = requestAnimationFrame(frame);
+      else { cancelAnimationFrame(raf); window.removeEventListener('resize', size); cv.remove(); }
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  // Split the German part of the <h1> into per-letter spans and wave them once.
+  function danceTitle(){
+    const target = document.querySelector('h1 .de') || document.querySelector('h1');
+    if (!target || target.dataset.danced) return;
+    target.dataset.danced = '1';
+    const text = target.textContent;
+    const frag = document.createDocumentFragment();
+    [...text].forEach((ch, i) => {
+      if (ch === ' ') { frag.appendChild(document.createTextNode(' ')); return; }
+      const sp = document.createElement('span');
+      sp.className = 'de-letter';
+      sp.textContent = ch;
+      sp.style.animationDelay = (i * 35) + 'ms';
+      frag.appendChild(sp);
+    });
+    target.textContent = '';
+    target.appendChild(frag);
+    // Leave the spans in place; the animation runs once and the letters look identical after.
+  }
+
+  function celebrate(){
+    if (reducedMotion()) return;      // respect the OS setting; no motion at all
+    try {
+      confetti(2600);
+      danceTitle();
+      // Tilt the CONTENT wrapper, never <body>. A transform on an ancestor makes
+      // position:fixed descendants resolve against that ancestor instead of the viewport —
+      // so tilting <body> would drag the fixed confetti canvas along with it and rotate it.
+      // The canvas is a direct child of <body>, which stays untransformed.
+      const stage = document.querySelector('.wrap') || document.body;
+      stage.classList.add('de-party');
+      setTimeout(() => stage.classList.remove('de-party'), 1400);
+    } catch (e) { /* a broken party must never break the lesson */ }
+  }
+
   /* ---------- Anki export ----------
      Output is a tab-separated file with Anki's import header directives (2.1.54+):
        #separator:Tab   the delimiter
@@ -262,6 +369,9 @@ const Engine = (() => {
       d.innerHTML=`<span class="co-badge">✓ Marked done</span>`+
         (justNow?'<div class="ex-msg" style="margin-top:12px">Nice — this shows ✓ on the hub, for good.</div>':'');
       box.appendChild(d);
+      // Celebrate ONLY on a fresh pass. `justNow` is false when the page merely re-renders an
+      // already-done lesson, so reloading never re-triggers it.
+      if (justNow) celebrate();
     }
     render(); mount.appendChild(box);
   }
