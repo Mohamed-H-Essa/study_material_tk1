@@ -1418,5 +1418,33 @@ window.DECKS = {
       {"f":"gerade Ziffer → Ost-West","b":"even number = east-west route"},
       {"f":"ungerade Ziffer → Nord-Süd","b":"odd number = north-south route"}
     ]
+  },
+  "bilderbuch": {
+    deck: "DE · Bilder im Buch",
+    cards: [
+      {"f":"das Bilderbuch → die Bilderbücher","b":"the picture book"},
+      {"f":"die Seite → die Seiten","b":"the page","ex":"Nächste Seite!"},
+      {"f":"das Ei → die Eier","b":"egg → eggs"},
+      {"f":"das Huhn → die Hühner","b":"chicken → chickens"},
+      {"f":"die Brille → die Brillen","b":"the glasses (SINGULAR in German)"},
+      {"f":"die Träne → die Tränen","b":"the tear","ex":"Da sind zwei Tränen."},
+      {"f":"der Kessel → die Kessel","b":"the kettle / cauldron"},
+      {"f":"der Krug → die Krüge","b":"jug → jugs"},
+      {"f":"die Schüssel → die Schüsseln","b":"the bowl"},
+      {"f":"der Löffel → die Löffel","b":"the spoon"},
+      {"f":"die Mauer → die Mauern","b":"the outside wall (die Wand = inside)"},
+      {"f":"das Seil → die Seile","b":"the rope","ex":"Er balanciert auf dem Seil."},
+      {"f":"die Kerze → die Kerzen","b":"the candle"},
+      {"f":"der Mond → die Monde","b":"the moon"},
+      {"f":"der Hut → die Hüte","b":"hat → hats"},
+      {"f":"kaputt ⇄ ganz","b":"broken ⇄ whole / in one piece"},
+      {"f":"kaputtgehen","b":"to break (by itself)","ex":"damit er nicht kaputt geht"},
+      {"f":"ein hart gekochtes Ei","b":"a hard-boiled egg (participle as adjective)"},
+      {"f":"damit","b":"so that (→ verb LAST, like weil)"},
+      {"f":"balancieren","b":"to balance"},
+      {"f":"sich verbeugen","b":"to bow"},
+      {"f":"bequem","b":"comfortable","ex":"ein bequemer Stuhl"},
+      {"f":"Hier ist / Hier sitzt …","b":"Here is / Here sits… — the describing frame"}
+    ]
   }
 };

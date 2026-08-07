@@ -152,6 +152,27 @@ if _d["mism"]:
 if len(_d["d"]) != len(CAT):
     fail.append("decks.js has %d decks but there are %d lessons" % (len(_d["d"]), len(CAT)))
 
+# --- 9. the video a page embeds must be the one the catalogue names ---------
+# This is the check that would have caught the 2026-08 mix-up, where a whole batch of
+# lessons was given the id of the NEXT video in the source list. Titles are not fetched
+# here (no network in the verifier) — that is a separate, deliberate step; see
+# tools/check_video_titles.sh.
+SECOND_VIDEO = {"weatherweek": {"kkLK2nUOlJE"}}   # lessons that legitimately show 2 videos
+for f, v in BY_FILE.items():
+    if not os.path.exists(f):
+        continue
+    s = open(f, encoding="utf-8").read()
+    ids = set(re.findall(r"youtube\.com/watch\?v=([A-Za-z0-9_-]{11})", s)) | \
+          set(re.findall(r"img\.youtube\.com/vi/([A-Za-z0-9_-]{11})/", s))
+    allowed = {v["id"]} | set(SECOND_VIDEO.get(v["slug"], ()))
+    if v.get("id2"):
+        allowed.add(v["id2"])
+    if v["id"] not in ids:
+        err(f, "catalogue video id %s does not appear on the page" % v["id"])
+    extra = ids - allowed
+    if extra:
+        err(f, "page embeds video id(s) not in the catalogue: %s" % sorted(extra))
+
 print("checked %d html files, %d catalogue entries" % (len(html_files), len(CAT)))
 if fail:
     print("\nFAILURES (%d):" % len(fail))

@@ -29,18 +29,18 @@ window.LESSONS = [
   {stage:2,n:15,file:"15_winter_girl.html",id:"tzJqBfvTlQI",slug:"wintergirl",title:"The Girl in Winter",de:"Das Mädchen im Winter",tag:"Clothing · tragen · colours"},
 
   // ---- Stufe 2 (continued) · the body, people & the everyday world ----
-  {stage:2,n:16,file:"16_body_parts.html",id:"Ngy_6VW1JOE",slug:"koerper",title:"Parts of the Body",de:"Der Körper und die Körperteile",tag:"Head to toe · what each part does"},
-  {stage:2,n:17,file:"17_face_parts.html",id:"mns-P8FB37s",slug:"gesicht",title:"Parts of the Face",de:"Das Gesicht",tag:"Eyes/ears/nose · the five senses"},
-  {stage:2,n:18,file:"18_describing_people.html",id:"TI70A-ZobXo",slug:"personen",title:"Describing People",de:"Personen beschreiben",tag:"Tall/slim · hair & eyes · character · jobs"},
-  {stage:2,n:19,file:"19_family.html",id:"E8gJks0PKd0",slug:"familie",title:"Emma's Family",de:"Emmas Familie",tag:"Parents · siblings · aunts, uncles, cousins"},
-  {stage:2,n:20,file:"20_counting.html",id:"fYyaK2_C9yw",slug:"zaehlen",title:"Let's Count",de:"Wir zählen auf Deutsch",tag:"Numbers 1-30 · how many? · counting things"},
-  {stage:2,n:21,file:"21_home_rooms.html",id:"lK9ef5fftW4",slug:"zuhause",title:"Describing Your Home",de:"Emmas Haus",tag:"Six rooms · furniture · the garden"},
-  {stage:2,n:22,file:"22_daily_things.html",id:"DXih53xUERU",slug:"jedentag",title:"Things We Do Every Day",de:"Dinge, die wir jeden Tag machen",tag:"Sleep/wake/eat/walk · everyday verbs"},
-  {stage:2,n:23,file:"23_emmas_week.html",id:"2ehaFqxDxtM",slug:"woche",title:"Emma's Week: Hobbies & Days",de:"Emmas Woche",tag:"Mon-Sun · hobbies · morgens/abends"},
-  {stage:2,n:24,file:"24_bag_contents.html",id:"XIYsmkoHoPI",slug:"tasche",title:"Things I Carry in My Bag",de:"Was ist in meiner Tasche?",tag:"Everyday objects · wallet, keys, tissues"},
-  {stage:2,n:25,file:"25_funny_animals.html",id:"0Yel0i3tpEo",slug:"tiernamen",title:"Funny Animal Names",de:"Lustige Tiernamen",tag:"Rhino, skunk, raccoon, slug, sloth · compounds"},
-  {stage:2,n:26,file:"26_green_animals.html",id:"EMEnR6WQ250",slug:"gruenetiere",title:"Green Animals — Guess Which",de:"Grüne Tiere",tag:"Turtle, croc, frog, snake, dino · describing"},
-  {stage:2,n:27,file:"27_love_hate.html",id:"nsjNxiQ3470",slug:"liebehasse",title:"Things I Love vs Things I Hate",de:"Dinge, die ich liebe und hasse",tag:"lieben/hassen · opinions · summer & mountains"},
+  {stage:2,n:16,file:"16_body_parts.html",id:"DXih53xUERU",slug:"koerper",title:"Parts of the Body",de:"Der Körper und die Körperteile",tag:"Head to toe · what each part does"},
+  {stage:2,n:17,file:"17_face_parts.html",id:"2ehaFqxDxtM",slug:"gesicht",title:"Parts of the Face",de:"Das Gesicht",tag:"Eyes/ears/nose · the five senses"},
+  {stage:2,n:18,file:"18_describing_people.html",id:"nsjNxiQ3470",slug:"personen",title:"Describing People",de:"Personen beschreiben",tag:"Tall/slim · hair & eyes · character · jobs"},
+  {stage:2,n:19,file:"19_family.html",id:"TI70A-ZobXo",slug:"familie",title:"Emma's Family",de:"Emmas Familie",tag:"Parents · siblings · aunts, uncles, cousins"},
+  {stage:2,n:20,file:"20_counting.html",id:"E8gJks0PKd0",slug:"zaehlen",title:"Let's Count",de:"Wir zählen auf Deutsch",tag:"Numbers 1-30 · how many? · counting things"},
+  {stage:2,n:21,file:"21_home_rooms.html",id:"fYyaK2_C9yw",slug:"zuhause",title:"Describing Your Home",de:"Emmas Haus",tag:"Six rooms · furniture · the garden"},
+  {stage:2,n:22,file:"22_daily_things.html",id:"omHq0j5MGb4",slug:"jedentag",title:"Things We Do Every Day",de:"Dinge, die wir jeden Tag machen",tag:"Sleep/wake/eat/walk · everyday verbs"},
+  {stage:2,n:23,file:"23_emmas_week.html",id:"EMEnR6WQ250",slug:"woche",title:"Emma's Week: Hobbies & Days",de:"Emmas Woche",tag:"Mon-Sun · hobbies · morgens/abends"},
+  {stage:2,n:24,file:"24_bag_contents.html",id:"mns-P8FB37s",slug:"tasche",title:"Things I Carry in My Bag",de:"Was ist in meiner Tasche?",tag:"Everyday objects · wallet, keys, tissues"},
+  {stage:2,n:25,file:"25_funny_animals.html",id:"NC4K5wg-iBw",slug:"tiernamen",title:"Funny Animal Names",de:"Lustige Tiernamen",tag:"Rhino, skunk, raccoon, slug, sloth · compounds"},
+  {stage:2,n:26,file:"26_green_animals.html",id:"lK9ef5fftW4",slug:"gruenetiere",title:"Green Animals — Guess Which",de:"Grüne Tiere",tag:"Turtle, croc, frog, snake, dino · describing"},
+  {stage:2,n:27,file:"27_love_hate.html",id:"0Yel0i3tpEo",slug:"liebehasse",title:"Things I Love vs Things I Hate",de:"Dinge, die ich liebe und hasse",tag:"lieben/hassen · opinions · summer & mountains"},
   {stage:2,n:28,file:"28_creepy_things.html",id:"a_Tp7qTa5Jk",slug:"gruselig",title:"Things We Find Creepy",de:"Gruselige Dinge",tag:"finden + adjective · dolls, fog, caves, clowns"},
   {stage:2,n:29,file:"29_snow_activities.html",id:"VH-ckQhjy1E",slug:"schnee",title:"Things to Do in the Snow",de:"Was man im Schnee machen kann",tag:"Snowball fight · snowman · sledging"},
   {stage:2,n:30,file:"30_christmas.html",id:"fnKkltPH4QU",slug:"weihnachten",title:"Christmas Vocabulary",de:"Weihnachtsvokabeln",tag:"Advent calendar · tree · presents · Santa"},
@@ -57,7 +57,7 @@ window.LESSONS = [
   {stage:4,n:37,file:"37_introduce_yourself.html",id:"huwi-cjPPXU",id2:"Yaelm87PTvg",slug:"vorstellen",title:"Introduce Yourself",de:"Sich vorstellen",tag:"Name · age · home · hobbies"},
 
   // ---- Stufe 5 · Stories & longer input ----
-  {stage:5,n:38,file:"38_felix_park.html",id:"omHq0j5MGb4",slug:"felixpark",title:"Felix at the Park",de:"Felix im Park",tag:"A short story · past-tense feel · climbing & jumping"},
+  {stage:5,n:38,file:"38_felix_park.html",id:"XIYsmkoHoPI",slug:"felixpark",title:"Felix at the Park",de:"Felix im Park",tag:"A short story · past-tense feel · climbing & jumping"},
   {stage:5,n:39,file:"39_peter_rabbit.html",id:"8sIfpXZ86kQ",slug:"peterhase",title:"Peter Rabbit — Describing Pictures",de:"Peter Hase",tag:"Clothing · running & hiding · a picture book"},
   {stage:5,n:40,file:"40_snow_white.html",id:"dMaIgKKNFCY",slug:"schneewittchen",title:"Snow White & the Seven Dwarfs",de:"Schneewittchen",tag:"Fairy tale · the magic mirror · poisoned apple"},
   {stage:5,n:41,file:"41_struwwelpeter.html",id:"-y1rxt6wd2c",slug:"friedrich",title:"The Story of Wicked Frederick",de:"Die Geschichte vom bösen Friedrich",tag:"Struwwelpeter · a cruel boy gets his comeuppance"},
@@ -78,5 +78,10 @@ window.LESSONS = [
   {stage:6,n:54,file:"54_guess_country.html",id:"eB8hOHsP1GQ",slug:"laender",title:"Guess the Country",de:"Kannst du das Land erraten?",tag:"Countries · flags · geography · a guessing game"},
   {stage:6,n:55,file:"55_german_numbers.html",id:"4guODmVfzhw",slug:"deutschzahlen",title:"The German Language in Numbers",de:"Die deutsche Sprache in Zahlen",tag:"Who speaks German & where · big numbers"},
   {stage:6,n:56,file:"56_germany_facts.html",id:"EqLYcBlyrjo",slug:"deutschlandfakten",title:"Germany in Facts & Figures",de:"Deutschland in Zahlen und Fakten",tag:"Population · rivers · mountains · geography"},
-  {stage:6,n:57,file:"57_autobahn.html",id:"aMQ88JhVbuI",slug:"autobahn",title:"10 Facts About the Autobahn",de:"Zehn Fakten über die Autobahn",tag:"Speed limits · Rettungsgasse · longest & shortest"}
+  {stage:6,n:57,file:"57_autobahn.html",id:"aMQ88JhVbuI",slug:"autobahn",title:"10 Facts About the Autobahn",de:"Zehn Fakten über die Autobahn",tag:"Speed limits · Rettungsgasse · longest & shortest"},
+
+  // Appended rather than slotted into Stufe 5 at its "natural" position: inserting would
+  // renumber ten files and their prev/next seams for no teaching benefit, and display
+  // order is cosmetic anyway (slugs carry the progress).
+  {stage:5,n:58,file:"58_picture_book.html",id:"Ngy_6VW1JOE",slug:"bilderbuch",title:"Pictures in a Children's Book",de:"Humpty Dumpty — Bilder im Buch",tag:"Narrating pictures · nächste Seite · a kettle, a wall, a rope"}
 ];
