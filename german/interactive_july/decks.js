@@ -1446,5 +1446,33 @@ window.DECKS = {
       {"f":"bequem","b":"comfortable","ex":"ein bequemer Stuhl"},
       {"f":"Hier ist / Hier sitzt …","b":"Here is / Here sits… — the describing frame"}
     ]
+  },
+  "esgibt": {
+    deck: "DE · Es gibt",
+    cards: [
+      {"f":"Es gibt …","b":"There is / There are — ONE form for both (+ Akkusativ)"},
+      {"f":"Es gibt einen Fluss.","b":"There is a river (der → einen: accusative)"},
+      {"f":"Es gibt keine Palmen.","b":"There are no palm trees (negate with kein)"},
+      {"f":"Gibt es …?","b":"Is there / are there …? (verb first)"},
+      {"f":"es gibt ⇄ haben","b":"existence in general ⇄ a specific thing possesses it"},
+      {"f":"das Bundesland → die Bundesländer","b":"federal state — Germany has 16"},
+      {"f":"die Großstadt → die Großstädte","b":"large city — Germany has 81"},
+      {"f":"die Insel → die Inseln","b":"island — 92, but only 19 inhabited"},
+      {"f":"bewohnt ⇄ unbewohnt","b":"inhabited ⇄ uninhabited"},
+      {"f":"der Fluss → die Flüsse","b":"river — about 15,000 in Germany"},
+      {"f":"der Rhein","b":"the Rhine — Germany's longest river"},
+      {"f":"die Palme → die Palmen","b":"the palm tree","ex":"In Deutschland gibt es keine Palmen."},
+      {"f":"der Dialekt → die Dialekte","b":"dialect — Germany has ~20"},
+      {"f":"Bayerisch / Hessisch / Plattdeutsch","b":"three German dialects"},
+      {"f":"die Partei → die Parteien","b":"political party — 7 in the Bundestag"},
+      {"f":"der Bundestag","b":"the German parliament, in Berlin"},
+      {"f":"das Volksfest → die Volksfeste","b":"public festival — ~9,800 a year"},
+      {"f":"das Oktoberfest","b":"the most famous Volksfest"},
+      {"f":"der Weihnachtsmarkt → die Weihnachtsmärkte","b":"Christmas market — ~3,000"},
+      {"f":"die Biersorte → die Biersorten","b":"kind of beer — ~5,000 in Germany"},
+      {"f":"fließen","b":"to flow","ex":"Flüsse, die durch Deutschland fließen"},
+      {"f":"ungefähr","b":"approximately"},
+      {"f":"verschieden","b":"different / various"}
+    ]
   }
 };

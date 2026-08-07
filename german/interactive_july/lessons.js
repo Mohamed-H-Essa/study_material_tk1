@@ -83,5 +83,9 @@ window.LESSONS = [
   // Appended rather than slotted into Stufe 5 at its "natural" position: inserting would
   // renumber ten files and their prev/next seams for no teaching benefit, and display
   // order is cosmetic anyway (slugs carry the progress).
-  {stage:5,n:58,file:"58_picture_book.html",id:"Ngy_6VW1JOE",slug:"bilderbuch",title:"Pictures in a Children's Book",de:"Humpty Dumpty — Bilder im Buch",tag:"Narrating pictures · nächste Seite · a kettle, a wall, a rope"}
+  {stage:5,n:58,file:"58_picture_book.html",id:"Ngy_6VW1JOE",slug:"bilderbuch",title:"Pictures in a Children's Book",de:"Humpty Dumpty — Bilder im Buch",tag:"Narrating pictures · nächste Seite · a kettle, a wall, a rope"},
+
+  // Grammar (es gibt) rather than culture, so Stufe 3 — but appended at the end for the same
+  // reason as 58: renumbering to slot it in would touch a dozen files for a cosmetic gain.
+  {stage:3,n:59,file:"59_es_gibt.html",id:"889sjsfyiaU",slug:"esgibt",title:"How to Say “There Is / Are”",de:"Es gibt …",tag:"es gibt + Akkusativ · Germany by the numbers"}
 ];

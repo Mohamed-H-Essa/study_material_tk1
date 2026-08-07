@@ -48,9 +48,34 @@
     hidden: [],
     isHidden: function (slug) { return Sync.hidden.indexOf(slug) !== -1; },
     // Authenticated POST for the admin panel (adminGet / adminSet). Rejects when sync is off.
+    // adminSet's reply carries the caller's own fresh state, so apply it — otherwise the tab
+    // that just changed something keeps showing the old value.
     call: function (action, extra) {
       if (!Sync.enabled) return Promise.reject(new Error('sync disabled'));
-      return post(action, extra);
+      return post(action, extra).then(function (res) {
+        if (res && res.ok && res.state) applyServerState(res.state, res.seq);
+        return res;
+      });
+    },
+
+    // Force a FULL re-read from the server, ignoring our cursor, and treat the answer as
+    // authoritative. This is the "backend is the source of truth" escape hatch: a delta pull
+    // only carries what changed since our cursor, so anything that went stale for another
+    // reason (an admin edit made in this very tab, a half-finished earlier sync) would never
+    // be corrected. `cb` runs after the state has been applied.
+    refresh: function (cb) {
+      if (!Sync.enabled) { cb && cb(); return; }
+      setStatus('syncing');
+      post('pull', { cursor: 0 })
+        .then(function (res) {
+          if (res && res.ok) {
+            applyServerState(res.state, res.seq, /*authoritative=*/true);
+            applyAdminFields(res);
+            setStatus('synced');
+          } else setStatus('offline');
+          cb && cb();
+        })
+        .catch(function () { setStatus('offline'); cb && cb(); });
     },
     logout: function () {
       // Wipe ALL local progress + auth so the next user on this device does not inherit it.
@@ -109,6 +134,31 @@
     rawSet(k, JSON.stringify('0'));
     queue(k, { v: '0', kind: 'done', clear: true });
   };
+  // Mark a lesson done / not-done and push it immediately (no 2s debounce), resolving once
+  // the SERVER has accepted it. The hub's per-card toggle uses this, so what you see after
+  // it settles is what the backend actually stores — not an optimistic local guess.
+  // Un-doning rides the same sanctioned {clear:true} intent as Sync.clearDone.
+  Sync.setDone = function (slug, on) {
+    var k = 'de.' + slug + '.done';
+    rawSet(k, JSON.stringify(on ? '1' : '0'));
+    var intent = on ? { v: '1', kind: 'done' } : { v: '0', kind: 'done', clear: true };
+    dirty[k] = intent;
+    if (!Sync.enabled) return Promise.resolve({ ok: true, local: true });
+    var sent = {}; sent[k] = intent;
+    delete dirty[k];
+    setStatus('syncing');
+    return post('push', { changes: sent })
+      .then(function (res) {
+        if (res && res.ok) {
+          // Trust the server's answer for this key rather than our optimistic write.
+          applyServerState(res.state, res.seq, /*authoritative=*/true);
+          setStatus('synced');
+        } else { requeue(sent); setStatus('offline'); }
+        return res;
+      })
+      .catch(function (e) { requeue(sent); setStatus('offline'); throw e; });
+  };
+
   Sync.resetAnki = function (slug, map) {
     var k = 'de.' + slug + '.anki';
     var v = map && typeof map === 'object' ? map : {};
@@ -154,7 +204,11 @@
     return v === '1' || v === 1 || v === true;
   }
 
-  function applyServerState(state, serverSeq) {
+  // `authoritative` = this is a deliberate full re-read (Sync.refresh), so the server's
+  // answer wins outright. The done-is-permanent guard below exists to stop STALE data from
+  // silently un-doing a lesson; a full pull we just asked for is not stale, and honouring it
+  // is the whole point of "the backend is the source of truth".
+  function applyServerState(state, serverSeq, authoritative) {
     if (state) {
       Object.keys(state).forEach(function (k) {
         if (!isDataKey(k)) return;
@@ -171,8 +225,24 @@
         // deliberate human action by the admin, not a stale or racing write. Without this the
         // admin's override would apply on every device EXCEPT the ones that already show ✓,
         // i.e. exactly the devices the override is meant to fix.
-        if (/\.done$/.test(k) && localIsDone(k) && !entryIsDone(entry) && entry.cleared !== true) return;
+        if (!authoritative &&
+            /\.done$/.test(k) && localIsDone(k) && !entryIsDone(entry) && entry.cleared !== true) return;
         rawSet(k, typeof entry.v === 'string' ? entry.v : JSON.stringify(entry.v));
+      });
+    }
+    // On an authoritative full re-read the server's blob is the COMPLETE picture, so a
+    // de.<slug>.* key we hold locally but the server has never heard of is local-only
+    // debris (a write that never landed, or state left by an older build). Drop it —
+    // otherwise "the backend is the source of truth" would only be half true: we would
+    // adopt every value the server HAS, but keep phantom ones it does not.
+    // Keys with an unacked local write (dirty) are left alone; they are about to be pushed.
+    if (authoritative && state) {
+      // Snapshot the key list first — removing while iterating localStorage is unsafe.
+      var localKeys = [];
+      for (var i = 0; i < LS.length; i++) localKeys.push(LS.key(i));
+      localKeys.forEach(function (k) {
+        if (!isDataKey(k) || dirty[k] || state[k]) return;
+        LS.removeItem(k);
       });
     }
     if (serverSeq != null) setCursor(serverSeq);

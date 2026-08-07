@@ -92,6 +92,40 @@ lesson.** A bare local write to `de.<slug>.done = "0"` is ignored by the server 
 the client apply guard, so it would not work anyway. (`Sync.resetAnki` for deck resets is still
 available; only `done` is locked.)
 
+## Done-state: the backend is the source of truth
+
+The hub used to read `localStorage` and render once. That broke in a specific way: you tick a
+lesson done in **admin.html**, click through to the hub, and it still shows not-done. Two causes,
+both fixed — and neither was browser cache:
+
+1. **`adminSet` returned no state.** It writes to the target user's blob server-side, but the tab
+   that made the change never learned of it, so its `localStorage` kept the old value. `adminSet`
+   now returns the caller's own fresh `state` + `seq`, and `Sync.call` applies it.
+2. **A delta pull could not heal it.** `pull` only returns entries newer than the client's cursor;
+   an admin write can sit at a seq this browser has already passed. `Sync.refresh()` forces a
+   **full** read (`cursor:0`) and applies it **authoritatively**.
+
+"Authoritatively" means two things beyond a normal pull, and both matter:
+- It **bypasses the done-is-permanent guard.** That guard exists to stop *stale* data un-doing a
+  lesson; a full pull we just asked for is not stale. (`done` is still permanent against every
+  other path — see the section above.)
+- It **prunes local-only keys.** A `de.<slug>.*` key the server has never heard of is debris;
+  keeping it would make "source of truth" only half true. Keys with an unacked local write are
+  left alone.
+
+The hub renders once immediately (never a blank page), then again after `Sync.refresh()`, and
+again on `visibilitychange` — so returning from the admin tab always repaints. **When sync is
+disabled** (raw files, no backend) `refresh()` is a no-op and nothing is pruned, so offline-only
+use keeps its local progress. There is a test for exactly that.
+
+Hovering a hub card also gives a **done toggle** next to the Anki button. It calls
+`Sync.setDone(slug, on)`, which pushes immediately (no debounce), resolves only once the **server**
+has accepted, and repaints from the server's answer — so the button shows stored state, not an
+optimistic guess. Un-doning uses the sanctioned `{clear:true}` intent. On failure it shows
+`✗ Failed` rather than lying.
+
+Covered by `tools/test_done.js` (jsdom, real pages, fake backend).
+
 ## Anki export
 
 Three ways out, all producing ONE tab-separated file that Anki imports directly:

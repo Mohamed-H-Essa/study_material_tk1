@@ -34,14 +34,29 @@ footer{margin-top:40px;color:#5a6070;font-size:13px}
    The card is an <a>, so this button must stopPropagation/preventDefault (see the JS) or
    clicking it would navigate to the lesson instead of downloading. It stays visible while
    focused so it is reachable by keyboard, and on touch screens (no hover) it is always shown. */
-.dl{position:absolute;left:8px;bottom:8px;right:8px;display:flex;align-items:center;justify-content:center;gap:7px;
-  padding:7px 10px;border-radius:7px;border:1px solid #4a90d9;background:rgba(10,14,22,.92);color:#9ad4ea;
-  font-size:12.5px;font-weight:600;font-family:inherit;cursor:pointer;
-  opacity:0;transform:translateY(4px);transition:opacity .15s,transform .15s,background .15s,color .15s}
-.card:hover .dl,.dl:focus-visible{opacity:1;transform:translateY(0)}
+/* the two hover buttons share a row along the bottom of the thumbnail */
+.acts{position:absolute;left:8px;right:8px;bottom:8px;display:flex;gap:6px;
+  opacity:0;transform:translateY(4px);transition:opacity .15s,transform .15s}
+.card:hover .acts,.acts:focus-within{opacity:1;transform:translateY(0)}
+@media (hover:none){.acts{opacity:1;transform:translateY(0)}}
+
+/* ✓ done toggle — reflects SERVER state; disabled while the write is in flight */
+.tg{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:7px 8px;border-radius:7px;
+  border:1px solid #2f6b46;background:rgba(10,14,22,.92);color:#7dd6a0;
+  font-size:12.5px;font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap;
+  transition:background .15s,color .15s,border-color .15s}
+.tg:hover{background:#0f2419;color:#a6e9c0}
+.tg.is-done{border-color:#16a34a;background:#0f2419;color:#4ade80}
+.tg.busy{opacity:.6;cursor:progress}
+.tg.err{border-color:#ef4444;color:#f87171;background:#241014}
+
+/* Anki download — visibility is handled by the .acts parent, not here. */
+.dl{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;
+  padding:7px 8px;border-radius:7px;border:1px solid #4a90d9;background:rgba(10,14,22,.92);color:#9ad4ea;
+  font-size:12.5px;font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap;
+  transition:background .15s,color .15s,border-color .15s}
 .dl:hover{background:#16233a;color:#bfe6f5}
-.dl.done{border-color:#16a34a;background:#0f2419;color:#4ade80;opacity:1;transform:translateY(0)}
-@media (hover:none){.dl{opacity:1;transform:translateY(0)}}
+.dl.done{border-color:#16a34a;background:#0f2419;color:#4ade80}
 
 /* ---- the collective "export everything I've finished" bar ---- */
 .bulk{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:#141d2a;border:1px solid #29405c;
@@ -103,6 +118,14 @@ const STAGE_NAMES = {
   6:"Stufe 6 · Culture, opinions &amp; real-world German"
 };
 
+// Keep a card and its toggle in step with the (server-confirmed) done state.
+function paintCard(a, tg, done){
+  a.classList.toggle('done', !!done);
+  tg.classList.remove('busy');
+  tg.classList.toggle('is-done', !!done);
+  tg.textContent = done ? '✓ Done' : 'Mark done';
+}
+
 function isDone(slug){
   // The lecture engine saves done-state with JSON.stringify, so the raw value
   // is the string "1" *with quotes*. Parse it back the same way before comparing.
@@ -138,20 +161,50 @@ function renderCards(){
       shown++;
       const a = document.createElement('a');
       a.href = v.file;
-      a.className = 'card' + (isDone(v.slug) ? ' done' : '');
+      const done = isDone(v.slug);
+      a.className = 'card' + (done ? ' done' : '');
       const nCards = (window.DECKS && DECKS[v.slug]) ? DECKS[v.slug].cards.length : 0;
       a.innerHTML = `
         <div class="thumb">
           <img src="https://img.youtube.com/vi/${v.id}/hqdefault.jpg" alt="${v.title}" loading="lazy">
           <span class="num">${v.n}</span>
           <span class="done-badge">✓ done</span>
-          ${nCards ? `<button class="dl" type="button" title="Download this lesson's Anki deck">⬇ Anki <span style="opacity:.7;font-weight:400">${nCards}</span></button>` : ''}
+          <div class="acts">
+            <button class="tg${done ? ' is-done' : ''}" type="button" title="Mark this lesson done / not done">${done ? '✓ Done' : 'Mark done'}</button>
+            ${nCards ? `<button class="dl" type="button" title="Download this lesson's Anki deck">⬇ Anki <span style="opacity:.7;font-weight:400">${nCards}</span></button>` : ''}
+          </div>
         </div>
         <div class="body">
           <h3>${v.title}</h3>
           <div class="de" lang="de">${v.de}</div>
           <div class="tag">${v.tag}</div>
         </div>`;
+      const tg = a.querySelector('.tg');
+      if (tg) tg.addEventListener('click', function(e){
+        // Same reason as the download button: this lives inside an <a>.
+        e.preventDefault(); e.stopPropagation();
+        if (tg.classList.contains('busy')) return;
+        const want = !tg.classList.contains('is-done');
+        tg.classList.add('busy'); tg.classList.remove('err');
+        tg.textContent = want ? 'Marking…' : 'Clearing…';
+        // Sync.setDone resolves only once the SERVER has accepted the change, and applies
+        // the server's answer authoritatively — so the button reflects stored state, not
+        // an optimistic guess. On failure we say so instead of lying about it.
+        Promise.resolve(Sync.setDone(v.slug, want))
+          .then(function(res){
+            const ok = !res || res.ok !== false;
+            if (!ok) throw new Error((res && res.error) || 'rejected');
+            paintCard(a, tg, isDone(v.slug));
+            updateBulk(visible);
+          })
+          .catch(function(){
+            tg.classList.remove('busy');
+            tg.classList.add('err');
+            tg.textContent = '✗ Failed';
+            setTimeout(function(){ tg.classList.remove('err'); paintCard(a, tg, isDone(v.slug)); }, 2200);
+          });
+      });
+
       const dl = a.querySelector('.dl');
       if (dl) dl.addEventListener('click', function(e){
         // The card is an <a>; without these the click would follow the link instead.
@@ -181,10 +234,33 @@ function renderCards(){
     if (nav) nav.style.display = '';
   }
 }
-// Gate on the initial pull (falls back to local state on offline/timeout). If sync.js is
-// absent (raw files opened directly), render immediately.
-if (window.Sync && typeof window.Sync.ready === 'function') window.Sync.ready(renderCards);
+// THE BACKEND IS THE SOURCE OF TRUTH.
+//
+// Render once on whatever we have (so the page is never blank), then force a FULL re-read
+// from the server and render again from that. The second pass is what fixes the case that
+// used to bite: you tick a lesson done in the admin panel and come back here, but this tab's
+// localStorage still holds the old value. A normal pull would not help — it is a delta
+// against our cursor, and the admin write may sit at a seq we have already passed, or have
+// been made by this very tab. Sync.refresh() ignores the cursor and takes the server's answer
+// as authoritative, so a stale browser can always heal itself. It is also why nothing here
+// depends on cache headers: we re-ask rather than trusting what we happen to hold.
+function renderFromServer(){
+  renderCards();
+  if (window.Sync && typeof Sync.refresh === 'function' && Sync.enabled) {
+    Sync.refresh(function(){ renderCards(); });
+  }
+}
+if (window.Sync && typeof window.Sync.ready === 'function') window.Sync.ready(renderFromServer);
 else renderCards();
+
+// Re-check when the tab is shown again — coming back from the admin panel in another tab,
+// or waking a phone, should not leave a stale ✓ on screen.
+document.addEventListener('visibilitychange', function(){
+  if (document.visibilityState === 'visible' && window.Sync && Sync.enabled &&
+      typeof Sync.refresh === 'function') {
+    Sync.refresh(function(){ renderCards(); });
+  }
+});
 
 // Refresh the "export my finished lessons" bar. Only lessons that are BOTH visible to this
 // user and marked ✓ done are included, in hub order.

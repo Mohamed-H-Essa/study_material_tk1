@@ -345,7 +345,19 @@ export const handler = async (event) => {
         }
       }
 
-      return json(200, { ok: true, config: await readAdminConfig() });
+      // Return the CALLER's own fresh state alongside the config. Without this the admin's
+      // own browser keeps the pre-change value in localStorage (adminSet writes server-side
+      // at a new seq, but the tab that made the change never learns of it), so navigating
+      // to the hub showed the stale ✓ — the bug this fixes. `seq` lets the client advance
+      // its cursor in the same step, and `state` is the FULL blob, not a delta, so the
+      // caller cannot end up behind whatever it just wrote.
+      const selfState = await readState(user);
+      return json(200, {
+        ok: true,
+        config: await readAdminConfig(),
+        seq: currentSeq(selfState),
+        state: delta(selfState, 0),
+      });
     }
 
     return json(400, { ok: false, error: 'unknown action' });
