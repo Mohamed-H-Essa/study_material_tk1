@@ -141,6 +141,84 @@ const settle = ms => new Promise(r => setTimeout(r, ms));
     } else fails.push('toggle: no push on un-done');
   }
 
+  // ---------- 3b. a click must NEVER navigate, whatever it lands on ----------
+  // The reported symptom was "clicking done opens the lesson instead". A click can land on
+  // the button's inner <span>, and a re-render can replace the element a listener was bound
+  // to — so the card-level capture handler, not the button's own, is what must veto it.
+  {
+    const { w } = boot({ localDone: [], serverDone: [] });
+    await settle(300);
+    const card = [...w.document.querySelectorAll('.card')]
+      .find(c => c.getAttribute('href') === '16_body_parts.html');
+
+    for (const [label, el] of [
+      ['button itself', card.querySelector('.tg')],
+      ['inner span',    card.querySelector('.tg span')],
+      ['anki button',   card.querySelector('.dl')],
+      ['acts wrapper',  card.querySelector('.acts')],
+    ]) {
+      if (!el) { fails.push('nav: missing ' + label); continue; }
+      const ev = new w.MouseEvent('click', { bubbles: true, cancelable: true });
+      el.dispatchEvent(ev);
+      check(ev.defaultPrevented,
+        'nav: a click on the ' + label + ' would NAVIGATE to the lesson');
+    }
+    console.log('  navigation: clicks on button, inner span, anki and wrapper all vetoed');
+
+    // and the overlays must never swallow clicks
+    const css = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+    const overlay = css.slice(css.indexOf('.card.done .thumb::after'), css.indexOf('.card.done .num'));
+    check((overlay.match(/pointer-events:none/g) || []).length >= 2,
+      'the done-overlays must both be pointer-events:none or they block the buttons');
+    console.log('  done-overlays are pointer-events:none (cannot block clicks)');
+  }
+
+  // ---------- 3c. the buttons must work on a DONE card ----------
+  // This is the exact reported failure: on a finished lesson the green overlay sat above
+  // the buttons (it had no pointer-events:none), so every click fell through to the <a>
+  // and opened the lesson. Neither the toggle NOR the Anki download worked — but only on
+  // done cards, which is what made it look like a toggle-specific bug.
+  {
+    const calls = [];
+    const { w } = boot({ localDone: ['koerper'], serverDone: ['koerper'], captureCalls: calls });
+    await settle(300);
+    const card = [...w.document.querySelectorAll('.card')]
+      .find(c => c.getAttribute('href') === '16_body_parts.html');
+    check(card.classList.contains('done'), 'done-card: fixture should start done');
+
+    for (const sel of ['.tg', '.dl', '.tg span']) {
+      const el = card.querySelector(sel);
+      if (!el) { fails.push('done-card: missing ' + sel); continue; }
+      const ev = new w.MouseEvent('click', { bubbles: true, cancelable: true });
+      el.dispatchEvent(ev);
+      check(ev.defaultPrevented, 'done-card: click on ' + sel + ' would navigate');
+    }
+
+    // The probes above fire real clicks, which leave the button mid-flight (`busy`) — the
+    // handler deliberately ignores a click while one is in progress. Use a fresh page for
+    // the functional half so we are not fighting our own probe.
+    const calls2 = [];
+    const { w: w3 } = boot({ localDone: ['koerper'], serverDone: ['koerper'], captureCalls: calls2 });
+    await settle(300);
+    const card3 = [...w3.document.querySelectorAll('.card')]
+      .find(c => c.getAttribute('href') === '16_body_parts.html');
+    check(card3.classList.contains('done'), 'done-card: fresh fixture should be done');
+    calls2.length = 0;
+    card3.querySelector('.tg').click();
+    await settle(300);
+    const push = calls2.find(c => c.action === 'push');
+    check(!!push, 'done-card: toggle sent no push');
+    if (push) {
+      // The card starts done, so this click clears it. What matters here is that a click
+      // on a DONE card reaches the server at all — that is what the overlay used to block.
+      const e = push.changes['de.koerper.done'];
+      check(!!e, 'done-card: push carried no done key');
+      check(e && e.v === '0' && e.clear === true,
+        'done-card: clearing a done card must send {clear:true}, got ' + JSON.stringify(e));
+      console.log('  DONE card: buttons clickable, un-done reaches the server');
+    }
+  }
+
   // ---------- 4. the Anki button still works and does not navigate ----------
   {
     const { w } = boot({ localDone: [], serverDone: [] });

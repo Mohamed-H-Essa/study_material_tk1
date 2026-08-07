@@ -53,7 +53,8 @@
     call: function (action, extra) {
       if (!Sync.enabled) return Promise.reject(new Error('sync disabled'));
       return post(action, extra).then(function (res) {
-        if (res && res.ok && res.state) applyServerState(res.state, res.seq);
+        // adminSet replies with the caller's full blob (server sends delta(state,0)).
+        if (res && res.ok && res.state) applyServerState(res.state, res.seq, true, true);
         return res;
       });
     },
@@ -69,7 +70,7 @@
       post('pull', { cursor: 0 })
         .then(function (res) {
           if (res && res.ok) {
-            applyServerState(res.state, res.seq, /*authoritative=*/true);
+            applyServerState(res.state, res.seq, /*authoritative=*/true, /*complete=*/true);
             applyAdminFields(res);
             setStatus('synced');
           } else setStatus('offline');
@@ -151,7 +152,8 @@
       .then(function (res) {
         if (res && res.ok) {
           // Trust the server's answer for this key rather than our optimistic write.
-          applyServerState(res.state, res.seq, /*authoritative=*/true);
+          // NOT `complete`: a push replies with a delta, so nothing may be pruned from it.
+          applyServerState(res.state, res.seq, /*authoritative=*/true, /*complete=*/false);
           setStatus('synced');
         } else { requeue(sent); setStatus('offline'); }
         return res;
@@ -204,11 +206,15 @@
     return v === '1' || v === 1 || v === true;
   }
 
-  // `authoritative` = this is a deliberate full re-read (Sync.refresh), so the server's
-  // answer wins outright. The done-is-permanent guard below exists to stop STALE data from
-  // silently un-doing a lesson; a full pull we just asked for is not stale, and honouring it
-  // is the whole point of "the backend is the source of truth".
-  function applyServerState(state, serverSeq, authoritative) {
+  // `authoritative` = the server's answer wins outright, overriding the done-is-permanent
+  // guard below (that guard stops STALE data un-doing a lesson; a response we just asked
+  // for is not stale). `complete` = the response is the WHOLE blob, not a delta, so keys
+  // missing from it are genuinely gone and may be pruned.
+  //
+  // These are two different things and must not be conflated: a push replies with a DELTA,
+  // so it may be authoritative but is never complete. Pruning on a delta would delete every
+  // key that simply had not changed.
+  function applyServerState(state, serverSeq, authoritative, complete) {
     if (state) {
       Object.keys(state).forEach(function (k) {
         if (!isDataKey(k)) return;
@@ -230,13 +236,13 @@
         rawSet(k, typeof entry.v === 'string' ? entry.v : JSON.stringify(entry.v));
       });
     }
-    // On an authoritative full re-read the server's blob is the COMPLETE picture, so a
+    // On a COMPLETE re-read the server's blob is the whole picture, so a
     // de.<slug>.* key we hold locally but the server has never heard of is local-only
     // debris (a write that never landed, or state left by an older build). Drop it —
     // otherwise "the backend is the source of truth" would only be half true: we would
     // adopt every value the server HAS, but keep phantom ones it does not.
     // Keys with an unacked local write (dirty) are left alone; they are about to be pushed.
-    if (authoritative && state) {
+    if (complete && state) {
       // Snapshot the key list first — removing while iterating localStorage is unsafe.
       var localKeys = [];
       for (var i = 0; i < LS.length; i++) localKeys.push(LS.key(i));

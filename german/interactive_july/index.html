@@ -21,7 +21,33 @@ h1{font-size:30px;font-weight:700;color:#fff;margin-bottom:4px}
 .num{position:absolute;top:8px;left:8px;background:rgba(0,0,0,.72);color:#fff;font-size:12px;font-weight:700;padding:2px 8px;border-radius:20px}
 .done-badge{position:absolute;top:8px;right:8px;background:#16a34a;color:#fff;font-size:12px;font-weight:700;padding:2px 8px;border-radius:20px;display:none}
 .card.done .done-badge{display:block}
-.card.done .thumb::after{content:"";position:absolute;inset:0;background:rgba(22,163,74,.14)}
+/* A finished lesson's thumbnail gets a fine paper grain rather than a flat wash of green:
+   two hairline grids at 1px and 4px, plus a soft diagonal sheen, over a very light green
+   tint. The grids are pure CSS gradients (no image), sit at low alpha, and are drawn UNDER
+   nothing but the image itself — the number, the ✓ badge and the hover buttons all paint
+   above this layer, so nothing is ever obscured. */
+.card.done .thumb::after{
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:2;
+  background:
+    /* fine 4px grid — the "newsprint" weave */
+    repeating-linear-gradient(0deg,   rgba(255,255,255,.045) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(90deg,  rgba(255,255,255,.045) 0 1px, transparent 1px 4px),
+    /* even finer 1px cross-hatch, barely there, to break up flat areas */
+    repeating-linear-gradient(0deg,   rgba(0,0,0,.05) 0 1px, transparent 1px 2px),
+    repeating-linear-gradient(90deg,  rgba(0,0,0,.05) 0 1px, transparent 1px 2px),
+    /* a soft off-axis sheen so it reads as slightly wrinkled paper, not a flat screen */
+    repeating-linear-gradient(103deg, rgba(255,255,255,.035) 0 2px, transparent 2px 9px),
+    repeating-linear-gradient(17deg,  rgba(0,0,0,.03) 0 3px, transparent 3px 11px),
+    linear-gradient(rgba(22,163,74,.16), rgba(22,163,74,.16));
+  mix-blend-mode:soft-light;
+}
+/* soft-light keeps the grain from muddying the picture; a second, plain layer supplies the
+   green so the "done" signal stays obvious even on very light or very dark thumbnails. */
+.card.done .thumb::before{
+  content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(160deg, rgba(22,163,74,.20), rgba(22,163,74,.10) 60%, rgba(22,163,74,.22));
+}
+.card.done .num,.card.done .done-badge,.card.done .acts{position:absolute;z-index:3}
 .body{padding:12px 14px}
 .body h3{font-size:16px;font-weight:600;color:#fff;margin-bottom:3px}
 .body .de{font-size:14px;color:#7ec8e3}
@@ -45,6 +71,7 @@ footer{margin-top:40px;color:#5a6070;font-size:13px}
   border:1px solid #2f6b46;background:rgba(10,14,22,.92);color:#7dd6a0;
   font-size:12.5px;font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap;
   transition:background .15s,color .15s,border-color .15s}
+.tg>span,.dl>span{pointer-events:none}   /* clicks always land on the button itself */
 .tg:hover{background:#0f2419;color:#a6e9c0}
 .tg.is-done{border-color:#16a34a;background:#0f2419;color:#4ade80}
 .tg.busy{opacity:.6;cursor:progress}
@@ -119,11 +146,17 @@ const STAGE_NAMES = {
 };
 
 // Keep a card and its toggle in step with the (server-confirmed) done state.
+function tgLabel(tg, text){
+  // Write into the inner <span> rather than replacing the button's children — the span
+  // is what makes clicks land on the button itself (pointer-events:none in the CSS).
+  var sp = tg.querySelector('span');
+  if (sp) sp.textContent = text; else tg.textContent = text;
+}
 function paintCard(a, tg, done){
   a.classList.toggle('done', !!done);
   tg.classList.remove('busy');
   tg.classList.toggle('is-done', !!done);
-  tg.textContent = done ? '✓ Done' : 'Mark done';
+  tgLabel(tg, done ? '✓ Done' : 'Mark done');
 }
 
 function isDone(slug){
@@ -170,7 +203,7 @@ function renderCards(){
           <span class="num">${v.n}</span>
           <span class="done-badge">✓ done</span>
           <div class="acts">
-            <button class="tg${done ? ' is-done' : ''}" type="button" title="Mark this lesson done / not done">${done ? '✓ Done' : 'Mark done'}</button>
+            <button class="tg${done ? ' is-done' : ''}" type="button" title="Mark this lesson done / not done"><span>${done ? '✓ Done' : 'Mark done'}</span></button>
             ${nCards ? `<button class="dl" type="button" title="Download this lesson's Anki deck">⬇ Anki <span style="opacity:.7;font-weight:400">${nCards}</span></button>` : ''}
           </div>
         </div>
@@ -179,14 +212,26 @@ function renderCards(){
           <div class="de" lang="de">${v.de}</div>
           <div class="tag">${v.tag}</div>
         </div>`;
+      // The card is an <a>. Veto navigation for ANY click that starts inside the button
+      // row, in the capture phase, before the anchor's default action is considered.
+      // Relying only on the buttons' own handlers was fragile: a click can land on a
+      // child node, and a re-render can replace the element the listener was bound to.
+      a.addEventListener('click', function(e){
+        if (e.target && e.target.closest && e.target.closest('.acts')) {
+          // preventDefault ONLY. stopPropagation here would also stop the buttons' own
+          // handlers from ever running (this is the capture phase, so we fire first).
+          // Cancelling the default action is enough to stop the <a> navigating.
+          e.preventDefault();
+        }
+      }, true);
+
       const tg = a.querySelector('.tg');
       if (tg) tg.addEventListener('click', function(e){
-        // Same reason as the download button: this lives inside an <a>.
         e.preventDefault(); e.stopPropagation();
         if (tg.classList.contains('busy')) return;
         const want = !tg.classList.contains('is-done');
         tg.classList.add('busy'); tg.classList.remove('err');
-        tg.textContent = want ? 'Marking…' : 'Clearing…';
+        tgLabel(tg, want ? 'Marking…' : 'Clearing…');
         // Sync.setDone resolves only once the SERVER has accepted the change, and applies
         // the server's answer authoritatively — so the button reflects stored state, not
         // an optimistic guess. On failure we say so instead of lying about it.
@@ -200,7 +245,7 @@ function renderCards(){
           .catch(function(){
             tg.classList.remove('busy');
             tg.classList.add('err');
-            tg.textContent = '✗ Failed';
+            tgLabel(tg, '✗ Failed');
             setTimeout(function(){ tg.classList.remove('err'); paintCard(a, tg, isDone(v.slug)); }, 2200);
           });
       });

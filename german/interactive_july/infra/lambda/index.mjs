@@ -177,7 +177,11 @@ function applyChange(state, key, change, seqFn) {
     // Un-done only with explicit intent; a bare "0" from a stale device is ignored.
     if (change.clear === true) {
       if (existing && !isDoneValue(existing.v)) return false; // already cleared — idempotent
-      state[key] = { v: '0', seq: seqFn(), kind };
+      // Stamp `cleared:true`. Without it, sync.js's "done is permanent" guard would block
+      // this on any device that already shows ✓ — including the one that asked for it, on
+      // its next ordinary pull — so the ✓ would silently come back. This is set for ANY
+      // explicit clear (the hub's done-toggle as well as adminSet), not just admin ones.
+      state[key] = { v: '0', seq: seqFn(), kind, cleared: true };
       return true;
     }
     return false;
@@ -328,20 +332,15 @@ export const handler = async (event) => {
         for (const [u, keys] of Object.entries(body.progress)) {
           if (!USERS[u] || !keys || typeof keys !== 'object') continue;
           const changes = {};
-          const clearedKeys = [];
           for (const [k, v] of Object.entries(keys)) {
             if (!/^de\.[A-Za-z0-9_-]{1,64}\.done$/.test(k)) continue;
             const on = v === '1' || v === 1 || v === true;
             changes[k] = on ? { v: '1', kind: 'done' } : { v: '0', kind: 'done', clear: true };
-            if (!on) clearedKeys.push(k);
           }
           if (!Object.keys(changes).length) continue;
-          const st = mergeAll(await readState(u), changes);
-          for (const k of clearedKeys) {
-            if (st[k] && !isDoneValue(st[k].v)) st[k].cleared = true;
-            // A re-done later drops the flag again (applyChange rewrites the entry without it).
-          }
-          await writeState(u, st);
+          // applyChange now stamps `cleared:true` for any {clear:true} intent, so there is
+          // nothing extra to do here. (A later re-done rewrites the entry without the flag.)
+          await writeState(u, mergeAll(await readState(u), changes));
         }
       }
 

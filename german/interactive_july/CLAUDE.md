@@ -126,6 +126,25 @@ optimistic guess. Un-doning uses the sanctioned `{clear:true}` intent. On failur
 
 Covered by `tools/test_done.js` (jsdom, real pages, fake backend).
 
+**The overlay must never eat clicks.** The done-card tint is an absolutely-positioned layer on
+top of the thumbnail. It originally had no `pointer-events:none`, so on a *finished* lesson it
+covered the hover buttons and every click fell through to the card's `<a>` — the toggle AND the
+Anki download both silently opened the lesson instead. Both `.card.done .thumb::before/::after`
+are now `pointer-events:none`, the controls sit at `z-index:3` above them, and there is a test
+asserting it. If you add another overlay, give it `pointer-events:none` too.
+
+**Two subtleties in that click path**, both of which caused a regression while fixing this:
+- The card-level capture handler calls `preventDefault()` **only**. Adding `stopPropagation()`
+  there also stops the buttons' own handlers from ever running — capture fires first.
+- Button labels are written into an inner `<span>` (`tgLabel()`), not via `textContent` on the
+  button. `textContent` destroys the children, and the span carries `pointer-events:none` so a
+  click always resolves to the button itself rather than a text node.
+
+**`authoritative` vs `complete`** in `applyServerState` are different flags and must not be
+conflated: a `push` reply is a DELTA (authoritative, not complete), a `refresh`/`adminSet` reply
+is the whole blob (both). Pruning happens only when `complete` — pruning on a delta would delete
+every key that merely had not changed.
+
 ## Anki export
 
 Three ways out, all producing ONE tab-separated file that Anki imports directly:
