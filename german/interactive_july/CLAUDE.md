@@ -22,6 +22,10 @@ lessons.js                 THE lesson catalogue (one entry per lesson). Shared b
                            admin panel so the two can never drift. Edit lessons HERE.
 decks.js                   Every lesson's Anki cards, keyed by slug. AUTO-GENERATED from the
                            lesson files by `node tools/gen_decks.js` — never hand-edit.
+frequency.js               window.FREQ — the everyday-speech frequency list behind the hub's
+                           coverage bar. Data only; hand-maintained.
+stats.js                   window.Stats.compute() — the hub's derived stats. PURE (no DOM, no
+                           globals, no storage), so it is unit-testable and safely wrappable.
 index.html                 The hub. Redirects to login.html if not signed in. Renders from
                            LESSONS, filtered by the caller's hidden list; signed-in strip.
 admin.html                 Admin panel (mohamed only). Per-user visibility + done overrides.
@@ -155,6 +159,75 @@ When everything is finished it disables itself and reads "✓ All caught up".
 It is refreshed by `updateJump()` alongside `updateBulk()` on every render, so it stays correct
 as you toggle lessons done. Cards carry `data-slug` purely so it can find its target again after
 a re-render. Covered by `tools/test_done.js`.
+
+## Hub: the derived-stats panel
+
+A compact panel above the export bar showing what has actually accumulated: lessons done,
+distinct words known, nouns (and how many came with their plural), an estimated level, Anki
+cards unlocked, a coverage bar, and a `▸ more stats` disclosure holding per-Stufe bars, the
+der/die/das + word-type breakdown, and the next milestones.
+
+**It is READ-ONLY and derived.** Everything comes from `lessons.js` + `decks.js` + the done
+flags. It writes no `de.<slug>.*` key and cannot change done-state — `verify.py` asserts that
+`renderStats` contains no such `setItem`. The only thing it stores is `de.__statsopen`, the
+disclosure's open/closed state, which is a local UI preference and deliberately **not synced**.
+
+```
+frequency.js   window.FREQ — the everyday-speech frequency list + a lemma map.
+stats.js       window.Stats.compute({lessons, decks, freq, isDone, stageNames}) -> result.
+               PURE: takes every input as an argument, reads no global, touches no DOM,
+               writes no storage. Testable in plain node; wrappable in try/catch.
+index.html     renderStats(visible) — markup only.
+```
+
+`compute()` is called with the **already-visibility-filtered** lesson array, so a lesson the
+admin hid from that user is absent from both the numerator and the denominator.
+
+**Fallbacks are the point — a broken stat must never cost the user the hub.** Each is tested:
+
+| Failure | Behaviour |
+| --- | --- |
+| `frequency.js` missing | coverage bar omitted; every other tile still renders |
+| `stats.js` missing | panel hidden entirely; hub behaves as before the feature |
+| `compute()` throws | caught; panel hidden; lessons still render |
+| `DECKS` missing | word/card tiles zero; lesson counts still correct |
+| sync disabled (raw files) | works from localStorage alone |
+| nothing done yet | five tiles at zero + copy explaining what fills in; never `NaN` |
+
+### How the coverage bar is grounded (and why it is honest)
+
+The bar answers "how much of everyday spoken German do my words cover?". A small core of
+lemmas accounts for most of what people actually say, so **coverage is the SUM of each matched
+lemma's share, not a count**. Knowing *und* and *ich* moves it far more than two rare nouns —
+a count-based bar would claim otherwise, which is badly false. There is a test asserting that
+20 core words beat 20 rare nouns.
+
+`FREQ.words` is ~600 lemmas in rough frequency-rank order with a Zipfian share each,
+normalised so the list sums to `totalShare` (0.80). The **order is empirical**; the individual
+per-word shares are a smooth model, not measured counts. That is why the UI shows `≈` and
+says "estimated". Do not present it as a corpus measurement.
+
+Because the course teaches concrete nouns rather than function words, a learner who finishes
+all 59 lessons lands around 35% — that is the true figure for this vocabulary, not a bug.
+
+**Word counting rules** (in `stats.js`, driven by the card-front formats this project already
+mandates): `der Schrank → die Schränke` is one noun with gender and a plural;
+`weich ⇄ hart` is two adjectives; `über (+ Dativ)` and anything ending in `?` is a phrase;
+`(kein Plural)`/`(nur Plural)` set countability. **Excluded as non-vocabulary:** the alphabet
+lesson's pronunciation cards (detected from the BACK — "sounds like…" — so it stays
+slug-independent), gender-rule suffixes (`-ung`), fill-in-the-blanks (`___ Buch`) and bare
+figures (`60 Prozent`). Words are **deduped across lessons** by normalised front, exactly as
+the Anki exporter dedupes — `der Wasserhahn` is taught in both *tea* and *kitchen*.
+
+The **level band** (A0/A1/A1+/A2/A2+) is a transparent function of words known, always
+rendered with the word *estimated* and a tooltip saying what it is based on. It is a
+motivational gauge and explicitly not a CEFR assessment.
+
+`renderStats()` is called from the end of `renderCards()`, so it repaints through the same
+path that already handles the first render, `Sync.refresh()` and `visibilitychange` — no
+second data path, so the tiles can never disagree with the ✓ ticks beside them.
+
+Covered by `tools/test_stats.js` (pure computation + jsdom resilience).
 
 ## Celebration on completion
 

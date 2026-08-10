@@ -100,6 +100,27 @@ for f, v in BY_FILE.items():
     except ValueError:
         err(f, "missing config.js / sync.js / _engine.js script tag")
 
+# --- 5b. the hub's stats panel still has its data + maths ------------------
+# The panel degrades gracefully if these are missing (that is tested in
+# tools/test_stats.js), but silently losing them would quietly downgrade the hub,
+# so a dropped script tag should fail the build rather than pass unnoticed.
+_hub = os.path.join(ROOT, "index.html")
+if os.path.exists(_hub):
+    _s = open(_hub, encoding="utf-8").read()
+    for _need in ("frequency.js", "stats.js"):
+        if 'src="%s"' % _need not in _s:
+            err("index.html", "stats panel needs <script src=\"%s\"> (see the design doc)" % _need)
+    if 'src="stats.js"' in _s and 'src="decks.js"' in _s:
+        if _s.index('src="decks.js"') > _s.index('src="stats.js"'):
+            err("index.html", "decks.js must load BEFORE stats.js")
+    for _need in ("frequency.js", "stats.js"):
+        if not os.path.exists(os.path.join(ROOT, _need)):
+            err(_need, "referenced by index.html but the file does not exist")
+    # the panel is read-only: it must never write a progress key
+    _m = re.search(r"function renderStats\(.*?\n}\n", _s, re.S)
+    if _m and re.search(r"setItem\(\s*['\"]de\.(?!__)", _m.group(0)):
+        err("index.html", "renderStats must never write a de.<slug>.* key")
+
 # --- 6. inline PAGE parses as JS -------------------------------------------
 for f, v in BY_FILE.items():
     if not os.path.exists(f):

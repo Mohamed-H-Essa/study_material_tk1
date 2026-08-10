@@ -96,6 +96,50 @@ footer{margin-top:40px;color:#5a6070;font-size:13px}
 .bulk .what b{color:#7ec8e3}
 .bulk.ok button{background:#16a34a;border-color:#16a34a}
 
+/* ---- derived stats panel ----
+   Read-only. Everything here is computed from lessons.js + decks.js + the done
+   flags by stats.js; nothing in this panel can write progress. If stats.js or
+   frequency.js is missing the panel simply does not render — see renderStats(). */
+.stats{background:#161a24;border:1px solid #262a38;border-radius:10px;padding:16px 18px;margin:0 0 14px;display:none}
+.stats.on{display:block}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:10px}
+.tile{background:#1b2030;border:1px solid #2b3142;border-radius:8px;padding:10px 12px;text-align:center}
+.tile b{display:block;font-size:22px;font-weight:700;color:#fff;line-height:1.15;letter-spacing:-.5px}
+.tile b i{font-style:normal;font-size:14px;font-weight:600;color:#5a6070}
+.tile span{display:block;font-size:11.5px;color:#8b93a7;margin-top:3px;text-transform:uppercase;letter-spacing:.6px}
+.tile.lvl b{color:#c9a96e}
+.tile small{display:block;font-size:11px;color:#5a6070;margin-top:2px}
+
+/* the coverage bar */
+.cov{margin-top:14px}
+.cov .lab{display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;color:#8b93a7;margin-bottom:5px;gap:10px}
+.cov .lab b{color:#7ec8e3;font-size:13.5px}
+.bar{height:9px;border-radius:5px;background:#0f1219;border:1px solid #262a38;overflow:hidden}
+.bar>i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,#4a90d9,#47e891);transition:width .5s ease}
+.cov .hint{font-size:11.5px;color:#5a6070;margin-top:5px}
+
+/* the "more stats" disclosure */
+.more{margin-top:12px;border-top:1px solid #232838;padding-top:10px}
+.more>summary{cursor:pointer;font-size:12.5px;color:#8b93a7;list-style:none;user-select:none;display:inline-block;padding:2px 0}
+.more>summary::-webkit-details-marker{display:none}
+.more>summary::before{content:"▸ ";color:#c9a96e}
+.more[open]>summary::before{content:"▾ "}
+.more>summary:hover{color:#bfc6d4}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:12px}
+.mgrid h4{font-size:11.5px;text-transform:uppercase;letter-spacing:.8px;color:#c9a96e;margin-bottom:8px;font-weight:600}
+.srow{display:flex;align-items:center;gap:8px;font-size:12.5px;color:#8b93a7;margin-bottom:6px}
+.srow .nm{flex:0 0 82px;color:#bfc6d4}
+.srow .bar{flex:1;height:7px}
+.srow .ct{flex:0 0 42px;text-align:right;font-variant-numeric:tabular-nums;color:#7ec8e3}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:12px;padding:3px 9px;border-radius:20px;background:#1b2030;border:1px solid #2b3142;color:#bfc6d4}
+.chip b{color:#fff;font-weight:600}
+.chip.der{border-color:#3a5a8c;color:#9ac4ea}
+.chip.die{border-color:#8c3a5a;color:#ea9ac4}
+.chip.das{border-color:#3a8c5a;color:#9aeac4}
+.mile{font-size:12.5px;color:#8b93a7;margin-bottom:5px;padding-left:14px;position:relative}
+.mile::before{content:"▸";position:absolute;left:0;color:#c9a96e}
+
 /* "jump to my next lesson" — scrolls, never navigates */
 .jump{display:inline-flex;align-items:center;gap:9px;padding:10px 17px;border-radius:8px;
   border:1px solid #2f6b46;background:#0f2419;color:#7dd6a0;font-size:14.5px;font-weight:600;
@@ -124,6 +168,10 @@ footer{margin-top:40px;color:#5a6070;font-size:13px}
 
   <a href="revision.html" style="display:block;background:#141d2a;border:1px solid #29405c;border-radius:10px;padding:14px 18px;margin:0 0 8px;text-decoration:none;color:#7ec8e3;font-weight:600">🔁 Revision — cumulative quizzes across every lesson &amp; “Export ALL cards” for Anki <span style="color:#8b93a7;font-weight:400">→</span></a>
 
+  <!-- Derived stats. Hidden by default and only switched on by renderStats() once it has
+       real numbers, so a missing stats.js/frequency.js leaves no empty box behind. -->
+  <section class="stats" id="stats" aria-label="Your progress so far"></section>
+
   <div class="bulk" id="bulk">
     <button class="jump" id="jumpBtn" disabled>↓ Jump to my next lesson</button>
     <button id="bulkBtn" disabled>⬇ Export my finished lessons</button>
@@ -148,6 +196,11 @@ if (!(localStorage.getItem('de.__user') && localStorage.getItem('de.__token'))) 
 <!-- decks.js carries every lesson's flashcards; _engine.js supplies the Anki export helpers.
      The engine only does anything when a page calls Engine.init(), which the hub never does. -->
 <script src="decks.js"></script>
+<!-- The stats panel's data + maths. Both are OPTIONAL: if either fails to load the hub
+     renders exactly as it did before the panel existed (see renderStats()). frequency.js
+     must come before stats.js only in the sense that both must exist by first render. -->
+<script src="frequency.js"></script>
+<script src="stats.js"></script>
 <script src="_engine.js"></script>
 <script>
 const STAGE_NAMES = {
@@ -256,7 +309,8 @@ function renderCards(){
             if (!ok) throw new Error((res && res.error) || 'rejected');
             paintCard(a, tg, isDone(v.slug));
             updateBulk(visible);
-  updateJump(visible);
+            updateJump(visible);
+            renderStats(visible);
           })
           .catch(function(){
             tg.classList.remove('busy');
@@ -289,6 +343,7 @@ function renderCards(){
   // (a word deliberately taught in two lessons) are written once — see buildTSV.
   updateBulk(visible);
   updateJump(visible);
+  renderStats(visible);
 
   // The admin panel link only appears for the admin account.
   if (window.Sync && Sync.isAdmin) {
@@ -323,6 +378,132 @@ document.addEventListener('visibilitychange', function(){
     Sync.refresh(function(){ renderCards(); });
   }
 });
+
+// ---- the derived stats panel ----
+//
+// READ-ONLY. Every number comes from stats.js over the data the hub already has; this
+// function writes no progress key and cannot change done-state. It is called from the end
+// of renderCards(), so it repaints through the SAME path that already handles the first
+// render, Sync.refresh() and visibilitychange — no second data path, so the tiles can never
+// disagree with the ✓ ticks beside them.
+//
+// A BROKEN STAT MUST NEVER COST THE USER THE HUB. Hence: the whole body is wrapped in
+// try/catch, a missing window.Stats returns early, and a missing window.FREQ merely drops
+// the coverage bar while every other tile still renders.
+var STATS_OPEN_KEY = 'de.__statsopen';   // local UI preference; NOT synced, not progress
+
+function esc(s){ return String(s).replace(/[&<>"]/g, function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+
+function barHTML(pct, cls){
+  var p = Math.max(0, Math.min(100, Number(pct) || 0));
+  return '<div class="bar' + (cls ? ' ' + cls : '') + '"><i style="width:' + p + '%"></i></div>';
+}
+
+function renderStats(visible){
+  var host = document.getElementById('stats');
+  if (!host) return;
+  // stats.js absent (older deploy, blocked file) → behave exactly as before the feature.
+  if (!window.Stats || typeof Stats.compute !== 'function') { host.className = 'stats'; return; }
+
+  try {
+    var s = Stats.compute({
+      lessons: visible,
+      decks: window.DECKS || null,
+      freq: window.FREQ || null,      // absent → s.coverage is null → no bar
+      isDone: isDone,
+      stageNames: STAGE_NAMES
+    });
+
+    var w = s.words;
+    var open = false;
+    try { open = localStorage.getItem(STATS_OPEN_KEY) === '1'; } catch (e) {}
+
+    // ---- the always-visible tile row ----
+    var html = '<div class="tiles">' +
+      // the denominator uses <i>, not a nested <span> — .tile span is the LABEL rule
+      '<div class="tile"><b>' + s.lessons.done + '<i>/' + s.lessons.total + '</i></b>' +
+        '<span>lessons</span><small>' + s.lessons.pct + '% complete</small></div>' +
+      '<div class="tile"><b>' + w.total + '</b><span>words known</span></div>' +
+      '<div class="tile"><b>' + w.nouns + '</b><span>nouns</span>' +
+        (w.nouns ? '<small>' + w.withPlural + ' with plural</small>' : '') + '</div>' +
+      '<div class="tile lvl" title="' + esc(s.level.why) + '"><b>' + s.level.band + '</b>' +
+        '<span>est. level</span>' +
+        (s.level.next ? '<small>next: ' + s.level.next + '</small>' : '<small>top band</small>') + '</div>' +
+      '<div class="tile"><b>' + s.cards.unlocked + '</b><span>anki cards</span>' +
+        '<small>of ' + s.cards.total + '</small></div>' +
+    '</div>';
+
+    // ---- coverage bar (only when frequency.js loaded) ----
+    // Nothing done yet: say what the panel is FOR rather than showing a dead 0% bar.
+    if (s.lessons.done === 0) {
+      html += '<div class="cov"><div class="hint" style="margin-top:12px">' +
+        'Finish a lesson’s check-off and this fills in: the words you know, how much of ' +
+        'everyday German they cover, and your estimated level.</div></div>';
+    } else if (s.coverage) {
+      html += '<div class="cov">' +
+        '<div class="lab"><span>Everyday-speech coverage</span>' +
+        '<b>≈' + s.coverage.pct + '%</b></div>' +
+        barHTML(s.coverage.fill) +
+        '<div class="hint">' + s.coverage.matched + ' of the ' + s.coverage.of +
+        ' most common German words met. A small core of words makes up most of what people ' +
+        'actually say, so common words move this bar far more than rare ones. Estimated.</div>' +
+      '</div>';
+    }
+
+    // ---- the disclosure: per-Stufe, word shape, milestones ----
+    html += '<details class="more"' + (open ? ' open' : '') + '>' +
+      '<summary>more stats</summary><div class="mgrid">';
+
+    html += '<div><h4>Progress by Stufe</h4>';
+    for (var i = 0; i < s.lessons.byStage.length; i++) {
+      var st = s.lessons.byStage[i];
+      html += '<div class="srow"><span class="nm">' + esc(st.name) + '</span>' +
+              barHTML(st.pct) +
+              '<span class="ct">' + st.done + '/' + st.total + '</span></div>';
+    }
+    html += '</div>';
+
+    html += '<div><h4>The shape of your vocabulary</h4><div class="chips">' +
+      '<span class="chip der"><b>' + w.gender.der + '</b> der</span>' +
+      '<span class="chip die"><b>' + w.gender.die + '</b> die</span>' +
+      '<span class="chip das"><b>' + w.gender.das + '</b> das</span>' +
+      '<span class="chip"><b>' + w.verbs + '</b> verbs</span>' +
+      '<span class="chip"><b>' + w.adjectives + '</b> adjectives</span>' +
+      '<span class="chip"><b>' + w.phrases + '</b> phrases</span>' +
+      '</div>';
+    if (w.total) {
+      html += '<div class="hint" style="margin-top:9px;font-size:11.5px;color:#5a6070">' +
+        w.withPlural + ' of your ' + w.nouns + ' nouns came with their plural' +
+        (w.uncountable ? ' · ' + w.uncountable + ' uncountable' : '') + '.</div>';
+    }
+    html += '</div>';
+
+    if (s.milestones.length) {
+      html += '<div><h4>Next up</h4>';
+      for (var m = 0; m < s.milestones.length; m++) {
+        html += '<div class="mile">' + esc(s.milestones[m]) + '</div>';
+      }
+      html += '</div>';
+    }
+    html += '</div></details>';
+
+    host.innerHTML = html;
+    host.className = 'stats on';
+
+    // Remember whether the extra stats are expanded. Local only — a UI preference is
+    // not progress, so it deliberately never touches sync.
+    var det = host.querySelector('details.more');
+    if (det) det.addEventListener('toggle', function(){
+      try { localStorage.setItem(STATS_OPEN_KEY, det.open ? '1' : '0'); } catch (e) {}
+    });
+  } catch (e) {
+    // Never let a stats bug break the hub: hide the panel and carry on.
+    host.className = 'stats';
+    host.innerHTML = '';
+    if (window.console && console.warn) console.warn('stats panel skipped:', e);
+  }
+}
 
 // "Jump to my next lesson" — scrolls the hub to the first VISIBLE lesson that is not yet
 // done, in hub order. Deliberately a scroll and not a navigation: it just moves you to the
