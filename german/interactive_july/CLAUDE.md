@@ -339,6 +339,29 @@ make deploy          # apply infra + regenerate config.js + upload site
 make outputs         # show site_url / sync_url
 ```
 
+### Deploying content when Terraform state is unavailable (2026-08-11)
+
+`make site` asks Terraform for the bucket name, so it fails on a machine with no state:
+`terraform.tfstate` was **never actually committed** despite the comment in `main.tf` saying it
+is, and `infra/terraform.tfvars` is gitignored. On this machine `terraform` also lives at
+`/opt/homebrew/bin/terraform`, not the `~/.local/bin/terraform` the Makefile assumes.
+
+A **content-only** deploy does not need Terraform at all — the bucket names are stable:
+
+```
+cd <repo root of the site>
+eval "$(aws configure export-credentials --format env)"
+aws s3 sync . s3://german-study-site-321209672840 --delete \
+  --exclude ".git/*" --exclude "infra/*" --exclude "docs/*" --exclude "tools/*" \
+  --exclude "*.md" --exclude ".gitignore" --exclude ".DS_Store"
+```
+
+Always `--dryrun` first: `--delete` is destructive, and the dry run is what caught `tools/`
+(the test scripts) being published to the public site — now excluded in the Makefile too.
+Check `config.js` matches what is already deployed before syncing, so a stale local copy can
+never point the live site at the wrong SYNC_URL. Anything touching the **Lambda or infra**
+still needs real Terraform state + `terraform.tfvars`.
+
 - **Architecture:** S3 website (public) for the site + **API Gateway (HTTP API) → Lambda** for
   sync + private S3 `state` bucket for per-user blobs. (Not CloudFront / not a Lambda Function
   URL — see the account-verification note below.)

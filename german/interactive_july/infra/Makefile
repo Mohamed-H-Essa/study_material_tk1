@@ -35,6 +35,7 @@ site:
 	$(AWS) s3 sync $(SITEDIR) s3://$$BUCKET \
 	  --delete \
 	  --exclude ".git/*" --exclude "infra/*" --exclude "docs/*" \
+	  --exclude "tools/*" \
 	  --exclude "*.md" --exclude ".gitignore" --exclude ".DS_Store"; \
 	echo "site uploaded to s3://$$BUCKET"
 
