@@ -1,8 +1,40 @@
 # Deployment & Cross-Device Sync — Design
 
 **Date:** 2026-07-13
-**Status:** Approved, implemented
+**Status:** PARTLY SUPERSEDED (2026-08-11) — see the banner below
 **Author:** Mohamed + Claude
+
+> ### ⚠️ The hosting described here no longer exists
+>
+> The AWS account was torn down on **2026-08-11** (it was expiring). Nothing in §§4–11 runs any
+> more: no S3 buckets, no Lambda, no API Gateway, no Terraform. `infra/` is kept as history only.
+>
+> **What replaced it**
+>
+> | Layer | Was | Is now |
+> | --- | --- | --- |
+> | Static site | S3 website bucket | GitHub Pages, published by `.github/workflows/pages.yml` on push to `main` |
+> | Sync backend | API Gateway → Lambda | Cloudflare Worker `german-sync.mhosnytech.workers.dev` |
+> | State storage | Private S3 bucket, one JSON blob per user | SQLite-backed Durable Object, same blobs under `user:<name>` / `admin:config` |
+> | Deploy | `make deploy` (Terraform + `aws s3 sync`) | `git push` for the site; `npx wrangler deploy` for the backend |
+> | Secrets | Lambda env via `terraform.tfvars` | Cloudflare Worker secrets |
+>
+> The **wire protocol is unchanged**, so §§3 and 12 (the sync model, the merge rules, the
+> `de.<slug>.<what>` key format) are still accurate and still binding. §2's principles —
+> slug-is-identity, offline-first, additive merges — are the reason the migration was cheap:
+> the client's only tie to the backend is `SYNC_URL` in `config.js`, so swapping hosts touched
+> one line.
+>
+> One thing this doc got wrong, worth remembering: §4 says `terraform.tfstate` is committed. It
+> never was. That is why a content deploy later failed on a machine without local state, and why
+> `config.js` is now a plain committed file rather than generated from infrastructure output.
+>
+> Two behaviours documented here as AWS constraints are gone with it: the account-verification
+> hold (§11, which blocked CloudFront and Lambda Function URLs and forced the API-Gateway design)
+> and the unguarded S3 read-modify-write, which was a real lost-update race — 40 concurrent
+> pushes lost 37 of them. The Durable Object fixes that structurally; see CLAUDE.md.
+>
+> **Current, authoritative docs: `CLAUDE.md` → "Hosting: moving off AWS" and "Deploy / operate".**
 
 ## 1. What the user asked for (verbatim intent)
 

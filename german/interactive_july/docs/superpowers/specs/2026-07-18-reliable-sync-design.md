@@ -1,10 +1,20 @@
 # Reliable Sync via Server-Authoritative Versioning — Design
 
 **Date:** 2026-07-18
-**Status:** Approved, implementing
+**Status:** Approved, implemented — **the merge model below is still current and binding**
 **Author:** Mohamed + Claude
-**Supersedes the sync-merge portion of** `docs/2026-07-13-deployment-and-sync-design.md`
-(architecture — S3 site + API Gateway + Lambda + private state bucket — is unchanged).
+**Supersedes the sync-merge portion of** `docs/2026-07-13-deployment-and-sync-design.md`.
+
+> **Note (2026-08-11): the hosting moved, the merge model did not.** Where this doc says "the
+> Lambda" or "S3", read "the Cloudflare Worker" and "the Durable Object" — AWS was torn down when
+> the account expired. The merge engine (`isDataKey`/`kindOf`/`currentSeq`/`applyChange`/
+> `mergeAll`/`delta`) was carried across **verbatim and diffed to prove it**, so every rule
+> specified here — server-assigned `__seq` ordering, `done` monotonic, `anki` per-card
+> forward-only union, other = higher seq wins, lazy `{v,t}` upgrade — holds exactly as written.
+>
+> The one thing that got *better*: this doc's design assumed a read-modify-write against S3 with
+> no compare-and-swap, which was a genuine lost-update race (40 concurrent pushes lost 37). A
+> Durable Object's synchronous storage makes that read-modify-write atomic. See CLAUDE.md.
 
 ## 1. Problem
 
