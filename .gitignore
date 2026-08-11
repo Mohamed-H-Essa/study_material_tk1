@@ -7,3 +7,8 @@ german/interactive_july/infra/terraform.tfstate.backup
 german/interactive_july/infra/terraform.tfvars
 german/interactive_july/infra/.terraform/
 german/interactive_july/infra/lambda.zip
+
+# Cloudflare Worker local dev state. Holds the local Durable Object database and a cf.json
+# cache that includes IP-derived location data — never commit it.
+german/interactive_july/worker/.wrangler/
+german/interactive_july/worker/node_modules/

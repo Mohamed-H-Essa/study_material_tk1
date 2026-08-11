@@ -358,31 +358,97 @@ fires. This was verified both ways in jsdom (signed-out → redirects; signed-in
 cards). Renaming would have meant rewriting 137 `index.html` references across 66 files for no
 behavioural gain.
 
-**Half 2 — the sync backend → NOT DONE.** Pages is static-only and cannot host it. Until a new
-backend exists, `sync.js` degrades to localStorage-only: progress is per-browser and does not
-follow you across devices. This is safe — a failed pull hits `.catch()` and never calls
-`applyServerState`, so nothing is pruned — but note two hazards:
+**Half 2 — the sync backend → Cloudflare Workers + a SQLite Durable Object. CODE DONE, NOT YET
+DEPLOYED.** It lives in `worker/` and passes the full contract suite locally. It needs a (free,
+no-card) Cloudflare account to go live — see the runbook below.
 
-- **Do not use the logout button while there is no backend.** `Sync.logout()` wipes every local
-  `de.*` key on the assumption that progress is safe in the cloud. Once AWS is gone that
-  assumption is false and logging out destroys local progress.
-- **`de.__syncurl` is written into localStorage at login**, so after the backend moves, a browser
-  keeps calling the dead AWS URL until the user logs out and back in (or the key is cleared).
+`worker/src/index.mjs` is a port of `infra/lambda/index.mjs` with the **same wire protocol**, so
+the client changes nothing but `SYNC_URL`. The ~77-line merge engine
+(`isDataKey`/`kindOf`/`currentSeq`/`applyChange`/`mergeAll`/`delta`) was copied **verbatim** —
+verified byte-identical by diff — because it encodes the product rules and rewriting it would
+risk regressing them. Only the 4 S3 calls and the handler signature changed.
 
-The pre-migration cloud state (28 lessons done, 24 anki decks) is committed at
-`backup/sync-state-2026-08-11/` — the three S3 blobs verbatim, to be imported into whatever
-replaces the Lambda. It contains only slugs, done flags and card ease values; no secrets.
+**Why a Durable Object and not KV — this fixes a real, measured bug.** The Lambda did
+`readState → mergeAll → writeState` against S3 with no conditional write (no ETag/`IfMatch`), so
+overlapping pushes clobbered each other. `tools/test_sync_race.mjs` fires 40 concurrent pushes:
 
-The recommended replacement is **Cloudflare Workers + a SQLite-backed Durable Object**: no card
-at signup, never sleeps, transactional storage, and `node:crypto`'s `createHmac` ports verbatim
-under `nodejs_compat`. Durable Objects specifically rather than KV, because the current handler
-does an unguarded `readState → mergeAll → writeState` with **no ETag/`IfMatch`** — a real
-lost-update race that KV would inherit and a DO removes structurally. The ~100-line merge engine
-(`applyChange`/`mergeAll`/`delta`) is pure JS touching no platform API and moves across
-unchanged; it was extracted and run standalone off-AWS, reproducing done-is-permanent, the
-sanctioned `{clear:true}`, and the per-card anki union exactly. Only the 4 S3 calls and the
-handler signature change (~60 of 367 lines). `sync.js` and the lesson pages need nothing but a
-new `SYNC_URL`.
+| backend | concurrent pushes | survived | lost |
+| --- | --- | --- | --- |
+| old Lambda + S3 (realistic latency) | 40 | 3 | **37** |
+| Worker + Durable Object | 40 | 40 | **0** |
+
+KV would inherit the same hazard (eventually consistent, last-write-wins). A DO routes every
+request to one single-threaded object, and the **synchronous** `ctx.storage.kv` API makes the
+read-modify-write physically unable to yield — stronger than relying on input gates around async
+calls. **The rule to preserve: never `await` non-storage I/O between reading and writing state
+in the DO**, or the input gate opens and the race returns. `test_sync_race.mjs` guards this.
+
+Free-tier notes: SQLite-backed DOs (`new_sqlite_classes`, *not* `new_classes`) are the backend
+available on the Workers Free plan — that choice is what keeps this free. Limits are 100k Worker
+requests/day and 5 GB DO storage against a worst-case ~34 KB per user. `workers.dev` subdomains
+need no card. `nodejs_compat` + `compatibility_date ≥ 2024-09-23` is what makes `createHmac` work.
+
+### Testing the backend (do this before any deploy)
+
+```
+cd worker && npx wrangler dev --port 8788 \
+  --var TOKEN_SECRET:test --var PW_MOHAMED:x --var PW_MUSTAFA:y \
+  --var ALLOW_RESET:1 --var IMPORT_TOKEN:dev-import
+PW_MOHAMED=x PW_MUSTAFA=y node ../tools/test_sync_contract.mjs http://localhost:8788   # 24 cases
+PW_MOHAMED=x node ../tools/test_sync_race.mjs http://localhost:8788                    # 40/40
+```
+
+`tools/sync_contract_cases.mjs` holds the 24 cases. They are an **executable spec**: each one was
+first validated against the real Lambda code (run locally against an in-memory S3) so they record
+what the backend actually did, then the Worker was required to pass the identical set. Both
+backends score 24/24. `/__reset` is honoured only when `ALLOW_RESET=1`, which production never
+sets; `action:'import'` 403s unless `IMPORT_TOKEN` is set and matches.
+
+### Deploying the Worker (the remaining manual step)
+
+Needs a free Cloudflare account (email + password; no card, no phone).
+
+```
+cd worker
+npx wrangler login                      # opens a browser once
+npx wrangler secret put TOKEN_SECRET    # reuse the AWS value to keep existing tokens valid
+npx wrangler secret put PW_MOHAMED
+npx wrangler secret put PW_MUSTAFA
+npx wrangler deploy                     # -> https://german-sync.<subdomain>.workers.dev
+```
+
+Secrets live only in Cloudflare, never in the repo. **Reuse the old `TOKEN_SECRET`** and existing
+30-day login tokens keep working; change it and everyone is simply asked to log in again.
+
+Then import the rescued progress ONCE, and remove the import token afterwards:
+
+```
+npx wrangler secret put IMPORT_TOKEN            # any random string
+node tools/build_import_payload.mjs > /tmp/import.json   # from backup/sync-state-2026-08-11/
+curl -X POST https://german-sync.<subdomain>.workers.dev \
+  -H 'content-type: application/json' --data-binary @/tmp/import.json
+npx wrangler secret delete IMPORT_TOKEN         # close the door
+```
+
+Import is **idempotent and non-destructive**: it skips any key that already has data, so running
+it twice cannot clobber progress. Verified locally against the real backup — 28 lessons done, 24
+anki decks, `seq` 398 preserved exactly, and Mustafa's 35 hidden lessons intact.
+
+Finally point the site at it and redeploy: set `SYNC_URL` in `config.js` to the workers.dev URL,
+commit, push (Pages deploys itself). **`config.js` is no longer generated by Terraform** — it is
+now a plain committed file.
+
+### Two client-side gotchas when the backend URL changes
+
+- **`de.__syncurl` is written into localStorage at login**, so a browser keeps calling the OLD
+  URL until the user logs out and back in. After switching, log out and in once on each device.
+- **Do not use the logout button while no backend is reachable.** `Sync.logout()` wipes every
+  local `de.*` key on the assumption progress is safe in the cloud. Between AWS dying and the
+  Worker going live that assumption is false. (A failed *pull* is safe — it hits `.catch()` and
+  never calls `applyServerState`, so nothing is pruned.)
+
+The pre-migration cloud state is committed at `backup/sync-state-2026-08-11/` — the three S3 blobs
+verbatim. It contains only slugs, done flags and card ease values; no secrets.
 
 ## Deploy / operate
 
