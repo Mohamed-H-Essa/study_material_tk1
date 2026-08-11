@@ -323,6 +323,67 @@ vocab-table and Anki *display* text.
    `cd infra && make site` — new slugs sync automatically.
 8. Commit + push.
 
+## Hosting: moving off AWS (2026-08-11)
+
+The AWS account is expiring. The move is in **two independent halves**, because the site and the
+sync backend have almost no coupling: the frontend's only tie to AWS is the single generated line
+in `config.js`, and every internal link is relative.
+
+**Half 1 — the static site → GitHub Pages. DONE.** `.github/workflows/pages.yml` publishes on
+every push to `main` that touches `german/interactive_july/**`. Deploying is now just `git push`;
+`make site` is no longer needed. Live at
+`https://mohamed-h-essa.github.io/study_material_tk1/`.
+
+Why Pages over the alternatives (researched 2026-08-11, the constraint being **Egypt: no card,
+no phone verification**): the repo already exists and is already public, so there is no new
+signup and therefore no new identity check. GitLab Pages is disqualified because its builds run
+on shared CI runners that require **card validation** — directly in the deploy path. Netlify's
+post-2025 free tier is 300 credits/month with production deploys at 15 credits each, so ~20
+deploys exhaust the month. Vercel's Hobby plan is non-commercial-only, worded broadly enough
+that even accepting donations breaches it. Cloudflare Pages is the viable runner-up (truly
+unlimited static bandwidth, email-only signup) if a custom domain is ever wanted.
+
+Two things the workflow is deliberate about, both learned from the S3 deploy:
+- It publishes **only** `german/interactive_july/`. The repo also holds unrelated
+  `saa_c03_material/`, which must never reach the public site.
+- It deletes `infra/`, `tools/`, `docs/`, `backup/` and `*.md` **from a copy**, then runs a guard
+  step that hard-fails if any forbidden dir survives or a required file is missing. `tools/` was
+  once caught being published by an S3 `--dryrun`; that near-miss is now a build-time assertion
+  rather than a habit.
+
+**The site root is `index.html` (the hub), not `login.html`.** S3 needed `login.html` as its index
+document; Pages does not, and no file was renamed — the hub's first inline script already does
+`location.replace('login.html')` when `de.__user`/`de.__token` are absent, so the gate still
+fires. This was verified both ways in jsdom (signed-out → redirects; signed-in → renders all 59
+cards). Renaming would have meant rewriting 137 `index.html` references across 66 files for no
+behavioural gain.
+
+**Half 2 — the sync backend → NOT DONE.** Pages is static-only and cannot host it. Until a new
+backend exists, `sync.js` degrades to localStorage-only: progress is per-browser and does not
+follow you across devices. This is safe — a failed pull hits `.catch()` and never calls
+`applyServerState`, so nothing is pruned — but note two hazards:
+
+- **Do not use the logout button while there is no backend.** `Sync.logout()` wipes every local
+  `de.*` key on the assumption that progress is safe in the cloud. Once AWS is gone that
+  assumption is false and logging out destroys local progress.
+- **`de.__syncurl` is written into localStorage at login**, so after the backend moves, a browser
+  keeps calling the dead AWS URL until the user logs out and back in (or the key is cleared).
+
+The pre-migration cloud state (28 lessons done, 24 anki decks) is committed at
+`backup/sync-state-2026-08-11/` — the three S3 blobs verbatim, to be imported into whatever
+replaces the Lambda. It contains only slugs, done flags and card ease values; no secrets.
+
+The recommended replacement is **Cloudflare Workers + a SQLite-backed Durable Object**: no card
+at signup, never sleeps, transactional storage, and `node:crypto`'s `createHmac` ports verbatim
+under `nodejs_compat`. Durable Objects specifically rather than KV, because the current handler
+does an unguarded `readState → mergeAll → writeState` with **no ETag/`IfMatch`** — a real
+lost-update race that KV would inherit and a DO removes structurally. The ~100-line merge engine
+(`applyChange`/`mergeAll`/`delta`) is pure JS touching no platform API and moves across
+unchanged; it was extracted and run standalone off-AWS, reproducing done-is-permanent, the
+sanctioned `{clear:true}`, and the per-card anki union exactly. Only the 4 S3 calls and the
+handler signature change (~60 of 367 lines). `sync.js` and the lesson pages need nothing but a
+new `SYNC_URL`.
+
 ## Deploy / operate
 
 Prereqs: AWS CLI authenticated, Terraform at `~/.local/bin/terraform`. Real secrets in

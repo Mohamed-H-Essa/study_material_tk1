@@ -1,0 +1,93 @@
+# Publish the German study site to GitHub Pages.
+#
+# Why this exists: the site used to live on S3 in an AWS account that is expiring. Pages is the
+# replacement for the STATIC half only — it serves files and runs no server-side code, so it
+# cannot host the sync backend (that stays on its own service; see CLAUDE.md).
+#
+# Two things this workflow is careful about, both learned the hard way on the S3 deploy:
+#
+#  1. It publishes ONLY german/interactive_july/. This repo also holds unrelated material
+#     (saa_c03_material), which must never reach the public site.
+#  2. It strips the non-site directories from the copy it uploads — infra/ (Terraform, and the
+#     lambda source), tools/ (the test scripts, which were once caught being published by a
+#     --dryrun), docs/ and *.md. Deleting them from a COPY keeps the repo untouched.
+#
+# The site root is index.html, the hub. That is deliberate and matches the old S3 behaviour even
+# though S3 was configured with login.html as its index document: the hub's first inline script
+# redirects to login.html when de.__user / de.__token are absent, so an unauthenticated visitor
+# still lands on the login gate. No file is renamed, so all 137 relative index.html links keep
+# working.
+name: Deploy site to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'german/interactive_july/**'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch: # so a deploy can be forced without a content change
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Let a running deploy finish rather than cancelling it: a half-applied site is worse than a
+# slightly stale one.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Assemble the publishable site
+        run: |
+          set -euo pipefail
+          srcdir=german/interactive_july
+          out=_site
+          mkdir -p "$out"
+          cp -R "$srcdir"/. "$out"/
+          # Strip everything that is not part of the public site.
+          rm -rf "$out/infra" "$out/tools" "$out/docs" "$out/backup"
+          find "$out" -maxdepth 1 -name '*.md' -delete
+          rm -f "$out/.gitignore" "$out/.DS_Store"
+          echo "--- publishing:"
+          ls -la "$out"
+
+      - name: Guard against publishing the wrong thing
+        run: |
+          set -euo pipefail
+          # Fail loudly rather than quietly shipping secrets or unrelated material.
+          for forbidden in infra tools docs backup saa_c03_material; do
+            if [ -e "_site/$forbidden" ]; then
+              echo "REFUSING TO DEPLOY: _site/$forbidden should not be published." >&2
+              exit 1
+            fi
+          done
+          # The site is useless without these.
+          for required in index.html login.html sync.js config.js _engine.js lessons.js; do
+            if [ ! -f "_site/$required" ]; then
+              echo "REFUSING TO DEPLOY: _site/$required is missing." >&2
+              exit 1
+            fi
+          done
+          echo "OK: $(find _site -type f | wc -l) files, $(du -sh _site | cut -f1) total."
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
