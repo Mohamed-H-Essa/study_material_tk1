@@ -52,7 +52,7 @@ jobs:
           mkdir -p "$out"
           cp -R "$srcdir"/. "$out"/
           # Strip everything that is not part of the public site.
-          rm -rf "$out/infra" "$out/tools" "$out/docs" "$out/backup"
+          rm -rf "$out/infra" "$out/tools" "$out/docs" "$out/backup" "$out/worker"
           find "$out" -maxdepth 1 -name '*.md' -delete
           rm -f "$out/.gitignore" "$out/.DS_Store"
           echo "--- publishing:"
@@ -62,12 +62,23 @@ jobs:
         run: |
           set -euo pipefail
           # Fail loudly rather than quietly shipping secrets or unrelated material.
-          for forbidden in infra tools docs backup saa_c03_material; do
+          for forbidden in infra tools docs backup worker saa_c03_material; do
             if [ -e "_site/$forbidden" ]; then
               echo "REFUSING TO DEPLOY: _site/$forbidden should not be published." >&2
               exit 1
             fi
           done
+          # A denylist only catches what we thought of: `worker/` was added later and shipped
+          # silently until the live site was checked. So ALSO assert there are no subdirectories
+          # at all — this site is a flat pile of HTML/CSS/JS, and anything nested is either new
+          # tooling that needs excluding above, or a mistake. Fail closed on both.
+          unexpected="$(find _site -mindepth 1 -maxdepth 1 -type d)"
+          if [ -n "$unexpected" ]; then
+            echo "REFUSING TO DEPLOY: unexpected directories in _site:" >&2
+            echo "$unexpected" >&2
+            echo "The site is flat by design. Add these to the rm -rf above if they are not public." >&2
+            exit 1
+          fi
           # The site is useless without these.
           for required in index.html login.html sync.js config.js _engine.js lessons.js; do
             if [ ! -f "_site/$required" ]; then
