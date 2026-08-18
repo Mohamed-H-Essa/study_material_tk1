@@ -87,5 +87,24 @@ window.LESSONS = [
 
   // Grammar (es gibt) rather than culture, so Stufe 3 — but appended at the end for the same
   // reason as 58: renumbering to slot it in would touch a dozen files for a cosmetic gain.
-  {stage:3,n:59,file:"59_es_gibt.html",id:"889sjsfyiaU",slug:"esgibt",title:"How to Say “There Is / Are”",de:"Es gibt …",tag:"es gibt + Akkusativ · Germany by the numbers"}
+  {stage:3,n:59,file:"59_es_gibt.html",id:"889sjsfyiaU",slug:"esgibt",title:"How to Say “There Is / Are”",de:"Es gibt …",tag:"es gibt + Akkusativ · Germany by the numbers"},
+
+  // ---- Stufe 7 · The Cases (der Fall) ----
+  {stage:7,n:60,file:"60_sentence_roles.html",id:"_F_zkRPRX6A",slug:"rollen",title:"Who Does What to Whom",de:"Wer macht was?",tag:"Verb · subject · object — no endings yet"},
+  {stage:7,n:61,file:"61_word_order_meaning.html",id:"-28mQsB6OkI",slug:"wortstellung",title:"Word Order vs Endings",de:"Wortstellung oder Endung?",tag:"Why German can move words · the first-noun trap"},
+  {stage:7,n:62,file:"62_nominativ.html",id:"UBaUvhEFZXg",slug:"nominativ",title:"Nominativ — the Doer",de:"Der Nominativ",tag:"der/die/das · wer? · sein takes Nominativ"},
+  {stage:7,n:63,file:"63_akkusativ.html",id:"A3kDyxMO2xI",slug:"akkusativ",title:"Akkusativ — only der changes",de:"Der Akkusativ",tag:"der → den · wen oder was? · sehen/haben/brauchen"},
+  {stage:7,n:64,file:"64_akkusativ_input.html",id:"a_eTHyBbRjs",slug:"akkinput",title:"Which One Is It?",de:"Wer macht es — wirklich?",tag:"Structured input · the ending is the only clue"},
+  {stage:7,n:65,file:"65_erste_nomen.html",id:"pqnYBp5dmYo",slug:"erstenomen",title:"The First Noun Trap",de:"Das erste Nomen ist nicht immer das Subjekt",tag:"Breaking the English habit · fronting for emphasis"},
+  {stage:7,n:66,file:"66_ein_kein_mein.html",id:"e__PZsWLI2Y",slug:"akkein",title:"einen, keinen, meinen",de:"ein · kein · mein im Akkusativ",tag:"one -en ending · kein not nicht"},
+  {stage:7,n:67,file:"67_akk_praepositionen.html",id:"_SODerHXlhQ",slug:"akkprep",title:"durch, für, gegen, ohne, um",de:"Präpositionen mit Akkusativ",tag:"Five always-Akkusativ prepositions · the chant"},
+  {stage:7,n:68,file:"68_dativ.html",id:"yuYTleQIIxI",slug:"dativ",title:"Dativ — the Receiver",de:"Der Dativ",tag:"dem/der/dem · wem? · built on vor dem / vor der"},
+  {stage:7,n:69,file:"69_dativ_praepositionen.html",id:"dSGS_213evU",slug:"datprep",title:"The Dative Chant",de:"aus · außer · bei · mit · nach · seit · von · zu",tag:"The eight always-Dativ prepositions · beim/vom/zum/zur"},
+  {stage:7,n:70,file:"70_dativ_verben.html",id:"1nfxYAqx9qU",slug:"datverben",title:"Verbs that take Dativ",de:"Verben mit Dativ",tag:"helfen · danken · gehören · gefallen (backwards)"},
+  {stage:7,n:71,file:"71_geben.html",id:"tU9YRMCYtAg",slug:"geben",title:"Giving: Both Objects",de:"Ich gebe dem Mann das Buch",tag:"Dativ + Akkusativ together · word order"},
+  {stage:7,n:72,file:"72_wechsel.html",id:"cPJ1Es1rF1g",slug:"wechsel",title:"wo? or wohin?",de:"Die Wechselpräpositionen",tag:"Change of location · the honest version of lesson 35"},
+  {stage:7,n:73,file:"73_akk_pronomen.html",id:"mYnu5l4al9k",slug:"akkpron",title:"mich, dich, ihn",de:"Personalpronomen im Akkusativ",tag:"er → ihn · the same masculine-only pattern"},
+  {stage:7,n:74,file:"74_dat_pronomen.html",id:"KmfuB5ZK7iE",slug:"datpron",title:"mir, dir, ihm",de:"Personalpronomen im Dativ",tag:"The mich/mir split · Wie geht es dir?"},
+  {stage:7,n:75,file:"75_dativ_plural.html",id:"ax0_q8hn8jo",slug:"datplural",title:"den Kindern & the Genitiv",de:"Dativ Plural und der Genitiv",tag:"The extra -n · Emmas Haus · recognise des/der"},
+  {stage:7,n:76,file:"76_alle_faelle.html",id:"Uab5EC28h1w",slug:"allefaelle",title:"All Four Together",de:"Alle vier Fälle",tag:"Full table · five habits · honest expectations"},
 ];

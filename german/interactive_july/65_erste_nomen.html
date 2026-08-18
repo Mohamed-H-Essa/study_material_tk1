@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>65 · The First Noun Trap</title>
+<link rel="stylesheet" href="_engine.css">
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav">
+  <a href="index.html">☰ Hub</a>
+  <a href="64_akkusativ_input.html">← Which One Is It?</a>
+  <span class="spacer"></span>
+  <a href="66_ein_kein_mein.html">einen, keinen, meinen →</a>
+</div>
+
+<a class="videowrap" href="https://www.youtube.com/watch?v=pqnYBp5dmYo" target="_blank" rel="noopener">
+  <img src="https://img.youtube.com/vi/pqnYBp5dmYo/hqdefault.jpg" alt="German Word Order Part 1 — Position of Main Verbs">
+  <span class="play"></span>
+</a>
+<div class="watchline">▶ Tap to watch · <span lang="de">Die Wortstellung</span></div>
+
+<h1>65 · <span class="de" lang="de">Das erste Nomen ist nicht immer das Subjekt</span></h1>
+<p class="lead">A short lesson about one specific bad habit — and it is a habit every English speaker brings to German. Naming it out loud is worth more than another hundred sentences of practice, because you cannot stop doing something you have not noticed you do.</p>
+<span class="rainbow-note"><span class="rainbow">rainbow</span> = bonus beyond the video</span>
+
+<div class="anki-export-mount"></div>
+
+<h2><span class="step">The habit</span>Your brain votes for the first noun</h2>
+<div class="tip">English sentences are overwhelmingly <b>doer first</b>. After a lifetime of that, your brain takes a shortcut: <i>whatever noun I meet first is the one doing it.</i> It is fast, and in English it is almost always right.<br><br>In German it is right most of the time too — and that is exactly what makes it dangerous. It fails only occasionally, so it never gets corrected. Then one day a sentence means the opposite of what you thought.</div>
+<div class="warn"><b>This is measured, not theoretical.</b> Learners tested on sentences like <span lang='de'>Den Hund sieht die Katze</span> scored <b>below 50%</b> — worse than flipping a coin on a two-choice question. Knowing the rule was not the problem. The habit simply fired first. So the fix is not more rules; it is <b>deliberately looking at the article before you decide</b>, until that becomes the reflex instead.</div>
+<h2><span class="step">The fix</span>Two seconds, every time</h2>
+<div class="tip">When a German sentence starts with a noun, do this before deciding anything:<br><br>1. <b>Look at the article.</b> Is it <span lang='de'>der</span> or <span lang='de'>den</span>?<br>2. <span lang='de'><b>den</b></span> → this is <b>not</b> the doer. Keep reading; the doer is further along.<br>3. <span lang='de'><b>der</b></span> → fine, this is the doer.<br><br>Feminine and neuter (<span lang='de'>die</span>, <span lang='de'>das</span>) look identical in both cases, so with those you rely on the <i>other</i> noun in the sentence — which is why the masculine is where all the information is.</div>
+<h2><span class="step">Why bother</span>Why German fronts things at all</h2>
+<div class="tip">Germans move a word to the front for <b>emphasis</b> — the way English uses stress or a cleft sentence:<br><br><span lang='de'>Den Kuchen habe ich gegessen.</span> → <i>The <b>cake</b> — that's what I ate.</i> (not the biscuits)<br><span lang='de'>Diesen Film kenne ich nicht.</span> → <i>That <b>film</b> I don't know.</i><br><br>Nothing is lost by moving it, because the ending is still doing its job. This is a feature, not a quirk — and it is only available to a language that marks its cases.</div>
+<h2><span class="step">Practice</span>Spot the doer — the article decides</h2>
+<div id="trainer-spot"></div>
+<h2><span class="step">Practice</span>What is being emphasised?</h2>
+<div id="trainer-betonung"></div>
+<h2><span class="step">Anki</span>The habit and the fix</h2>
+<div id="anki-mount"></div>
+
+<div id="checkoff-mount"></div>
+
+<div class="anki-export-mount"></div>
+
+<div class="topnav" style="margin-top:40px">
+  <a href="index.html">☰ Hub</a>
+  <a href="64_akkusativ_input.html">← Which One Is It?</a>
+  <span class="spacer"></span>
+  <a href="66_ein_kein_mein.html">Next: einen, keinen, meinen →</a>
+</div>
+</div>
+
+<script src="config.js"></script>
+<script src="sync.js"></script>
+<script src="_engine.js"></script>
+<script>
+window.PAGE = {
+  slug:"erstenomen",
+  ankiDeck:"DE · Wortstellung & Betonung",
+  anki:[
+    {"f":"first noun trap (rule)","b":"English speakers read the first noun as the doer — check the article instead","ex":"tested learners scored below 50% on object-first sentences"},
+    {"f":"den at the start of a sentence (rule)","b":"means this noun is NOT the doer — read on","ex":"Den Hund sieht die Katze. → the cat is the doer"},
+    {"f":"der at the start of a sentence (rule)","b":"this noun IS the doer","ex":"Der Hund sieht die Katze."},
+    {"f":"why German fronts a word (rule)","b":"emphasis — and nothing is lost, because the ending keeps the role","ex":"Den Kuchen habe ich gegessen. = THE CAKE is what I ate."},
+    {"f":"Den Kuchen habe ich gegessen.","b":"The cake is what I ate.","ex":"fronted for emphasis; ich is still the doer"},
+    {"f":"Diesen Film kenne ich nicht.","b":"That film I don't know.","ex":"diesen = accusative masculine"},
+    {"f":"der Kuchen → die Kuchen","b":"the cake","ex":"Ich esse den Kuchen."},
+    {"f":"der Film → die Filme","b":"the film · the movie","ex":"Ich sehe den Film."}
+  ],
+  trainers:[
+    {id:"spot", title:"Is the first noun the doer?", kind:"Habit-breaking drill", repeat:2, items:[
+      {"type":"mc","q":"<b lang='de'>Den Film sehe ich morgen.</b> — is <b lang='de'>den Film</b> the doer?","opts":["no — den means it is the object","yes"],"answer":"no — den means it is the object","why":"ich is the doer. The film is what gets watched."},
+      {"type":"mc","q":"<b lang='de'>Der Film beginnt um acht.</b> — is <b lang='de'>der Film</b> the doer?","opts":["yes — der marks the subject","no"],"answer":"yes — der marks the subject","why":"der Film is the subject of beginnen."},
+      {"type":"mc","q":"<b lang='de'>Den Kuchen isst der Junge.</b> — who eats?","opts":["der Junge","der Kuchen"],"answer":"der Junge","why":"den Kuchen = the object."},
+      {"type":"mc","q":"<b lang='de'>Den Brief schreibt die Mutter.</b> — who writes?","opts":["die Mutter","der Brief"],"answer":"die Mutter","why":"den Brief is being written."},
+      {"type":"mc","q":"<b lang='de'>Der Junge isst den Kuchen.</b> — who eats?","opts":["der Junge","der Kuchen"],"answer":"der Junge","why":"Same meaning as the earlier one, ordinary order."},
+      {"type":"mc","q":"You see a sentence starting with <b lang='de'>Den …</b> — what do you conclude?","opts":["the doer comes later","that word is the doer"],"answer":"the doer comes later","why":"den always marks a masculine object."},
+      {"type":"mc","q":"<b lang='de'>Den Hund mag ich.</b> = ","opts":["I like the dog.","The dog likes me."],"answer":"I like the dog.","why":"ich is the doer; den Hund is what I like."}
+    ]},
+    {id:"betonung", title:"Why front the word?", kind:"Emphasis", repeat:1, items:[
+      {"type":"mc","q":"Why would someone say <b lang='de'>Den Kuchen habe ich gegessen</b> instead of <b lang='de'>Ich habe den Kuchen gegessen</b>?","opts":["to emphasise the cake","because it is more correct","to ask a question"],"answer":"to emphasise the cake","why":"Fronting = emphasis. Both sentences are correct and mean the same."},
+      {"type":"mc","q":"Does moving the object to the front change who did it?","opts":["no — the ending keeps the roles","yes"],"answer":"no — the ending keeps the roles","why":"That is what a case system buys you."},
+      {"type":"mc","q":"Could English do the same trick freely?","opts":["no — English needs word order for meaning","yes, always"],"answer":"no — English needs word order for meaning","why":"'The dog sees the man' cannot be reordered without changing meaning."},
+      {"type":"mc","q":"<b lang='de'>Diesen Film kenne ich nicht.</b> — who does not know the film?","opts":["ich","der Film"],"answer":"ich","why":"diesen Film is the object; ich is the subject."}
+    ]}
+  ],
+  checkoff:{ title:"First-noun check", pass:0.8, intro:"Six questions. Look at the article before you answer. Pass to mark ✓ on the hub.", items:[
+    {"type":"mc","q":"<b lang='de'>Den Kuchen isst der Junge.</b> — who eats?","opts":["der Junge","der Kuchen"],"answer":"der Junge","why":"den Kuchen is the object."},
+    {"type":"mc","q":"A sentence starting with <span lang='de'>Den …</span> tells you…","opts":["the doer comes later","that noun is the doer"],"answer":"the doer comes later","why":"den = accusative = object."},
+    {"type":"mc","q":"<b lang='de'>Den Film sehe ich morgen.</b> — who watches?","opts":["ich","der Film"],"answer":"ich","why":"ich is the subject."},
+    {"type":"mc","q":"Why does German front words?","opts":["for emphasis","to form questions"],"answer":"for emphasis","why":"And it costs nothing, because the endings hold the roles."},
+    {"type":"mc","q":"<b lang='de'>Den Brief schreibt die Mutter.</b> — who writes?","opts":["die Mutter","der Brief"],"answer":"die Mutter","why":"den Brief is written."},
+    {"type":"mc","q":"Is 'first noun = doer' a safe rule in German?","opts":["no","yes"],"answer":"no","why":"It is right often enough to feel safe and wrong often enough to hurt."}
+  ]}
+};
+Engine.init();
+</script>
+</body>
+</html>

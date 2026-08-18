@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>64 · Which One Is It?</title>
+<link rel="stylesheet" href="_engine.css">
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav">
+  <a href="index.html">☰ Hub</a>
+  <a href="63_akkusativ.html">← Akkusativ — only der changes</a>
+  <span class="spacer"></span>
+  <a href="65_erste_nomen.html">The First Noun Trap →</a>
+</div>
+
+<a class="videowrap" href="https://www.youtube.com/watch?v=a_eTHyBbRjs" target="_blank" rel="noopener">
+  <img src="https://img.youtube.com/vi/a_eTHyBbRjs/hqdefault.jpg" alt="Learn the Nominative Case — Part 2: Possessive Articles">
+  <span class="play"></span>
+</a>
+<div class="watchline">▶ Tap to watch · <span lang="de">mein · dein · sein</span></div>
+
+<h1>64 · <span class="de" lang="de">Wer macht es — wirklich?</span></h1>
+<p class="lead">No new grammar in this lesson. This is <b>training</b>. Every question below is built so that the <i>only</i> way to answer it is to actually read the article. That is the whole point — and it is the part that 59 lessons of listening could not give you.</p>
+<span class="rainbow-note"><span class="rainbow">rainbow</span> = bonus beyond the video</span>
+
+<div class="anki-export-mount"></div>
+
+<h2><span class="step">Why this lesson exists</span>Making the ending necessary</h2>
+<div class="tip">When you hear <span lang='de'>ich sehe den Hund</span>, you do not need <span lang='de'>den</span> — the meaning is obvious without it. So your brain skips it. Perfectly sensible, and it is why the endings never stuck.<br><br>Below, both answers are always <b>equally possible</b>. A dog can see a cat; a cat can see a dog. The article is the <b>only</b> information that decides it. Read it, or you cannot answer.</div>
+<div class="warn"><b>Expect these to feel slow and slightly annoying.</b> You will want to answer from the word order and you will have to stop yourself. That resistance is the habit being rewritten. Go slowly — accuracy matters far more than speed here.</div>
+<h2><span class="step">Training · long</span>Who is doing it?</h2>
+<div id="trainer-wer1"></div>
+<h2><span class="step">Training · long</span>More — mixed order</h2>
+<div id="trainer-wer2"></div>
+<h2><span class="step">Training</span>Produce it yourself</h2>
+<div id="trainer-produce"></div>
+<h2><span class="step">Anki</span>Reference</h2>
+<div id="anki-mount"></div>
+
+<div id="checkoff-mount"></div>
+
+<div class="anki-export-mount"></div>
+
+<div class="topnav" style="margin-top:40px">
+  <a href="index.html">☰ Hub</a>
+  <a href="63_akkusativ.html">← Akkusativ — only der changes</a>
+  <span class="spacer"></span>
+  <a href="65_erste_nomen.html">Next: The First Noun Trap →</a>
+</div>
+</div>
+
+<script src="config.js"></script>
+<script src="sync.js"></script>
+<script src="_engine.js"></script>
+<script>
+window.PAGE = {
+  slug:"akkinput",
+  ankiDeck:"DE · Akkusativ-Training",
+  anki:[
+    {"f":"Der Hund sieht den Mann.","b":"The dog sees the man.","ex":"der = doer, den = the one seen"},
+    {"f":"Den Hund sieht der Mann.","b":"The man sees the dog.","ex":"same meaning as 'Der Mann sieht den Hund' — just fronted"},
+    {"f":"Die Katze jagt den Hund.","b":"The cat chases the dog.","ex":"die Katze = doer"},
+    {"f":"Den Hund jagt die Katze.","b":"The cat chases the dog.","ex":"still the cat doing it — den marks the dog as the object"},
+    {"f":"how to answer 'who is doing it?' (rule)","b":"find the article: der = doer, den = the one it is done to","ex":"never use position — use the ending"},
+    {"f":"der Schüler → die Schüler","b":"the pupil · the student","ex":"Den Lehrer fragt der Schüler."},
+    {"f":"der Lehrer → die Lehrer","b":"the teacher","ex":"Der Lehrer fragt den Schüler."},
+    {"f":"der Bruder → die Brüder","b":"the brother","ex":"Den Bruder ruft die Schwester."},
+    {"f":"die Schwester → die Schwestern","b":"the sister","ex":"Die Schwester ruft den Bruder."},
+    {"f":"jagen","b":"to chase · to hunt","ex":"Die Katze jagt den Hund."},
+    {"f":"rufen","b":"to call","ex":"Sie ruft den Bruder."},
+    {"f":"besuchen","b":"to visit","ex":"Den Vater besucht der Sohn."}
+  ],
+  trainers:[
+    {id:"wer1", title:"Who is doing it?", kind:"Structured input · read the article", repeat:2, items:[
+      {"type":"mc","q":"<b lang='de'>Den Hund sieht die Katze.</b> — who sees?","opts":["die Katze","der Hund"],"answer":"die Katze","why":"den Hund = object. The cat is doing the seeing."},
+      {"type":"mc","q":"<b lang='de'>Der Hund sieht die Katze.</b> — who sees?","opts":["der Hund","die Katze"],"answer":"der Hund","why":"der Hund = subject here."},
+      {"type":"mc","q":"<b lang='de'>Den Mann ruft die Frau.</b> — who calls?","opts":["die Frau","der Mann"],"answer":"die Frau","why":"den Mann is being called."},
+      {"type":"mc","q":"<b lang='de'>Der Mann ruft die Frau.</b> — who calls?","opts":["der Mann","die Frau"],"answer":"der Mann","why":"der Mann is the subject."},
+      {"type":"mc","q":"<b lang='de'>Den Lehrer fragt der Schüler.</b> — who asks?","opts":["der Schüler","der Lehrer"],"answer":"der Schüler","why":"den Lehrer = the one asked."},
+      {"type":"mc","q":"<b lang='de'>Den Bruder ruft die Schwester.</b> — who calls?","opts":["die Schwester","der Bruder"],"answer":"die Schwester","why":"den Bruder = the one called."},
+      {"type":"mc","q":"<b lang='de'>Die Schwester ruft den Bruder.</b> — who calls?","opts":["die Schwester","der Bruder"],"answer":"die Schwester","why":"Same meaning as the last one, different order."},
+      {"type":"mc","q":"<b lang='de'>Den Sohn besucht der Vater.</b> — who visits?","opts":["der Vater","der Sohn"],"answer":"der Vater","why":"den Sohn is being visited."}
+    ]},
+    {id:"wer2", title:"Who is doing it? — round two", kind:"Structured input · mixed", repeat:2, items:[
+      {"type":"mc","q":"<b lang='de'>Den Hund jagt die Katze.</b> — who chases?","opts":["die Katze","der Hund"],"answer":"die Katze","why":"den Hund = the one chased. Yes, really — the cat chases the dog."},
+      {"type":"mc","q":"<b lang='de'>Der Hund jagt die Katze.</b> — who chases?","opts":["der Hund","die Katze"],"answer":"der Hund","why":"Now the dog is the subject."},
+      {"type":"mc","q":"<b lang='de'>Den Vater fragt das Kind.</b> — who asks?","opts":["das Kind","der Vater"],"answer":"das Kind","why":"den Vater = the one asked."},
+      {"type":"mc","q":"<b lang='de'>Der Vater fragt das Kind.</b> — who asks?","opts":["der Vater","das Kind"],"answer":"der Vater","why":"der Vater is the subject."},
+      {"type":"mc","q":"<b lang='de'>Den Freund besucht der Bruder.</b> — who visits?","opts":["der Bruder","der Freund"],"answer":"der Bruder","why":"den Freund is being visited."},
+      {"type":"mc","q":"<b lang='de'>Den Schüler sieht der Lehrer.</b> — who sees?","opts":["der Lehrer","der Schüler"],"answer":"der Lehrer","why":"den Schüler = the one seen."},
+      {"type":"mc","q":"<b lang='de'>Die Frau hört den Mann.</b> — who hears?","opts":["die Frau","der Mann"],"answer":"die Frau","why":"den Mann = the one heard."},
+      {"type":"mc","q":"<b lang='de'>Den Mann hört die Frau.</b> — who hears?","opts":["die Frau","der Mann"],"answer":"die Frau","why":"Same as the previous item — the order changed, the meaning did not."}
+    ]},
+    {id:"produce", title:"Now build it yourself", kind:"Production", repeat:1, items:[
+      {"type":"mc","q":"'The dog sees the man.' = ","opts":["Der Hund sieht den Mann.","Den Hund sieht der Mann.","Der Hund sieht der Mann."],"answer":"Der Hund sieht den Mann.","why":"Doer = der Hund, object = den Mann."},
+      {"type":"mc","q":"'The man sees the dog.' = ","opts":["Der Mann sieht den Hund.","Den Mann sieht der Hund."],"answer":"Der Mann sieht den Hund.","why":"Doer takes der, object takes den."},
+      {"type":"type","q":"Type: <b>I see the man.</b>","answer":["ich sehe den mann"],"why":"Ich sehe den Mann."},
+      {"type":"type","q":"Type: <b>I see the woman.</b>","answer":["ich sehe die frau"],"why":"Ich sehe die Frau — feminine does not change."},
+      {"type":"type","q":"Type: <b>The cat chases the dog.</b> (die Katze, der Hund)","answer":["die katze jagt den hund"],"why":"Die Katze jagt den Hund."},
+      {"type":"mc","q":"<b lang='de'>Den Kaffee trinkt Emma.</b> — who drinks?","opts":["Emma","der Kaffee"],"answer":"Emma","why":"den Kaffee = the object."}
+    ]}
+  ],
+  checkoff:{ title:"Reading check", pass:0.8, intro:"Seven sentences. Read the article, not the order. Pass to mark ✓ on the hub.", items:[
+    {"type":"mc","q":"<b lang='de'>Den Hund sieht die Katze.</b> — who sees?","opts":["die Katze","der Hund"],"answer":"die Katze","why":"den = object."},
+    {"type":"mc","q":"<b lang='de'>Der Hund sieht die Katze.</b> — who sees?","opts":["der Hund","die Katze"],"answer":"der Hund","why":"der = subject."},
+    {"type":"mc","q":"<b lang='de'>Den Lehrer fragt der Schüler.</b> — who asks?","opts":["der Schüler","der Lehrer"],"answer":"der Schüler","why":"den Lehrer is asked."},
+    {"type":"mc","q":"<b lang='de'>Den Bruder ruft die Schwester.</b> — who calls?","opts":["die Schwester","der Bruder"],"answer":"die Schwester","why":"den Bruder is called."},
+    {"type":"mc","q":"'The man sees the dog.' =","opts":["Der Mann sieht den Hund.","Den Mann sieht der Hund."],"answer":"Der Mann sieht den Hund.","why":"Doer der, object den."},
+    {"type":"type","q":"Type: <b>I see the man.</b>","answer":["ich sehe den mann"],"why":"Ich sehe den Mann."},
+    {"type":"mc","q":"What decides who the doer is?","opts":["the article","the position"],"answer":"the article","why":"That is the whole lesson."}
+  ]}
+};
+Engine.init();
+</script>
+</body>
+</html>

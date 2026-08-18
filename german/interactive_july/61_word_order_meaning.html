@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>61 · Word Order vs Endings</title>
+<link rel="stylesheet" href="_engine.css">
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav">
+  <a href="index.html">☰ Hub</a>
+  <a href="60_sentence_roles.html">← Who Does What to Whom</a>
+  <span class="spacer"></span>
+  <a href="62_nominativ.html">Nominativ — the Doer →</a>
+</div>
+
+<a class="videowrap" href="https://www.youtube.com/watch?v=-28mQsB6OkI" target="_blank" rel="noopener">
+  <img src="https://img.youtube.com/vi/-28mQsB6OkI/hqdefault.jpg" alt="German Cases 1 — Understanding the German Case System">
+  <span class="play"></span>
+</a>
+<div class="watchline">▶ Tap to watch · <span lang="de">Warum hat Deutsch Fälle?</span></div>
+
+<h1>61 · <span class="de" lang="de">Wortstellung oder Endung?</span></h1>
+<p class="lead">The single idea that makes German cases make sense. English tells you who did what by <b>where the words sit</b>. German tells you by <b>how the words are dressed</b>. Once you see this, cases stop being decoration and become information.</p>
+<span class="rainbow-note"><span class="rainbow">rainbow</span> = bonus beyond the video</span>
+
+<div class="anki-export-mount"></div>
+
+<h2><span class="step">The core idea</span>English moves words. German dresses them.</h2>
+<div class="tip">In English, position <b>is</b> the meaning. Watch what happens when nothing changes except the order:<br><br><i>The <b>man</b> sees the <b>dog</b>.</i><br><i>The <b>dog</b> sees the <b>man</b>.</i><br><br>Same five words. Opposite meaning. Nothing about the words themselves changed — only where they stand. English has almost no endings left, so word order has to carry the whole load.</div>
+<div class="tip">German does it the other way round. The words carry a <b>label</b>, so they can move without losing their job:<br><br><span lang='de'>Der Mann sieht <b>den</b> Hund.</span> — the man sees the dog<br><span lang='de'><b>Den</b> Hund sieht der Mann.</span> — <b>still</b>: the man sees the dog<br><br>The dog moved to the front, but it is still wearing <span lang='de'><b>den</b></span>, so it is still the one being seen. German moved a word for emphasis and lost nothing, because the ending did the work.</div>
+<div class="warn"><b>This is the trap your brain will fall into — it is normal and it has a name.</b> Learners automatically read <b>the first noun as the doer</b>. So <span lang='de'>Den Hund sieht der Mann</span> feels like <i>the dog sees the man</i>. It is not. Researchers who tested this found learners scoring <b>below 50%</b> on sentences like these — worse than guessing. Not because they are bad at German, but because the English habit is very strong. The drills below exist to break exactly this habit, so expect them to feel awkward at first. That means they are working.</div>
+<h2><span class="step">Why it matters to you</span>Why 59 lessons of listening did not give you this</h2>
+<div class="tip">You have understood hundreds of German sentences without ever needing <span lang='de'>den</span>. That is not a failure — it is efficient. If you hear <span lang='de'>ich sehe den Hund</span>, the meaning is obvious from the words alone, so your brain skips the ending. It only starts paying attention when the ending is the <b>only</b> thing that tells you the answer. That is what these drills do: they make the ending <b>necessary</b>.</div>
+<h2><span class="step">Practice</span>Who is doing it? (the ending is your only clue)</h2>
+<div id="trainer-first"></div>
+<h2><span class="step">Practice</span>Order vs meaning</h2>
+<div id="trainer-order"></div>
+<h2><span class="step">Anki</span>The idea in cards</h2>
+<div id="anki-mount"></div>
+
+<div id="checkoff-mount"></div>
+
+<div class="anki-export-mount"></div>
+
+<div class="topnav" style="margin-top:40px">
+  <a href="index.html">☰ Hub</a>
+  <a href="60_sentence_roles.html">← Who Does What to Whom</a>
+  <span class="spacer"></span>
+  <a href="62_nominativ.html">Next: Nominativ — the Doer →</a>
+</div>
+</div>
+
+<script src="config.js"></script>
+<script src="sync.js"></script>
+<script src="_engine.js"></script>
+<script>
+window.PAGE = {
+  slug:"wortstellung",
+  ankiDeck:"DE · Wortstellung & Endungen",
+  anki:[
+    {"f":"Why does German have cases? (rule)","b":"so words can show their JOB with an ending instead of a position","ex":"Den Hund sieht der Mann = the man sees the dog, even though 'dog' is first"},
+    {"f":"English marks roles with… (rule)","b":"WORD ORDER (position)","ex":"The man sees the dog ≠ The dog sees the man"},
+    {"f":"German marks roles with… (rule)","b":"ENDINGS (the article changes)","ex":"der Mann → den Mann"},
+    {"f":"first noun trap (rule)","b":"do NOT assume the first noun is the doer — check the article","ex":"Den Hund sieht der Mann → der Mann is the doer"},
+    {"f":"Den Hund sieht der Mann.","b":"The man sees the dog. (dog fronted for emphasis)","ex":"den = object, der = subject — position did not decide it"},
+    {"f":"Der Hund sieht den Mann.","b":"The dog sees the man.","ex":"now der Hund is the doer"}
+  ],
+  trainers:[
+    {id:"first", title:"Who is doing it?", kind:"Structured input · the ending decides", repeat:2, items:[
+      {"type":"mc","q":"<b lang='de'>Den Hund sieht die Katze.</b> — who is doing the seeing?","opts":["die Katze","der Hund"],"answer":"die Katze","why":"den Hund is wearing den → it is the OBJECT. die Katze is the doer, even though it comes second."},
+      {"type":"mc","q":"<b lang='de'>Der Hund sieht die Katze.</b> — who is doing the seeing?","opts":["der Hund","die Katze"],"answer":"der Hund","why":"der Hund → subject. Here first noun and doer happen to match."},
+      {"type":"mc","q":"<b lang='de'>Den Mann hört das Kind.</b> — who is doing the hearing?","opts":["das Kind","der Mann"],"answer":"das Kind","why":"den Mann = object. The child is doing the hearing."},
+      {"type":"mc","q":"<b lang='de'>Den Lehrer fragt der Schüler.</b> — who asks?","opts":["der Schüler","der Lehrer"],"answer":"der Schüler","why":"den Lehrer = the one being asked. der Schüler = the asker."},
+      {"type":"mc","q":"<b lang='de'>Der Lehrer fragt den Schüler.</b> — who asks?","opts":["der Lehrer","der Schüler"],"answer":"der Lehrer","why":"Reverse of the last one. Only the articles swapped — and that flipped the meaning."},
+      {"type":"mc","q":"<b lang='de'>Den Bruder ruft die Schwester.</b> — who is calling?","opts":["die Schwester","der Bruder"],"answer":"die Schwester","why":"den Bruder = the one being called."},
+      {"type":"mc","q":"<b lang='de'>Die Frau sieht den Hund.</b> — who is doing the seeing?","opts":["die Frau","der Hund"],"answer":"die Frau","why":"den Hund = object → die Frau is the subject."},
+      {"type":"mc","q":"<b lang='de'>Den Vater besucht der Sohn.</b> — who does the visiting?","opts":["der Sohn","der Vater"],"answer":"der Sohn","why":"den Vater is being visited; der Sohn does it."}
+    ]},
+    {id:"order", title:"Does moving the word change the meaning?", kind:"Order vs endings", repeat:2, items:[
+      {"type":"mc","q":"<b lang='de'>Der Mann sieht den Hund</b> and <b lang='de'>Den Hund sieht der Mann</b> mean…","opts":["the same thing","opposite things"],"answer":"the same thing","why":"Both = the man sees the dog. The endings never changed, so the meaning never changed."},
+      {"type":"mc","q":"<i>The man sees the dog</i> and <i>The dog sees the man</i> mean…","opts":["opposite things","the same thing"],"answer":"opposite things","why":"English has no case endings here, so position alone carries the meaning."},
+      {"type":"mc","q":"In German, what tells you who the doer is?","opts":["the article (der/den)","the position in the sentence"],"answer":"the article (der/den)","why":"That is the whole point of a case system."},
+      {"type":"mc","q":"Why would a German speaker put the object first?","opts":["for emphasis — and nothing is lost","it is a mistake","to make it a question"],"answer":"for emphasis — and nothing is lost","why":"Fronting highlights it. The ending keeps the meaning safe."},
+      {"type":"mc","q":"<b lang='de'>Den Kaffee trinkt Emma.</b> — who drinks?","opts":["Emma","der Kaffee"],"answer":"Emma","why":"den Kaffee is the object. Coffee cannot drink anyway — but the ending told you before the logic did."}
+    ]}
+  ],
+  checkoff:{ title:"Word order check", pass:0.8, intro:"Six questions. The endings are your only clue — read them, do not guess from position. Pass to mark ✓ on the hub.", items:[
+    {"type":"mc","q":"<b lang='de'>Den Hund sieht der Mann.</b> — who sees?","opts":["der Mann","der Hund"],"answer":"der Mann","why":"der = subject, den = object, regardless of order."},
+    {"type":"mc","q":"English shows who-does-what mainly with…","opts":["word order","endings"],"answer":"word order","why":"English lost most of its case endings."},
+    {"type":"mc","q":"German shows who-does-what mainly with…","opts":["endings","word order"],"answer":"endings","why":"Which is why the word order can move."},
+    {"type":"mc","q":"<b lang='de'>Den Bruder ruft die Schwester.</b> — who calls?","opts":["die Schwester","der Bruder"],"answer":"die Schwester","why":"den Bruder is being called."},
+    {"type":"mc","q":"Is it safe to assume the first noun is the doer?","opts":["no — check the article","yes, always"],"answer":"no — check the article","why":"That assumption is the single most common reading error."},
+    {"type":"mc","q":"<b lang='de'>Der Hund beißt den Mann</b> means…","opts":["the dog bites the man","the man bites the dog"],"answer":"the dog bites the man","why":"der Hund = doer, den Mann = the one bitten."}
+  ]}
+};
+Engine.init();
+</script>
+</body>
+</html>

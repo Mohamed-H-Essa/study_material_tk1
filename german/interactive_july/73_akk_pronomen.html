@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>73 · mich, dich, ihn</title>
+<link rel="stylesheet" href="_engine.css">
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav">
+  <a href="index.html">☰ Hub</a>
+  <a href="72_wechsel.html">← wo? or wohin?</a>
+  <span class="spacer"></span>
+  <a href="74_dat_pronomen.html">mir, dir, ihm →</a>
+</div>
+
+<a class="videowrap" href="https://www.youtube.com/watch?v=mYnu5l4al9k" target="_blank" rel="noopener">
+  <img src="https://img.youtube.com/vi/mYnu5l4al9k/hqdefault.jpg" alt="Learn the Accusative Case — Part 2: Personal Pronouns">
+  <span class="play"></span>
+</a>
+<div class="watchline">▶ Tap to watch · <span lang="de">Pronomen im Akkusativ</span></div>
+
+<h1>73 · <span class="de" lang="de">Personalpronomen im Akkusativ</span></h1>
+<p class="lead">Pronouns change for case too — and here English actually helps a little, because it does the same thing: <i>I</i> → <i>me</i>, <i>he</i> → <i>him</i>. German just has more forms and keeps them tidier.</p>
+<span class="rainbow-note"><span class="rainbow">rainbow</span> = bonus beyond the video</span>
+
+<div class="anki-export-mount"></div>
+
+<h2><span class="step">The forms</span>Nominativ → Akkusativ</h2>
+<table class="vocab">
+<tr><td class="w" lang="de">ich → mich</td><td class="m">I → me</td></tr>
+<tr><td class="w" lang="de">du → dich</td><td class="m">you → you</td></tr>
+<tr><td class="w" lang="de">er → ihn</td><td class="m">he → him</td></tr>
+<tr><td class="w" lang="de">sie → sie</td><td class="m">she → her (no change)</td></tr>
+<tr><td class="w" lang="de">es → es</td><td class="m">it → it (no change)</td></tr>
+<tr><td class="w" lang="de">wir → uns</td><td class="m">we → us</td></tr>
+<tr><td class="w" lang="de">ihr → euch</td><td class="m">you (pl.) → you</td></tr>
+<tr><td class="w" lang="de">sie → sie</td><td class="m">they → them (no change)</td></tr>
+<tr><td class="w" lang="de">Sie → Sie</td><td class="m">you (formal) → you (no change)</td></tr>
+</table>
+<div class="tip"><b>Notice the same pattern as the articles.</b> The masculine is where the visible change happens: <span lang='de'>er → <b>ihn</b></span>, just like <span lang='de'>der → <b>den</b></span>. Feminine, neuter and plural stay put — <span lang='de'>sie</span>, <span lang='de'>es</span>, <span lang='de'>sie</span>. Half of this table is already free.</div>
+<div class="warn"><b>Do not mix up <span lang='de'>sie</span> and <span lang='de'>Sie</span>.</b> Lower-case <span lang='de'>sie</span> = <i>she</i> or <i>they</i>; capital <span lang='de'>Sie</span> = <i>you</i> (polite). All three are unchanged in the Akkusativ, so context and the capital letter are your only clues — which is fine, because in speech the verb ending usually settles it.</div>
+<h2><span class="step">Practice</span>Replace the noun with a pronoun</h2>
+<div id="trainer-ersetzen"></div>
+<h2><span class="step">Practice</span>Which pronoun?</h2>
+<div id="trainer-welches"></div>
+<h2><span class="step">Anki</span>Akkusativ pronouns</h2>
+<div id="anki-mount"></div>
+
+<div id="checkoff-mount"></div>
+
+<div class="anki-export-mount"></div>
+
+<div class="topnav" style="margin-top:40px">
+  <a href="index.html">☰ Hub</a>
+  <a href="72_wechsel.html">← wo? or wohin?</a>
+  <span class="spacer"></span>
+  <a href="74_dat_pronomen.html">Next: mir, dir, ihm →</a>
+</div>
+</div>
+
+<script src="config.js"></script>
+<script src="sync.js"></script>
+<script src="_engine.js"></script>
+<script>
+window.PAGE = {
+  slug:"akkpron",
+  ankiDeck:"DE · Akkusativ-Pronomen",
+  anki:[
+    {"f":"ich → mich (rule)","b":"me (Akkusativ)","ex":"Er sieht mich."},
+    {"f":"du → dich (rule)","b":"you (Akkusativ)","ex":"Ich sehe dich."},
+    {"f":"er → ihn (rule)","b":"him (Akkusativ) — the visible masculine change","ex":"Ich sehe ihn."},
+    {"f":"sie → sie (rule)","b":"her / them — no change","ex":"Ich sehe sie."},
+    {"f":"es → es (rule)","b":"it — no change","ex":"Ich sehe es."},
+    {"f":"wir → uns (rule)","b":"us (Akkusativ)","ex":"Er sieht uns."},
+    {"f":"ihr → euch (rule)","b":"you (plural, Akkusativ)","ex":"Ich sehe euch."},
+    {"f":"Ich sehe ihn.","b":"I see him.","ex":"der Mann → ihn"},
+    {"f":"Ich sehe sie.","b":"I see her. / I see them.","ex":"die Frau → sie"},
+    {"f":"Ich sehe es.","b":"I see it.","ex":"das Kind → es"},
+    {"f":"Liebst du mich?","b":"Do you love me?","ex":"lieben + Akkusativ"}
+  ],
+  trainers:[
+    {id:"ersetzen", title:"Swap the noun for a pronoun", kind:"Akkusativ-Pronomen", repeat:2, items:[
+      {"type":"mc","q":"<b lang='de'>Ich sehe den Mann.</b> → <b lang='de'>Ich sehe ___.</b>","opts":["ihn","er","ihm"],"answer":"ihn","why":"der Mann → den Mann → ihn."},
+      {"type":"mc","q":"<b lang='de'>Ich sehe die Frau.</b> → <b lang='de'>Ich sehe ___.</b>","opts":["sie","ihr","ihn"],"answer":"sie","why":"Feminine does not change."},
+      {"type":"mc","q":"<b lang='de'>Ich sehe das Kind.</b> → <b lang='de'>Ich sehe ___.</b>","opts":["es","ihn","ihm"],"answer":"es","why":"Neuter does not change."},
+      {"type":"mc","q":"<b lang='de'>Ich sehe die Kinder.</b> → <b lang='de'>Ich sehe ___.</b>","opts":["sie","es","ihnen"],"answer":"sie","why":"Plural → sie."},
+      {"type":"mc","q":"<b lang='de'>Er sieht ___.</b> (me)","opts":["mich","ich","mir"],"answer":"mich","why":"ich → mich."},
+      {"type":"mc","q":"<b lang='de'>Ich sehe ___.</b> (you, informal)","opts":["dich","du","dir"],"answer":"dich","why":"du → dich."},
+      {"type":"mc","q":"<b lang='de'>Sie sieht ___.</b> (us)","opts":["uns","wir"],"answer":"uns","why":"wir → uns."}
+    ]},
+    {id:"welches", title:"Which form?", kind:"Nominativ or Akkusativ pronoun", repeat:2, items:[
+      {"type":"mc","q":"<b lang='de'>___ sehe den Hund.</b> (I)","opts":["Ich","Mich"],"answer":"Ich","why":"Subject → Nominativ ich."},
+      {"type":"mc","q":"<b lang='de'>Der Hund sieht ___.</b> (me)","opts":["mich","ich"],"answer":"mich","why":"Object → Akkusativ mich."},
+      {"type":"mc","q":"<b lang='de'>___ ist mein Bruder.</b> (he)","opts":["Er","Ihn"],"answer":"Er","why":"sein = '=' → Nominativ er."},
+      {"type":"mc","q":"<b lang='de'>Ich kenne ___.</b> (him)","opts":["ihn","er"],"answer":"ihn","why":"Object → ihn."},
+      {"type":"mc","q":"Which pronoun visibly changes in the Akkusativ?","opts":["er → ihn","sie → sie"],"answer":"er → ihn","why":"Same pattern as der → den: the masculine is where it shows."},
+      {"type":"type","q":"Type: <b>I see him.</b>","answer":["ich sehe ihn"],"why":"Ich sehe ihn."},
+      {"type":"type","q":"Type: <b>Do you love me?</b> (du)","answer":["liebst du mich","liebst du mich?"],"why":"Liebst du mich?"}
+    ]}
+  ],
+  checkoff:{ title:"Akkusativ-Pronomen check", pass:0.8, intro:"Six questions. Pass to mark ✓ on the hub.", items:[
+    {"type":"mc","q":"<b lang='de'>ich</b> → Akkusativ","opts":["mich","mir"],"answer":"mich","why":"mich = me (direct object)."},
+    {"type":"mc","q":"<b lang='de'>er</b> → Akkusativ","opts":["ihn","ihm"],"answer":"ihn","why":"ihn = him."},
+    {"type":"mc","q":"<b lang='de'>Ich sehe die Frau</b> → <b lang='de'>Ich sehe ___.</b>","opts":["sie","ihr"],"answer":"sie","why":"Feminine unchanged."},
+    {"type":"mc","q":"<b lang='de'>Der Hund sieht ___.</b> (me)","opts":["mich","ich"],"answer":"mich","why":"Object form."},
+    {"type":"mc","q":"<b lang='de'>wir</b> → Akkusativ","opts":["uns","euch"],"answer":"uns","why":"uns = us."},
+    {"type":"type","q":"Type: <b>I see him.</b>","answer":["ich sehe ihn"],"why":"Ich sehe ihn."}
+  ]}
+};
+Engine.init();
+</script>
+</body>
+</html>
