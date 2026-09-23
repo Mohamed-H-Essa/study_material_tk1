@@ -1,12 +1,14 @@
 # German Study — project guide (read this first)
 
 A personal comprehensible-input German study app for two users (Mohamed, Mustafa). Static
-HTML/JS lessons, deployed to AWS S3, with cross-device progress sync via one Lambda. Personal
+HTML/JS lessons on GitHub Pages, with cross-device progress sync via one Cloudflare Worker. Personal
 project, **not enterprise** — keep it minimal, resilient, and cheap. Linguistic correctness and
 backwards-compatibility matter more than design polish.
 
 Full rationale: `docs/2026-07-13-deployment-and-sync-design.md` (architecture) and
 `docs/superpowers/specs/2026-07-18-reliable-sync-design.md` (the current sync-merge model).
+Teaching format & the case-system curriculum: `docs/superpowers/specs/2026-09-23-sentence-lessons-and-stufe7-design.md`
+(why words are taught inside video sentences, the 🔊 voice + Hide-English toggle, the Stufe 7 order).
 Content pipeline & teaching stance also live in Claude's long-term memory (project: german-ci-*).
 
 ## Layout
@@ -342,6 +344,21 @@ one with `pip install youtube-transcript-api` then
 `YouTubeTranscriptApi().fetch(<id>, languages=['de'])` (or `yt-dlp --write-auto-subs`). YouTube
 rate-limits (HTTP 429 / IpBlocked) after ~30 quick fetches; wait ~15-60 min and retry.
 Covered by `tools/test_sentences.js`.
+
+## Stufe 7 — the case system: order and the prerequisite rule (2026-09)
+
+Lessons 60–76 teach the cases in this order, each form right after its case:
+60 roles · 61 order vs endings · 62 Nominativ pronouns · 63 mein/dein/sein · 64 Akkusativ (der→den) ·
+65 einen/meinen · 66 mich/dich/ihn · 67 durch/für/gegen/ohne/um · 68 first-noun trap + reading drills ·
+69 Dativ articles + plural -n · 70 mir/dir/ihm · 71 Dativ prepositions + einem/meiner · 72 Dativ verbs ·
+73 both objects (pronoun order) · 74 Wechselpräpositionen · 75 Genitiv · 76 all four.
+
+**The rule: a lesson may only test what has been taught at or before it.** When editing any Stufe 7
+lesson, check every quiz answer, cloze and checkoff item against this list. Chunks the learner has
+heard for months (*Wie geht es dir?*, *mit dem Bus*) may appear as phrases, but nothing may *test*
+the later form. Every grammar lesson opens with a 🔁 revision warm-up drilling the 1–3 lessons just
+before it. If you reorder, re-check the warm-ups and every "lesson NN" cross-reference in the text.
+Rationale and the full change log: the 2026-09-23 design doc.
 
 ## Adding or reordering a lesson (progress-safe procedure)
 
