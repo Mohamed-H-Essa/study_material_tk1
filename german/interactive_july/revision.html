@@ -55,6 +55,10 @@
 <p class="lead">Modals, weil/dass, the passive, comparatives, cases in motion — everything the stories and culture videos threw at you.</p>
 <div id="trainer-s56"></div>
 
+<h2><span class="step">Stufe 7 · Review</span>The four cases</h2>
+<p class="lead">Roles, then Nominativ → Akkusativ → Dativ → Genitiv, in the order the lessons teach them. Every answer is decided by an ending — read it, don't guess from the order.</p>
+<div id="trainer-s7"></div>
+
 <div class="topnav" style="margin-top:40px">
   <a href="index.html">☰ Hub</a>
   <span class="spacer"></span>
@@ -206,11 +210,32 @@ const S56 = {id:"s56", title:"Stufe 5-6 — stories, culture & harder grammar", 
   {type:"type", q:"plural: <b>the accidents</b> →", answer:["die Unfälle","die Unfaelle"], why:"die Unfälle."}
 ]};
 
+const S7 = {id:"s7", title:"Stufe 7 — the four cases", kind:"Cumulative review", repeat:2, items:[
+  {type:"mc", q:"<b lang='de'>Den Hund sieht der Mann.</b> Who does the seeing?", opts:["der Mann","der Hund"], answer:"der Mann", why:"den = object; der = subject. The ending decides, not the order."},
+  {type:"mc", q:"'my family' = <b lang='de'>___ Familie</b>", opts:["meine","mein"], answer:"meine", why:"die Familie → meine (lesson 63)."},
+  {type:"mc", q:"'Anna and her brother' = <b lang='de'>Anna und ___ Bruder</b>", opts:["ihr","sein"], answer:"ihr", why:"The OWNER (Anna) picks ihr; the noun picks the ending."},
+  {type:"mc", q:"<b lang='de'>Ich sehe ___ Tisch.</b>", opts:["den","der","dem"], answer:"den", why:"Akkusativ: der → den (lesson 64)."},
+  {type:"mc", q:"<b lang='de'>Ich habe ___ Hund.</b> (no dog)", opts:["keinen","kein","nicht einen"], answer:"keinen", why:"kein → keinen, masculine Akkusativ (lesson 65)."},
+  {type:"mc", q:"<b lang='de'>Der Film? Ich kenne ___ nicht.</b>", opts:["ihn","er","ihm"], answer:"ihn", why:"er → ihn in the Akkusativ (lesson 66)."},
+  {type:"mc", q:"<b lang='de'>Das Geschenk ist für ___ Vater.</b>", opts:["meinen","meinem","mein"], answer:"meinen", why:"für always takes the Akkusativ (lesson 67)."},
+  {type:"mc", q:"<b lang='de'>Ich gebe ___ Kind einen Apfel.</b>", opts:["dem","das","den"], answer:"dem", why:"The receiver is Dativ: das → dem (lesson 69)."},
+  {type:"mc", q:"<b lang='de'>Wir helfen den ___.</b>", opts:["Kindern","Kinder"], answer:"Kindern", why:"Dativ plural adds -n (lesson 69)."},
+  {type:"mc", q:"'Can you help me?' = <b lang='de'>Kannst du ___ helfen?</b>", opts:["mir","mich"], answer:"mir", why:"helfen takes the Dativ → mir (lessons 70, 72)."},
+  {type:"mc", q:"<b lang='de'>Ich fahre mit ___ Bus.</b>", opts:["dem","den"], answer:"dem", why:"mit always takes the Dativ (lesson 71)."},
+  {type:"mc", q:"<b lang='de'>Der Pullover gefällt ___.</b> (I like the jumper)", opts:["mir","ich","mich"], answer:"mir", why:"gefallen: the thing is the subject, the person is Dativ (lesson 72)."},
+  {type:"mc", q:"'I give it to him' =", opts:["Ich gebe es ihm.","Ich gebe ihm es."], answer:"Ich gebe es ihm.", why:"Two pronouns → Akkusativ first (lesson 73)."},
+  {type:"mc", q:"<b lang='de'>Ich lege das Buch auf ___ Tisch.</b>", opts:["den","dem"], answer:"den", why:"legen = moving it to a new place → Akkusativ (lesson 74)."},
+  {type:"mc", q:"<b lang='de'>Das Buch liegt auf ___ Tisch.</b>", opts:["dem","den"], answer:"dem", why:"liegen = location, no change of place → Dativ (lesson 74)."},
+  {type:"mc", q:"'the father's car' =", opts:["das Auto des Vaters","das Auto der Vater","das Auto dem Vater"], answer:"das Auto des Vaters", why:"Genitiv: des + -s (lesson 75)."},
+  {type:"type", q:"Spoken alternative: <b lang='de'>das Auto des Vaters</b> → das Auto ___ Vater", answer:["vom","von dem"], why:"von + Dativ: vom Vater."}
+]};
+
 Engine.mountTrainer(document.getElementById('trainer-s2'), S2);
 Engine.mountTrainer(document.getElementById('trainer-s2b'), S2B);
 Engine.mountTrainer(document.getElementById('trainer-pos'), POS);
 Engine.mountTrainer(document.getElementById('trainer-s3'), S3);
 Engine.mountTrainer(document.getElementById('trainer-s56'), S56);
+Engine.mountTrainer(document.getElementById('trainer-s7'), S7);
 </script>
 </body>
 </html>
