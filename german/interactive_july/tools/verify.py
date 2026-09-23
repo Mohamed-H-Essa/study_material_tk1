@@ -149,6 +149,26 @@ for f, v in BY_FILE.items():
             continue
         err(f, "noun without plural in vocab table: %r" % word)
 
+# --- 7b. plural rule in sentence blocks + sentence cards ----------------------
+# Reworked lessons teach words inside video sentences. The same rule applies there:
+# a noun gloss chip (<p class="gl"><span>der See · die Seen = lake</span>) and a
+# sentence card's `w` field must carry the plural or an explicit kein/nur Plural.
+NOUN = re.compile(r'^(der|die|das) [A-ZÄÖÜ]')
+for f, v in BY_FILE.items():
+    if not os.path.exists(f):
+        continue
+    s = open(f, encoding="utf-8").read()
+    for gl in re.findall(r'<p class="gl" lang="de">(.*?)</p>', s, re.S):
+        for chip in re.findall(r'<span>(.*?)</span>', gl):
+            word = chip.split(" = ")[0].strip()
+            if NOUN.match(word) and not ("·" in word or "kein Plural" in word or "nur Plural" in word):
+                err(f, "noun without plural in sentence gloss: %r" % chip)
+    for w in re.findall(r'"w":\s*"([^"]*)"', s):
+        if NOUN.match(w) and not ("→" in w or "kein Plural" in w or "nur Plural" in w):
+            err(f, "sentence card word without plural: %r" % w)
+    if s.count('class="sents"') and '"w":' not in s:
+        err(f, "has sentence blocks but no sentence cards (w field)")
+
 # --- 8. export mounts + decks.js in step with the lessons ------------------
 for f, v in BY_FILE.items():
     if not os.path.exists(f):

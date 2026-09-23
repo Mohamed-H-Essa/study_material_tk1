@@ -13,7 +13,14 @@ const Engine = (() => {
   const norm = s => String(s).toLowerCase().trim().replace(/\s+/g,' ').replace(/[.!?]$/,'');
   const strip = s => String(s).replace(/<[^>]+>/g,'');
 
-  /* ---------- ANKI ---------- */
+  /* ---------- ANKI ----------
+     A card is {f, b, ex?, hint?}. SENTENCE cards (the format for reworked lessons) add:
+       w  — the word the sentence teaches, in the canonical front format
+            ("der See → die Seen", "gewinnen ⇄ verlieren", "Das stimmt nicht.")
+       wm — that word's English meaning
+     f is then a sentence from the video with the word in <b>, and b its translation. The
+     hub's vocabulary stats read `w` instead of `f`, so a sentence never counts as a word. */
+  const gloss = c => c.w ? '<b>' + c.w + '</b>' + (c.wm ? ' = ' + c.wm : '') : '';
   function anki(mount, deckName, cards){
     const box = el('div','anki');
     let idx = 0, showing = false;
@@ -36,9 +43,10 @@ const Engine = (() => {
       } else {
         const card = seq[idx % seq.length];
         const cel = el('div','anki-card');
-        cel.innerHTML = `<div class="anki-front" lang="de">${card.f}</div>`+
+        // A sentence card (one with a `w` word field) gets a smaller front so a whole line fits.
+        cel.innerHTML = `<div class="anki-front${card.w?' sentence':''}" lang="de">${card.f}</div>`+
           (card.hint?`<div class="anki-hint">${card.hint}</div>`:'')+
-          (showing?`<div class="anki-back"><span lang="de">${card.b}</span>${card.ex?`<div class="ex" lang="de">${card.ex}</div>`:''}</div>`:`<div class="anki-hint">tap to flip</div>`);
+          (showing?`<div class="anki-back"><span lang="de">${card.b}</span>${gloss(card)?`<div class="gloss" lang="de">${gloss(card)}</div>`:''}${card.ex?`<div class="ex" lang="de">${card.ex}</div>`:''}</div>`:`<div class="anki-hint">tap to flip</div>`);
         cel.onclick = ()=>{ showing=!showing; render(); };
         box.appendChild(cel);
         if(showing){
@@ -178,7 +186,7 @@ const Engine = (() => {
 
   // A field must never contain a tab or newline or it would break the column layout.
   const field = s => String(s == null ? '' : s).replace(/[\t\r\n]+/g, ' ').trim();
-  const back = c => c.b + (c.ex ? '<br><i>' + c.ex + '</i>' : '');
+  const back = c => c.b + (c.w ? '<br>' + gloss(c) : '') + (c.ex ? '<br><i>' + c.ex + '</i>' : '');
   // Anki reads "::" as deck nesting ("Deutsch::16 · Body" = subdeck "16 · Body" of "Deutsch").
   // We DO want that, so split on it, clean each segment, and rejoin — a stray "::" inside a
   // lesson title becomes an em dash instead of silently creating an extra nesting level.
@@ -411,8 +419,65 @@ const Engine = (() => {
     });
   }
 
+  /* ---------- SENTENCE BLOCKS ----------
+     Reworked lessons teach words inside sentences from the video:
+       <div class="sents">
+         <div class="sent"><p class="de" lang="de">… <b>Wort</b> …</p><p class="en">…</p>
+           <p class="gl" lang="de"><span>das Wort · die Wörter = word</span></p></div>
+       </div>
+     The markup is plain HTML and reads fine without JS. The engine only adds a 🔊 button per
+     sentence (browser speech, German voice) and a "hide English" toggle so you can test
+     whether you understood a line before looking. The toggle is a per-device UI preference,
+     deliberately stored OUTSIDE the de.* namespace so it never syncs and logout keeps it. */
+  const UI_HIDE_EN = 'ui.hideEnglish';
+  function speak(text){
+    try{
+      const ss = window.speechSynthesis; if(!ss) return;
+      ss.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'de-DE'; u.rate = 0.9;
+      const v = (ss.getVoices()||[]).find(v=>/^de(-|_|$)/i.test(v.lang));
+      if(v) u.voice = v;
+      ss.speak(u);
+    }catch(e){}
+  }
+  function sentences(){
+    const blocks = document.querySelectorAll('.sents');
+    if(!blocks.length) return;
+    let hide = false;
+    try{ hide = localStorage.getItem(UI_HIDE_EN) === '1'; }catch(e){}
+    const apply = () => blocks.forEach(b=>{
+      b.classList.toggle('hide-en', hide);
+      const t = b.querySelector('.sents-toggle');
+      if(t) t.textContent = hide ? '👁 Show English' : '🙈 Hide English';
+    });
+    blocks.forEach(b=>{
+      if(b.querySelector('.sents-bar')) return;          // render() can run more than once
+      const bar = el('div','sents-bar');
+      const t = el('button','sents-toggle');
+      t.type = 'button';
+      t.onclick = ()=>{ hide = !hide; try{ localStorage.setItem(UI_HIDE_EN, hide?'1':'0'); }catch(e){} apply(); };
+      bar.appendChild(t);
+      bar.appendChild(el('span','sents-note','Read the German first. Tap a hidden line to peek.'));
+      b.insertBefore(bar, b.firstChild);
+      b.querySelectorAll('.sent').forEach(s=>{
+        const de = s.querySelector('.de'); if(!de) return;
+        if(window.speechSynthesis){
+          const btn = el('button','say','🔊');
+          btn.type = 'button'; btn.title = 'Hear it';
+          btn.onclick = e=>{ e.stopPropagation(); speak(de.textContent.replace(btn.textContent,'').trim()); };
+          de.insertBefore(btn, de.firstChild);
+        }
+        const en = s.querySelector('.en');
+        if(en) en.onclick = ()=>en.classList.toggle('peek');
+      });
+    });
+    apply();
+  }
+
   function render(){
     const P = window.PAGE; SLUG = P.slug;
+    sentences();
     exportButtons(P);
     if(P.anki && P.anki.length){ const m=$('#anki-mount'); if(m) anki(m, P.ankiDeck||'Deck', P.anki); }
     if(P.trainers){ P.trainers.forEach(t=>{ const m = document.getElementById('trainer-'+t.id); if(m) trainer(m,t); }); }

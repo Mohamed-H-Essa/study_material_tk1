@@ -31,6 +31,8 @@
 <h2><span class="step">Why this lesson exists</span>Making the ending necessary</h2>
 <div class="tip">When you hear <span lang='de'>ich sehe den Hund</span>, you do not need <span lang='de'>den</span> — the meaning is obvious without it. So your brain skips it. Perfectly sensible, and it is why the endings never stuck.<br><br>Below, both answers are always <b>equally possible</b>. A dog can see a cat; a cat can see a dog. The article is the <b>only</b> information that decides it. Read it, or you cannot answer.</div>
 <div class="warn"><b>Expect these to feel slow and slightly annoying.</b> You will want to answer from the word order and you will have to stop yourself. That resistance is the habit being rewritten. Go slowly — accuracy matters far more than speed here.</div>
+<h2><span class="step">Training</span>Fill the gap — lines from the video</h2>
+<div id="trainer-luecken"></div>
 <h2><span class="step">Training · long</span>Who is doing it?</h2>
 <div id="trainer-wer1"></div>
 <h2><span class="step">Training · long</span>More — mixed order</h2>
@@ -65,15 +67,37 @@ window.PAGE = {
     {"f":"Die Katze jagt den Hund.","b":"The cat chases the dog.","ex":"die Katze = doer"},
     {"f":"Den Hund jagt die Katze.","b":"The cat chases the dog.","ex":"still the cat doing it — den marks the dog as the object"},
     {"f":"how to answer 'who is doing it?' (rule)","b":"find the article: der = doer, den = the one it is done to","ex":"never use position — use the ending"},
-    {"f":"der Schüler → die Schüler","b":"the pupil · the student","ex":"Den Lehrer fragt der Schüler."},
-    {"f":"der Lehrer → die Lehrer","b":"the teacher","ex":"Der Lehrer fragt den Schüler."},
-    {"f":"der Bruder → die Brüder","b":"the brother","ex":"Den Bruder ruft die Schwester."},
-    {"f":"die Schwester → die Schwestern","b":"the sister","ex":"Die Schwester ruft den Bruder."},
-    {"f":"jagen","b":"to chase · to hunt","ex":"Die Katze jagt den Hund."},
-    {"f":"rufen","b":"to call","ex":"Sie ruft den Bruder."},
-    {"f":"besuchen","b":"to visit","ex":"Den Vater besucht der Sohn."}
+    {"f":"Den Lehrer fragt <b>der Schüler</b>.","b":"The pupil asks the teacher.","w":"der Schüler → die Schüler","wm":"pupil, student"},
+    {"f":"<b>Der Lehrer</b> fragt den Schüler.","b":"The teacher asks the pupil.","w":"der Lehrer → die Lehrer","wm":"teacher"},
+    {"f":"<b>Den Bruder</b> ruft die Schwester.","b":"The sister calls the brother.","w":"der Bruder → die Brüder","wm":"brother"},
+    {"f":"<b>Die Schwester</b> ruft den Bruder.","b":"The sister calls the brother.","w":"die Schwester → die Schwestern","wm":"sister"},
+    {"f":"Der Hund <b>jagt</b> die Katze.","b":"The dog chases the cat.","w":"jagen","wm":"to chase, to hunt"},
+    {"f":"Der Mann <b>ruft</b> die Frau.","b":"The man calls the woman.","w":"rufen","wm":"to call"},
+    {"f":"Den Sohn <b>besucht</b> der Vater.","b":"The father visits the son.","w":"besuchen","wm":"to visit"},
+    {"f":"mein Haus · meine Familie (rule)","b":"Nominativ: masculine/neuter → mein, dein, sein … · feminine/plural → meine, deine, seine …","ex":"mein Arzt · mein Haus · meine Familie · meine Stühle"},
+    {"f":"<b>Meine Stühle</b> sind im Wohnzimmer.","b":"My chairs are in the living room.","w":"der Stuhl → die Stühle","wm":"chair"},
+    {"f":"<b>Mein Arzt</b> ist nett.","b":"My doctor is nice.","w":"der Arzt → die Ärzte","wm":"doctor"},
+    {"f":"<b>Seine Familie</b> ist groß.","b":"His family is big.","w":"die Familie → die Familien","wm":"family"},
+    {"f":"Unser Haus hat zwei <b>Badezimmer</b>.","b":"Our house has two bathrooms.","w":"das Badezimmer → die Badezimmer","wm":"bathroom"},
+    {"f":"<b>Euer Haus</b> ist in der Stadt.","b":"Your (pl.) house is in the city.","w":"das Haus → die Häuser","wm":"house"},
+    {"f":"Eure Stühle sind auf der <b>Terrasse</b>.","b":"Your (pl.) chairs are on the terrace.","w":"die Terrasse → die Terrassen","wm":"terrace, patio"},
+    {"f":"Ihre Familie <b>wohnt</b> in Bayern.","b":"Her family lives in Bavaria.","w":"wohnen","wm":"to live (reside)"},
+    {"f":"Dein Arzt <b>redet</b> viel.","b":"Your doctor talks a lot.","w":"reden","wm":"to talk"}
   ],
   trainers:[
+    {
+      id:"luecken", title:"Lines from the video", kind:"Fill the gap", repeat:2, items:[
+        {"type": "mc", "q": "<span lang='de'>___ Stühle sind im Wohnzimmer.</span> (my)", "opts": ["Meine", "Mein", "Meinen"], "answer": "Meine", "why": "die Stühle = plural → meine."},
+        {"type": "mc", "q": "<span lang='de'>___ Arzt ist nett.</span> (my)", "opts": ["Mein", "Meine", "Meinen"], "answer": "Mein", "why": "der Arzt, subject (Nominativ) → mein."},
+        {"type": "mc", "q": "<span lang='de'>___ Familie ist groß.</span> (his)", "opts": ["Seine", "Sein", "Seinen"], "answer": "Seine", "why": "die Familie = feminine → seine."},
+        {"type": "mc", "q": "<span lang='de'>Unser Haus hat zwei ___.</span>", "opts": ["Badezimmer", "Terrasse", "Familie"], "answer": "Badezimmer", "why": "zwei Badezimmer = two bathrooms (plural = singular)."},
+        {"type": "mc", "q": "<span lang='de'>___ Haus ist in der Stadt.</span> (your, several friends)", "opts": ["Euer", "Eure", "Euren"], "answer": "Euer", "why": "das Haus = neuter → euer."},
+        {"type": "mc", "q": "<span lang='de'>___ Stühle sind auf der Terrasse.</span> (your, several friends)", "opts": ["Eure", "Euer", "Euren"], "answer": "Eure", "why": "plural → eure (the e of euer drops: eure)."},
+        {"type": "mc", "q": "<span lang='de'>Ihre Familie ___ in Bayern.</span>", "opts": ["wohnt", "wohnen", "wohne"], "answer": "wohnt", "why": "die Familie = sie (singular) → wohnt."},
+        {"type": "mc", "q": "<span lang='de'>Seine Familie wohnt ___ Hamburg.</span>", "opts": ["in", "nach", "zu"], "answer": "in", "why": "wohnen in + city."},
+        {"type": "mc", "q": "<span lang='de'>Dein Arzt ___ viel.</span>", "opts": ["redet", "reden", "redest"], "answer": "redet", "why": "dein Arzt = er → redet."},
+        {"type": "mc", "q": "<span lang='de'>Ihre Stühle ___ schwarz.</span>", "opts": ["sind", "ist", "bist"], "answer": "sind", "why": "die Stühle = plural → sind."}
+      ]},
     {id:"wer1", title:"Who is doing it?", kind:"Structured input · read the article", repeat:2, items:[
       {"type":"mc","q":"<b lang='de'>Den Hund sieht die Katze.</b> — who sees?","opts":["die Katze","der Hund"],"answer":"die Katze","why":"den Hund = object. The cat is doing the seeing."},
       {"type":"mc","q":"<b lang='de'>Der Hund sieht die Katze.</b> — who sees?","opts":["der Hund","die Katze"],"answer":"der Hund","why":"der Hund = subject here."},

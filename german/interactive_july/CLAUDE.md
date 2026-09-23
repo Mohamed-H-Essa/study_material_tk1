@@ -33,6 +33,7 @@ index.html                 The hub. Redirects to login.html if not signed in. Re
 admin.html                 Admin panel (mohamed only). Per-user visibility + done overrides.
 NN_slug.html               One lesson per file, numbered by display order.
 revision.html              Cumulative revision quizzes + "Export ALL cards".
+transcripts/               YouTube captions per lesson (<slug>.txt). Source for sentence blocks. Not published.
 docs/                      Design docs (the 2026-07-13 one is partly superseded — see its banner).
 worker/src/index.mjs       THE SYNC BACKEND (live). Cloudflare Worker + a SQLite Durable Object:
                            login/pull/push + adminGet/adminSet. Server-assigned sequence numbers
@@ -295,6 +296,9 @@ video says the plural** — if the video omits it, supply the correct standard p
   The `.art` cell still holds the singular article (`der`/`die`/`das`). The `· die …` shows the
   plural *with its always-`die` article* so learners see the article flip.
 - **Anki front**: `der Schrank → die Schränke` (singular w/ article → plural w/ article).
+- **Sentence blocks / sentence cards** (the current lesson format, see below): the gloss chip
+  reads `der Schrank · die Schränke = cupboard`, and a sentence card's `w` field uses the Anki-front
+  form `der Schrank → die Schränke`. `verify.py` enforces both.
 - **Uncountable / singular-only** nouns (e.g. *das Besteck*, *das Salz*, *die Milch*, mass nouns,
   most abstract nouns): write `(kein Plural)` in the table and Anki, don't invent one.
 - **Plural-only** nouns (e.g. *die Eltern*, *die Ferien*): mark `(nur Plural)`.
@@ -305,6 +309,39 @@ and Anki fronts. It never touches a `slug`, a trainer `answer`, `id`, `checkoff`
 `de.<slug>.*` storage key, so already-done lessons keep syncing and stay marked ✓ done. When
 retrofitting, do not change trainer/checkoff `answer` strings (they gate the ✓) — only the
 vocab-table and Anki *display* text.
+
+## Lesson format: words inside sentences from the video (2026-09)
+
+Comprehensible input: a word sticks when it is met inside a line the learner has just heard and
+understood, not as a table row. So lessons teach vocabulary as **sentences taken from the video's
+own transcript**, in video order. `44_tennis_match.html` is the reference implementation — copy it.
+
+- **Sentence blocks** replace the vocab tables:
+  `<div class="sents"><div class="sent"><p class="de" lang="de">… <b>Wort</b> …</p><p class="en">…</p><p class="gl" lang="de"><span>das Wort · die Wörter = word</span></p></div></div>`.
+  Plain HTML (works without JS). The engine's `sentences()` adds a 🔊 per line (browser speech,
+  `de-DE`) and a *Hide English* toggle (blurs `.en`; tap a line to peek). The toggle is a
+  per-device preference stored as `ui.hideEnglish` — deliberately **outside** `de.*`, so it
+  never syncs and logout keeps it.
+- The old tables stay, folded, in `<details class="wordlist">` — quick reference, and they keep
+  `verify.py`'s table plural check meaningful.
+- **Sentence cards:** `{f:"<video line, word in <b>>", b:"<English>", w:"der See → die Seen", wm:"lake"}`.
+  `w`/`wm` are what the hub's stats count (`stats.js` reads `card.w || card.f`), what the card back
+  and the Anki export show as the gloss, and they keep the plural rule on the card. `f` must be unique
+  per deck (ease is keyed by front). Grammar-rule cards may keep the old `{f,b}` shape.
+- **Cloze trainer** `luecken` ("Fill the gap — lines from the video") drills the same lines.
+- Lines are cleaned from auto-captions (punctuation, stutters, obvious mis-hearings) but never
+  invent content; a word the video never says gets a short context sentence tagged
+  `<span class="rainbow">bonus</span>`.
+- **Changing a lesson's cards resets that lesson's Anki ease** (keyed by front). That is why the
+  2026-09 rework touched only lessons Mohamed had not finished (44–58, 60–76; 1–43 and 59 were
+  ✓ done and left alone). Never rework a done lesson's deck without asking.
+
+**Transcripts** live in `transcripts/<slug>.txt` (timestamped YouTube captions; header says
+manual/auto and language). They are NOT published — `pages.yml` strips `transcripts/`. Fetch a new
+one with `pip install youtube-transcript-api` then
+`YouTubeTranscriptApi().fetch(<id>, languages=['de'])` (or `yt-dlp --write-auto-subs`). YouTube
+rate-limits (HTTP 429 / IpBlocked) after ~30 quick fetches; wait ~15-60 min and retry.
+Covered by `tools/test_sentences.js`.
 
 ## Adding or reordering a lesson (progress-safe procedure)
 
@@ -317,8 +354,9 @@ vocab-table and Anki *display* text.
    `<title>`/`<h1>`; fix the prev/next seams on the two neighbours.
 4. **Build the file** from the template of a recent lesson: topnav, video thumb
    (`img.youtube.com/vi/<ID>/hqdefault.jpg`), a `🔁 Revision` block drilling earlier lessons,
-   vocab tables (correct der/die/das **+ plural — see the plural rule below**), tips, per-file
-   Anki deck (~15-25 cards w/ examples & ⇄ opposites), 2-3 repeating trainers, checkoff
+   **sentence blocks from the transcript** (save it to `transcripts/<slug>.txt`; correct
+   der/die/das **+ plural** — see the format section above), tips, per-file Anki deck of
+   ~15-25 **sentence cards**, a `luecken` cloze trainer + 1-2 more repeating trainers, checkoff
    (pass 0.8). **Include the two sync lines** before `_engine.js`:
    `<script src="config.js"></script><script src="sync.js"></script>`
 5. **Update** `index.html` VIDEOS (stage/n/file/id/slug/title/de/tag), renumber shifted `n:`,

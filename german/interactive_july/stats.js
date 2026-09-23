@@ -85,8 +85,8 @@ window.Stats = (function () {
     var words = p.split(/\s+/);
     var first = words[0].toLowerCase();
 
-    // ---- noun: starts with an article ----
-    if (ARTICLES[first] && words.length >= 2) {
+    // ---- noun: an article + a Capitalised word ("die meisten Leute" is a phrase, not a noun) ----
+    if (ARTICLES[first] && words.length >= 2 && /^[A-ZÄÖÜ]/.test(words[1])) {
       var noun = words.slice(1).join(' ');
       return {
         key: noun.toLowerCase(),
@@ -129,8 +129,10 @@ window.Stats = (function () {
       if (!d || !d.cards) continue;
       for (var c = 0; c < d.cards.length; c++) {
         var card = d.cards[c];
-        if (isNotVocab(card.f, card.b)) continue;
-        var ps = pieces(card.f);
+        // A sentence card names its word in `w` (meaning in `wm`); count that, never the sentence.
+        var front = card.w || card.f, meaning = card.w ? card.wm : card.b;
+        if (isNotVocab(front, meaning)) continue;
+        var ps = pieces(front);
         for (var p = 0; p < ps.length; p++) {
           var item = classify(ps[p]);
           if (!item || !item.key) continue;

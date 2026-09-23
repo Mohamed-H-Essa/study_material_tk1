@@ -52,7 +52,7 @@ jobs:
           mkdir -p "$out"
           cp -R "$srcdir"/. "$out"/
           # Strip everything that is not part of the public site.
-          rm -rf "$out/infra" "$out/tools" "$out/docs" "$out/backup" "$out/worker"
+          rm -rf "$out/infra" "$out/tools" "$out/docs" "$out/backup" "$out/worker" "$out/transcripts"
           find "$out" -maxdepth 1 -name '*.md' -delete
           rm -f "$out/.gitignore" "$out/.DS_Store"
           echo "--- publishing:"
@@ -62,7 +62,7 @@ jobs:
         run: |
           set -euo pipefail
           # Fail loudly rather than quietly shipping secrets or unrelated material.
-          for forbidden in infra tools docs backup worker saa_c03_material; do
+          for forbidden in infra tools docs backup worker transcripts saa_c03_material; do
             if [ -e "_site/$forbidden" ]; then
               echo "REFUSING TO DEPLOY: _site/$forbidden should not be published." >&2
               exit 1

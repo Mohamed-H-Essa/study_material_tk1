@@ -51,6 +51,9 @@ p{margin-bottom:12px}
 .anki-front{font-size:24px;color:#fff}
 .anki-hint{font-size:13px;color:#5a6070;margin-top:10px}
 .anki-back{font-size:19px;color:#7ec8e3;margin-top:14px;border-top:1px solid #2a2f3e;padding-top:14px;width:100%}
+.anki-front.sentence{font-size:20px;line-height:1.45}
+.anki-front b,.anki-back b{color:#fcd34d;font-weight:600}
+.anki-back .gloss{font-size:15px;color:#dfe3ea;margin-top:8px}
 .anki-back .ex{font-size:14px;color:#8b93a7;margin-top:8px}
 .anki-rate{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:14px}
 .anki-rate button{padding:10px;border-radius:8px;border:1px solid #2a2f3e;background:#0e1017;color:#dfe3ea;cursor:pointer;font-size:14px}
@@ -148,3 +151,23 @@ p{margin-bottom:12px}
 
 .hidden{display:none}
 kbd{background:#262a38;padding:1px 6px;border-radius:4px;color:#aeb4c2;font-size:12px;font-family:ui-monospace,monospace}
+
+/* Sentence blocks: words taught inside lines from the video (see _engine.js sentences()). */
+.sents{margin:14px 0 18px}
+.sents-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.sents-toggle{padding:6px 12px;border-radius:7px;border:1px solid #2a2f3e;background:#171a24;color:#aeb4c2;cursor:pointer;font-size:13px}
+.sents-toggle:hover{border-color:#4a90d9;color:#9ad4ea}
+.sents-note{font-size:12.5px;color:#5a6070}
+.sent{background:#171a24;border:1px solid #262a38;border-left:3px solid #3b5b8a;border-radius:9px;padding:11px 14px;margin:8px 0}
+.sent .de{margin:0;font-size:17px;line-height:1.5;color:#fff}
+.sent .de b{color:#fcd34d;font-weight:600}
+.sent .say{background:none;border:0;cursor:pointer;font-size:14px;padding:0 8px 0 0;opacity:.6;vertical-align:1px}
+.sent .say:hover{opacity:1}
+.sent .en{margin:4px 0 0;font-size:14px;color:#8b93a7}
+.sents.hide-en .sent .en{filter:blur(5px);cursor:pointer;user-select:none;transition:filter .15s}
+.sents.hide-en .sent .en.peek{filter:none}
+.sent .gl{margin:7px 0 0;display:flex;flex-wrap:wrap;gap:6px}
+.sent .gl span{font-size:12.5px;color:#aeb4c2;background:#0e1017;border:1px solid #262a38;border-radius:5px;padding:2px 8px}
+details.wordlist{margin:6px 0 18px}
+details.wordlist summary{cursor:pointer;color:#8b93a7;font-size:13.5px;padding:4px 0}
+details.wordlist summary:hover{color:#dfe3ea}

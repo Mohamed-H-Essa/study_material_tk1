@@ -44,6 +44,8 @@
 <div id="trainer-roles"></div>
 <h2><span class="step">Practice</span>Now the same thing in German sentences</h2>
 <div id="trainer-german"></div>
+<h2><span class="step">Training</span>Fill the gap — lines from the video</h2>
+<div id="trainer-luecken"></div>
 <h2><span class="step">Anki</span>The words you need for the rest of Stufe 7</h2>
 <div id="anki-mount"></div>
 
@@ -76,7 +78,15 @@ window.PAGE = {
     {"f":"Genitiv (rule)","b":"the case of the OWNER","ex":"Emmas Haus · des Mannes"},
     {"f":"the company (rule)","b":"boss = Nominativ · task = Akkusativ · employee = Dativ · owner = Genitiv","ex":"Easy German 300's picture — keep it for all of Stufe 7"},
     {"f":"wer? (rule)","b":"who? — finds the SUBJECT","ex":"Wer sieht den Hund? → der Mann"},
-    {"f":"wen? (rule)","b":"whom? — finds the direct OBJECT","ex":"Wen sieht der Mann? → den Hund"}
+    {"f":"wen? (rule)","b":"whom? — finds the direct OBJECT","ex":"Wen sieht der Mann? → den Hund"},
+    {"f":"Im Deutschen gibt es vier <b>Fälle</b>.","b":"In German there are four cases.","w":"der Fall → die Fälle","wm":"case (grammar)"},
+    {"f":"Stellt euch einen deutschen Satz so vor wie eine <b>Firma</b>.","b":"Picture a German sentence like a company.","w":"die Firma → die Firmen","wm":"company, firm"},
+    {"f":"Ich bin die <b>Chefin</b>.","b":"I am the boss.","w":"die Chefin → die Chefinnen","wm":"(female) boss (m.: der Chef → die Chefs)"},
+    {"f":"Als Chefin <b>denke</b> ich viel <b>nach</b>.","b":"As the boss, I think things over a lot.","w":"nachdenken","wm":"to think (something) over (separable)"},
+    {"f":"Das ist der motivierte <b>Mitarbeiter</b>.","b":"That is the motivated employee.","w":"der Mitarbeiter → die Mitarbeiter","wm":"employee, colleague"},
+    {"f":"Erik, endlich bekommst du ein neues <b>Projekt</b>.","b":"Erik, you're finally getting a new project.","w":"das Projekt → die Projekte","wm":"project"},
+    {"f":"Deshalb gebe ich dem Mitarbeiter heute nicht noch mehr <b>Aufgaben</b>.","b":"So today I'm not giving the employee any more tasks.","w":"die Aufgabe → die Aufgaben","wm":"task"},
+    {"f":"Der <b>Besitzer</b> ist selten da, aber er ist trotzdem wichtig.","b":"The owner is rarely there, but he is still important.","w":"der Besitzer → die Besitzer","wm":"owner"}
   ],
   trainers:[
     {id:"roles", title:"Subject or object? (English)", kind:"Concept drill", repeat:2, items:[
@@ -95,6 +105,17 @@ window.PAGE = {
       {"type":"mc","q":"In <b lang='de'>Der Hund sieht den Mann</b>, which word changed from its dictionary form?","opts":["den Mann (der → den)","der Hund","sieht"],"answer":"den Mann (der → den)","why":"You learned it as der Mann. As the object it becomes den Mann. That change IS the accusative."},
       {"type":"mc","q":"Which role does the EMPLOYEE 🧑‍💻 stand for?","opts":["the receiver (Dativ)","the doer (Nominativ)","the task (Akkusativ)"],"answer":"the receiver (Dativ)","why":"Boss = Nominativ, task = Akkusativ, employee/receiver = Dativ, owner = Genitiv."},
       {"type":"mc","q":"Why does German change the article at all?","opts":["to show each word's JOB in the sentence","to sound nicer","to mark the plural"],"answer":"to show each word's JOB in the sentence","why":"English uses word order for this. German uses endings — which is why German can move words around."}
+    ]},
+    {id:"luecken", title:"Lines from the video", kind:"Fill the gap", repeat:2, items:[
+      {"type":"mc","q":"<span lang='de'>Im Deutschen gibt es vier ___.</span>","opts":["Fälle","Fall","Fällen"],"answer":"Fälle","why":"der Fall → die Fälle: four cases — Nominativ, Akkusativ, Dativ, Genitiv."},
+      {"type":"mc","q":"<span lang='de'>Stellt euch einen deutschen Satz so vor wie eine ___.</span>","opts":["Firma","Besitzer","Projekt"],"answer":"Firma","why":"eine needs a die-word: die Firma = the company."},
+      {"type":"mc","q":"<span lang='de'>Ich bin die ___.</span>","opts":["Chefin","Mitarbeiter","Besitzer"],"answer":"Chefin","why":"die Chefin = the (female) boss — the Nominativ, the one who acts."},
+      {"type":"mc","q":"<span lang='de'>Das ist der motivierte ___.</span>","opts":["Mitarbeiter","Chefin","Firma"],"answer":"Mitarbeiter","why":"der needs a masculine noun: der Mitarbeiter = the employee."},
+      {"type":"mc","q":"<span lang='de'>Als Chefin denke ich viel ___.</span>","opts":["nach","an","auf"],"answer":"nach","why":"nachdenken — the prefix nach jumps to the end."},
+      {"type":"mc","q":"<span lang='de'>Erik, endlich bekommst du ein neues ___.</span>","opts":["Projekt","Aufgabe","Firma"],"answer":"Projekt","why":"ein neues … needs a das-word: das Projekt."},
+      {"type":"mc","q":"<span lang='de'>Der Mitarbeiter liebt neue ___, aber er hat zu viel Arbeit.</span>","opts":["Projekte","Projekt","Projekten"],"answer":"Projekte","why":"das Projekt → die Projekte (plural)."},
+      {"type":"mc","q":"<span lang='de'>Deshalb gebe ich dem Mitarbeiter heute nicht noch mehr ___.</span>","opts":["Aufgaben","Aufgabe","Chefin"],"answer":"Aufgaben","why":"mehr + plural: die Aufgabe → die Aufgaben."},
+      {"type":"mc","q":"<span lang='de'>Der ___ ist selten da, aber er ist trotzdem wichtig.</span>","opts":["Besitzer","Chefin","Firma"],"answer":"Besitzer","why":"der Besitzer = the owner — the Genitiv in the company picture."}
     ]}
   ],
   checkoff:{ title:"Roles check", pass:0.8, intro:"Six quick ones on the three words. No endings to memorise yet. Pass to mark ✓ on the hub.", items:[

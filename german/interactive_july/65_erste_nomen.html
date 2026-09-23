@@ -35,6 +35,8 @@
 <div class="tip">When a German sentence starts with a noun, do this before deciding anything:<br><br>1. <b>Look at the article.</b> Is it <span lang='de'>der</span> or <span lang='de'>den</span>?<br>2. <span lang='de'><b>den</b></span> → this is <b>not</b> the doer. Keep reading; the doer is further along.<br>3. <span lang='de'><b>der</b></span> → fine, this is the doer.<br><br>Feminine and neuter (<span lang='de'>die</span>, <span lang='de'>das</span>) look identical in both cases, so with those you rely on the <i>other</i> noun in the sentence — which is why the masculine is where all the information is.</div>
 <h2><span class="step">Why bother</span>Why German fronts things at all</h2>
 <div class="tip">Germans move a word to the front for <b>emphasis</b> — the way English uses stress or a cleft sentence:<br><br><span lang='de'>Den Kuchen habe ich gegessen.</span> → <i>The <b>cake</b> — that's what I ate.</i> (not the biscuits)<br><span lang='de'>Diesen Film kenne ich nicht.</span> → <i>That <b>film</b> I don't know.</i><br><br>Nothing is lost by moving it, because the ending is still doing its job. This is a feature, not a quirk — and it is only available to a language that marks its cases.</div>
+<h2><span class="step">Training</span>Fill the gap — lines from the video</h2>
+<div id="trainer-luecken"></div>
 <h2><span class="step">Practice</span>Spot the doer — the article decides</h2>
 <div id="trainer-spot"></div>
 <h2><span class="step">Practice</span>What is being emphasised?</h2>
@@ -66,12 +68,34 @@ window.PAGE = {
     {"f":"den at the start of a sentence (rule)","b":"means this noun is NOT the doer — read on","ex":"Den Hund sieht die Katze. → the cat is the doer"},
     {"f":"der at the start of a sentence (rule)","b":"this noun IS the doer","ex":"Der Hund sieht die Katze."},
     {"f":"why German fronts a word (rule)","b":"emphasis — and nothing is lost, because the ending keeps the role","ex":"Den Kuchen habe ich gegessen. = THE CAKE is what I ate."},
-    {"f":"Den Kuchen habe ich gegessen.","b":"The cake is what I ate.","ex":"fronted for emphasis; ich is still the doer"},
-    {"f":"Diesen Film kenne ich nicht.","b":"That film I don't know.","ex":"diesen = accusative masculine"},
-    {"f":"der Kuchen → die Kuchen","b":"the cake","ex":"Ich esse den Kuchen."},
-    {"f":"der Film → die Filme","b":"the film · the movie","ex":"Ich sehe den Film."}
+    {"f":"<b>Den Kuchen</b> habe ich gegessen.","b":"The cake is what I ate. (fronted for emphasis; ich is still the doer)","w":"der Kuchen → die Kuchen","wm":"cake"},
+    {"f":"<b>Diesen Film</b> kenne ich nicht.","b":"That film I don't know. (diesen = Akkusativ masculine)","w":"der Film → die Filme","wm":"film, movie"},
+    {"f":"verb position in a main clause (rule)","b":"the verb is always element 2 — the subject is element 1 or element 3","ex":"Ich habe morgen frei. = Morgen habe ich frei."},
+    {"f":"Ich <b>fahre</b> morgen <b>nach</b> Berlin.","b":"I'm going to Berlin tomorrow.","w":"fahren nach","wm":"to go / drive to (a city or country)"},
+    {"f":"Morgen habe ich <b>frei</b>.","b":"Tomorrow I have the day off.","w":"frei haben","wm":"to have time off"},
+    {"f":"<b>Jeden Tag</b> jogge ich 10 km.","b":"Every day I jog 10 km.","w":"jeden Tag","wm":"every day (Akkusativ of time)"},
+    {"f":"Jeden Tag <b>jogge</b> ich 10 km.","b":"Every day I jog 10 km.","w":"joggen","wm":"to jog"},
+    {"f":"Auf dem <b>Balkon</b> steht ein Tisch.","b":"There's a table on the balcony.","w":"der Balkon → die Balkone","wm":"balcony"},
+    {"f":"Auf dem Balkon steht ein <b>Tisch</b>.","b":"There's a table on the balcony.","w":"der Tisch → die Tische","wm":"table"},
+    {"f":"In den <b>Sommerferien</b> steht man oft im Stau.","b":"In the summer holidays you often get stuck in traffic.","w":"die Sommerferien (nur Plural)","wm":"summer holidays"},
+    {"f":"In den Sommerferien steht man oft im <b>Stau</b>.","b":"In the summer holidays you often get stuck in traffic.","w":"der Stau → die Staus","wm":"traffic jam (im Stau stehen = to be stuck in traffic)"},
+    {"f":"Morgen <b>fliegt</b> meine Schwester nach Thailand.","b":"Tomorrow my sister is flying to Thailand.","w":"fliegen","wm":"to fly"},
+    {"f":"Morgen fliegt meine <b>Schwester</b> nach Thailand.","b":"Tomorrow my sister is flying to Thailand.","w":"die Schwester → die Schwestern","wm":"sister"}
   ],
   trainers:[
+    {
+      id:"luecken", title:"Lines from the video", kind:"Fill the gap", repeat:2, items:[
+        {"type": "mc", "q": "<span lang='de'>Ich fahre morgen ___ Berlin.</span>", "opts": ["nach", "zu", "bei"], "answer": "nach", "why": "nach + city/country (no article) = to."},
+        {"type": "mc", "q": "<span lang='de'>Morgen ___ frei.</span>", "opts": ["habe ich", "ich habe"], "answer": "habe ich", "why": "Morgen is element 1 → the verb stays 2nd, the subject moves to 3rd."},
+        {"type": "mc", "q": "<span lang='de'>___ Tag jogge ich 10 km.</span>", "opts": ["Jeden", "Jeder", "Jedem"], "answer": "Jeden", "why": "Time without a preposition goes in the Akkusativ: jeden Tag."},
+        {"type": "mc", "q": "<span lang='de'>Jeden Tag ___ 10 km.</span>", "opts": ["jogge ich", "ich jogge", "joggen ich"], "answer": "jogge ich", "why": "Jeden Tag = element 1, jogge = element 2, ich = element 3."},
+        {"type": "mc", "q": "<span lang='de'>Auf dem Balkon ___.</span>", "opts": ["steht ein Tisch", "ein Tisch steht"], "answer": "steht ein Tisch", "why": "Auf dem Balkon is ONE element (three words) → the verb comes 2nd, the subject ein Tisch 3rd."},
+        {"type": "mc", "q": "<span lang='de'>Auf dem Balkon steht ___ Tisch.</span>", "opts": ["ein", "einen", "einem"], "answer": "ein", "why": "ein Tisch is the SUBJECT (it stands) → Nominativ ein, even though it comes after the verb."},
+        {"type": "mc", "q": "<span lang='de'>In den Sommerferien ___ oft im Stau.</span>", "opts": ["steht man", "man steht"], "answer": "steht man", "why": "In den Sommerferien = element 1 → steht = element 2, man = element 3."},
+        {"type": "mc", "q": "<span lang='de'>In den Sommerferien steht man oft im ___.</span>", "opts": ["Stau", "Balkon", "Tisch"], "answer": "Stau", "why": "im Stau stehen = to be stuck in traffic."},
+        {"type": "mc", "q": "<span lang='de'>Morgen fliegt ___ Schwester nach Thailand.</span>", "opts": ["meine", "mein", "meinen"], "answer": "meine", "why": "die Schwester, subject → meine."},
+        {"type": "mc", "q": "<span lang='de'>Man steht in den Sommerferien oft im Stau.</span> — which word is in position 2?", "opts": ["steht", "man", "in den Sommerferien"], "answer": "steht", "why": "The verb is always element 2 in a main clause."}
+      ]},
     {id:"spot", title:"Is the first noun the doer?", kind:"Habit-breaking drill", repeat:2, items:[
       {"type":"mc","q":"<b lang='de'>Den Film sehe ich morgen.</b> — is <b lang='de'>den Film</b> the doer?","opts":["no — den means it is the object","yes"],"answer":"no — den means it is the object","why":"ich is the doer. The film is what gets watched."},
       {"type":"mc","q":"<b lang='de'>Der Film beginnt um acht.</b> — is <b lang='de'>der Film</b> the doer?","opts":["yes — der marks the subject","no"],"answer":"yes — der marks the subject","why":"der Film is the subject of beginnen."},
