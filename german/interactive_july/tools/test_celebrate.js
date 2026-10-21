@@ -52,6 +52,8 @@ function boot(file, { done = false, reduceMotion = false } = {}) {
       w.AudioContext = function () {
         this.currentTime = 0; this.state = 'running'; this.destination = {};
         this.createGain = () => ({ gain: param(), connect(){} });
+        this.createDelay = () => ({ delayTime: param(), connect(){} });
+        this.createBiquadFilter = () => ({ type: '', frequency: param(), connect(){} });
         this.createOscillator = () => {
           const o = { type: '', frequency: param(), connect(){}, stop(){} };
           o.start = () => tones.push(o.frequency.value);

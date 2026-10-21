@@ -241,8 +241,8 @@ Covered by `tools/test_stats.js` (pure computation + jsdom resilience).
 ## Celebration on completion
 
 Passing a check-off for the first time fires a short celebration: confetti, a wave through the
-title's letters, a small tilt of the page, and a soft two-note "ding" (`chime()`, synthesised
-with Web Audio — no audio file). It is deliberately a gimmick — motivation only,
+title's letters, a small tilt of the page, and a short rising chime (`chime()`: a C-major arpeggio landing on
+a chord, synthesised with Web Audio — no audio file). It is deliberately a gimmick — motivation only,
 and it must never get in the way:
 
 - **Once only.** It hangs off `renderDone(justNow)`; `justNow` is false when the page merely

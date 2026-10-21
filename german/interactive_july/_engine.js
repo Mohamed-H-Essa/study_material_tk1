@@ -161,11 +161,20 @@ const Engine = (() => {
     // Leave the spans in place; the animation runs once and the letters look identical after.
   }
 
-  // A short, soft two-note "ding" (think a to-do app's check sound), synthesised with Web
-  // Audio so there is no asset to fetch. Two bell-ish notes a fifth apart (C6 -> G6), each a
-  // sine plus a quiet inharmonic overtone, with a fast attack and an exponential fade.
+  // A warm, rising "you did it" chime, synthesised with Web Audio so there is no asset to
+  // fetch. A quick C-major arpeggio (C6 E6 G6 -> C7) lands on a full chord with a soft low C
+  // underneath for body; each note is a sine with two quiet bell partials, fast attack and an
+  // exponential ring-out, and a short filtered echo gives it a little room. ~1.3 s, no vibrato
+  // or buzz, so it feels rewarding rather than arcade-y.
   // It plays from the click that passed the check-off, so browsers allow it. Sound is not
   // motion, so it still plays under prefers-reduced-motion; any failure is swallowed.
+  const CHIME = [            // [Hz, start s, ring-out s, level]
+    [1046.5, 0.00, 0.55, 0.80],
+    [1318.5, 0.07, 0.60, 0.75],
+    [1568.0, 0.14, 0.75, 0.70],
+    [2093.0, 0.21, 1.10, 0.60],
+    [523.25, 0.21, 0.90, 0.45],
+  ];
   let audioCtx;
   function chime(){
     try {
@@ -175,19 +184,25 @@ const Engine = (() => {
       if (audioCtx.state === 'suspended' && audioCtx.resume) audioCtx.resume();
       const ac = audioCtx, t0 = ac.currentTime + 0.01;
       const out = ac.createGain();
-      out.gain.value = 0.18;                            // subtle, not a fanfare
+      out.gain.value = 0.22;
       out.connect(ac.destination);
-      [[1046.5, 0, 0.45], [1568, 0.085, 0.7]].forEach(([f, at, len]) => {
+      // A single soft echo through a low-pass: room, not reverb soup.
+      const echo = ac.createDelay(), tone = ac.createBiquadFilter(), wet = ac.createGain();
+      echo.delayTime.value = 0.12;
+      tone.type = 'lowpass'; tone.frequency.value = 3000;
+      wet.gain.value = 0.28;
+      out.connect(echo); echo.connect(tone); tone.connect(wet); wet.connect(ac.destination);
+      CHIME.forEach(([f, at, len, lvl]) => {
         const t = t0 + at;
-        [[f, 1], [f * 2.76, 0.12]].forEach(([freq, amp]) => {   // fundamental + bell partial
+        [[1, 1], [2, 0.18], [2.76, 0.08]].forEach(([mul, amp]) => {   // fundamental + bell partials
           const o = ac.createOscillator(), g = ac.createGain();
           o.type = 'sine';
-          o.frequency.value = freq;
+          o.frequency.value = f * mul;
           g.gain.setValueAtTime(0.0001, t);
-          g.gain.exponentialRampToValueAtTime(amp, t + 0.006);
-          g.gain.exponentialRampToValueAtTime(0.0001, t + len);
+          g.gain.exponentialRampToValueAtTime(lvl * amp, t + 0.008);
+          g.gain.exponentialRampToValueAtTime(0.0001, t + len / mul ** 0.3);
           o.connect(g); g.connect(out);
-          o.start(t); o.stop(t + len + 0.02);
+          o.start(t); o.stop(t + len + 0.05);
         });
       });
     } catch (e) { /* no sound is fine */ }
