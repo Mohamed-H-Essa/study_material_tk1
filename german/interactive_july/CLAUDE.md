@@ -241,7 +241,8 @@ Covered by `tools/test_stats.js` (pure computation + jsdom resilience).
 ## Celebration on completion
 
 Passing a check-off for the first time fires a short celebration: confetti, a wave through the
-title's letters, and a small tilt of the page. It is deliberately a gimmick — motivation only,
+title's letters, a small tilt of the page, and a soft two-note "ding" (`chime()`, synthesised
+with Web Audio — no audio file). It is deliberately a gimmick — motivation only,
 and it must never get in the way:
 
 - **Once only.** It hangs off `renderDone(justNow)`; `justNow` is false when the page merely
@@ -250,7 +251,8 @@ and it must never get in the way:
   `pointer-events:none`, and it removes itself once the pieces settle. It is wrapped in a
   try/catch — a broken party must not break a lesson.
 - **Respects `prefers-reduced-motion`.** The engine checks it and returns early; the CSS also
-  opts out. Nothing animates for users who asked for that.
+  opts out. Nothing animates for users who asked for that. The chime is not motion, so it
+  still plays; like the rest it is wrapped in try/catch and silently skipped without Web Audio.
 
 **The tilt goes on `.wrap`, never `<body>`.** A CSS transform on an ancestor makes
 `position:fixed` descendants resolve against *that ancestor* instead of the viewport — tilting

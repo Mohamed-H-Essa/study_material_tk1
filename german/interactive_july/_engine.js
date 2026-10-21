@@ -161,7 +161,40 @@ const Engine = (() => {
     // Leave the spans in place; the animation runs once and the letters look identical after.
   }
 
+  // A short, soft two-note "ding" (think a to-do app's check sound), synthesised with Web
+  // Audio so there is no asset to fetch. Two bell-ish notes a fifth apart (C6 -> G6), each a
+  // sine plus a quiet inharmonic overtone, with a fast attack and an exponential fade.
+  // It plays from the click that passed the check-off, so browsers allow it. Sound is not
+  // motion, so it still plays under prefers-reduced-motion; any failure is swallowed.
+  let audioCtx;
+  function chime(){
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      audioCtx = audioCtx || new AC();
+      if (audioCtx.state === 'suspended' && audioCtx.resume) audioCtx.resume();
+      const ac = audioCtx, t0 = ac.currentTime + 0.01;
+      const out = ac.createGain();
+      out.gain.value = 0.18;                            // subtle, not a fanfare
+      out.connect(ac.destination);
+      [[1046.5, 0, 0.45], [1568, 0.085, 0.7]].forEach(([f, at, len]) => {
+        const t = t0 + at;
+        [[f, 1], [f * 2.76, 0.12]].forEach(([freq, amp]) => {   // fundamental + bell partial
+          const o = ac.createOscillator(), g = ac.createGain();
+          o.type = 'sine';
+          o.frequency.value = freq;
+          g.gain.setValueAtTime(0.0001, t);
+          g.gain.exponentialRampToValueAtTime(amp, t + 0.006);
+          g.gain.exponentialRampToValueAtTime(0.0001, t + len);
+          o.connect(g); g.connect(out);
+          o.start(t); o.stop(t + len + 0.02);
+        });
+      });
+    } catch (e) { /* no sound is fine */ }
+  }
+
   function celebrate(){
+    chime();
     if (reducedMotion()) return;      // respect the OS setting; no motion at all
     try {
       confetti(2600);

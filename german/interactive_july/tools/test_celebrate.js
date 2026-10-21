@@ -23,6 +23,7 @@ function boot(file, { done = false, reduceMotion = false } = {}) {
   // Seed BEFORE the page scripts run — setting it after boot is too late, the engine has
   // already rendered from an empty store.
   if (done) store['de.koerper.done'] = JSON.stringify('1');
+  const tones = [];                                         // oscillators the chime started
   const vc = new VirtualConsole();
   const errors = [];
   vc.on('jsdomError', e => errors.push(e.message));
@@ -46,6 +47,17 @@ function boot(file, { done = false, reduceMotion = false } = {}) {
         matches: reduceMotion && /reduce/.test(q),
         addListener(){}, removeListener(){}, addEventListener(){}, removeEventListener(){},
       });
+      // jsdom has no Web Audio; a minimal fake that records each started oscillator.
+      const param = () => ({ value: 0, setValueAtTime(){}, exponentialRampToValueAtTime(){} });
+      w.AudioContext = function () {
+        this.currentTime = 0; this.state = 'running'; this.destination = {};
+        this.createGain = () => ({ gain: param(), connect(){} });
+        this.createOscillator = () => {
+          const o = { type: '', frequency: param(), connect(){}, stop(){} };
+          o.start = () => tones.push(o.frequency.value);
+          return o;
+        };
+      };
       // jsdom has no canvas backend; stub just enough for the confetti loop to run.
       w.HTMLCanvasElement.prototype.getContext = function () {
         return { setTransform(){}, clearRect(){}, save(){}, restore(){},
@@ -53,7 +65,7 @@ function boot(file, { done = false, reduceMotion = false } = {}) {
       };
     },
   });
-  return { dom, w: dom.window, store, errors };
+  return { dom, w: dom.window, store, errors, tones };
 }
 
 // Answer every check-off question correctly until the block reports done.
@@ -89,7 +101,7 @@ const settle = ms => new Promise(r => setTimeout(r, ms));
 (async () => {
   // ---------- 1. passing a check-off celebrates ----------
   {
-    const { w, store, errors } = boot('16_body_parts.html');
+    const { w, store, errors, tones } = boot('16_body_parts.html');
     await settle(200);
     const passed = passCheckoff(w);
     check(passed, 'celebrate: could not drive the check-off to a pass');
@@ -110,6 +122,7 @@ const settle = ms => new Promise(r => setTimeout(r, ms));
     check(/pointer-events:\s*none/.test(cv.style.cssText),
       'celebrate: the confetti canvas must be click-through');
     check(Number(cv.style.zIndex) >= 999, 'celebrate: confetti should sit above the page');
+    check(tones.length > 0, 'celebrate: the completion chime did not play');
     check(errors.length === 0, 'celebrate: page errors: ' + errors.join('; '));
 
     // the title still reads the same after being split into letters
@@ -121,19 +134,20 @@ const settle = ms => new Promise(r => setTimeout(r, ms));
 
   // ---------- 2. reloading an already-done lesson does NOT celebrate ----------
   {
-    const { w } = boot('16_body_parts.html', { done: true });
+    const { w, tones } = boot('16_body_parts.html', { done: true });
     await settle(250);
     check(!!w.document.querySelector('.co-badge'), 'reload: lesson should render as done');
     check(!w.document.querySelector('canvas.de-confetti'),
       'reload: confetti fired again on an already-done lesson');
     check(!w.document.querySelector('.wrap').classList.contains('de-party'),
       'reload: page tilt fired again on an already-done lesson');
+    check(tones.length === 0, 'reload: the chime played again on an already-done lesson');
     console.log('  reload of a done lesson: no confetti, no tilt (correct)');
   }
 
   // ---------- 3. prefers-reduced-motion suppresses everything ----------
   {
-    const { w } = boot('16_body_parts.html', { reduceMotion: true });
+    const { w, tones } = boot('16_body_parts.html', { reduceMotion: true });
     await settle(200);
     passCheckoff(w);
     await settle(120);
@@ -143,7 +157,8 @@ const settle = ms => new Promise(r => setTimeout(r, ms));
       'reduced-motion: page tilt must not run');
     check(w.document.querySelectorAll('.de-letter').length === 0,
       'reduced-motion: letters must not be animated');
-    console.log('  prefers-reduced-motion: nothing animates (respected)');
+    check(tones.length > 0, 'reduced-motion: the chime is not motion and should still play');
+    console.log('  prefers-reduced-motion: nothing animates (respected), chime still plays');
   }
 
   console.log('');
